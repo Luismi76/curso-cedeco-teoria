@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a365d">
+    <title>Guía de Duplicati en Linux · Teoría curso</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --ac: #2b6cb0;
+            --verde: #276749;
+            --naranja: #c05621;
+            --rojo: #c53030;
+            --morado: #553c9a;
+            --teal: #234e52;
+            --ocre: #975a16;
+            --gb: #e2e8f0;
+            --tx: #2d3748;
+            --bg: #f7fafc;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+
+        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #63b3ed, #4299e1, #3182ce); z-index: 200; transition: width .1s; width: 0; }
+
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
+        .back-home { color: #fff; text-decoration: none; font-size: 18px; padding: 4px 8px; opacity: .85; }
+        .back-home:active { opacity: 1; }
+        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        #btn-idx:active { background: rgba(255,255,255,.15); }
+
+        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
+        .drawer-bg.show { display: block; opacity: 1; }
+        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 75vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
+        .drawer.show { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
+        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
+        .drawer a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--tx); text-decoration: none; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+        .drawer a:active { background: #ebf8ff; }
+        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .container { max-width: 760px; margin: 0 auto; padding: 16px 16px 80px; }
+
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--ac) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 24px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 12px; position: relative; }
+        .hero .meta { font-size: 13.5px; opacity: .9; line-height: 1.65; position: relative; }
+        .hero .meta strong { color: #fff; opacity: 1; }
+
+        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
+        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .topic-header:active { background: #f7fafc; }
+        .topic-num { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); line-height: 1.3; }
+        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
+        .topic.open .topic-arrow { transform: rotate(180deg); }
+        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .topic.open .topic-body { max-height: none; }
+        .topic-content { padding: 0 18px 20px; }
+
+        .c1 { background: var(--ac); }
+        .c2 { background: var(--morado); }
+        .c3 { background: var(--rojo); }
+        .c4 { background: var(--naranja); }
+        .c5 { background: var(--verde); }
+        .c6 { background: var(--teal); }
+        .c7 { background: var(--ocre); }
+        .c8 { background: #718096; }
+
+        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
+        .topic-content h3:first-child { margin-top: 4px; }
+        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
+        .topic-content p { margin: 8px 0; font-size: 15px; }
+        .topic-content strong { color: #1a202c; }
+        .topic-content code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--naranja); font-family: 'SF Mono', Consolas, Monaco, monospace; }
+        .topic-content pre { background: #1a202c; color: #e2e8f0; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 12px 0; font-family: 'SF Mono', Consolas, Monaco, monospace; -webkit-overflow-scrolling: touch; }
+        .topic-content pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+        .topic-content pre .comment { color: #718096; }
+
+        .topic-content ol, .topic-content ul { margin: 8px 0 10px 22px; font-size: 15px; }
+        .topic-content li { margin: 7px 0; }
+        .topic-content li li { margin: 4px 0; font-size: 14px; }
+
+        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+        .info p { margin: 3px 0; }
+        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
+        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
+        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
+        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
+        .info-title { font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .info-blue .info-title { color: var(--ac); }
+        .info-yellow .info-title { color: #975a16; }
+        .info-red .info-title { color: var(--rojo); }
+        .info-green .info-title { color: var(--verde); }
+
+        .step-big { display: flex; gap: 14px; align-items: flex-start; margin: 16px 0; padding: 14px; background: #f7fafc; border-radius: 10px; border-left: 4px solid var(--ac); }
+        .step-big .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--ac); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+        .step-big .step-body { flex: 1; }
+        .step-big .step-body strong { color: var(--azul); display: block; margin-bottom: 4px; font-size: 14.5px; }
+        .step-big .step-body p { margin: 0; font-size: 14px; }
+
+        .two-cols { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+        @media (min-width: 640px) { .two-cols { grid-template-columns: 1fr 1fr; } }
+        .col-card { background: #f7fafc; border: 1px solid var(--gb); border-radius: 10px; padding: 14px 16px; }
+        .col-card h4 { margin-top: 0; color: var(--azul); font-size: 14px; }
+        .col-card ul { margin: 6px 0 0 18px; font-size: 13.5px; }
+        .col-card li { margin: 4px 0; }
+
+        .trouble { border: 1px solid var(--gb); border-radius: 10px; padding: 12px 14px; margin: 10px 0; background: #fff; }
+        .trouble summary { font-weight: 600; font-size: 14.5px; color: var(--azul); cursor: pointer; padding: 2px 0; }
+        .trouble summary::marker { color: var(--ac); }
+        .trouble[open] summary { border-bottom: 1px solid var(--gb); padding-bottom: 8px; margin-bottom: 8px; }
+        .trouble p { font-size: 14px; margin: 6px 0; }
+
+        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--ac); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
+        #bt:active { background: var(--azul); }
+
+        @media (min-width: 768px) {
+            .container { padding: 24px 24px 80px; }
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 28px; }
+            .topic-content { padding: 0 24px 24px; }
+            .topic-header { padding: 18px 24px; }
+        }
+
+        @media print {
+            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
+            .topic-body { max-height: none !important; }
+            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <div class="topnav">
+        <a href="index.html" class="back-home" aria-label="Inicio">&#8592;</a>
+        <h1>Guía de Duplicati</h1>
+        <span class="badge">Linux</span>
+        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
+    </div>
+
+    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-handle"></div>
+        <h2>Índice</h2>
+        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Qué es Duplicati y por qué usarlo</a>
+        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Antes de empezar</a>
+        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. Instalación en Ubuntu</a>
+        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. Primer acceso · signin link</a>
+        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. Fijar contraseña del panel</a>
+        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. Crear tu primer backup</a>
+        <a href="#s7" onclick="toggleDrawer()"><span class="dot c7"></span>7. Ejecutar, incremental y restaurar</a>
+        <a href="#s8" onclick="toggleDrawer()"><span class="dot c8"></span>8. Problemas frecuentes (FAQ)</a>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Guía práctica de Duplicati<br>en Linux (Ubuntu)</h1>
+            <div class="meta">
+                <strong>Versión cubierta:</strong> Duplicati 2.2.0.1 estable (nov. 2025) o superior<br>
+                <strong>Entorno:</strong> VM con Ubuntu 22.04 / 24.04 LTS<br>
+                <strong>Objetivo:</strong> instalar, entender las dos contraseñas, hacer un backup cifrado y restaurarlo sin sustos.
+            </div>
+        </div>
+
+        <div class="info info-green">
+            <div class="info-title">Cómo usar esta guía</div>
+            <p>Sigue las secciones en orden. Cada comando está pensado para copiar y pegar tal cual en la terminal de Ubuntu. Si algo no responde, revisa la sección <a href="#s8" style="color:var(--verde);font-weight:600">problemas frecuentes</a> al final.</p>
+        </div>
+
+        <!-- ==================== 1 ==================== -->
+        <div class="topic open" id="s1">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">1</div>
+                <div class="topic-title">Qué es Duplicati y por qué usarlo</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <p>Duplicati es una herramienta gratuita y de código abierto para hacer <strong>copias de seguridad automáticas, cifradas e incrementales</strong>. Se controla desde una interfaz web que abres en el navegador.</p>
+
+                    <h3>Por qué lo usamos en clase</h3>
+                    <ul>
+                        <li><strong>Interfaz gráfica clara:</strong> no hay que aprender comandos para el día a día.</li>
+                        <li><strong>Cifrado AES-256 integrado:</strong> el backup es ilegible sin tu passphrase, aunque alguien se lleve el disco.</li>
+                        <li><strong>Incremental:</strong> después del primer backup, solo copia lo que cambia.</li>
+                        <li><strong>Multidestino:</strong> carpeta local, NAS, SFTP, Google Drive, OneDrive, S3, Backblaze...</li>
+                        <li><strong>Programación automática:</strong> define un horario y olvídate.</li>
+                    </ul>
+
+                    <h3>Las dos contraseñas de Duplicati (muy importante)</h3>
+                    <p>Este es el primer lío que suele tener el alumno. Duplicati maneja <strong>dos contraseñas distintas</strong> y hay que saber cuál es cuál:</p>
+
+                    <div class="two-cols">
+                        <div class="col-card">
+                            <h4>&#128274; Contraseña del panel (UI)</h4>
+                            <ul>
+                                <li>Protege el acceso a <code>http://localhost:8200</code></li>
+                                <li>Se fija una vez, para todo Duplicati</li>
+                                <li>Si se pierde, se puede reiniciar el servicio y volver a usar el <em>signin link</em></li>
+                            </ul>
+                        </div>
+                        <div class="col-card">
+                            <h4>&#128273; Passphrase del backup</h4>
+                            <ul>
+                                <li>Cifra el <strong>contenido</strong> de cada trabajo de backup (AES-256)</li>
+                                <li>Se define una por cada job que creas</li>
+                                <li><strong>Si se pierde, el backup es irrecuperable</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Regla de oro</div>
+                        <p>La contraseña del panel es solo una cerradura del panel de control. La passphrase del backup es la clave del contenido. No las confundas, ni uses la misma para ambas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2 ==================== -->
+        <div class="topic" id="s2">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c2">2</div>
+                <div class="topic-title">Antes de empezar</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Requisitos</h3>
+                    <ul>
+                        <li>VM con <strong>Ubuntu 22.04 o 24.04</strong> LTS (Server o Desktop).</li>
+                        <li>Conexión a Internet (para descargar el paquete).</li>
+                        <li>Usuario con permisos <code>sudo</code>.</li>
+                        <li>Al menos <strong>2 GB libres</strong> en el disco donde va a vivir Duplicati y el destino de backup.</li>
+                    </ul>
+
+                    <h3>Preparar el destino del backup</h3>
+                    <p>Aunque el backup podría ir a la misma partición, para la práctica vamos a dejarlo en una carpeta separada. Ejecuta esto una vez antes de instalar Duplicati:</p>
+                    <pre><span class="comment"># Crear la carpeta de destino</span>
+sudo mkdir -p /mnt/backup/duplicati
+
+<span class="comment"># Dar permisos al usuario actual (ajusta "alumno" si tu usuario es otro)</span>
+sudo chown -R $USER:$USER /mnt/backup
+
+<span class="comment"># Comprobar</span>
+ls -ld /mnt/backup/duplicati</pre>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Por qué damos los permisos</div>
+                        <p>Si el servicio de Duplicati no puede escribir en la carpeta, el botón "Probar la conexión" del asistente fallará con un mensaje de permiso denegado.</p>
+                    </div>
+
+                    <h3>Datos de prueba</h3>
+                    <p>Crea una carpeta con archivos que luego usaremos para el backup:</p>
+                    <pre>mkdir -p ~/datos_empresa/documentos
+echo "Informe Q1 2026" > ~/datos_empresa/documentos/informe_q1.txt
+echo "Hoja de cálculo trimestral" > ~/datos_empresa/documentos/hoja.txt
+echo "Política interna" > ~/datos_empresa/politica.txt
+ls -R ~/datos_empresa</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 3 ==================== -->
+        <div class="topic" id="s3">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">3</div>
+                <div class="topic-title">Instalación de Duplicati en Ubuntu</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <p>Duplicati se distribuye como paquete <code>.deb</code> <strong>autocontenido</strong>. Las versiones actuales ya no requieren instalar Mono por separado.</p>
+
+                    <h3>Descargar e instalar la versión estable</h3>
+                    <pre><span class="comment"># 1. Actualizar índices y herramientas básicas</span>
+sudo apt update
+sudo apt install -y wget
+
+<span class="comment"># 2. Descargar Duplicati 2.2.0.1 estable (Linux x64 GUI)</span>
+cd /tmp
+wget https://updates.duplicati.com/stable/duplicati-2.2.0.1_stable_2025-11-09-linux-x64-gui.deb
+
+<span class="comment"># 3. Instalar (apt resuelve dependencias solo)</span>
+sudo apt install -y ./duplicati-2.2.0.1_stable_2025-11-09-linux-x64-gui.deb</pre>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Si ha salido una versión más nueva</div>
+                        <p>Ve a <a href="https://duplicati.com/download" target="_blank" style="color:#975a16;font-weight:600">duplicati.com/download</a>, copia el enlace de la versión Linux x64 (.deb) y sustitúyelo en el <code>wget</code>. Cambia también el nombre del fichero en el <code>apt install</code>.</p>
+                    </div>
+
+                    <h3>Arrancar Duplicati como servicio</h3>
+                    <pre><span class="comment"># Activar para que arranque con el sistema e iniciarlo ahora</span>
+sudo systemctl enable --now duplicati
+
+<span class="comment"># Verificar (debe decir: Active: active (running))</span>
+sudo systemctl status duplicati</pre>
+
+                    <p>Pulsa <code>q</code> para salir del <code>status</code>. Si ves <strong>"active (running)"</strong> en verde, Duplicati ya está escuchando en <code>http://localhost:8200</code>.</p>
+
+                    <div class="info info-green">
+                        <div class="info-title">Comprobación rápida</div>
+                        <p>Ejecuta <code>curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8200</code>. Debe responder <code>200</code> o <code>302</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 4 ==================== -->
+        <div class="topic" id="s4">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">4</div>
+                <div class="topic-title">Primer acceso con el "signin link"</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <div class="info info-red">
+                        <div class="info-title">Atención · cambio importante desde la versión 2.1</div>
+                        <p>Las versiones modernas generan una <strong>contraseña aleatoria</strong> al arrancar por primera vez. No te la dicen. Para entrar la primera vez hay que usar un enlace temporal (<strong>signin link</strong>) que aparece en los logs.</p>
+                    </div>
+
+                    <div class="step-big">
+                        <div class="step-num">1</div>
+                        <div class="step-body">
+                            <strong>Abre el navegador en http://localhost:8200</strong>
+                            <p>Verás una pantalla de login. No intentes adivinar la contraseña: no la sabes.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-big">
+                        <div class="step-num">2</div>
+                        <div class="step-body">
+                            <strong>Busca el signin link en el log del servicio</strong>
+                            <p>Vuelve a la terminal y ejecuta:</p>
+                        </div>
+                    </div>
+                    <pre><span class="comment"># Filtrar las líneas que contienen el enlace</span>
+sudo journalctl -u duplicati | grep -i "signin\|sign-in\|token" | tail -5
+
+<span class="comment"># Si no aparece nada, muestra el log entero desde el último arranque</span>
+sudo journalctl -u duplicati -b --no-pager | tail -40</pre>
+
+                    <div class="step-big">
+                        <div class="step-num">3</div>
+                        <div class="step-body">
+                            <strong>Localiza la URL completa</strong>
+                            <p>Busca una línea parecida a esta (el token real es muchísimo más largo):</p>
+                        </div>
+                    </div>
+                    <pre>Sep 12 10:23:07 ubuntu duplicati[1234]:
+  To access the server, open this link in your browser:
+  http://localhost:8200/signin.html?token=eyJhbGciOi...xxxxxxxxxxxxx</pre>
+
+                    <div class="step-big">
+                        <div class="step-num">4</div>
+                        <div class="step-body">
+                            <strong>Copia y pega la URL entera en el navegador</strong>
+                            <p>Incluyendo el token. Al pulsar Intro, Duplicati te dejará entrar al panel sin pedirte contraseña.</p>
+                        </div>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Si el link ha caducado</div>
+                        <p>El token tiene vida corta (unos minutos). Si tarda en llegar al navegador o lo pegaste mal, reinicia el servicio y consulta el log otra vez:</p>
+                        <pre style="margin-top:8px">sudo systemctl restart duplicati
+sleep 2
+sudo journalctl -u duplicati | grep -i "signin\|token" | tail -3</pre>
+                    </div>
+
+                    <h3>Truco · cambiar el idioma al español</h3>
+                    <p>Una vez dentro, arriba a la derecha hay un desplegable de idioma. Selecciona <strong>Español</strong> si lo prefieres. Los textos de esta guía usan tanto los nombres en inglés como en español para que identifiques los botones sin importar el idioma activo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5 ==================== -->
+        <div class="topic" id="s5">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c4">5</div>
+                <div class="topic-title">Fijar la contraseña del panel web</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <p>Para no depender del signin link cada vez que cierres el navegador, establece una contraseña <strong>fija</strong> para el panel de administración:</p>
+
+                    <ol>
+                        <li>En el panel, arriba a la derecha, pulsa el icono de engranaje o <strong>"Settings"</strong> (Configuración).</li>
+                        <li>Busca la sección <strong>"Access to the user interface"</strong> (Acceso a la interfaz de usuario).</li>
+                        <li>Marca la casilla <strong>"Password protected"</strong> (Proteger con contraseña).</li>
+                        <li>Escribe una contraseña robusta (12+ caracteres, con mayúsculas, minúsculas, números y símbolos). Confírmala.</li>
+                        <li>Pulsa <strong>"OK"</strong> abajo del formulario.</li>
+                    </ol>
+
+                    <p>A partir de ahora, cada vez que abras <code>http://localhost:8200</code> te pedirá esa contraseña antes de entrar.</p>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Esta contraseña NO cifra nada</div>
+                        <p>Solo es la llave del panel de administración. El contenido de los backups se cifra con la <strong>passphrase</strong> de cada job (sección siguiente).</p>
+                    </div>
+
+                    <h3>Si olvidas la contraseña del panel</h3>
+                    <p>Reinicia el servicio y vuelve a usar el signin link del log:</p>
+                    <pre>sudo systemctl restart duplicati
+sudo journalctl -u duplicati | grep -i "signin\|token" | tail -3</pre>
+                    <p>Dentro del panel, en Settings, puedes desmarcar "Password protected" o fijar una contraseña nueva.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 6 ==================== -->
+        <div class="topic" id="s6">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">6</div>
+                <div class="topic-title">Crear tu primer trabajo de backup</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <p>En el panel, pulsa <strong>"Add backup"</strong> (Añadir copia de seguridad) → <strong>"Configure a new backup"</strong> (Configurar una nueva copia) → <strong>"Next"</strong>. El asistente se divide en 5 pasos.</p>
+
+                    <h3>Paso 1 · General y cifrado</h3>
+                    <p>Aquí es donde se configura la <strong>passphrase del backup</strong>, la llave del cifrado.</p>
+
+                    <ol>
+                        <li><strong>Name</strong> (Nombre): escribe algo descriptivo, p. ej. <code>Backup Documentos Empresa</code>.</li>
+                        <li><strong>Description</strong> (Descripción): opcional, para qué sirve este backup.</li>
+                        <li><strong>Encryption</strong> (Cifrado): deja el valor por defecto <code>AES-256 encryption, built in</code>.</li>
+                        <li><strong>Passphrase</strong> (Frase de contraseña): escribe una contraseña robusta (12+ caracteres con mayúsculas, minúsculas, números y símbolos).
+                            <ul>
+                                <li>Alternativa: pulsa el botón <strong>"Generate"</strong> (Generar) para que Duplicati cree una contraseña aleatoria muy segura.</li>
+                                <li>El icono del ojo te permite ver lo que estás escribiendo.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Repeat Passphrase</strong> (Repetir): vuelve a escribirla para confirmar. Si no coinciden, Duplicati no te deja avanzar.</li>
+                        <li><strong>Apunta la passphrase en un lugar seguro</strong> (gestor de contraseñas, papel en caja fuerte). Sin ella el backup es papel mojado.</li>
+                        <li>Pulsa <strong>"Next"</strong> (Siguiente).</li>
+                    </ol>
+
+                    <div class="info info-red">
+                        <div class="info-title">La passphrase del backup NO se puede recuperar</div>
+                        <p>Duplicati no guarda copia de ella en ningún servidor. Si la pierdes, los datos cifrados quedan <strong>inaccesibles para siempre</strong>. Anótala ANTES de continuar.</p>
+                    </div>
+
+                    <h3>Paso 2 · Destino (Destination)</h3>
+                    <ol>
+                        <li><strong>Storage Type</strong> (Tipo de almacenamiento): selecciona <strong>"Local folder or drive"</strong> (Carpeta local o unidad).</li>
+                        <li><strong>Folder path</strong> (Ruta de carpeta): escribe <code>/mnt/backup/duplicati</code>.</li>
+                        <li>Pulsa <strong>"Test connection"</strong> (Probar la conexión). Debe responder con un mensaje verde.</li>
+                        <li>Si da error de permisos, sal del asistente, ejecuta <code>sudo chown -R $USER:$USER /mnt/backup</code> y vuelve.</li>
+                        <li>Pulsa <strong>"Next"</strong>.</li>
+                    </ol>
+
+                    <h3>Paso 3 · Datos de origen (Source Data)</h3>
+                    <ol>
+                        <li>En el árbol de carpetas de la izquierda, navega hasta tu home.</li>
+                        <li>Marca la casilla de <code>datos_empresa</code> (la carpeta que preparaste en la sección 2).</li>
+                        <li>Observa que aparece listada como seleccionada a la derecha.</li>
+                        <li>Pulsa <strong>"Next"</strong>.</li>
+                    </ol>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Filtros (opcional)</div>
+                        <p>Debajo del árbol puedes excluir tipos de fichero (por ejemplo, archivos temporales o cachés). Para la práctica déjalo vacío.</p>
+                    </div>
+
+                    <h3>Paso 4 · Programación (Schedule)</h3>
+                    <ol>
+                        <li>Marca <strong>"Automatically run backups"</strong> (Ejecutar automáticamente).</li>
+                        <li><strong>Next time</strong>: deja la sugerida (hoy a las 13:00 o similar).</li>
+                        <li><strong>Run again every</strong>: configura <code>1 Days</code> (cada día).</li>
+                        <li><strong>Allowed days</strong>: marca todos los días de la semana para la práctica.</li>
+                        <li>Pulsa <strong>"Next"</strong>.</li>
+                    </ol>
+
+                    <h3>Paso 5 · Opciones (Options)</h3>
+                    <ol>
+                        <li><strong>Upload volume size</strong> (Tamaño de volumen): deja los <strong>50 MB</strong> por defecto.</li>
+                        <li><strong>Backup retention</strong> (Retención): deja <strong>"Keep all backups"</strong> (Mantener todas las copias) para la práctica.</li>
+                        <li>Pulsa <strong>"Save"</strong> (Guardar). Verás tu trabajo en la pantalla principal.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 7 ==================== -->
+        <div class="topic" id="s7">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c6">7</div>
+                <div class="topic-title">Ejecutar, observar el incremental y restaurar</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Primera ejecución (backup completo)</h3>
+                    <ol>
+                        <li>En la pantalla principal, junto a tu trabajo, pulsa <strong>"Run now"</strong> (Ejecutar ahora).</li>
+                        <li>Espera a que aparezca "Last successful backup" (Última copia exitosa) con la hora actual.</li>
+                        <li>Abre otra terminal y comprueba que hay ficheros cifrados en el destino:</li>
+                    </ol>
+                    <pre>ls -lh /mnt/backup/duplicati/
+<span class="comment"># Verás archivos .dblock .dindex .dlist, todos cifrados</span></pre>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Por qué no se ven los archivos originales</div>
+                        <p>Duplicati fragmenta y cifra el contenido antes de escribirlo. Aunque alguien se lleve la carpeta <code>/mnt/backup/duplicati</code>, sin la passphrase no podrá leer nada.</p>
+                    </div>
+
+                    <h3>Probar el backup incremental</h3>
+                    <ol>
+                        <li>Modifica uno de los ficheros y añade uno nuevo:</li>
+                    </ol>
+                    <pre>echo "Actualización del informe" >> ~/datos_empresa/documentos/informe_q1.txt
+echo "Nota añadida hoy" > ~/datos_empresa/documentos/nota_hoy.txt</pre>
+                    <ol start="2">
+                        <li>Vuelve al panel y pulsa <strong>"Run now"</strong> otra vez.</li>
+                        <li>Observa que esta vez <strong>tarda muchísimo menos</strong>: solo copia lo que ha cambiado desde la ejecución anterior.</li>
+                    </ol>
+
+                    <h3>Restaurar un archivo</h3>
+                    <ol>
+                        <li>En el panel, en tu trabajo de backup, pulsa la flecha que despliega más opciones y selecciona <strong>"Restore"</strong> (Restaurar).</li>
+                        <li>Elige el punto en el tiempo que quieras restaurar (la última copia, por defecto).</li>
+                        <li>Navega por el árbol de archivos y marca el o los archivos a restaurar.</li>
+                        <li>Elige la ubicación de restauración:
+                            <ul>
+                                <li><strong>"Original location"</strong> (Ubicación original): sobrescribe los actuales.</li>
+                                <li><strong>"Pick location"</strong> (Elegir ubicación): restaura a otra carpeta, por ejemplo <code>/tmp/restaurado/</code>. <strong>Recomendado para la práctica.</strong></li>
+                            </ul>
+                        </li>
+                        <li>Pulsa <strong>"Restore"</strong> y espera a que termine.</li>
+                        <li>Verifica desde terminal:</li>
+                    </ol>
+                    <pre>ls -R /tmp/restaurado/
+cat /tmp/restaurado/datos_empresa/documentos/informe_q1.txt</pre>
+
+                    <div class="info info-green">
+                        <div class="info-title">Restaurar una versión anterior</div>
+                        <p>Duplicati guarda múltiples versiones. Para recuperar una versión pasada de un fichero (antes de una edición accidental), en "Restore" elige un punto anterior en el desplegable de fecha/hora.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 8 ==================== -->
+        <div class="topic" id="s8">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c7">8</div>
+                <div class="topic-title">Problemas frecuentes (FAQ)</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <details class="trouble">
+                        <summary>No puedo acceder a http://localhost:8200</summary>
+                        <p>Comprueba que el servicio está activo:</p>
+                        <pre>sudo systemctl status duplicati</pre>
+                        <p>Si no está en <code>active (running)</code>, arráncalo:</p>
+                        <pre>sudo systemctl start duplicati</pre>
+                        <p>Comprueba que el puerto está escuchando:</p>
+                        <pre>sudo ss -tlnp | grep 8200</pre>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>No encuentro el signin link en el log</summary>
+                        <p>Reinicia el servicio para forzar que vuelva a imprimirlo:</p>
+                        <pre>sudo systemctl restart duplicati
+sleep 3
+sudo journalctl -u duplicati -b --no-pager | grep -i "signin\|sign-in\|token"</pre>
+                        <p>Si aún no aparece, mira los últimos mensajes del log completo buscando "http":</p>
+                        <pre>sudo journalctl -u duplicati -b --no-pager | grep -i "http"</pre>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>El signin link dice "Token expired" o "Invalid token"</summary>
+                        <p>El token caduca en pocos minutos. Reinicia el servicio y usa el nuevo enlace inmediatamente:</p>
+                        <pre>sudo systemctl restart duplicati</pre>
+                        <p>Copia y pega la URL completa (incluyendo el token, que es muy largo). No pongas saltos de línea.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>"Test connection" falla con permisos denegados</summary>
+                        <p>El servicio de Duplicati se ejecuta con tu usuario o como <code>root</code> según cómo se haya instalado. Asegúrate de que tiene permiso de escritura en el destino:</p>
+                        <pre>sudo chown -R $USER:$USER /mnt/backup
+sudo chmod -R u+rwX /mnt/backup</pre>
+                        <p>Si está montado en una partición NTFS, también puede dar problemas. Prueba con una carpeta dentro de tu home, por ejemplo <code>~/Backup</code>.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>He olvidado la passphrase del backup</summary>
+                        <p>Malas noticias: el contenido cifrado <strong>no se puede recuperar</strong>. Duplicati no almacena la passphrase en ningún sitio. Si era un backup de prueba, borra la carpeta de destino y crea uno nuevo:</p>
+                        <pre>rm -rf /mnt/backup/duplicati
+mkdir -p /mnt/backup/duplicati</pre>
+                        <p>Desde el panel, borra el trabajo anterior y crea uno nuevo con una passphrase que apuntes bien esta vez.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>He olvidado la contraseña del panel (UI)</summary>
+                        <p>Reinicia el servicio y vuelve a entrar con el signin link del log:</p>
+                        <pre>sudo systemctl restart duplicati
+sudo journalctl -u duplicati -b --no-pager | grep -i "signin\|token"</pre>
+                        <p>Dentro del panel, en Settings, puedes desactivar "Password protected" o fijar una contraseña nueva.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>El backup aparece como "Warning" en amarillo</summary>
+                        <p>Pulsa en el trabajo para ver los detalles. Causas frecuentes:</p>
+                        <ul>
+                            <li>Archivos bloqueados por otro proceso (cierra programas que usen los archivos del origen).</li>
+                            <li>Archivos con nombres raros (emojis, espacios dobles) que Duplicati no puede leer.</li>
+                            <li>Poco espacio libre en el destino.</li>
+                        </ul>
+                        <p>Un warning no significa fallo total: la parte que sí se pudo copiar está guardada.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>Quiero cambiar la passphrase de un backup existente</summary>
+                        <p>En el trabajo de backup, abre <strong>"Edit"</strong>, ve al paso 1 "General and encryption" y cambia la passphrase. Ojo: los backups ya existentes siguen necesitando la passphrase antigua para restaurarse. Los nuevos volúmenes usarán la nueva.</p>
+                        <p>Por eso lo recomendable es <strong>no cambiar</strong> la passphrase a mitad de vida del backup, y si se cambia, guardar las dos.</p>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>Duplicati va muy lento</summary>
+                        <p>Comprueba:</p>
+                        <ul>
+                            <li>El tamaño de volumen (paso 5 del asistente): si es muy pequeño (&lt;20 MB), sube muchos ficheros pequeños. Usa 50-100 MB.</li>
+                            <li>Si el destino es red (SMB, SFTP), la velocidad depende del enlace, no de Duplicati.</li>
+                            <li>En la primera ejecución es normal que tarde: comprime, cifra y fragmenta todo.</li>
+                        </ul>
+                    </details>
+
+                    <details class="trouble">
+                        <summary>Cómo verificar que el backup funciona sin restaurar todo</summary>
+                        <p>En el trabajo, opciones (icono de 3 puntos) &rarr; <strong>"Verify files"</strong>. Duplicati descifra y comprueba la integridad de una muestra sin restaurar a disco. Si todo sale verde, el backup es recuperable.</p>
+                    </details>
+
+                    <h3>Comandos de referencia rápida</h3>
+                    <pre><span class="comment"># Estado del servicio</span>
+sudo systemctl status duplicati
+
+<span class="comment"># Reiniciar (imprime nuevo signin link)</span>
+sudo systemctl restart duplicati
+
+<span class="comment"># Ver el log completo en vivo</span>
+sudo journalctl -u duplicati -f
+
+<span class="comment"># Ver el signin link del arranque actual</span>
+sudo journalctl -u duplicati -b --no-pager | grep -i "signin\|token"
+
+<span class="comment"># Detener Duplicati</span>
+sudo systemctl stop duplicati
+
+<span class="comment"># Desinstalar (borra el programa, NO los backups)</span>
+sudo apt remove duplicati</pre>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="info info-green" style="margin-top:30px">
+            <div class="info-title">Enlaces útiles</div>
+            <ul style="margin:6px 0 0 18px;font-size:14px">
+                <li>Web oficial: <a href="https://duplicati.com" target="_blank" style="color:var(--verde);font-weight:600">duplicati.com</a></li>
+                <li>Descargas: <a href="https://duplicati.com/download" target="_blank" style="color:var(--verde);font-weight:600">duplicati.com/download</a></li>
+                <li>Documentación: <a href="https://docs.duplicati.com" target="_blank" style="color:var(--verde);font-weight:600">docs.duplicati.com</a></li>
+                <li>Foro de soporte: <a href="https://forum.duplicati.com" target="_blank" style="color:var(--verde);font-weight:600">forum.duplicati.com</a></li>
+            </ul>
+        </div>
+
+    </div><!-- /container -->
+
+    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+    <script>
+    function toggle(header) {
+        header.closest('.topic').classList.toggle('open');
+    }
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('show');
+        document.getElementById('drawer-bg').classList.toggle('show');
+    }
+    window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    </script>
+</body>
+</html>
