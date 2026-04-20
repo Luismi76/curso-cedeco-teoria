@@ -1146,16 +1146,64 @@ sudo systemctl start duplicati</pre>
                     </div>
 
                     <h3>5.3 Crear un trabajo de backup</h3>
+                    <p>El asistente de Duplicati se divide en <strong>5 pasos</strong>. Avanza con el boton <em>"Siguiente"</em> al final de cada pantalla.</p>
+
+                    <h4>Paso 1 — General y cifrado (aqui se configura la contrasena)</h4>
                     <div class="pasos">
                         <ol>
-                            <li>Haz clic en <strong>"Anadir copia de seguridad"</strong> (o "Add backup").</li>
-                            <li>Selecciona <strong>"Configurar una nueva copia de seguridad"</strong>.</li>
-                            <li><strong>General:</strong> Ponle un nombre descriptivo (ej: "Backup Documentos Empresa"). Activa el cifrado y escribe una contrasena segura.</li>
-                            <li><strong>Destino:</strong> Selecciona "Carpeta local" y escribe la ruta <code>/mnt/backup/duplicati</code>.</li>
-                            <li><strong>Datos de origen:</strong> Selecciona la carpeta <code>/home/alumno/datos_empresa</code> (o la carpeta de tu usuario).</li>
-                            <li><strong>Programacion:</strong> Configura para que se ejecute cada dia a las 23:00.</li>
-                            <li><strong>Opciones:</strong> Deja las opciones por defecto (tamano de volumen 50 MB).</li>
-                            <li>Haz clic en <strong>"Guardar"</strong>.</li>
+                            <li>En la pantalla principal de Duplicati, haz clic en <strong>"Anadir copia de seguridad"</strong> (o "Add backup").</li>
+                            <li>Selecciona <strong>"Configurar una nueva copia de seguridad"</strong> y pulsa <strong>"Siguiente"</strong>.</li>
+                            <li><strong>Nombre:</strong> escribe un nombre descriptivo, por ejemplo <code>Backup Documentos Empresa</code>.</li>
+                            <li><strong>Descripcion</strong> (opcional): anota para que sirve este backup.</li>
+                            <li><strong>Cifrado:</strong> en el desplegable deja la opcion por defecto <code>AES-256 encryption, built in</code>. Esto activa el cifrado del contenido del backup.</li>
+                            <li><strong>Frase de contrasena (Passphrase):</strong> escribe una contrasena robusta (minimo 12 caracteres, con mayusculas, minusculas, numeros y simbolos).
+                                <ul>
+                                    <li>Tambien puedes pulsar el boton <strong>"Generar"</strong> junto al campo y Duplicati creara una contrasena segura aleatoria.</li>
+                                    <li>Usa el icono del ojo para ver lo que escribes y evitar erratas.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Repetir frase de contrasena:</strong> vuelve a escribirla (o pegala si la generaste) para confirmar. Si las dos no coinciden, Duplicati no te dejara pasar al siguiente paso.</li>
+                            <li><strong>Guarda la contrasena fuera del equipo</strong> (gestor de contrasenas, papel en lugar seguro, etc.).</li>
+                            <li>Pulsa <strong>"Siguiente"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Atencion — la contrasena NO se puede recuperar.</strong> Duplicati cifra el backup localmente con tu contrasena y no guarda copia en ningun servidor. Si la pierdes, los datos del backup quedan <strong>inaccesibles para siempre</strong>. Apuntala antes de continuar.
+                    </div>
+
+                    <h4>Paso 2 — Destino</h4>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Tipo de destino:</strong> selecciona <strong>"Carpeta local o unidad"</strong>.</li>
+                            <li><strong>Ruta de la carpeta:</strong> escribe <code>/mnt/backup/duplicati</code>.</li>
+                            <li>Pulsa el boton <strong>"Probar la conexion"</strong> (Test connection). Debe responder con un mensaje de exito. Si da error, revisa los permisos de la carpeta destino.</li>
+                            <li>Pulsa <strong>"Siguiente"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Paso 3 — Datos de origen</h4>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el arbol de carpetas, marca la casilla de <code>/home/alumno/datos_empresa</code> (o la carpeta de tu usuario).</li>
+                            <li>Pulsa <strong>"Siguiente"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Paso 4 — Programacion</h4>
+                    <div class="pasos">
+                        <ol>
+                            <li>Marca <strong>"Ejecutar copias de seguridad automaticamente"</strong>.</li>
+                            <li>Configura para que se ejecute <strong>cada dia a las 23:00</strong>.</li>
+                            <li>Pulsa <strong>"Siguiente"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Paso 5 — Opciones</h4>
+                    <div class="pasos">
+                        <ol>
+                            <li>Deja las opciones por defecto (tamano de volumen remoto <strong>50 MB</strong>, retencion "Mantener todas las copias de seguridad").</li>
+                            <li>Pulsa <strong>"Guardar"</strong> para finalizar el asistente.</li>
                         </ol>
                     </div>
 
