@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Gestión de discos, redes y asistencia remota</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --ac: #2b6cb0;
+            --verde: #276749;
+            --naranja: #c05621;
+            --rojo: #c53030;
+            --morado: #553c9a;
+            --teal: #234e52;
+            --rosa: #b83280;
+            --ocre: #975a16;
+            --indigo: #434190;
+            --gb: #e2e8f0;
+            --tx: #2d3748;
+            --bg: #f7fafc;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+
+        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #63b3ed, #4299e1, #3182ce); z-index: 200; transition: width .1s; width: 0; }
+
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
+        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        #btn-idx:active { background: rgba(255,255,255,.15); }
+        .back-home { color: #fff; text-decoration: none; font-size: 18px; padding: 4px 8px; opacity: .85; }
+        .back-home:active { opacity: 1; }
+
+        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
+        .drawer-bg.show { display: block; opacity: 1; }
+        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 75vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
+        .drawer.show { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
+        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
+        .drawer a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--tx); text-decoration: none; font-size: 15px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+        .drawer a:active { background: #ebf8ff; }
+        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 16px 16px 80px; }
+
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--ac) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 24px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero::before { content: ''; position: absolute; bottom: -40px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,.04); border-radius: 50%; }
+        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 14px; position: relative; }
+        .hero .meta { font-size: 13px; opacity: .85; line-height: 1.6; position: relative; }
+        .hero .meta strong { color: #fff; opacity: 1; }
+
+        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
+        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .topic-header:active { background: #f7fafc; }
+        .topic-num { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); line-height: 1.3; }
+        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
+        .topic.open .topic-arrow { transform: rotate(180deg); }
+        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .topic.open .topic-body { max-height: none; }
+        .topic-content { padding: 0 18px 20px; }
+
+        .c1 { background: var(--rojo); }
+        .c2 { background: var(--naranja); }
+        .c3 { background: var(--ac); }
+        .c4 { background: var(--morado); }
+        .c5 { background: var(--verde); }
+        .c6 { background: var(--teal); }
+        .c7 { background: var(--indigo); }
+        .c8 { background: var(--rosa); }
+        .c9 { background: var(--ocre); }
+        .c10 { background: #718096; }
+
+        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
+        .topic-content h3:first-child { margin-top: 4px; }
+        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
+        .topic-content p { margin: 6px 0; font-size: 15px; }
+        .topic-content strong { color: #1a202c; }
+        .topic-content code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--naranja); font-family: 'SF Mono', Consolas, Monaco, monospace; }
+        .topic-content pre { background: #1a202c; color: #e2e8f0; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 10px 0; font-family: 'SF Mono', Consolas, Monaco, monospace; -webkit-overflow-scrolling: touch; }
+        .topic-content pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+        .table-wrap { overflow-x: auto; margin: 12px -18px; padding: 0 18px; -webkit-overflow-scrolling: touch; }
+        .topic-content table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 400px; }
+        .topic-content th { background: #edf2f7; color: var(--azul); padding: 10px; text-align: left; font-size: 12px; font-weight: 700; border: 1px solid var(--gb); white-space: nowrap; }
+        .topic-content td { padding: 8px 10px; border: 1px solid var(--gb); vertical-align: top; }
+        .topic-content tr:nth-child(even) { background: #f7fafc; }
+
+        .topic-content ul, .topic-content ol { margin: 8px 0 8px 20px; font-size: 15px; }
+        .topic-content li { margin: 6px 0; }
+        .topic-content li li { margin: 3px 0; font-size: 14px; }
+        .topic-content ul ul { margin: 4px 0 4px 16px; }
+
+        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+        .info p { margin: 3px 0; }
+        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
+        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
+        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
+        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
+        .info-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .info-blue .info-title { color: var(--ac); }
+        .info-yellow .info-title { color: #975a16; }
+        .info-red .info-title { color: var(--rojo); }
+        .info-green .info-title { color: var(--verde); }
+
+        .diagram { margin: 16px 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+
+        .practice-link { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); border: 1px solid #90cdf4; border-radius: 10px; padding: 12px 14px; margin: 16px 0 4px; text-decoration: none; color: var(--azul); font-size: 14px; font-weight: 600; transition: all .2s; }
+        .practice-link:hover { background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%); transform: translateY(-1px); }
+        .practice-link .icon { font-size: 20px; }
+        .practice-link .arrow { margin-left: auto; color: var(--ac); }
+
+        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--ac); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
+        #bt:active { background: var(--azul); }
+
+        @media (min-width: 768px) {
+            .container { padding: 24px 24px 80px; }
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 28px; }
+            .topic-content { padding: 0 24px 24px; }
+            .topic-header { padding: 18px 24px; }
+            .table-wrap { margin: 12px 0; padding: 0; }
+        }
+
+        @media print {
+            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
+            .topic-body { max-height: none !important; }
+            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <div class="topnav">
+        <a href="index.html" class="back-home" aria-label="Inicio">&#8592;</a>
+        <h1>Gestión de discos y redes</h1>
+        <span class="badge">10 sesiones</span>
+        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
+    </div>
+
+    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-handle"></div>
+        <h2>Sesiones</h2>
+        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Particionado: fundamentos</a>
+        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Particionado y formateo en Linux</a>
+        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. Volúmenes avanzados (RAID, LVM)</a>
+        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. Clonación de discos</a>
+        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. Copias de seguridad: fundamentos</a>
+        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. Copias de seguridad: automatización</a>
+        <a href="#s7" onclick="toggleDrawer()"><span class="dot c7"></span>7. Redes: fundamentos TCP/IP</a>
+        <a href="#s8" onclick="toggleDrawer()"><span class="dot c8"></span>8. Diagnóstico y seguridad de red</a>
+        <a href="#s9" onclick="toggleDrawer()"><span class="dot c9"></span>9. Asistencia remota</a>
+        <a href="#s10" onclick="toggleDrawer()"><span class="dot c10"></span>10. Compartición de recursos</a>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Gestión de discos, redes<br>y asistencia remota</h1>
+            <div class="meta">
+                <strong>Certificado:</strong> IFCT0309 - Montaje y Reparación<br>
+                <strong>Módulo complementario:</strong> 50 h - 10 sesiones<br>
+                <strong>Contenido:</strong> particionado, RAID, clonación, backups, redes y soporte remoto
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 1 ==================== -->
+        <div class="topic open" id="s1">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">1</div>
+                <div class="topic-title">Particionado de discos: fundamentos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>¿Qué es una partición?</h3>
+                    <p>Una partición es una <strong>división lógica</strong> de un disco duro o SSD. Es como dividir un armario grande en varios compartimentos: cada uno es independiente y puede tener su propia organización.</p>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="max-width:400px">
+                            <rect x="0" y="0" width="400" height="110" rx="10" fill="#f7fafc" stroke="#cbd5e0" stroke-width="1"/>
+                            <text x="200" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#2d3748">DISCO FÍSICO (500 GB)</text>
+                            <rect x="20" y="32" width="110" height="50" rx="4" fill="#4299e1" stroke="#2b6cb0"/>
+                            <text x="75" y="53" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Windows</text>
+                            <text x="75" y="68" text-anchor="middle" font-size="9" fill="#bee3f8">150 GB · NTFS</text>
+                            <rect x="135" y="32" width="85" height="50" rx="4" fill="#48bb78" stroke="#276749"/>
+                            <text x="177" y="53" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Linux</text>
+                            <text x="177" y="68" text-anchor="middle" font-size="9" fill="#c6f6d5">100 GB · ext4</text>
+                            <rect x="225" y="32" width="155" height="50" rx="4" fill="#ed8936" stroke="#c05621"/>
+                            <text x="302" y="53" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Datos</text>
+                            <text x="302" y="68" text-anchor="middle" font-size="9" fill="#feebc8">250 GB · NTFS</text>
+                            <text x="200" y="100" text-anchor="middle" font-size="9" fill="#718096">Tres particiones independientes en un mismo disco físico</text>
+                        </svg>
+                    </div>
+
+                    <h3>MBR vs GPT: dos formas de organizar particiones</h3>
+                    <p>Cuando un disco se inicializa hay que elegir un esquema de particionado. Hoy en día, <strong>siempre que la placa tenga UEFI</strong>, se usa GPT.</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Característica</th><th>MBR</th><th>GPT</th></tr>
+                        <tr><td>Año</td><td>1983</td><td>2006</td></tr>
+                        <tr><td>Máx. particiones</td><td>4 primarias (o 3 + 1 extendida)</td><td><strong>128</strong> (todas iguales)</td></tr>
+                        <tr><td>Tamaño máx. disco</td><td>2 TB</td><td><strong>9,4 ZB</strong> (prácticamente ilimitado)</td></tr>
+                        <tr><td>Firmware</td><td>BIOS / UEFI legacy</td><td>Solo UEFI</td></tr>
+                        <tr><td>Redundancia</td><td>Un único registro: si se daña, no arranca</td><td>Copia de seguridad al final del disco</td></tr>
+                        <tr><td>Secure Boot</td><td>No</td><td>Sí</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Regla práctica</div>
+                        <p>Si el equipo es de <strong>2012 o posterior</strong>, usa GPT. Solo para equipos con BIOS antigua o SOs muy viejos se usa MBR.</p>
+                    </div>
+
+                    <h3>Tipos de particiones (MBR)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Descripción</th><th>Máximo</th></tr>
+                        <tr><td><strong>Primaria</strong></td><td>Partición independiente, puede arrancar un SO</td><td>4 por disco</td></tr>
+                        <tr><td><strong>Extendida</strong></td><td>«Contenedor» que alberga particiones lógicas</td><td>1 por disco</td></tr>
+                        <tr><td><strong>Lógica</strong></td><td>Dentro de la extendida, no arranca SO directamente</td><td>Sin límite práctico</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Ojo</div>
+                        <p>En GPT <strong>no existen</strong> tipos primaria/extendida/lógica: todas las particiones son iguales y no hay límite de 4.</p>
+                    </div>
+
+                    <h3>Sistemas de archivos</h3>
+                    <p>Es el «idioma» que usa el SO para leer y escribir datos en una partición.</p>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Sistema</th><th>SO</th><th>Máx. archivo</th><th>Uso típico</th></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Windows</td><td>16 TB</td><td>Disco principal de Windows, discos externos grandes</td></tr>
+                        <tr><td><strong>FAT32</strong></td><td>Todos</td><td>4 GB</td><td>USBs y SD pequeñas, compatibilidad universal</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>Todos</td><td>16 EB</td><td>USBs grandes, sin límite de 4 GB</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>16 TB</td><td>Disco principal de Linux</td></tr>
+                        <tr><td><strong>Btrfs</strong></td><td>Linux</td><td>16 EB</td><td>Linux moderno, snapshots, compresión</td></tr>
+                        <tr><td><strong>swap</strong></td><td>Linux</td><td>—</td><td>Memoria virtual (equivalente al pagefile)</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-red">
+                        <div class="info-title">Cuidado con FAT32</div>
+                        <p>Si copias un archivo de más de 4 GB a un USB con FAT32, da error. Solución: formatear el USB como <strong>exFAT</strong> (universal) o NTFS (Windows).</p>
+                    </div>
+
+                    <h3>Herramientas de particionado en Windows</h3>
+                    <ul>
+                        <li><strong>Administrador de discos:</strong> gráfica, integrada (clic derecho en Inicio → Administración de discos).</li>
+                        <li><strong>diskpart:</strong> línea de comandos avanzada. Muy potente, pero <strong>no pide confirmación</strong>: un <code>clean</code> borra todo el disco.</li>
+                    </ul>
+
+                    <a href="practica_16_particionado_windows.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 16 · Particionado en Windows</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 2 ==================== -->
+        <div class="topic" id="s2">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c2">2</div>
+                <div class="topic-title">Particionado y formateo en Linux</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Todo es un archivo</h3>
+                    <p>A diferencia de Windows (C:, D:...), Linux organiza todo en un <strong>árbol único</strong> que empieza en <code>/</code>:</p>
+
+                    <pre>/                     ← Raíz (equivalente a C:\)
+├── home/             ← Carpetas personales
+├── etc/              ← Configuración
+├── var/              ← Logs, bases de datos
+├── boot/             ← Arranque del kernel
+├── dev/              ← Dispositivos (discos, USB)
+├── mnt/              ← Montaje manual
+└── media/            ← Montaje automático (USB, CD)</pre>
+
+                    <h3>Los discos son archivos en /dev/</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Dispositivo</th><th>Significado</th></tr>
+                        <tr><td><code>/dev/sda</code></td><td>Primer disco SATA/USB</td></tr>
+                        <tr><td><code>/dev/sda1</code></td><td>Primera partición del primer disco</td></tr>
+                        <tr><td><code>/dev/sdb</code></td><td>Segundo disco</td></tr>
+                        <tr><td><code>/dev/nvme0n1</code></td><td>Primer SSD NVMe</td></tr>
+                        <tr><td><code>/dev/nvme0n1p1</code></td><td>Primera partición del NVMe</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Montaje: conectar una partición al árbol</h3>
+                    <p>En Linux hay que «montar» cada partición en un directorio:</p>
+                    <pre>sudo mount /dev/sdb1 /mnt/datos   # Montar
+ls /mnt/datos                      # Acceder
+sudo umount /mnt/datos             # Desmontar</pre>
+
+                    <h3>/etc/fstab: montaje automático</h3>
+                    <p>Para que una partición se monte sola al arrancar, se configura en <code>/etc/fstab</code>:</p>
+                    <pre># &lt;dispositivo&gt;  &lt;punto_montaje&gt;  &lt;fs&gt;   &lt;opciones&gt;  &lt;dump&gt; &lt;pass&gt;
+/dev/sda1        /                 ext4   defaults    0      1
+/dev/sda2        /home             ext4   defaults    0      2
+UUID=...         /mnt/datos        ext4   defaults    0      2</pre>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Mejor por UUID que por /dev/sdX</div>
+                        <p>El nombre <code>/dev/sdb</code> puede cambiar si conectas los discos en otro orden. El <strong>UUID</strong> (que sacas con <code>blkid</code>) es único y estable.</p>
+                    </div>
+
+                    <h3>Tipos de formateo</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Nivel</th><th>Qué hace</th><th>Cuándo</th></tr>
+                        <tr><td><strong>Bajo nivel</strong></td><td>Reescribe la estructura física</td><td>Casi nunca (puede dañar discos modernos)</td></tr>
+                        <tr><td><strong>Alto nivel</strong></td><td>Crea el sistema de archivos</td><td>Al preparar una partición nueva</td></tr>
+                        <tr><td><strong>Rápido</strong></td><td>Solo borra la tabla de contenidos</td><td>Para reutilizar rápido</td></tr>
+                        <tr><td><strong>Completo</strong></td><td>Borra + verifica sector a sector</td><td>Si sospechas que hay sectores dañados</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Herramientas en Linux</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Tipo</th><th>Descripción</th></tr>
+                        <tr><td><strong>GParted</strong></td><td>Gráfica</td><td>Editor visual muy intuitivo</td></tr>
+                        <tr><td><code>fdisk</code></td><td>CLI</td><td>Particionado clásico, interactivo</td></tr>
+                        <tr><td><code>parted</code></td><td>CLI</td><td>Alternativa moderna a fdisk</td></tr>
+                        <tr><td><code>mkfs</code></td><td>CLI</td><td>Crea el sistema de archivos</td></tr>
+                        <tr><td><code>lsblk</code></td><td>CLI</td><td>Muestra discos y particiones en árbol</td></tr>
+                        <tr><td><code>blkid</code></td><td>CLI</td><td>UUID y tipo de cada partición</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Journaling: el diario del sistema de archivos</h3>
+                    <p>Los FS modernos (NTFS, ext4, Btrfs) llevan un <strong>registro</strong> de operaciones pendientes. Si hay un corte de luz, el SO consulta el diario y completa o deshace las operaciones incompletas, evitando pérdida de datos. FAT32 <strong>no tiene</strong> journaling: por eso hay que hacer «quitar hardware con seguridad» en los USBs.</p>
+
+                    <a href="practica_17_particionado_linux.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 17 · Particionado en Linux</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 3 ==================== -->
+        <div class="topic" id="s3">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">3</div>
+                <div class="topic-title">Gestión avanzada de volúmenes (RAID y LVM)</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>RAID: discos que trabajan en equipo</h3>
+                    <p>RAID (Redundant Array of Independent Disks) combina varios discos para mejorar el <strong>rendimiento</strong>, la <strong>seguridad</strong> o ambos.</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Nivel</th><th>Discos mín.</th><th>Cómo funciona</th><th>Capacidad útil</th></tr>
+                        <tr><td><strong>RAID 0</strong> <br><small>Stripping</small></td><td>2</td><td>Datos repartidos entre discos: velocidad ×2. <strong>Si falla uno, pierdes todo.</strong></td><td>100%</td></tr>
+                        <tr><td><strong>RAID 1</strong> <br><small>Mirror</small></td><td>2</td><td>Datos duplicados. Si falla un disco, el otro tiene la copia.</td><td>50%</td></tr>
+                        <tr><td><strong>RAID 5</strong></td><td>3</td><td>Datos + paridad repartidos. Puede fallar <strong>1 disco</strong> sin perder datos.</td><td>(N-1) discos</td></tr>
+                        <tr><td><strong>RAID 10</strong></td><td>4</td><td>Espejo + stripping combinados: rápido y tolerante a fallos.</td><td>50%</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" style="max-width:400px">
+                            <text x="100" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#2b6cb0">RAID 0 (velocidad)</text>
+                            <rect x="30" y="28" width="60" height="110" rx="6" fill="#ebf8ff" stroke="#2b6cb0"/>
+                            <text x="60" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#2b6cb0">Disco 1</text>
+                            <rect x="38" y="50" width="44" height="16" fill="#4299e1"/><text x="60" y="62" text-anchor="middle" font-size="9" fill="#fff">A1</text>
+                            <rect x="38" y="68" width="44" height="16" fill="#4299e1"/><text x="60" y="80" text-anchor="middle" font-size="9" fill="#fff">B1</text>
+                            <rect x="38" y="86" width="44" height="16" fill="#4299e1"/><text x="60" y="98" text-anchor="middle" font-size="9" fill="#fff">C1</text>
+                            <rect x="38" y="104" width="44" height="16" fill="#4299e1"/><text x="60" y="116" text-anchor="middle" font-size="9" fill="#fff">D1</text>
+                            <rect x="100" y="28" width="60" height="110" rx="6" fill="#ebf8ff" stroke="#2b6cb0"/>
+                            <text x="130" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#2b6cb0">Disco 2</text>
+                            <rect x="108" y="50" width="44" height="16" fill="#63b3ed"/><text x="130" y="62" text-anchor="middle" font-size="9" fill="#fff">A2</text>
+                            <rect x="108" y="68" width="44" height="16" fill="#63b3ed"/><text x="130" y="80" text-anchor="middle" font-size="9" fill="#fff">B2</text>
+                            <rect x="108" y="86" width="44" height="16" fill="#63b3ed"/><text x="130" y="98" text-anchor="middle" font-size="9" fill="#fff">C2</text>
+                            <rect x="108" y="104" width="44" height="16" fill="#63b3ed"/><text x="130" y="116" text-anchor="middle" font-size="9" fill="#fff">D2</text>
+
+                            <text x="290" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#276749">RAID 1 (seguridad)</text>
+                            <rect x="220" y="28" width="60" height="110" rx="6" fill="#f0fff4" stroke="#276749"/>
+                            <text x="250" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#276749">Disco 1</text>
+                            <rect x="228" y="50" width="44" height="16" fill="#48bb78"/><text x="250" y="62" text-anchor="middle" font-size="9" fill="#fff">A</text>
+                            <rect x="228" y="68" width="44" height="16" fill="#48bb78"/><text x="250" y="80" text-anchor="middle" font-size="9" fill="#fff">B</text>
+                            <rect x="228" y="86" width="44" height="16" fill="#48bb78"/><text x="250" y="98" text-anchor="middle" font-size="9" fill="#fff">C</text>
+                            <rect x="228" y="104" width="44" height="16" fill="#48bb78"/><text x="250" y="116" text-anchor="middle" font-size="9" fill="#fff">D</text>
+                            <rect x="290" y="28" width="60" height="110" rx="6" fill="#f0fff4" stroke="#276749"/>
+                            <text x="320" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#276749">Disco 2</text>
+                            <rect x="298" y="50" width="44" height="16" fill="#48bb78"/><text x="320" y="62" text-anchor="middle" font-size="9" fill="#fff">A</text>
+                            <rect x="298" y="68" width="44" height="16" fill="#48bb78"/><text x="320" y="80" text-anchor="middle" font-size="9" fill="#fff">B</text>
+                            <rect x="298" y="86" width="44" height="16" fill="#48bb78"/><text x="320" y="98" text-anchor="middle" font-size="9" fill="#fff">C</text>
+                            <rect x="298" y="104" width="44" height="16" fill="#48bb78"/><text x="320" y="116" text-anchor="middle" font-size="9" fill="#fff">D</text>
+                        </svg>
+                    </div>
+
+                    <h3>RAID por hardware vs software</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Cómo</th><th>Coste</th><th>Rendimiento</th></tr>
+                        <tr><td><strong>Hardware</strong></td><td>Tarjeta controladora dedicada</td><td>100-500 €</td><td>Alto (la CPU no se ocupa)</td></tr>
+                        <tr><td><strong>Software</strong></td><td>Lo gestiona el SO</td><td>Gratuito</td><td>Algo menor (usa CPU)</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para un taller o PYME</div>
+                        <p>El RAID por software es suficiente y gratuito. Windows lo llama «volumen reflejado/seccionado» y Linux usa <code>mdadm</code>.</p>
+                    </div>
+
+                    <h3>Volúmenes dinámicos en Windows</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Volumen</th><th>Descripción</th><th>Equivale a</th></tr>
+                        <tr><td><strong>Simple</strong></td><td>Partición normal</td><td>Partición estándar</td></tr>
+                        <tr><td><strong>Distribuido</strong></td><td>Une espacio de varios discos</td><td>JBOD</td></tr>
+                        <tr><td><strong>Seccionado</strong></td><td>Reparte datos entre discos</td><td>RAID 0</td></tr>
+                        <tr><td><strong>Reflejado</strong></td><td>Duplica en dos discos</td><td>RAID 1</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>LVM en Linux: volúmenes lógicos flexibles</h3>
+                    <p>LVM añade una capa entre los discos físicos y las particiones. Permite <strong>redimensionar en caliente</strong> sin reiniciar.</p>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" style="max-width:380px">
+                            <rect x="10" y="10" width="360" height="55" rx="6" fill="#faf5ff" stroke="#805ad5"/>
+                            <text x="190" y="28" text-anchor="middle" font-size="10" font-weight="700" fill="#553c9a">Volúmenes Lógicos (LV)</text>
+                            <rect x="30" y="35" width="90" height="22" rx="3" fill="#805ad5"/><text x="75" y="50" text-anchor="middle" font-size="9" fill="#fff">lv_root (20G)</text>
+                            <rect x="140" y="35" width="90" height="22" rx="3" fill="#805ad5"/><text x="185" y="50" text-anchor="middle" font-size="9" fill="#fff">lv_home (30G)</text>
+                            <rect x="250" y="35" width="100" height="22" rx="3" fill="#805ad5"/><text x="300" y="50" text-anchor="middle" font-size="9" fill="#fff">lv_datos (10G)</text>
+
+                            <rect x="10" y="80" width="360" height="45" rx="6" fill="#e9d8fd" stroke="#6b46c1"/>
+                            <text x="190" y="97" text-anchor="middle" font-size="10" font-weight="700" fill="#553c9a">Grupo de Volúmenes (VG): «almacen» - 60 GB</text>
+                            <text x="190" y="115" text-anchor="middle" font-size="9" fill="#553c9a">Pool común de espacio</text>
+
+                            <rect x="10" y="140" width="360" height="50" rx="6" fill="#f7fafc" stroke="#2b6cb0"/>
+                            <text x="190" y="158" text-anchor="middle" font-size="10" font-weight="700" fill="#2b6cb0">Volúmenes Físicos (PV)</text>
+                            <rect x="40" y="165" width="130" height="18" rx="3" fill="#4299e1"/><text x="105" y="178" text-anchor="middle" font-size="9" fill="#fff">/dev/sda1 (30 GB)</text>
+                            <rect x="210" y="165" width="130" height="18" rx="3" fill="#4299e1"/><text x="275" y="178" text-anchor="middle" font-size="9" fill="#fff">/dev/sdb1 (30 GB)</text>
+                        </svg>
+                    </div>
+
+                    <ul>
+                        <li><strong>PV (Physical Volume):</strong> disco o partición real</li>
+                        <li><strong>VG (Volume Group):</strong> almacén que agrupa varios PV</li>
+                        <li><strong>LV (Logical Volume):</strong> partición virtual que sacas del VG, redimensionable</li>
+                    </ul>
+
+                    <a href="practica_18_volumenes_avanzados.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 18 · Volúmenes avanzados</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 4 ==================== -->
+        <div class="topic" id="s4">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c4">4</div>
+                <div class="topic-title">Clonación de discos y sistemas</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>¿Qué es clonar un disco?</h3>
+                    <p>Es hacer una <strong>copia exacta bit a bit</strong> de un disco o partición en otro destino. El destino queda idéntico al origen: SO, programas, configuración y datos incluidos. Como una fotocopia perfecta.</p>
+
+                    <h3>¿Cuándo se clona?</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Situación</th><th>Ejemplo</th></tr>
+                        <tr><td><strong>Migrar a disco nuevo</strong></td><td>Cambiar HDD → SSD sin reinstalar Windows</td></tr>
+                        <tr><td><strong>Despliegue masivo</strong></td><td>30 PCs de un aula con la misma imagen</td></tr>
+                        <tr><td><strong>Copia de seguridad completa</strong></td><td>Imagen del disco antes de una reparación</td></tr>
+                        <tr><td><strong>Sustitución por avería</strong></td><td>Restaurar rápido un equipo averiado</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Tipos de clonación</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Qué copia</th><th>Tamaño imagen</th></tr>
+                        <tr><td>Disco a disco</td><td>Todo el disco (incluida tabla de particiones)</td><td>Igual al origen</td></tr>
+                        <tr><td>Partición a partición</td><td>Solo una partición</td><td>Según partición</td></tr>
+                        <tr><td>Imagen de disco</td><td>El disco como archivo comprimido</td><td>Menor que el original</td></tr>
+                        <tr><td>Imagen de partición</td><td>Una partición como archivo</td><td>Menor aún</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Herramientas gratuitas</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Tipo</th><th>Interfaz</th></tr>
+                        <tr><td><strong>Clonezilla</strong></td><td>Live USB/CD</td><td>Menús de texto tipo asistente</td></tr>
+                        <tr><td><strong>Rescuezilla</strong></td><td>Live USB/CD</td><td><strong>Gráfica</strong> (basada en Clonezilla)</td></tr>
+                        <tr><td><code>dd</code></td><td>Linux CLI</td><td>Línea de comandos</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Recomendada: Rescuezilla</div>
+                        <p>Tiene interfaz gráfica y pasos guiados. Ideal para técnicos y alumnos que prefieren no pelearse con menús de texto.</p>
+                    </div>
+
+                    <h3>dd: la navaja suiza de Linux</h3>
+                    <pre># Clonar disco sda a sdb
+sudo dd if=/dev/sda of=/dev/sdb bs=4M status=progress
+
+# Crear imagen de una partición
+sudo dd if=/dev/sda1 of=/home/alumno/imagen.img bs=4M status=progress
+
+# Restaurar imagen a una partición
+sudo dd if=/home/alumno/imagen.img of=/dev/sdb1 bs=4M status=progress</pre>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Parámetro</th><th>Significado</th></tr>
+                        <tr><td><code>if=</code></td><td>Input file (origen)</td></tr>
+                        <tr><td><code>of=</code></td><td>Output file (destino)</td></tr>
+                        <tr><td><code>bs=</code></td><td>Block size (4M es óptimo)</td></tr>
+                        <tr><td><code>status=progress</code></td><td>Muestra el progreso</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-red">
+                        <div class="info-title">PELIGRO con dd</div>
+                        <p>Si confundes <code>if</code> y <code>of</code>, destruyes el disco de origen. <strong>Verifica SIEMPRE con <code>lsblk</code></strong> antes de ejecutar.</p>
+                    </div>
+
+                    <a href="practica_19_clonacion_discos.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 19 · Clonación de discos</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 5 ==================== -->
+        <div class="topic" id="s5">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">5</div>
+                <div class="topic-title">Copias de seguridad: fundamentos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>¿Por qué hacer copias de seguridad?</h3>
+                    <p>Los datos son lo más valioso del equipo. El hardware se reemplaza y el software se reinstala, pero los datos, si se pierden, se pierden.</p>
+                    <p><strong>Causas típicas de pérdida:</strong> fallo del disco, error humano (borrar por accidente), malware/ransomware, robo, incendio o inundación.</p>
+
+                    <h3>Tipos de copia</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Qué copia</th><th>Tamaño</th><th>Restauración</th></tr>
+                        <tr><td><strong>Completa</strong></td><td>TODOS los archivos</td><td>Grande</td><td>Rápida (un solo archivo)</td></tr>
+                        <tr><td><strong>Incremental</strong></td><td>Solo lo cambiado desde la ÚLTIMA copia (del tipo que sea)</td><td>Muy pequeña</td><td>Lenta (completa + todas las incrementales)</td></tr>
+                        <tr><td><strong>Diferencial</strong></td><td>Todo lo cambiado desde la ÚLTIMA COPIA COMPLETA</td><td>Media</td><td>Media (completa + última diferencial)</td></tr>
+                    </table>
+                    </div>
+
+                    <pre>Ejemplo: completa semanal + diaria
+Lunes (completa):        [████████████████] 10 GB
+Martes (incremental):    [██]                500 MB
+Miércoles (incremental): [█]                 200 MB
+Jueves (diferencial):    [███]               700 MB
+
+Restaurar al miércoles con incrementales: L + M + X
+Restaurar al jueves con diferencial:      L + J</pre>
+
+                    <h3>La regla 3-2-1</h3>
+                    <p>La estrategia profesional:</p>
+                    <ul>
+                        <li><strong>3 copias</strong> de los datos (el original + 2 copias)</li>
+                        <li><strong>2 soportes</strong> diferentes (disco externo + nube, p. ej.)</li>
+                        <li><strong>1 copia fuera del sitio</strong> (otro edificio, nube...)</li>
+                    </ul>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="max-width:400px">
+                            <rect x="10" y="25" width="110" height="60" rx="6" fill="#ebf8ff" stroke="#2b6cb0"/>
+                            <text x="65" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#2b6cb0">Original</text>
+                            <text x="65" y="65" text-anchor="middle" font-size="9" fill="#4a5568">PC del cliente</text>
+                            <rect x="145" y="25" width="110" height="60" rx="6" fill="#fffff0" stroke="#d69e2e"/>
+                            <text x="200" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#975a16">Copia 1</text>
+                            <text x="200" y="65" text-anchor="middle" font-size="9" fill="#4a5568">Disco externo</text>
+                            <text x="200" y="78" text-anchor="middle" font-size="8" fill="#718096">(mismo sitio)</text>
+                            <rect x="280" y="25" width="110" height="60" rx="6" fill="#f0fff4" stroke="#276749"/>
+                            <text x="335" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#276749">Copia 2</text>
+                            <text x="335" y="65" text-anchor="middle" font-size="9" fill="#4a5568">Nube / remoto</text>
+                            <text x="335" y="78" text-anchor="middle" font-size="8" fill="#718096">(fuera del sitio)</text>
+                            <text x="200" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#2d3748">REGLA 3-2-1</text>
+                            <text x="200" y="102" text-anchor="middle" font-size="9" fill="#718096">3 copias · 2 soportes · 1 fuera del sitio</text>
+                        </svg>
+                    </div>
+
+                    <h3>RPO y RTO: métricas clave</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Métrica</th><th>Significado</th><th>Ejemplo</th></tr>
+                        <tr><td><strong>RPO</strong> <br><small>Recovery Point Objective</small></td><td>¿Cuántos datos puedes permitirte perder?</td><td>RPO 1h = copias cada hora</td></tr>
+                        <tr><td><strong>RTO</strong> <br><small>Recovery Time Objective</small></td><td>¿Cuánto tiempo puedes estar sin el sistema?</td><td>RTO 4h = restaurar en &lt;4h</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Herramientas integradas en Windows</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Qué hace</th></tr>
+                        <tr><td><strong>Historial de archivos</strong></td><td>Copia automática de carpetas personales (Documentos, Escritorio...)</td></tr>
+                        <tr><td><strong>Imagen del sistema</strong></td><td>Copia completa del disco (SO + programas + datos)</td></tr>
+                        <tr><td><strong>Puntos de restauración</strong></td><td>Estado del sistema (registro, drivers). NO los archivos personales</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Historial de archivos</div>
+                        <p>Microsoft lo marca como función heredada, pero sigue funcionando en Windows 10/11. Es la opción más sencilla para respaldar archivos personales de forma automática.</p>
+                    </div>
+
+                    <a href="practica_20_copias_seguridad_windows.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 20 · Copias de seguridad en Windows</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 6 ==================== -->
+        <div class="topic" id="s6">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c6">6</div>
+                <div class="topic-title">Copias de seguridad: automatización</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <div class="info info-green">
+                        <div class="info-title">Automatizar = no depender de la memoria humana</div>
+                        <p>La copia más peligrosa es la que «ibas a hacer mañana». Un sistema profesional se ejecuta solo, sin tu intervención.</p>
+                    </div>
+
+                    <h3>Herramientas en Linux</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Tipo</th><th>Descripción</th></tr>
+                        <tr><td><code>tar</code></td><td>CLI</td><td>Empaqueta archivos en un .tar(.gz)</td></tr>
+                        <tr><td><code>rsync</code></td><td>CLI</td><td>Sincroniza dos ubicaciones. Solo copia lo cambiado</td></tr>
+                        <tr><td><code>cron</code></td><td>CLI</td><td>Programador de tareas del sistema</td></tr>
+                        <tr><td><strong>Duplicati</strong></td><td>Gráfica</td><td>Multiplataforma, web UI, soporta nube (Drive, OneDrive, S3...)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>tar: empaquetar y comprimir</h3>
+                    <pre># Crear archivo tar.gz
+tar -czvf backup.tar.gz /home/alumno/Documentos/
+
+# Ver contenido sin extraer
+tar -tzvf backup.tar.gz
+
+# Extraer
+tar -xzvf backup.tar.gz -C /mnt/restauracion/</pre>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Opción</th><th>Significado</th></tr>
+                        <tr><td><code>-c</code></td><td>Crear</td></tr>
+                        <tr><td><code>-x</code></td><td>Extraer</td></tr>
+                        <tr><td><code>-z</code></td><td>Comprimir con gzip</td></tr>
+                        <tr><td><code>-v</code></td><td>Verbose (mostrar progreso)</td></tr>
+                        <tr><td><code>-f</code></td><td>Nombre del archivo</td></tr>
+                        <tr><td><code>-t</code></td><td>Listar contenido</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>rsync: sincronización inteligente</h3>
+                    <pre># Sincronizar a disco externo
+rsync -avh --delete /home/alumno/Documentos/ /mnt/backup/Documentos/
+
+# A otro equipo por SSH (cifrado)
+rsync -avh -e ssh /home/alumno/Documentos/ usuario@192.168.1.100:/backup/</pre>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Por qué rsync es la estrella</div>
+                        <p>Solo transfiere los <strong>bytes que han cambiado</strong>. La primera ejecución puede tardar, pero las siguientes son rapidísimas.</p>
+                    </div>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Opción</th><th>Significado</th></tr>
+                        <tr><td><code>-a</code></td><td>Archive: preserva permisos, fechas, enlaces</td></tr>
+                        <tr><td><code>-v</code></td><td>Verbose</td></tr>
+                        <tr><td><code>-h</code></td><td>Human-readable</td></tr>
+                        <tr><td><code>--delete</code></td><td>Borra del destino lo que ya no existe en el origen</td></tr>
+                        <tr><td><code>-e ssh</code></td><td>Usa SSH cifrado</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>cron: programar tareas</h3>
+                    <pre># Editar el crontab del usuario
+crontab -e
+
+# Formato:
+# min hora día_mes mes día_sem  comando
+#  0-59 0-23 1-31  1-12   0-7
+
+# Backup diario a las 2:00 AM
+0 2 * * * rsync -avh /home/alumno/Documentos/ /mnt/backup/
+
+# Solo viernes a las 23:00
+0 23 * * 5 tar -czf /mnt/backup/semanal_$(date +\%Y\%m\%d).tar.gz /home/alumno/
+
+# Cada 6 horas
+0 */6 * * * /home/alumno/scripts/backup.sh</pre>
+
+                    <h3>Duplicati: backup gráfico con soporte para nube</h3>
+                    <p>Herramienta gratuita y de código abierto con interfaz web. Ofrece:</p>
+                    <ul>
+                        <li>Backup <strong>incremental, cifrado y comprimido</strong></li>
+                        <li>Destinos: local, NAS, Google Drive, OneDrive, Dropbox, SFTP, S3...</li>
+                        <li>Programación automática integrada</li>
+                        <li>Verificación de integridad de las copias</li>
+                    </ul>
+
+                    <a href="practica_21_copias_seguridad_linux.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 21 · Copias de seguridad en Linux</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 7 ==================== -->
+        <div class="topic" id="s7">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c7">7</div>
+                <div class="topic-title">Redes: fundamentos TCP/IP</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Tipos de redes por alcance</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Alcance</th><th>Ejemplo</th></tr>
+                        <tr><td><strong>PAN</strong></td><td>Personal (metros)</td><td>Bluetooth del móvil con auriculares</td></tr>
+                        <tr><td><strong>LAN</strong></td><td>Local (edificio)</td><td>Red del aula o la oficina</td></tr>
+                        <tr><td><strong>WLAN</strong></td><td>LAN inalámbrica</td><td>WiFi del aula</td></tr>
+                        <tr><td><strong>MAN</strong></td><td>Ciudad</td><td>Oficinas de una empresa en Madrid</td></tr>
+                        <tr><td><strong>WAN</strong></td><td>Mundial</td><td>Internet</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>El modelo TCP/IP: así viajan los datos</h3>
+                    <p>Los datos no viajan «tal cual»: se organizan en capas, como un paquete postal.</p>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" style="max-width:380px">
+                            <rect x="10" y="10" width="360" height="42" rx="4" fill="#fed7d7" stroke="#c53030"/>
+                            <text x="20" y="30" font-size="11" font-weight="700" fill="#c53030">4. APLICACIÓN</text>
+                            <text x="20" y="45" font-size="9" fill="#742a2a">HTTP, DNS, FTP, SSH, Discord... (lo que ves tú)</text>
+                            <rect x="10" y="57" width="360" height="42" rx="4" fill="#feebc8" stroke="#c05621"/>
+                            <text x="20" y="77" font-size="11" font-weight="700" fill="#c05621">3. TRANSPORTE</text>
+                            <text x="20" y="92" font-size="9" fill="#7b341e">TCP (fiable) / UDP (rápido) · puertos 80, 443, 22...</text>
+                            <rect x="10" y="104" width="360" height="42" rx="4" fill="#bee3f8" stroke="#2b6cb0"/>
+                            <text x="20" y="124" font-size="11" font-weight="700" fill="#2b6cb0">2. INTERNET</text>
+                            <text x="20" y="139" font-size="9" fill="#2a4365">IP (origen → destino): 192.168.1.10 → 8.8.8.8</text>
+                            <rect x="10" y="151" width="360" height="42" rx="4" fill="#c6f6d5" stroke="#276749"/>
+                            <text x="20" y="171" font-size="11" font-weight="700" fill="#276749">1. ACCESO A RED</text>
+                            <text x="20" y="186" font-size="9" fill="#22543d">Ethernet, WiFi (el cable, las ondas)</text>
+                        </svg>
+                    </div>
+
+                    <h3>Direcciones IP: la «matrícula» de cada equipo</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Concepto</th><th>Descripción</th><th>Ejemplo</th></tr>
+                        <tr><td><strong>Dirección IP</strong></td><td>Identifica a un dispositivo en la red</td><td>192.168.1.50</td></tr>
+                        <tr><td><strong>Máscara</strong></td><td>Qué parte es la red y qué parte el equipo</td><td>255.255.255.0</td></tr>
+                        <tr><td><strong>Gateway</strong></td><td>IP del router (salida a Internet)</td><td>192.168.1.1</td></tr>
+                        <tr><td><strong>DNS</strong></td><td>Traduce nombres a IPs</td><td>8.8.8.8 (Google)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>IP pública vs privada</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>Privada</th><th>Pública</th></tr>
+                        <tr><td>Quién la ve</td><td>Solo tu red local</td><td>Todo Internet</td></tr>
+                        <tr><td>Quién la asigna</td><td>Tu router (DHCP)</td><td>Tu ISP</td></tr>
+                        <tr><td>Rangos</td><td>192.168.x.x · 10.x.x.x · 172.16-31.x.x</td><td>Cualquier otra</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>DHCP y DNS: los dos invisibles</h3>
+                    <ul>
+                        <li><strong>DHCP:</strong> cuando te conectas, el router te asigna IP, máscara, gateway y DNS automáticamente. Sin DHCP, lo configurarías a mano en cada dispositivo.</li>
+                        <li><strong>DNS:</strong> la «guía telefónica» de Internet. Cuando escribes <code>www.google.es</code>, tu equipo pregunta al DNS por la IP y luego se conecta a ella.</li>
+                    </ul>
+
+                    <pre>Tú escribes: www.google.es
+    ↓
+Tu PC → DNS: «¿qué IP tiene www.google.es?»
+    ↓
+DNS responde: «142.250.185.3»
+    ↓
+Tu PC se conecta a 142.250.185.3</pre>
+
+                    <a href="practica_22_fundamentos_red.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 22 · Fundamentos de red</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 8 ==================== -->
+        <div class="topic" id="s8">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c8">8</div>
+                <div class="topic-title">Redes: diagnóstico y seguridad básica</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Puertos: las «puertas» de cada servicio</h3>
+                    <p>Cada servicio usa un número de puerto para que el SO sepa a qué programa entregar los datos.</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Puerto</th><th>Proto</th><th>Servicio</th><th>Ejemplo</th></tr>
+                        <tr><td>20-21</td><td>TCP</td><td>FTP</td><td>Transferencia de archivos</td></tr>
+                        <tr><td>22</td><td>TCP</td><td>SSH</td><td>Acceso remoto cifrado (Linux)</td></tr>
+                        <tr><td>53</td><td>UDP/TCP</td><td>DNS</td><td>Resolución de nombres</td></tr>
+                        <tr><td>80</td><td>TCP</td><td>HTTP</td><td>Web sin cifrar</td></tr>
+                        <tr><td>443</td><td>TCP</td><td>HTTPS</td><td>Web cifrada</td></tr>
+                        <tr><td>445</td><td>TCP</td><td>SMB</td><td>Compartición de Windows</td></tr>
+                        <tr><td>3389</td><td>TCP</td><td>RDP</td><td>Escritorio remoto Windows</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">0-1023: puertos «bien conocidos»</div>
+                        <p>Están reservados a servicios estándar. Del 1024 al 65535 se usan libremente para aplicaciones.</p>
+                    </div>
+
+                    <h3>Protocolos importantes</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Protocolo</th><th>Capa</th><th>Para qué sirve</th></tr>
+                        <tr><td><strong>HTTP/HTTPS</strong></td><td>Aplicación</td><td>Navegar por la web</td></tr>
+                        <tr><td><strong>FTP/SFTP</strong></td><td>Aplicación</td><td>Transferir archivos</td></tr>
+                        <tr><td><strong>SSH</strong></td><td>Aplicación</td><td>Terminal remota cifrada</td></tr>
+                        <tr><td><strong>DNS</strong></td><td>Aplicación</td><td>Resolver nombres → IPs</td></tr>
+                        <tr><td><strong>DHCP</strong></td><td>Aplicación</td><td>Asignar IPs automáticamente</td></tr>
+                        <tr><td><strong>TCP</strong></td><td>Transporte</td><td>Fiable (con confirmación)</td></tr>
+                        <tr><td><strong>UDP</strong></td><td>Transporte</td><td>Rápido sin confirmación (streaming, juegos, Discord)</td></tr>
+                        <tr><td><strong>ICMP</strong></td><td>Internet</td><td>Diagnóstico (ping, tracert)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Firewall: el portero de la red</h3>
+                    <p>Filtra el tráfico según reglas: <strong>permitir</strong> o <strong>bloquear</strong> por puerto, IP o programa.</p>
+                    <ul>
+                        <li>Windows: <strong>Firewall de Windows Defender</strong> (integrado)</li>
+                        <li>Linux: <code>iptables</code> o <code>ufw</code> (interfaz simplificada)</li>
+                    </ul>
+
+                    <h3>Herramientas de diagnóstico</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>SO</th><th>Para qué</th></tr>
+                        <tr><td><code>netstat</code> / <code>ss</code></td><td>Win / Linux</td><td>Conexiones activas y puertos abiertos</td></tr>
+                        <tr><td><code>nslookup</code> / <code>dig</code></td><td>Win / Linux</td><td>Consultas DNS</td></tr>
+                        <tr><td><code>tracert</code> / <code>traceroute</code></td><td>Win / Linux</td><td>Trazar la ruta hasta un destino</td></tr>
+                        <tr><td><strong>Nmap</strong></td><td>Ambos</td><td>Escanear puertos y servicios</td></tr>
+                        <tr><td><strong>Wireshark</strong></td><td>Ambos</td><td>Capturar y analizar paquetes</td></tr>
+                        <tr><td><strong>Advanced IP Scanner</strong></td><td>Windows</td><td>Descubrir dispositivos en la red local</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-red">
+                        <div class="info-title">Ética en escaneos</div>
+                        <p>Solo escanea equipos que sean tuyos o tengas permiso para escanear. Escanear redes ajenas puede ser <strong>ilegal</strong>.</p>
+                    </div>
+
+                    <h3>Diagnóstico por capas</h3>
+                    <p>Cuando algo no va, sigue este orden para aislar el problema:</p>
+                    <ol>
+                        <li><strong>Pila TCP/IP local:</strong> <code>ping 127.0.0.1</code></li>
+                        <li><strong>Puerta de enlace:</strong> <code>ping [gateway]</code></li>
+                        <li><strong>Internet sin DNS:</strong> <code>ping 8.8.8.8</code></li>
+                        <li><strong>Internet con DNS:</strong> <code>ping www.google.es</code></li>
+                    </ol>
+                    <p>El primer paso que falla te dice dónde está el problema (tarjeta, router, ISP o DNS).</p>
+
+                    <a href="practica_23_diagnostico_red.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 23 · Diagnóstico de red</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 9 ==================== -->
+        <div class="topic" id="s9">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c9">9</div>
+                <div class="topic-title">Asistencia remota: herramientas profesionales</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>¿Qué es la asistencia remota?</h3>
+                    <p>Permite controlar un equipo a distancia como si estuvieras sentado frente a él. Es fundamental en soporte técnico: ahorra desplazamientos, reduce tiempos y permite atender a clientes en cualquier parte del mundo.</p>
+
+                    <h3>Protocolos de acceso remoto</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Protocolo</th><th>Puerto</th><th>Cifrado</th><th>Uso</th></tr>
+                        <tr><td><strong>RDP</strong></td><td>3389</td><td>Sí</td><td>Escritorio remoto nativo de Windows</td></tr>
+                        <tr><td><strong>VNC</strong></td><td>5900</td><td>No por defecto</td><td>Control remoto multiplataforma open source</td></tr>
+                        <tr><td><strong>SSH</strong></td><td>22</td><td>Sí</td><td>Terminal remota cifrada (sin escritorio)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Herramientas profesionales (2026)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Gratuita</th><th>Ventajas</th></tr>
+                        <tr><td><strong>Asistencia rápida</strong> <br><small>Quick Assist</small></td><td>Sí (integrada)</td><td>No requiere instalar nada. Integrada en Windows 10/11.</td></tr>
+                        <tr><td><strong>TeamViewer</strong></td><td>Sí (personal)</td><td>La más conocida. Funciona detrás de firewalls sin configurar.</td></tr>
+                        <tr><td><strong>AnyDesk</strong></td><td>Sí (personal)</td><td>Muy ligera y rápida. Buena en conexiones lentas.</td></tr>
+                        <tr><td><strong>RustDesk</strong></td><td>Sí (open source)</td><td>100% abierta. Puedes montar tu propio servidor.</td></tr>
+                        <tr><td><strong>Chrome Remote Desktop</strong></td><td>Sí</td><td>Desde el navegador, sin instalar software.</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">¿Cuál usar en cada caso?</div>
+                        <ul style="margin-left:16px;font-size:14px">
+                            <li><strong>Quick Assist:</strong> soporte entre equipos Windows en empresa</li>
+                            <li><strong>TeamViewer / AnyDesk:</strong> soporte a clientes remotos (la opción más habitual en talleres)</li>
+                            <li><strong>RustDesk:</strong> cuando quieres privacidad total y servidor propio</li>
+                            <li><strong>Chrome Remote Desktop:</strong> acceso puntual rápido sin instalar nada</li>
+                            <li><strong>SSH:</strong> administración de servidores Linux sin escritorio</li>
+                        </ul>
+                    </div>
+
+                    <h3>Cómo funciona (simplificado)</h3>
+                    <div class="diagram">
+                        <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" style="max-width:400px">
+                            <rect x="10" y="30" width="120" height="80" rx="8" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="1.5"/>
+                            <text x="70" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#2b6cb0">TÉCNICO</text>
+                            <text x="70" y="70" text-anchor="middle" font-size="9" fill="#4a5568">(tu PC)</text>
+                            <text x="70" y="95" text-anchor="middle" font-size="9" fill="#2b6cb0">Controla</text>
+
+                            <rect x="270" y="30" width="120" height="80" rx="8" fill="#f0fff4" stroke="#276749" stroke-width="1.5"/>
+                            <text x="330" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#276749">CLIENTE</text>
+                            <text x="330" y="70" text-anchor="middle" font-size="9" fill="#4a5568">(su PC)</text>
+                            <text x="330" y="95" text-anchor="middle" font-size="9" fill="#276749">Es controlado</text>
+
+                            <path d="M 130 55 Q 200 20 270 55" stroke="#805ad5" stroke-width="1.5" fill="none" marker-end="url(#arr1)"/>
+                            <text x="200" y="30" text-anchor="middle" font-size="9" fill="#553c9a">ID + código</text>
+                            <path d="M 270 90 Q 200 125 130 90" stroke="#805ad5" stroke-width="1.5" fill="none" marker-end="url(#arr2)"/>
+                            <text x="200" y="138" text-anchor="middle" font-size="9" fill="#553c9a">pantalla + teclado + ratón</text>
+
+                            <defs>
+                                <marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#805ad5"/>
+                                </marker>
+                                <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#805ad5"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    <p style="text-align:center;font-size:12px;color:#718096">La mayoría usan un <strong>servidor intermediario</strong> en la nube para que funcione aunque ambos estén tras routers/firewalls (NAT traversal).</p>
+
+                    <h3>Seguridad en acceso remoto</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Riesgo</th><th>Prevención</th></tr>
+                        <tr><td>Acceso no autorizado</td><td>Contraseñas fuertes, códigos de sesión temporales</td></tr>
+                        <tr><td>Interceptación de datos</td><td>Cifrado extremo a extremo (todas las modernas lo tienen)</td></tr>
+                        <tr><td>Software abandonado</td><td>Sesiones únicas, no dejar agentes si no hace falta</td></tr>
+                        <tr><td>Ingeniería social</td><td>NUNCA des el código a un desconocido que diga ser «del soporte»</td></tr>
+                    </table>
+                    </div>
+
+                    <a href="practica_24_asistencia_remota.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 24 · Asistencia remota</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SESIÓN 10 ==================== -->
+        <div class="topic" id="s10">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">10</div>
+                <div class="topic-title">Compartición de recursos en red</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Grupo de trabajo vs Dominio</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>Grupo de trabajo</th><th>Dominio</th></tr>
+                        <tr><td>Gestión</td><td>Descentralizada (cada PC gestiona sus usuarios)</td><td>Centralizada (Active Directory)</td></tr>
+                        <tr><td>Tamaño</td><td>&lt; 20 equipos</td><td>Medianas y grandes empresas</td></tr>
+                        <tr><td>Coste</td><td>Gratuito (integrado en Windows)</td><td>Requiere Windows Server (licencia)</td></tr>
+                        <tr><td>Ejemplo</td><td>Red de casa, taller pequeño</td><td>Oficina de 200 empleados</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>SMB/CIFS: el protocolo de Windows</h3>
+                    <p>SMB (Server Message Block) es el protocolo que usa Windows para compartir carpetas e impresoras. También conocido como CIFS.</p>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 400 110" xmlns="http://www.w3.org/2000/svg" style="max-width:400px">
+                            <rect x="20" y="20" width="140" height="70" rx="8" fill="#ebf8ff" stroke="#2b6cb0"/>
+                            <text x="90" y="42" text-anchor="middle" font-size="10" font-weight="700" fill="#2b6cb0">PC-ALUMNO1</text>
+                            <text x="90" y="62" text-anchor="middle" font-size="9" fill="#4a5568">Carpeta</text>
+                            <text x="90" y="75" text-anchor="middle" font-size="9" fill="#4a5568">compartida</text>
+                            <rect x="240" y="20" width="140" height="70" rx="8" fill="#f0fff4" stroke="#276749"/>
+                            <text x="310" y="42" text-anchor="middle" font-size="10" font-weight="700" fill="#276749">PC-ALUMNO2</text>
+                            <text x="310" y="62" text-anchor="middle" font-size="9" fill="#4a5568">Accede a la</text>
+                            <text x="310" y="75" text-anchor="middle" font-size="9" fill="#4a5568">carpeta</text>
+                            <line x1="160" y1="55" x2="240" y2="55" stroke="#805ad5" stroke-width="2"/>
+                            <text x="200" y="50" text-anchor="middle" font-size="9" fill="#553c9a" font-weight="600">SMB</text>
+                            <text x="200" y="68" text-anchor="middle" font-size="8" fill="#718096">puerto 445</text>
+                        </svg>
+                    </div>
+
+                    <h3>Samba: SMB en Linux</h3>
+                    <p>Samba es la implementación de SMB para Linux. Permite que un equipo Linux comparta carpetas y sea visible en una red de Windows (y viceversa).</p>
+                    <pre>sudo apt install samba</pre>
+
+                    <h3>Permisos de compartición vs permisos NTFS</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Nivel</th><th>Se aplica a</th><th>Ejemplo</th></tr>
+                        <tr><td><strong>Permisos de compartición</strong></td><td>Acceso por red (SMB)</td><td>«Grupo Alumnos puede leer»</td></tr>
+                        <tr><td><strong>Permisos NTFS</strong></td><td>Acceso local y por red</td><td>«Solo admin puede modificar»</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Regla clave</div>
+                        <p>Windows aplica el permiso <strong>más restrictivo</strong> de los dos. Si la compartición dice «lectura/escritura» pero NTFS dice «solo lectura», el resultado es <strong>solo lectura</strong>.</p>
+                    </div>
+
+                    <h3>Mapeo de unidades de red</h3>
+                    <p>Asignas una letra (p. ej. Z:) a una carpeta compartida en otro equipo. Aparece en el Explorador como si fuera un disco local.</p>
+                    <pre>net use Z: \\192.168.1.10\Compartida /persistent:yes
+
+# Para desconectar:
+net use Z: /delete</pre>
+
+                    <h3>Descubrir recursos en la red</h3>
+                    <pre># Desde Windows
+net view \\192.168.1.10
+net view /all
+
+# Desde Linux
+smbclient -L //192.168.1.10 -N
+
+# Con Nmap
+nmap --script smb-enum-shares -p 445 192.168.1.10</pre>
+
+                    <a href="practica_25_comparticion_recursos.html" class="practice-link">
+                        <span class="icon">&#128295;</span>
+                        <span>Práctica 25 · Compartición de recursos</span>
+                        <span class="arrow">&#8594;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+
+    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+    <script>
+    function toggle(header) {
+        header.closest('.topic').classList.toggle('open');
+    }
+
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('show');
+        document.getElementById('drawer-bg').classList.toggle('show');
+    }
+
+    window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    </script>
+</body>
+</html>

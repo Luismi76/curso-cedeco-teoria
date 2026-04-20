@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 19: Clonacion de Discos y Sistemas</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 19: Clonacion de Discos y Sistemas</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Clonacion y copias de seguridad<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs + Clonezilla ISO + Rescuezilla ISO
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Preparacion previa:</strong> Antes de comenzar esta practica, necesitas descargar las ISOs de <strong>Clonezilla</strong> (<a href="https://clonezilla.org/downloads.php" target="_blank">clonezilla.org</a>) y <strong>Rescuezilla</strong> (<a href="https://rescuezilla.com/download" target="_blank">rescuezilla.com</a>). Descarga las versiones <strong>amd64 ISO</strong> de ambas herramientas. Asegurate de tenerlas listas en tu equipo anfitrion antes de empezar.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario profesional:</strong> Un cliente quiere migrar su sistema operativo de un disco duro HDD a un nuevo SSD sin tener que reinstalar el sistema ni perder ninguna configuracion. Ademas, el departamento de informatica de un centro educativo necesita desplegar la misma imagen de sistema operativo en 20 equipos identicos del aula de informatica. En esta practica aprenderemos las herramientas y tecnicas necesarias para resolver ambos escenarios.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender los conceptos fundamentales de clonacion de discos e imagenes de sistema.</li>
+                        <li>Utilizar el comando <code>dd</code> en Linux para clonar particiones y crear imagenes de disco.</li>
+                        <li>Usar <strong>Rescuezilla</strong> como herramienta grafica para crear y restaurar imagenes de disco.</li>
+                        <li>Usar <strong>Clonezilla</strong> como herramienta avanzada basada en asistente de texto para clonacion e imagenes.</li>
+                        <li>Comparar las diferentes herramientas de clonacion en terminos de facilidad de uso, velocidad y funcionalidades.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Ubuntu 24 de la Practica 07 disponible y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-clonezilla">
+                            <label for="req-clonezilla">ISO de Clonezilla descargada (clonezilla-live-X.X.X-XX-amd64.iso)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-rescuezilla">
+                            <label for="req-rescuezilla">ISO de Rescuezilla descargada (rescuezilla-X.X.X-64bit.iso)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-discos">
+                            <label for="req-discos">Espacio suficiente en disco para crear discos virtuales adicionales (minimo 10 GB libres)</label>
+                        </div>
+                    </div>
+                    <div class="nota">
+                        <strong>Preparar discos virtuales adicionales:</strong> En VirtualBox, ve a la configuracion de tu VM de Ubuntu &rarr; <strong>Almacenamiento</strong> &rarr; Controlador SATA &rarr; Anadir disco duro &rarr; Crear nuevo disco (VDI, 5 GB, dinamico). Anade <strong>dos discos adicionales</strong> de 5 GB cada uno. Estos seran los discos destino para las operaciones de clonacion. Tras iniciar la VM, puedes verificar que aparecen con <code>lsblk</code>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Clonar con dd en Linux -->
+            <div class="seccion">
+                <h2>Parte 1 — Clonar con dd en Linux (50 min)</h2>
+                <div class="seccion-body">
+                    <p>El comando <code>dd</code> (data duplicator) es una de las herramientas mas antiguas y potentes de Linux para copiar datos a bajo nivel. Permite clonar particiones y discos completos byte a byte.</p>
+
+                    <h3>Parametros principales de dd</h3>
+                    <table>
+                        <tr>
+                            <th style="width:20%">Parametro</th>
+                            <th style="width:30%">Significado</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><code>if=</code></td>
+                            <td>Input File (archivo de entrada)</td>
+                            <td>Dispositivo o archivo de origen desde el que se leen los datos</td>
+                        </tr>
+                        <tr>
+                            <td><code>of=</code></td>
+                            <td>Output File (archivo de salida)</td>
+                            <td>Dispositivo o archivo de destino donde se escriben los datos</td>
+                        </tr>
+                        <tr>
+                            <td><code>bs=</code></td>
+                            <td>Block Size (tamano de bloque)</td>
+                            <td>Tamano de los bloques de lectura/escritura. Valores comunes: 1M, 4M, 64K</td>
+                        </tr>
+                        <tr>
+                            <td><code>count=</code></td>
+                            <td>Numero de bloques</td>
+                            <td>Limita el numero de bloques a copiar (opcional)</td>
+                        </tr>
+                        <tr>
+                            <td><code>status=progress</code></td>
+                            <td>Mostrar progreso</td>
+                            <td>Muestra informacion de progreso durante la copia (velocidad, datos copiados)</td>
+                        </tr>
+                        <tr>
+                            <td><code>conv=sync,noerror</code></td>
+                            <td>Opciones de conversion</td>
+                            <td><code>sync</code> rellena bloques incompletos; <code>noerror</code> continua ante errores de lectura</td>
+                        </tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>PELIGRO: dd puede destruir todos tus datos.</strong> El comando <code>dd</code> es conocido como "disk destroyer" porque si confundes los parametros <code>if</code> (origen) y <code>of</code> (destino), <strong>sobreescribiras el disco de origen con datos del destino, destruyendo toda tu informacion de forma irrecuperable</strong>. Siempre verifica tres veces los dispositivos con <code>lsblk</code> antes de ejecutar <code>dd</code>. No hay confirmacion, no hay vuelta atras. En un entorno real, un error con <code>dd</code> puede significar la perdida total de datos de un cliente.
+                    </div>
+
+                    <h3>Procedimiento: Clonar una particion con dd</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un terminal en tu VM de Ubuntu.</li>
+                            <li>Ejecuta <strong>lsblk</strong> para identificar todos los discos y particiones disponibles.</li>
+                            <li>Identifica el disco de origen (normalmente <code>/dev/sda</code>) y los discos adicionales (<code>/dev/sdb</code>, <code>/dev/sdc</code>).</li>
+                            <li>Crea una particion pequena en <code>/dev/sdb</code> usando <strong>sudo fdisk /dev/sdb</strong> (nueva particion primaria de 1 GB).</li>
+                            <li>Formatea la particion: <strong>sudo mkfs.ext4 /dev/sdb1</strong></li>
+                            <li>Monta la particion, crea algunos archivos de prueba y desmontala:
+                                <pre class="codigo-bloque">sudo mkdir /mnt/origen
+sudo mount /dev/sdb1 /mnt/origen
+sudo cp /etc/hostname /etc/hosts /etc/fstab /mnt/origen/
+echo "Archivo de prueba para clonacion" | sudo tee /mnt/origen/prueba.txt
+sudo umount /mnt/origen</pre>
+                            </li>
+                            <li>Crea una particion del mismo tamano en <code>/dev/sdc</code> usando <strong>sudo fdisk /dev/sdc</strong>.</li>
+                            <li>Ejecuta la clonacion de particion a particion:
+                                <pre class="codigo-bloque">sudo dd if=/dev/sdb1 of=/dev/sdc1 bs=4M status=progress</pre>
+                            </li>
+                            <li>Espera a que finalice y anota la velocidad y el tamano copiado.</li>
+                            <li>Verifica la clonacion montando la particion destino:
+                                <pre class="codigo-bloque">sudo mkdir /mnt/destino
+sudo mount /dev/sdc1 /mnt/destino
+ls -la /mnt/destino/
+cat /mnt/destino/prueba.txt</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de la clonacion con dd</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Dispositivo de origen (<code>if</code>)</td>
+                            <td><input type="text" placeholder="Ej: /dev/sdb1"></td>
+                        </tr>
+                        <tr>
+                            <td>Dispositivo de destino (<code>of</code>)</td>
+                            <td><input type="text" placeholder="Ej: /dev/sdc1"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de bloque utilizado (<code>bs</code>)</td>
+                            <td><input type="text" placeholder="Ej: 4M"></td>
+                        </tr>
+                        <tr>
+                            <td>Datos copiados (bytes / registros)</td>
+                            <td><input type="text" placeholder="Ej: 1073741824 bytes (1.0 GB) copied"></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad de copia</td>
+                            <td><input type="text" placeholder="Ej: 150 MB/s"></td>
+                        </tr>
+                        <tr>
+                            <td>Archivos verificados en destino</td>
+                            <td><input type="text" placeholder="Ej: hostname, hosts, fstab, prueba.txt"></td>
+                        </tr>
+                        <tr>
+                            <td>Contenido de prueba.txt correcto (si/no)</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Clonacion de particion con dd</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando el comando dd, su progreso/resultado y la verificacion con ls y cat en el destino</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Crear imagen con dd -->
+            <div class="seccion">
+                <h2>Parte 2 — Crear imagen con dd (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Ademas de clonar de disco a disco, <code>dd</code> permite crear un <strong>archivo de imagen</strong> de una particion o disco completo. Esta imagen se puede guardar, comprimir y restaurar posteriormente.</p>
+
+                    <h3>Procedimiento: Crear y restaurar una imagen</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Asegurate de que la particion de origen (<code>/dev/sdb1</code>) esta <strong>desmontada</strong>:
+                                <pre class="codigo-bloque">sudo umount /dev/sdb1 2>/dev/null
+lsblk</pre>
+                            </li>
+                            <li>Crea una imagen de la particion en un archivo:
+                                <pre class="codigo-bloque">sudo dd if=/dev/sdb1 of=/home/$USER/imagen_sdb1.img bs=4M status=progress</pre>
+                            </li>
+                            <li>Comprueba el tamano de la imagen generada:
+                                <pre class="codigo-bloque">ls -lh /home/$USER/imagen_sdb1.img</pre>
+                            </li>
+                            <li>Comprime la imagen con <strong>gzip</strong> para reducir su tamano:
+                                <pre class="codigo-bloque">gzip -k /home/$USER/imagen_sdb1.img
+ls -lh /home/$USER/imagen_sdb1.img*</pre>
+                            </li>
+                            <li>Compara el tamano original y el comprimido.</li>
+                            <li>Restaura la imagen comprimida a otra particion (<code>/dev/sdc1</code>):
+                                <pre class="codigo-bloque">sudo umount /dev/sdc1 2>/dev/null
+gunzip -c /home/$USER/imagen_sdb1.img.gz | sudo dd of=/dev/sdc1 bs=4M status=progress</pre>
+                            </li>
+                            <li>Verifica la restauracion montando el destino:
+                                <pre class="codigo-bloque">sudo mount /dev/sdc1 /mnt/destino
+ls -la /mnt/destino/
+cat /mnt/destino/prueba.txt
+sudo umount /mnt/destino</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de la imagen con dd</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la imagen sin comprimir (.img)</td>
+                            <td><input type="text" placeholder="Ej: 1.0 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la imagen comprimida (.img.gz)</td>
+                            <td><input type="text" placeholder="Ej: 45 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Ratio de compresion (% reduccion)</td>
+                            <td><input type="text" placeholder="Ej: 95.5%"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de creacion de imagen</td>
+                            <td><input type="text" placeholder="Ej: 8 segundos"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de compresion</td>
+                            <td><input type="text" placeholder="Ej: 5 segundos"></td>
+                        </tr>
+                        <tr>
+                            <td>Restauracion exitosa (si/no)</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Sobre la compresion:</strong> <code>dd</code> copia todos los bytes del dispositivo, incluidos los bloques vacios (ceros). Por eso la imagen sin comprimir tiene el mismo tamano que la particion, aunque apenas tenga datos. Al comprimir con <code>gzip</code>, los bloques vacios se reducen drasticamente, por lo que la imagen comprimida es mucho mas pequena.
+                    </div>
+
+                    <h3>Captura 2: Creacion y restauracion de imagen con dd</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la creacion de imagen, compresion con gzip y verificacion de la restauracion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Rescuezilla -->
+            <div class="seccion">
+                <h2>Parte 3 — Rescuezilla (60 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>Rescuezilla</strong> es una herramienta grafica de codigo abierto para crear y restaurar imagenes de disco. Es compatible con imagenes de Clonezilla y ofrece una interfaz grafica muy amigable, ideal para usuarios que prefieren no usar la linea de comandos.</p>
+
+                    <div class="nota">
+                        <strong>Interfaz grafica:</strong> Rescuezilla tiene una GUI (interfaz grafica de usuario) muy intuitiva con botones grandes y un asistente paso a paso. Es la opcion mas amigable de las tres herramientas que veremos en esta practica.
+                    </div>
+
+                    <h3>Procedimiento: Configurar VirtualBox para arrancar desde Rescuezilla</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga</strong> tu VM de Ubuntu si esta encendida.</li>
+                            <li>En VirtualBox, ve a <strong>Configuracion</strong> de la VM &rarr; <strong>Almacenamiento</strong>.</li>
+                            <li>En el <strong>Controlador IDE</strong>, haz clic en el icono de disco vacio (o anade uno nuevo).</li>
+                            <li>Haz clic en el icono del disco a la derecha &rarr; <strong>Seleccionar archivo de disco</strong> &rarr; Busca y selecciona la ISO de Rescuezilla.</li>
+                            <li>Ve a <strong>Sistema</strong> &rarr; <strong>Orden de arranque</strong> y coloca <strong>Optico</strong> por encima de <strong>Disco duro</strong>.</li>
+                            <li>Inicia la VM. Deberia arrancar desde la ISO de Rescuezilla.</li>
+                            <li>Espera a que cargue el escritorio grafico de Rescuezilla (puede tardar 1-2 minutos).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Procedimiento: Crear una imagen de disco (Backup)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el escritorio de Rescuezilla, haz clic en el boton <strong>"Backup"</strong>.</li>
+                            <li>Selecciona el <strong>disco de origen</strong> que deseas respaldar (por ejemplo, <code>/dev/sdb</code> de 5 GB).</li>
+                            <li>Selecciona las <strong>particiones</strong> que deseas incluir en la imagen (marca todas o solo <code>sdb1</code>).</li>
+                            <li>Selecciona el <strong>destino</strong> donde guardar la imagen. Puedes elegir otro disco local de la VM o una carpeta compartida.</li>
+                            <li>Asigna un <strong>nombre</strong> a la imagen (por ejemplo: <code>backup_sdb_rescuezilla</code>).</li>
+                            <li>Revisa el resumen de la operacion y haz clic en <strong>"Next"</strong> o <strong>"Start"</strong> para comenzar.</li>
+                            <li>Espera a que finalice el proceso. Anota el tiempo y el tamano resultante.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Procedimiento: Restaurar una imagen (Restore)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Rescuezilla, haz clic en el boton <strong>"Restore"</strong>.</li>
+                            <li>Selecciona la <strong>ubicacion</strong> donde se guardo la imagen previamente.</li>
+                            <li>Selecciona la <strong>imagen</strong> que creaste en el paso anterior.</li>
+                            <li>Selecciona el <strong>disco de destino</strong> donde restaurar (por ejemplo, <code>/dev/sdc</code>).</li>
+                            <li>Revisa el resumen de la operacion. Asegurate de que el disco destino es correcto.</li>
+                            <li>Haz clic en <strong>"Next"</strong> o <strong>"Start"</strong> para iniciar la restauracion.</li>
+                            <li>Espera a que termine y verifica que la restauracion fue exitosa.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de Rescuezilla</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Disco de origen seleccionado</td>
+                            <td><input type="text" placeholder="Ej: /dev/sdb (5 GB)"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la imagen creada</td>
+                            <td><input type="text" placeholder="Ej: 120 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de creacion de la imagen (backup)</td>
+                            <td><input type="text" placeholder="Ej: 3 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco de destino para restauracion</td>
+                            <td><input type="text" placeholder="Ej: /dev/sdc (5 GB)"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de restauracion (restore)</td>
+                            <td><input type="text" placeholder="Ej: 2 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Restauracion exitosa (si/no)</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                        <tr>
+                            <td>Formato de imagen utilizado</td>
+                            <td><input type="text" placeholder="Ej: Rescuezilla / Clonezilla compatible"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Proceso de backup/restore con Rescuezilla</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la interfaz de Rescuezilla mostrando el proceso de backup o restore (seleccion de disco, progreso o resultado final)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Clonezilla -->
+            <div class="seccion">
+                <h2>Parte 4 — Clonezilla (60 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>Clonezilla</strong> es una de las herramientas de clonacion mas utilizadas en entornos profesionales. Funciona mediante un asistente basado en texto (ncurses) y ofrece opciones avanzadas de compresion, cifrado y clonacion multicast.</p>
+
+                    <h3>Procedimiento: Configurar VirtualBox para arrancar desde Clonezilla</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga</strong> tu VM si esta encendida.</li>
+                            <li>En VirtualBox, ve a <strong>Configuracion</strong> &rarr; <strong>Almacenamiento</strong>.</li>
+                            <li>Cambia la ISO del Controlador IDE: quita la de Rescuezilla y carga la de <strong>Clonezilla</strong>.</li>
+                            <li>Asegurate de que el orden de arranque tiene <strong>Optico</strong> primero.</li>
+                            <li>Inicia la VM. Aparecera el menu de arranque de Clonezilla.</li>
+                            <li>Selecciona <strong>"Clonezilla live (VGA 800x600)"</strong> o la opcion por defecto.</li>
+                            <li>Selecciona el idioma (<strong>es_ES.UTF-8 Spanish</strong> si esta disponible, o en ingles).</li>
+                            <li>Selecciona la configuracion de teclado (acepta la predeterminada o elige <strong>Spanish</strong>).</li>
+                            <li>Selecciona <strong>"Start_Clonezilla"</strong> para iniciar el asistente.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Procedimiento: Crear imagen de disco (savedisk)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciona el modo <strong>"device-image"</strong> (trabajar con imagenes de disco).</li>
+                            <li>Selecciona <strong>"local_dev"</strong> para guardar la imagen en un disco local.</li>
+                            <li>Clonezilla escaneara los dispositivos. Pulsa <strong>Enter</strong> cuando detecte tus discos.</li>
+                            <li>Selecciona el <strong>disco/particion de destino</strong> donde guardar la imagen (por ejemplo, <code>sdc1</code>).</li>
+                            <li>Selecciona el directorio de destino dentro de esa particion.</li>
+                            <li>Selecciona el modo <strong>"Beginner"</strong> (principiante) para usar las opciones por defecto.</li>
+                            <li>Selecciona <strong>"savedisk"</strong> para crear una imagen de un disco completo.</li>
+                            <li>Asigna un <strong>nombre</strong> a la imagen (por ejemplo: <code>imagen_sdb_clonezilla</code>).</li>
+                            <li>Selecciona el <strong>disco de origen</strong> del que crear la imagen (<code>sdb</code>).</li>
+                            <li>Acepta las opciones de compresion por defecto y confirma la operacion.</li>
+                            <li>Espera a que Clonezilla cree la imagen. Anota el tiempo y resultado.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Procedimiento: Restaurar imagen (restoredisk)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Si la VM se ha reiniciado, vuelve a arrancar desde la ISO de Clonezilla y repite los pasos iniciales hasta <strong>"Start_Clonezilla"</strong>.</li>
+                            <li>Selecciona <strong>"device-image"</strong> &rarr; <strong>"local_dev"</strong>.</li>
+                            <li>Selecciona la particion donde guardaste la imagen.</li>
+                            <li>Selecciona el modo <strong>"Beginner"</strong>.</li>
+                            <li>Selecciona <strong>"restoredisk"</strong> para restaurar una imagen a un disco.</li>
+                            <li>Selecciona la <strong>imagen</strong> que creaste anteriormente.</li>
+                            <li>Selecciona el <strong>disco de destino</strong> (<code>sdc</code>) donde restaurar.</li>
+                            <li>Confirma la operacion (Clonezilla pedira confirmacion dos veces por seguridad).</li>
+                            <li>Espera a que finalice y anota el resultado.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de Clonezilla</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Modo utilizado</td>
+                            <td><input type="text" placeholder="Ej: device-image / savedisk"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco de origen</td>
+                            <td><input type="text" placeholder="Ej: sdb (5 GB)"></td>
+                        </tr>
+                        <tr>
+                            <td>Ubicacion de la imagen guardada</td>
+                            <td><input type="text" placeholder="Ej: /dev/sdc1/home/partimag/"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la imagen creada</td>
+                            <td><input type="text" placeholder="Ej: 85 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de creacion (savedisk)</td>
+                            <td><input type="text" placeholder="Ej: 2 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco de destino para restauracion</td>
+                            <td><input type="text" placeholder="Ej: sdc (5 GB)"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de restauracion (restoredisk)</td>
+                            <td><input type="text" placeholder="Ej: 3 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Restauracion exitosa (si/no)</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Sobre Clonezilla:</strong> A diferencia de <code>dd</code>, Clonezilla solo copia los bloques que contienen datos reales (no los bloques vacios), lo que hace que las imagenes sean mas pequenas y el proceso mas rapido. Ademas, aplica compresion automatica y puede trabajar con multiples sistemas de archivos (ext4, NTFS, FAT32, etc.).
+                    </div>
+
+                    <h3>Captura 4: Proceso de savedisk/restoredisk con Clonezilla</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del asistente de Clonezilla mostrando el proceso de savedisk o restoredisk (seleccion de disco, progreso o resultado)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Comparativa de herramientas -->
+            <div class="seccion">
+                <h2>Parte 5 — Comparativa de herramientas</h2>
+                <div class="seccion-body">
+                    <p>Ahora que has utilizado las tres herramientas, completa la siguiente tabla comparativa basandote en tu experiencia durante la practica.</p>
+
+                    <h3>Tabla comparativa</h3>
+                    <table>
+                        <tr>
+                            <th style="width:22%">Caracteristica</th>
+                            <th style="width:26%">dd</th>
+                            <th style="width:26%">Rescuezilla</th>
+                            <th style="width:26%">Clonezilla</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Facilidad de uso</strong></td>
+                            <td><input type="text" placeholder="Ej: Baja - solo CLI"></td>
+                            <td><input type="text" placeholder="Ej: Alta - GUI intuitiva"></td>
+                            <td><input type="text" placeholder="Ej: Media - asistente texto"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Interfaz</strong></td>
+                            <td><input type="text" placeholder="CLI (linea de comandos)"></td>
+                            <td><input type="text" placeholder="GUI (grafica)"></td>
+                            <td><input type="text" placeholder="TUI (texto interactivo)"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Velocidad</strong></td>
+                            <td><input type="text" placeholder="Ej: Media"></td>
+                            <td><input type="text" placeholder="Ej: Media-alta"></td>
+                            <td><input type="text" placeholder="Ej: Alta"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compresion nativa</strong></td>
+                            <td><input type="text" placeholder="Ej: No (necesita gzip)"></td>
+                            <td><input type="text" placeholder="Ej: Si, automatica"></td>
+                            <td><input type="text" placeholder="Ej: Si, automatica"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Copia bloques vacios</strong></td>
+                            <td><input type="text" placeholder="Ej: Si (copia todo)"></td>
+                            <td><input type="text" placeholder="Ej: No (solo datos)"></td>
+                            <td><input type="text" placeholder="Ej: No (solo datos)"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tamano de imagen</strong></td>
+                            <td><input type="text" placeholder="Ej: Grande (sin comprimir)"></td>
+                            <td><input type="text" placeholder="Ej: Pequeno"></td>
+                            <td><input type="text" placeholder="Ej: Pequeno"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cuando usarlo</strong></td>
+                            <td><textarea placeholder="Ej: Copia exacta byte a byte, forense, scripts..." rows="3"></textarea></td>
+                            <td><textarea placeholder="Ej: Usuarios sin experiencia, respaldo rapido..." rows="3"></textarea></td>
+                            <td><textarea placeholder="Ej: Despliegue masivo, entornos profesionales..." rows="3"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Valoracion personal (1-10)</strong></td>
+                            <td><input type="text" placeholder="Ej: 6"></td>
+                            <td><input type="text" placeholder="Ej: 8"></td>
+                            <td><input type="text" placeholder="Ej: 9"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Reflexion sobre la comparativa</h3>
+                    <div class="pregunta">
+                        <p>Basandote en la tabla anterior, explica cual de las tres herramientas elegiras para cada uno de estos escenarios y por que:</p>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Escenario</th>
+                            <th>Herramienta elegida y justificacion</th>
+                        </tr>
+                        <tr>
+                            <td>Migrar el disco de un portatil de HDD a SSD</td>
+                            <td><textarea placeholder="Escribe la herramienta que usarias y explica por que..." rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Crear un respaldo rapido del disco de un cliente</td>
+                            <td><textarea placeholder="Escribe la herramienta que usarias y explica por que..." rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Desplegar una imagen en 20 equipos de un aula</td>
+                            <td><textarea placeholder="Escribe la herramienta que usarias y explica por que..." rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Crear una copia forense de un disco para analisis</td>
+                            <td><textarea placeholder="Escribe la herramienta que usarias y explica por que..." rows="2"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Comparativa visual</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura mostrando los tamanos de las imagenes generadas por cada herramienta (ls -lh) o cualquier comparativa visual relevante</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con un minimo de <strong>3 lineas</strong> cada una. Reflexiona sobre lo aprendido durante la practica.</p>
+
+                    <div class="pregunta">
+                        <p>1. ¿Cual es la diferencia entre clonar un disco y crear una imagen de disco? ¿En que situaciones usarias cada metodo?</p>
+                        <textarea placeholder="Explica las diferencias fundamentales entre clonacion directa (disco a disco) y la creacion de un archivo de imagen. Describe escenarios donde cada metodo es mas adecuado..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. ¿Cuando es preferible hacer una clonacion disco a disco directa en lugar de crear una imagen? ¿Y viceversa?</p>
+                        <textarea placeholder="Analiza las ventajas y desventajas de cada enfoque. Piensa en velocidad, almacenamiento intermedio, flexibilidad, posibilidad de guardar multiples imagenes..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. ¿Es posible clonar un disco grande (ej: 500 GB) a un disco mas pequeno (ej: 250 GB)? ¿Que condiciones deben cumplirse? ¿Que herramientas lo permiten?</p>
+                        <textarea placeholder="Reflexiona sobre los requisitos para clonar a un disco mas pequeno. Piensa en el espacio realmente ocupado vs el tamano total, y en como gestionan esto las diferentes herramientas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. En el escenario del aula de informatica con 20 PCs identicos, ¿como planificarias el despliegue de la imagen? ¿Que metodo y herramienta usarias? ¿Que problemas pueden surgir tras clonar (SID, nombre de equipo, direccion IP)?</p>
+                        <textarea placeholder="Describe un plan completo para el despliegue masivo. Menciona la herramienta elegida, el metodo (unicast, multicast...), y los problemas de configuracion individual que hay que resolver tras la clonacion..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. ¿Que precauciones de seguridad hay que tomar antes de realizar una clonacion o crear una imagen de disco en un entorno real con datos de clientes?</p>
+                        <textarea placeholder="Piensa en la verificacion de dispositivos, copias de seguridad previas, confirmacion con el cliente, integridad de datos, cifrado de imagenes, almacenamiento seguro de las imagenes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega y evaluacion -->
+            <div class="seccion">
+                <h2>Entrega y evaluacion</h2>
+                <div class="seccion-body">
+                    <h3>Capturas requeridas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:15%">Captura</th>
+                            <th>Contenido</th>
+                            <th style="width:80px">Incluida</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Clonacion de particion con dd (comando, resultado y verificacion)</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Creacion y restauracion de imagen con dd y gzip</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Proceso de backup/restore con Rescuezilla</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Proceso de savedisk/restoredisk con Clonezilla</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Comparativa visual de tamanos de imagenes o herramientas</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Practica 19 - Clonacion de Discos y Sistemas<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Clonacion con dd en Linux (Parte 1 y 2)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Uso de Rescuezilla - backup y restore (Parte 3)</td>
+                                <td>2.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Uso de Clonezilla - savedisk y restoredisk (Parte 4)</td>
+                                <td>2.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Tabla comparativa de herramientas (Parte 5)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 6)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 5 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Clonacion de particion con dd realizada y documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Imagen creada, comprimida y restaurada con dd</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Backup y restore con Rescuezilla completados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Savedisk y restoredisk con Clonezilla completados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Tabla comparativa completada con reflexiones por escenario</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">5 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 19 - Clonacion de Discos y Sistemas</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque de Clonacion y copias de seguridad (Practica 19)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 19: Clonacion de Discos y Sistemas';
+        const PREFIJO_ARCHIVO = 'P19_Clonacion_Discos';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

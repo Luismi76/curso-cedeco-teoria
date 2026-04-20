@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 25: Comparticion de Recursos en Red</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 25: Comparticion de Recursos en Red</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 — Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Comunicacion por red y comparticion de recursos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo en parejas<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs de Windows y Ubuntu (en red interna)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+                <div class="campo">
+                    <label>Nombre del companero/a</label>
+                    <input type="text" id="alumno-companero" placeholder="Nombre de tu pareja de trabajo">
+                </div>
+                <div class="campo">
+                    <label>Puesto de trabajo</label>
+                    <input type="text" id="alumno-puesto" placeholder="Ej: PC-07">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Requisito previo:</strong> Ambas maquinas virtuales (Windows y Ubuntu) deben estar en la misma red interna de VirtualBox con conectividad verificada desde la Practica 22. Comprueba que puedes hacer <code>ping</code> entre ambas VMs antes de empezar.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Eres tecnico en un pequeno taller de reparacion informatica. El taller tiene equipos con Windows y Linux que necesitan compartir archivos y una impresora de forma transparente. Tu mision es configurar toda la comparticion de recursos para que el equipo de tecnicos pueda trabajar sin fricciones entre ambos sistemas operativos.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de aprendizaje</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.9; font-size: 13px;">
+                        <li>Compartir carpetas en Windows mediante el protocolo SMB</li>
+                        <li>Configurar Samba en Linux para compartir recursos con equipos Windows</li>
+                        <li>Acceder a carpetas compartidas de Windows desde Linux usando <code>cifs-utils</code></li>
+                        <li>Mapear unidades de red de forma persistente</li>
+                        <li>Compartir impresoras en red entre Windows y Linux</li>
+                        <li>Descubrir y enumerar recursos compartidos en la red</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:40%">Requisito</th>
+                            <th>Estado</th>
+                        </tr>
+                        <tr>
+                            <td>Ambas VMs en Red Interna de VirtualBox</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Verificado</option>
+                                    <option>Pendiente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Conectividad entre VMs verificada (ping)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Verificado</option>
+                                    <option>Pendiente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Acceso con privilegios de administrador (Windows)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Verificado</option>
+                                    <option>Pendiente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Acceso con sudo (Ubuntu)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Verificado</option>
+                                    <option>Pendiente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>IP de la VM Windows</td>
+                            <td><input type="text" placeholder="Ej: 192.168.1.10"></td>
+                        </tr>
+                        <tr>
+                            <td>IP de la VM Ubuntu</td>
+                            <td><input type="text" placeholder="Ej: 192.168.1.20"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Parte 1: Compartir carpeta en Windows -->
+            <div class="seccion">
+                <h2>Parte 1: Compartir carpeta en Windows (50 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta primera parte vamos a crear una carpeta compartida en Windows y configurar los permisos de acceso por red.</p>
+
+                    <h3>1.1 Crear la carpeta y archivos de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Explorador de archivos</strong> y navega a <code>C:\</code></li>
+                            <li>Crea una nueva carpeta llamada <code>Compartida</code></li>
+                            <li>Dentro de la carpeta, crea los siguientes archivos de prueba:
+                                <ul style="margin-left: 20px; margin-top: 4px;">
+                                    <li><code>informe_prueba.txt</code> — escribe cualquier texto dentro</li>
+                                    <li><code>datos_taller.txt</code> — escribe datos ficticios de un taller</li>
+                                    <li>Crea una subcarpeta llamada <code>Backups</code></li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>1.2 Configurar la comparticion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho sobre <code>C:\Compartida</code> y selecciona <strong>Propiedades</strong></li>
+                            <li>Ve a la pestana <strong>Compartir</strong></li>
+                            <li>Pulsa en <strong>Uso compartido avanzado...</strong></li>
+                            <li>Marca la casilla <strong>"Compartir esta carpeta"</strong></li>
+                            <li>El nombre del recurso compartido debe ser <code>Compartida</code></li>
+                            <li>Pulsa en <strong>Permisos</strong> y configura:
+                                <ul style="margin-left: 20px; margin-top: 4px;">
+                                    <li><strong>Todos (Everyone)</strong>: Permiso de <strong>Lectura</strong></li>
+                                    <li><strong>Administradores</strong>: <strong>Control total</strong></li>
+                                </ul>
+                            </li>
+                            <li>Acepta todos los dialogos</li>
+                        </ol>
+                    </div>
+
+                    <h3>1.3 Acceder desde la otra VM</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde la otra maquina virtual (o desde la propia), abre el <strong>Explorador de archivos</strong></li>
+                            <li>En la barra de direcciones escribe: <code>\\IP_DE_WINDOWS\Compartida</code></li>
+                            <li>Comprueba que ves los archivos creados</li>
+                            <li>Tambien puedes acceder desde la <strong>linea de comandos (CMD)</strong>:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque">REM Mapear la carpeta compartida como unidad Z: (CMD)
+net use Z: \\192.168.1.10\Compartida
+
+REM Verificar que la unidad esta mapeada
+dir Z:\
+
+REM Listar los recursos compartidos de la maquina remota (PowerShell)
+REM (sustituye al antiguo "net view \\IP", que requiere SMBv1 desactivado por defecto)
+powershell -Command "Get-SmbShare -CimSession 192.168.1.10"</pre>
+
+                    <div class="nota">
+                        <strong>Nota sobre <code>net view</code>:</strong> El comando clasico <code>net view \\IP</code> dependia del protocolo <strong>SMBv1/NetBIOS</strong>, que esta <strong>desactivado por defecto en Windows 10/11</strong> por motivos de seguridad. Por eso suele devolver el error <em>"System error 6118"</em> o una lista vacia. La alternativa moderna es <code>Get-SmbShare -CimSession &lt;IP&gt;</code> en PowerShell, que utiliza WS-Management sobre SMBv2/3.
+                    </div>
+
+                    <h3>1.4 Probar permisos de lectura y escritura</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Intenta <strong>leer</strong> un archivo de la carpeta compartida</li>
+                            <li>Intenta <strong>crear</strong> un nuevo archivo desde el equipo remoto</li>
+                            <li>Intenta <strong>eliminar</strong> un archivo existente</li>
+                            <li>Anota los resultados en la tabla siguiente</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Accion</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Leer archivo remoto</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Crear archivo nuevo</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Eliminar archivo existente</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Comando <code>net use Z:</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte1">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de la carpeta compartida accedida desde otro equipo<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 2: Samba en Linux -->
+            <div class="seccion">
+                <h2>Parte 2: Samba - Compartir desde Linux (60 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vamos a configurar el servidor Samba en Ubuntu para que los equipos Windows puedan acceder a carpetas compartidas en Linux.</p>
+
+                    <h3>2.1 Instalar Samba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una terminal en Ubuntu</li>
+                            <li>Actualiza los repositorios e instala Samba:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque">sudo apt update
+sudo apt install samba -y
+
+# Verificar que Samba se ha instalado correctamente
+smbd --version
+
+# Comprobar que el servicio esta activo
+sudo systemctl status smbd</pre>
+
+                    <h3>2.2 Crear la carpeta a compartir</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea el directorio que vamos a compartir:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque"># Crear la carpeta compartida
+sudo mkdir -p /srv/compartida
+
+# Establecer permisos amplios para pruebas
+sudo chmod 777 /srv/compartida
+
+# Crear archivos de prueba
+echo "Archivo de prueba desde Linux" | sudo tee /srv/compartida/prueba_linux.txt
+echo "Datos del taller - equipo Ubuntu" | sudo tee /srv/compartida/datos_ubuntu.txt</pre>
+
+                    <h3>2.3 Configurar /etc/samba/smb.conf</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz una copia de seguridad del archivo de configuracion original:</li>
+                            <li>Edita el archivo de configuracion de Samba:</li>
+                            <li>Anade el siguiente bloque <strong>al final del archivo</strong>:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque"># Copia de seguridad
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
+
+# Editar configuracion
+sudo nano /etc/samba/smb.conf</pre>
+
+                    <p style="margin: 10px 0; font-weight: 600; color: var(--azul);">Bloque a anadir al final de smb.conf:</p>
+
+<pre class="codigo-bloque">[Compartida]
+   comment = Carpeta compartida del taller
+   path = /srv/compartida
+   browseable = yes
+   read only = no
+   guest ok = yes
+   create mask = 0664
+   directory mask = 0775
+   force user = nobody</pre>
+
+                    <h3>2.4 Reiniciar el servicio Samba</h3>
+<pre class="codigo-bloque"># Verificar que la configuracion no tiene errores
+testparm
+
+# Reiniciar los servicios de Samba
+sudo systemctl restart smbd
+sudo systemctl restart nmbd
+
+# Verificar que estan activos
+sudo systemctl status smbd</pre>
+
+                    <h3>2.5 Acceder desde Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM de Windows, abre el <strong>Explorador de archivos</strong></li>
+                            <li>Escribe en la barra de direcciones: <code>\\IP_DE_UBUNTU\Compartida</code></li>
+                            <li>Deberias ver los archivos <code>prueba_linux.txt</code> y <code>datos_ubuntu.txt</code></li>
+                            <li>Prueba a crear un archivo desde Windows dentro de la carpeta</li>
+                            <li>Vuelve a Ubuntu y comprueba que el archivo aparece en <code>/srv/compartida</code></li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:35%">Accion</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Instalar Samba</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Version instalada"></td>
+                        </tr>
+                        <tr>
+                            <td>testparm sin errores</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Resultado del testparm"></td>
+                        </tr>
+                        <tr>
+                            <td>Acceder desde Windows a \\IP\Compartida</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Crear archivo desde Windows en Samba</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Nombre del archivo creado"></td>
+                        </tr>
+                        <tr>
+                            <td>Verificar archivo en Ubuntu</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Aparece el archivo en /srv/compartida?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte2">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de Windows accediendo a la carpeta Samba de Linux<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 2">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 3: Acceder a Windows desde Linux -->
+            <div class="seccion">
+                <h2>Parte 3: Acceder a Windows desde Linux (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora haremos el camino inverso: desde Ubuntu, montaremos una carpeta compartida de Windows usando el protocolo CIFS.</p>
+
+                    <h3>3.1 Instalar cifs-utils</h3>
+<pre class="codigo-bloque">sudo apt install cifs-utils -y</pre>
+
+                    <h3>3.2 Montar la carpeta compartida de Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea el punto de montaje en Ubuntu:</li>
+                            <li>Monta la carpeta compartida de Windows:</li>
+                            <li>Verifica que puedes ver los archivos:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque"># Crear punto de montaje
+sudo mkdir -p /mnt/windows
+
+# Montar la carpeta compartida de Windows (acceso como invitado)
+sudo mount -t cifs //192.168.1.10/Compartida /mnt/windows -o guest,vers=3.0
+
+# Verificar que los archivos son visibles
+ls -la /mnt/windows
+
+# Leer un archivo
+cat /mnt/windows/informe_prueba.txt</pre>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Si el acceso como invitado no funciona, usa la opcion con usuario: <code>sudo mount -t cifs //IP/Compartida /mnt/windows -o username=USUARIO,password=CONTRASENA,vers=3.0</code>
+                    </div>
+
+                    <h3>3.3 Configurar montaje permanente en /etc/fstab</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Para que la carpeta se monte automaticamente al iniciar el sistema, edita <code>/etc/fstab</code>:</li>
+                            <li>Anade la siguiente linea al final del archivo:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque"># Editar fstab
+sudo nano /etc/fstab
+
+# Linea a anadir (sustituye la IP por la de tu VM Windows):
+//192.168.1.10/Compartida  /mnt/windows  cifs  guest,vers=3.0,_netdev  0  0
+
+# Probar que funciona sin reiniciar
+sudo mount -a
+
+# Verificar
+df -h | grep windows</pre>
+
+                    <div class="aviso">
+                        <strong>Atencion:</strong> Si introduces una linea incorrecta en <code>/etc/fstab</code>, el sistema podria no arrancar correctamente. Revisa siempre la sintaxis antes de guardar.
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo mount -t cifs ...</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe lo que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ls -la /mnt/windows</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Archivos visibles?"></td>
+                        </tr>
+                        <tr>
+                            <td>Linea anadida en <code>/etc/fstab</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Linea exacta que anadiste"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo mount -a</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Se monto correctamente?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte3">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de Linux accediendo a la carpeta compartida de Windows<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 3">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 4: Mapeo persistente de unidades -->
+            <div class="seccion">
+                <h2>Parte 4: Mapeo persistente de unidades en Windows (20 min)</h2>
+                <div class="seccion-body">
+                    <p>En Windows, podemos mapear una carpeta compartida como una letra de unidad de forma persistente para que sobreviva a los reinicios.</p>
+
+                    <h3>4.1 Mapear unidad de forma persistente</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una ventana de <strong>CMD como administrador</strong></li>
+                            <li>Ejecuta el siguiente comando para mapear la carpeta Samba de Linux como unidad Z:</li>
+                            <li>Verifica que aparece en el Explorador de archivos</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque">REM Mapear unidad de red persistente
+net use Z: \\192.168.1.20\Compartida /persistent:yes
+
+REM Verificar las unidades mapeadas
+net use
+
+REM Comprobar el contenido
+dir Z:\</pre>
+
+                    <h3>4.2 Verificar persistencia tras reinicio</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Reinicia</strong> la maquina virtual de Windows</li>
+                            <li>Una vez reiniciada, abre el <strong>Explorador de archivos</strong></li>
+                            <li>Comprueba que la unidad <code>Z:</code> sigue mapeada</li>
+                            <li>Ejecuta <code>net use</code> en CMD para confirmar</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.3 Desconectar la unidad mapeada</h3>
+<pre class="codigo-bloque">REM Desconectar la unidad Z:
+net use Z: /delete
+
+REM Verificar que se ha eliminado
+net use</pre>
+
+                    <table>
+                        <tr>
+                            <th style="width:35%">Accion</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td><code>net use Z: ... /persistent:yes</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Mensaje del comando"></td>
+                        </tr>
+                        <tr>
+                            <td>Unidad visible en Explorador</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Si</option>
+                                    <option>No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Aparece como unidad Z:?"></td>
+                        </tr>
+                        <tr>
+                            <td>Persistencia tras reinicio</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Si</option>
+                                    <option>No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Sigue mapeada despues de reiniciar?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>net use Z: /delete</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Se elimino correctamente?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte4">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de la unidad mapeada en el Explorador de archivos<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 4">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 5: Compartir impresora en red -->
+            <div class="seccion">
+                <h2>Parte 5: Compartir impresora en red (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Compartir una impresora en red permite que cualquier equipo de la oficina pueda imprimir sin necesidad de estar conectado directamente.</p>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Para este ejercicio usaremos la impresora virtual <strong>Microsoft Print to PDF</strong> que viene instalada por defecto en Windows. El procedimiento es identico al de una impresora fisica real.
+                    </div>
+
+                    <h3>5.1 Compartir la impresora en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Configuracion > Bluetooth y dispositivos > Impresoras y escaneres</strong></li>
+                            <li>Selecciona <strong>Microsoft Print to PDF</strong></li>
+                            <li>Pulsa en <strong>Propiedades de impresora</strong></li>
+                            <li>Ve a la pestana <strong>Compartir</strong></li>
+                            <li>Marca <strong>"Compartir esta impresora"</strong></li>
+                            <li>Pon como nombre de recurso: <code>PDF_Compartida</code></li>
+                            <li>Acepta los cambios</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 Conectar a la impresora desde otro equipo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde otro equipo Windows, abre el <strong>Explorador de archivos</strong></li>
+                            <li>Escribe: <code>\\IP_DE_WINDOWS</code> en la barra de direcciones</li>
+                            <li>Deberia aparecer la impresora compartida <code>PDF_Compartida</code></li>
+                            <li>Haz doble clic para instalar el controlador y anadirla</li>
+                            <li>Tambien puedes usar CMD:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque">REM Conectar a la impresora compartida
+rundll32 printui.dll,PrintUIEntry /in /n "\\192.168.1.10\PDF_Compartida"
+
+REM Verificar impresoras instaladas (PowerShell, wmic esta obsoleto)
+powershell -Command "Get-Printer | Select-Object Name, DriverName, PortName"</pre>
+
+                    <h3>5.3 Probar la impresion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre cualquier documento (Bloc de notas, por ejemplo)</li>
+                            <li>Selecciona <strong>Archivo > Imprimir</strong></li>
+                            <li>Elige la impresora de red <code>PDF_Compartida en \\IP</code></li>
+                            <li>Imprime y comprueba que se genera el PDF</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:35%">Accion</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Compartir impresora en Windows</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Nombre del recurso compartido"></td>
+                        </tr>
+                        <tr>
+                            <td>Conectar desde otro equipo</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Se instalo correctamente?"></td>
+                        </tr>
+                        <tr>
+                            <td>Imprimir documento de prueba</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Se genero el PDF?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte5">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de la impresora compartida en la red<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 6: Descubrir recursos en la red -->
+            <div class="seccion">
+                <h2>Parte 6: Descubrir recursos en la red (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Es fundamental saber como descubrir que recursos estan compartidos en una red. Veremos herramientas tanto de Windows como de Linux.</p>
+
+                    <h3>6.1 Desde Windows</h3>
+<pre class="codigo-bloque">REM Ver recursos compartidos de un equipo remoto (PowerShell, metodo moderno)
+powershell -Command "Get-SmbShare -CimSession 192.168.1.10"
+
+REM Ver TODOS los recursos compartidos incluidos los ocultos ($)
+powershell -Command "Get-SmbShare -CimSession 192.168.1.10 | Format-Table Name, Path, Description"
+
+REM Ver recursos compartidos del equipo local
+net share
+
+REM Tambien funciona el clasico (siempre que el equipo remoto tenga SMBv1 habilitado)
+REM net view \\192.168.1.10
+REM Aviso: net view falla con "System error 6118" si SMBv1 esta desactivado
+REM (que es el comportamiento por defecto en Windows 10/11).</pre>
+
+                    <h3>6.2 Desde Linux</h3>
+<pre class="codigo-bloque"># Listar recursos compartidos de un equipo Windows/Samba
+smbclient -L //192.168.1.10 -N
+
+# Listar con mas detalle
+smbclient -L //192.168.1.10 -N --option="client min protocol=SMB2"
+
+# Instalar nmap si no esta instalado
+sudo apt install nmap -y
+
+# Escanear recursos SMB con nmap
+nmap --script smb-enum-shares -p 445 192.168.1.10
+
+# Escanear todos los equipos de la red
+nmap --script smb-enum-shares -p 445 192.168.1.0/24</pre>
+
+                    <h3>6.3 Inventario de recursos descubiertos</h3>
+                    <p>Completa la tabla con todos los recursos compartidos que encuentres en la red del aula:</p>
+
+                    <table>
+                        <tr>
+                            <th>IP del equipo</th>
+                            <th>Nombre del recurso</th>
+                            <th>Tipo</th>
+                            <th>Acceso</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="192.168.1.x"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Tipo --</option>
+                                    <option>Carpeta</option>
+                                    <option>Impresora</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Acceso --</option>
+                                    <option>Permitido</option>
+                                    <option>Denegado</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-upload" id="foto-parte6">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura del resultado de la exploracion de recursos en red<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura parte 6">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 7: Proyecto final integrador -->
+            <div class="seccion">
+                <h2>Parte 7: Proyecto final integrador - Taller de reparacion (60 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Mini-proyecto evaluable:</strong> En parejas, debeis montar el entorno completo de un pequeno taller de reparacion informatica. Cada equipo tiene un rol y unos servicios que debe ofrecer. Al final, debeis demostrar que todo funciona y documentarlo con capturas de pantalla.
+                    </div>
+
+                    <h3>7.1 Equipo Windows (Tecnico)</h3>
+                    <p>El PC del tecnico debe tener configurado:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Carpeta compartida <code>C:\Informes</code></strong>: con permisos de lectura y escritura para el equipo del cliente</li>
+                            <li><strong>Impresora compartida</strong>: accesible desde la red</li>
+                            <li><strong>Herramienta de acceso remoto</strong> instalada (escritorio remoto de Windows habilitado o software como AnyDesk)</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Servicio del Tecnico (Windows)</th>
+                            <th style="width:20%">Estado</th>
+                            <th>Detalles</th>
+                        </tr>
+                        <tr>
+                            <td>Carpeta <code>C:\Informes</code> compartida (R/W)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Permisos configurados"></td>
+                        </tr>
+                        <tr>
+                            <td>Impresora compartida en red</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Nombre de la impresora"></td>
+                        </tr>
+                        <tr>
+                            <td>Acceso remoto habilitado</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Herramienta utilizada"></td>
+                        </tr>
+                    </table>
+
+                    <h3>7.2 Equipo Linux (Cliente)</h3>
+                    <p>El PC del cliente debe tener configurado:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Samba share <code>/srv/backups</code></strong>: carpeta compartida para copias de seguridad</li>
+                            <li><strong>Servicio SSH activo</strong>: para acceso remoto seguro desde el tecnico</li>
+                            <li><strong>Montaje automatico</strong> de la carpeta <code>C:\Informes</code> del tecnico en <code>/mnt/informes</code> (via fstab)</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Servicio del Cliente (Linux)</th>
+                            <th style="width:20%">Estado</th>
+                            <th>Detalles</th>
+                        </tr>
+                        <tr>
+                            <td>Samba share <code>/srv/backups</code></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Bloque smb.conf utilizado"></td>
+                        </tr>
+                        <tr>
+                            <td>SSH activo y accesible</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Puerto SSH"></td>
+                        </tr>
+                        <tr>
+                            <td>Auto-montaje de <code>/mnt/informes</code> (fstab)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Estado --</option>
+                                    <option>Configurado</option>
+                                    <option>Pendiente</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Linea de fstab"></td>
+                        </tr>
+                    </table>
+
+                    <h3>7.3 Demostracion del entorno</h3>
+                    <p>Debeis demostrar las siguientes funcionalidades:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Acceso remoto:</strong> El tecnico accede al equipo del cliente via SSH o escritorio remoto</li>
+                            <li><strong>Comparticion bidireccional:</strong> Crear un archivo en Windows y verlo en Linux, y viceversa</li>
+                            <li><strong>Backup automatizado:</strong> Copiar un archivo desde el equipo del tecnico a la carpeta de backups del cliente usando un script simple</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo-bloque"># Ejemplo de script de backup (ejecutar en Linux)
+#!/bin/bash
+# backup_informes.sh - Copia informes del tecnico a backups
+FECHA=$(date +%Y%m%d_%H%M%S)
+cp -r /mnt/informes/* /srv/backups/backup_$FECHA/
+echo "Backup completado: backup_$FECHA"</pre>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Demostracion</th>
+                            <th style="width:20%">Resultado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Acceso remoto funcional</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Metodo utilizado"></td>
+                        </tr>
+                        <tr>
+                            <td>Archivo creado en Windows visible en Linux</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Nombre del archivo"></td>
+                        </tr>
+                        <tr>
+                            <td>Archivo creado en Linux visible en Windows</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Nombre del archivo"></td>
+                        </tr>
+                        <tr>
+                            <td>Script de backup ejecutado</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Resultado --</option>
+                                    <option>Exito</option>
+                                    <option>Error</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Carpeta de backup creada"></td>
+                        </tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Entrega obligatoria:</strong> Documenta todo el proceso con capturas de pantalla y subelas al canal <strong>#entrega-practicas</strong> de Discord. Este proyecto integrador se evalua como mini-proyecto.
+                    </div>
+
+                    <div class="foto-upload" id="foto-parte7a">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura del entorno completo del tecnico (Windows)<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura proyecto tecnico">
+                    </div>
+
+                    <div class="foto-upload" id="foto-parte7b">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura del entorno completo del cliente (Linux)<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura proyecto cliente">
+                    </div>
+
+                    <div class="foto-upload" id="foto-parte7c">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p>Captura de la demostracion de comparticion bidireccional<br>Haz clic, arrastra o pega (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura demostracion">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 8: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 8: Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>8.1 ¿Que es el protocolo SMB/CIFS? ¿Para que se utiliza y en que sistemas operativos esta disponible?</p>
+                        <textarea rows="4" placeholder="Explica que es SMB/CIFS, su funcion principal y compatibilidad..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8.2 Cuando compartimos una carpeta en Windows, existen los permisos de comparticion y los permisos NTFS. ¿Cual prevalece cuando entran en conflicto? Pon un ejemplo.</p>
+                        <textarea rows="4" placeholder="Explica la diferencia entre ambos tipos de permisos y cual es mas restrictivo..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8.3 ¿Por que es necesario Samba en Linux? ¿Que problema resuelve?</p>
+                        <textarea rows="4" placeholder="Explica la funcion de Samba y por que Linux no puede compartir archivos con Windows de forma nativa..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8.4 ¿Cual es la diferencia entre un grupo de trabajo (workgroup) y un dominio? ¿En que entornos se usa cada uno?</p>
+                        <textarea rows="4" placeholder="Compara ambos conceptos y da ejemplos de uso..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8.5 ¿Es posible compartir archivos entre Windows y Linux sin usar Samba? Menciona al menos dos alternativas.</p>
+                        <textarea rows="4" placeholder="Investiga y menciona otras formas de compartir archivos entre ambos sistemas..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 9: Reto tecnico -->
+            <div class="seccion">
+                <h2>Parte 9: Reto tecnico — troubleshooting Samba y automatizacion (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Hasta aqui has configurado servicios siguiendo pasos. En esta parte tienes que <strong>romper, diagnosticar y automatizar</strong>. Se valora que leas los logs y justifiques cada decision, no que hagas funcionar la configuracion por casualidad.</p>
+
+                    <h3>Reto 1 — Rompe y repara Samba leyendo logs (15 min)</h3>
+                    <p>Sobre el recurso Samba que configuraste en la Parte 2, introduce <strong>intencionadamente</strong> los siguientes fallos <strong>uno a uno</strong>, observa desde el cliente Windows que pasa, y usa los logs del servidor para diagnosticar antes de arreglar:</p>
+                    <ol style="margin-left: 22px; line-height: 1.8; font-size: 13px;">
+                        <li>En <code>/etc/samba/smb.conf</code> cambia <code>read only = no</code> a <code>read only = yes</code> y recarga con <code>sudo systemctl reload smbd</code>.</li>
+                        <li>Cambia el propietario del directorio compartido a <code>root:root</code> con <code>chmod 700</code>.</li>
+                        <li>Elimina al usuario del fichero de usuarios Samba con <code>sudo smbpasswd -x nombreusuario</code> (anota el nombre antes para poder restaurarlo).</li>
+                    </ol>
+                    <p>Para cada fallo, rellena una fila de la tabla. <strong>No uses Google:</strong> consulta <code>/var/log/samba/log.smbd</code>, <code>/var/log/samba/log.&lt;hostname&gt;</code> y <code>sudo journalctl -u smbd -n 50</code>.</p>
+                    <table>
+                        <tr>
+                            <th style="width:15%">Fallo</th>
+                            <th style="width:25%">Mensaje de error visto en Windows</th>
+                            <th style="width:30%">Linea del log del servidor que explica la causa</th>
+                            <th style="width:30%">Correccion aplicada y verificacion</th>
+                        </tr>
+                        <tr>
+                            <td>1 (read only)</td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>2 (permisos)</td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>3 (usuario)</td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                            <td><textarea rows="2"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Reto 2 — Script propio de backup con rollback (20 min)</h3>
+                    <p>Escribe un script bash llamado <code>backup_a_samba.sh</code> <strong>sin copiar plantillas de internet</strong>. El script debera:</p>
+                    <ol style="margin-left: 22px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprobar si <code>/mnt/samba_backup</code> ya esta montado. Si no lo esta, montar el recurso Samba usando <code>mount -t cifs</code> con credenciales desde un fichero externo de credenciales (no en claro dentro del script).</li>
+                        <li>Ejecutar un <code>rsync -av --stats /home/$USER/documentos/ /mnt/samba_backup/$(hostname)-$(date +%F)/</code>.</li>
+                        <li>Si el codigo de salida de rsync es distinto de 0, <strong>borrar la carpeta parcial creada en destino</strong> (rollback) y registrar ERROR con detalle.</li>
+                        <li>Si rsync acaba bien, registrar OK, numero de ficheros transferidos y tamaño total, y desmontar el share.</li>
+                        <li>Guardar el log en <code>~/backup_samba.log</code> con fecha y hora en cada linea.</li>
+                    </ol>
+                    <p><strong>Pega aqui el contenido completo del script:</strong></p>
+                    <textarea rows="14" placeholder="#!/bin/bash&#10;# backup_a_samba.sh&#10;# ..."></textarea>
+                    <p style="margin-top: 10px;"><strong>Explica por que guardas las credenciales en un fichero externo</strong> y que permisos debe tener ese fichero. ¿Que pasaria si lo dejases en <code>644</code>?</p>
+                    <textarea rows="4"></textarea>
+
+                    <h3>Reto 3 — SMB vs NFS, decision razonada (10 min)</h3>
+                    <div class="escenario">
+                        <strong>Caso:</strong> Una oficina con 15 puestos Linux necesita un servidor central de ficheros al que todos los equipos monten un directorio comun. No hay ningun Windows en esa oficina. Tu responsable te pregunta si vale la pena mantener Samba o si convendria cambiar a NFS.
+                    </div>
+                    <div class="pregunta">
+                        <p>a) ¿Que recomiendas, Samba o NFS, y por que? Menciona al menos dos ventajas concretas (rendimiento, gestion de permisos, simplicidad) y una desventaja del que descartas en este contexto.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p>b) Si manaña la oficina incorporase 3 Mac y 2 Windows, ¿cambiaria tu decision? Explica como gestionarias la heterogeneidad sin mantener dos servicios en paralelo.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <h3>Captura del reto tecnico</h3>
+                    <p>Adjunta una unica captura que muestre: (a) una linea del log de Samba con el error del Reto 1 resaltado, y (b) la ejecucion exitosa de tu <code>backup_a_samba.sh</code> con el final del log (<code>OK</code>, numero de ficheros, tamaño).</p>
+                    <div class="foto-upload">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic, arrastra o pega una imagen (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura reto tecnico">
+                        <button class="btn-remove" onclick="removePhoto(this)">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th style="width:50%">Criterio</th>
+                                <th style="width:15%">Peso</th>
+                                <th>Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1: Compartir carpeta en Windows (SMB)</td>
+                                <td>12%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2: Configuracion de Samba en Linux</td>
+                                <td>15%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3: Acceso desde Linux a Windows (CIFS)</td>
+                                <td>12%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4: Mapeo persistente de unidades</td>
+                                <td>8%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5: Compartir impresora en red</td>
+                                <td>8%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 6: Descubrimiento de recursos en red</td>
+                                <td>5%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 7: Proyecto integrador del taller</td>
+                                <td>15%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 8: Preguntas de reflexion</td>
+                                <td>5%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parte 9: Reto tecnico (troubleshooting Samba + script propio + SMB/NFS)</td>
+                                <td>20%</td>
+                                <td>
+                                    <select>
+                                        <option value="">-- Nota --</option>
+                                        <option>Excelente (10)</option>
+                                        <option>Bien (7-8)</option>
+                                        <option>Suficiente (5-6)</option>
+                                        <option>Insuficiente (0-4)</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Firma y verificacion -->
+            <div class="seccion">
+                <h2>Firma y entrega</h2>
+                <div class="seccion-body">
+                    <h3>Lista de verificacion</h3>
+                    <div style="margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Carpeta compartida en Windows con permisos configurados (Parte 1)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Samba instalado y configurado en Linux (Parte 2)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Acceso desde Linux a Windows con CIFS (Parte 3)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Mapeo persistente de unidades verificado (Parte 4)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Impresora compartida en red (Parte 5)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Recursos de red descubiertos y documentados (Parte 6)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Proyecto integrador del taller completado (Parte 7)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte8">
+                            <label for="verif-parte8">5 preguntas de reflexion respondidas (Parte 8)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte9">
+                            <label for="verif-parte9">Parte 9: 3 fallos Samba diagnosticados con logs, script backup_a_samba.sh entregado y decision SMB/NFS razonada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">Todas las capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Comparticion de Recursos en Red</p>
+            <p style="margin-top:6px; font-style:italic;">Este proyecto integrador pone en practica todo lo aprendido en el modulo.</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 25: Comparticion de Recursos en Red';
+        const PREFIJO_ARCHIVO = 'P25_Comparticion_Recursos';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

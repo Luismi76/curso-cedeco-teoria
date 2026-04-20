@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 24: Asistencia Remota con Herramientas Profesionales</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code inline */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--rojo);
+        }
+
+        /* Code blocks */
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 24: Asistencia Remota con Herramientas Profesionales</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 — Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Asistencia remota y soporte tecnico<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo en parejas<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs + TeamViewer + AnyDesk + RustDesk + Chrome Remote Desktop + PuTTY
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+                <div class="campo">
+                    <label>Nombre del companero/a de pareja</label>
+                    <input type="text" id="alumno-pareja" placeholder="Nombre de tu companero/a de practica">
+                </div>
+                <div class="campo">
+                    <label>Rol inicial</label>
+                    <select id="alumno-rol">
+                        <option value="">Selecciona tu rol...</option>
+                        <option value="tecnico">Tecnico (controla remotamente)</option>
+                        <option value="cliente">Cliente (recibe la asistencia)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Trabajo en parejas:</strong> Esta practica se realiza en parejas. Cada alumno necesita al menos dos maquinas virtuales (Windows y Ubuntu) o trabajar con un companero de clase. Compartid pantallas y resultados en el canal de Discord del curso. A mitad de la practica, <strong>intercambiad los roles</strong> (tecnico y cliente) para que ambos experimenteis las dos perspectivas.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario profesional:</strong> Trabajas en un taller de reparacion de ordenadores. Un cliente te llama porque su PC tiene problemas: va lento, le han aparecido ventanas extranas y no puede configurar la impresora. No puede traer el equipo al taller, asi que necesitas darle soporte remoto. Tu mision es conectarte a su ordenador usando las herramientas que usan los profesionales del sector hoy en dia y resolver sus problemas a distancia.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de aprendizaje</h2>
+                <div class="seccion-body">
+                    <p>Al completar esta practica seras capaz de:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Utilizar <strong>Windows Quick Assist</strong> para dar asistencia rapida entre equipos Windows.</li>
+                            <li>Instalar y utilizar <strong>TeamViewer</strong> (gratuito para uso personal) para control remoto completo.</li>
+                            <li>Instalar y utilizar <strong>AnyDesk</strong> (gratuito para uso personal) como alternativa ligera y portatil.</li>
+                            <li>Instalar y utilizar <strong>RustDesk</strong> (open source, 100% gratuito) y entender sus ventajas.</li>
+                            <li>Configurar y utilizar <strong>Chrome Remote Desktop</strong> (gratuito) para acceso desde cualquier navegador.</li>
+                            <li>Conectarte por <strong>SSH con PuTTY</strong> a un servidor Linux para administracion por terminal.</li>
+                            <li><strong>Comparar todas las herramientas</strong> y saber cual elegir en cada situacion profesional real.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requisitos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:35%">Requisito</th>
+                            <th>Detalle</th>
+                        </tr>
+                        <tr>
+                            <td>Maquina virtual Windows 10/11</td>
+                            <td>Encendida, con acceso a Internet y sesion iniciada</td>
+                        </tr>
+                        <tr>
+                            <td>Maquina virtual Ubuntu 24</td>
+                            <td>Encendida, con acceso a Internet y sesion iniciada</td>
+                        </tr>
+                        <tr>
+                            <td>Acceso a Internet</td>
+                            <td>Necesario para descargar las herramientas y para las conexiones remotas</td>
+                        </tr>
+                        <tr>
+                            <td>Trabajo en parejas</td>
+                            <td>Cada alumno asume un rol (tecnico o cliente) y se intercambian a mitad de practica</td>
+                        </tr>
+                        <tr>
+                            <td>Discord</td>
+                            <td>Para coordinacion con tu companero y compartir resultados</td>
+                        </tr>
+                        <tr>
+                            <td>Navegador Chrome</td>
+                            <td>Necesario para Chrome Remote Desktop (instalado en la VM Windows)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Quick Assist -->
+            <div class="seccion">
+                <h2>Parte 1 — Asistencia rapida de Windows: Quick Assist (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Quick Assist es la herramienta de asistencia remota <strong>integrada en Windows 10 y 11</strong>. No requiere instalacion, ya viene con el sistema operativo. Es la forma mas rapida de conectarse entre dos equipos Windows.</p>
+
+                    <h3>Procedimiento paso a paso</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el equipo del <strong>tecnico</strong> (quien va a ayudar): abre el menu Inicio y busca <strong>"Quick Assist"</strong> o <strong>"Asistencia rapida"</strong>.</li>
+                            <li>Haz clic en <strong>"Ayudar a alguien"</strong> (Help someone). Se te pedira iniciar sesion con una cuenta de Microsoft.</li>
+                            <li>Una vez autenticado, se generara un <strong>codigo de 6 digitos</strong> con validez de 10 minutos.</li>
+                            <li>Comunica ese codigo a tu companero (el cliente) por Discord o en persona.</li>
+                            <li>En el equipo del <strong>cliente</strong>: abre Quick Assist y haz clic en <strong>"Obtener ayuda"</strong> (Get help).</li>
+                            <li>Introduce el codigo de 6 digitos y haz clic en <strong>"Enviar"</strong>.</li>
+                            <li>El cliente debe <strong>aceptar la conexion</strong> cuando aparezca el aviso de permisos.</li>
+                            <li>Una vez conectados, el tecnico vera el escritorio del cliente y podra controlarlo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Pruebas a realizar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde el equipo del tecnico, <strong>abre el Bloc de notas</strong> remotamente y escribe un mensaje.</li>
+                            <li>Abre el <strong>Administrador de tareas</strong> remotamente para comprobar el rendimiento.</li>
+                            <li>Prueba a <strong>transferir el control</strong> de vuelta al cliente (si la opcion esta disponible).</li>
+                            <li>Prueba la funcion de <strong>anotacion/dibujo</strong> en pantalla (si esta disponible en tu version).</li>
+                            <li><strong>Desconecta</strong> la sesion de forma limpia.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Cuenta de Microsoft:</strong> Solo el tecnico necesita tener cuenta de Microsoft. El cliente no necesita cuenta, solo introduce el codigo. Si no tienes cuenta de Microsoft, puedes crear una gratuita en <code>outlook.com</code>.
+                    </div>
+
+                    <h3>Observaciones de Quick Assist</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Aspecto evaluado</th>
+                            <th>Tu observacion</th>
+                        </tr>
+                        <tr>
+                            <td>Latencia (retraso al mover el raton)</td>
+                            <td><input type="text" placeholder="Ej: Baja, apenas se nota / Alta, mucho retraso..."></td>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de uso (del 1 al 10)</td>
+                            <td><input type="text" placeholder="Ej: 9/10 - muy sencillo"></td>
+                        </tr>
+                        <tr>
+                            <td>Calidad de imagen</td>
+                            <td><input type="text" placeholder="Ej: Buena / Regular / Se pixela..."></td>
+                        </tr>
+                        <tr>
+                            <td>Limitaciones encontradas</td>
+                            <td><input type="text" placeholder="Ej: Solo Windows, necesita cuenta Microsoft..."></td>
+                        </tr>
+                        <tr>
+                            <td>Permite transferencia de archivos?</td>
+                            <td><input type="text" placeholder="Si / No / Limitada..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Sesion de Quick Assist activa</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura mostrando Quick Assist conectado y controlando el escritorio remoto</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: TeamViewer -->
+            <div class="seccion">
+                <h2>Parte 2 — TeamViewer (50 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>TeamViewer es la herramienta de asistencia remota mas utilizada en el mundo profesional del soporte tecnico.</strong> Es gratuita para uso personal y permite control remoto, transferencia de archivos, chat y mucho mas. Si trabajas en soporte IT, es casi seguro que la usaras.</p>
+
+                    <h3>Instalacion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador en tu VM Windows y ve a <strong>teamviewer.com</strong>.</li>
+                            <li>Descarga la version <strong>"TeamViewer gratuito para uso personal"</strong>.</li>
+                            <li>Ejecuta el instalador. Selecciona <strong>"Instalacion predeterminada"</strong> y <strong>"Uso personal / no comercial"</strong>.</li>
+                            <li>Espera a que se complete la instalacion (2-3 minutos).</li>
+                            <li>Al abrir TeamViewer, se te asignara automaticamente un <strong>ID</strong> y una <strong>contrasena temporal</strong>.</li>
+                            <li><strong>Repite la instalacion en el segundo equipo</strong> (la VM de tu companero o tu segunda VM).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Conexion remota</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el equipo del <strong>cliente</strong>: anota el <strong>ID</strong> y la <strong>contrasena</strong> que muestra TeamViewer.</li>
+                            <li>Comunicaselos al tecnico por Discord.</li>
+                            <li>En el equipo del <strong>tecnico</strong>: introduce el <strong>ID del cliente</strong> en el campo "ID del asociado".</li>
+                            <li>Haz clic en <strong>"Conectar"</strong>.</li>
+                            <li>Introduce la <strong>contrasena</strong> del cliente cuando se solicite.</li>
+                            <li>Ya tienes control total del escritorio remoto.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Funciones a probar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Control remoto:</strong> Mueve el raton, abre aplicaciones, escribe texto en el Bloc de notas.</li>
+                            <li><strong>Transferencia de archivos:</strong> En la barra superior de TeamViewer, selecciona "Transferencia de archivos". Arrastra un archivo de tu PC al PC remoto y viceversa.</li>
+                            <li><strong>Chat:</strong> Abre la funcion de chat integrada y envia un mensaje a tu companero.</li>
+                            <li><strong>Reinicio remoto:</strong> Ve a Acciones > Reiniciar equipo remoto (el tecnico puede reiniciar el PC del cliente y la sesion se reconecta automaticamente).</li>
+                            <li><strong>Cambio de resolucion:</strong> En Ver > Resolucion, prueba a cambiar la calidad de la imagen remota.</li>
+                            <li><strong>Pantalla completa:</strong> Pulsa el boton de pantalla completa para trabajar como si estuvieras delante del PC remoto.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Dato profesional:</strong> TeamViewer es la herramienta mas utilizada en empresas de soporte IT, talleres de reparacion y departamentos de helpdesk. Tiene versiones de pago para uso comercial con funciones avanzadas como informes, gestion de equipos y despliegue masivo. La version gratuita es perfecta para soporte ocasional.
+                    </div>
+
+                    <h3>Datos de la conexion TeamViewer</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>ID de TeamViewer (equipo tecnico)</td>
+                            <td><input type="text" placeholder="Ej: 1 234 567 890"></td>
+                        </tr>
+                        <tr>
+                            <td>ID de TeamViewer (equipo cliente)</td>
+                            <td><input type="text" placeholder="Ej: 9 876 543 210"></td>
+                        </tr>
+                        <tr>
+                            <td>Version de TeamViewer instalada</td>
+                            <td><input type="text" placeholder="Ej: TeamViewer 15.x"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Observaciones de TeamViewer</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Aspecto evaluado</th>
+                            <th>Tu observacion</th>
+                        </tr>
+                        <tr>
+                            <td>Calidad de imagen</td>
+                            <td><input type="text" placeholder="Ej: Muy buena, se lee todo claramente..."></td>
+                        </tr>
+                        <tr>
+                            <td>Latencia / lag</td>
+                            <td><input type="text" placeholder="Ej: Minima, casi en tiempo real..."></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad de transferencia de archivos</td>
+                            <td><input type="text" placeholder="Ej: Rapida, un archivo de 10MB en 5 segundos..."></td>
+                        </tr>
+                        <tr>
+                            <td>Funcion de chat</td>
+                            <td><input type="text" placeholder="Ej: Funciona bien, util para comunicarse..."></td>
+                        </tr>
+                        <tr>
+                            <td>Reinicio remoto</td>
+                            <td><input type="text" placeholder="Ej: Funciono, se reconecto solo tras reiniciar..."></td>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de uso general (del 1 al 10)</td>
+                            <td><input type="text" placeholder="Ej: 8/10"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: TeamViewer conectado y controlando el escritorio remoto</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de TeamViewer mostrando la conexion activa con el escritorio del cliente</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: AnyDesk -->
+            <div class="seccion">
+                <h2>Parte 3 — AnyDesk (40 min)</h2>
+                <div class="seccion-body">
+                    <p>AnyDesk es una alternativa a TeamViewer muy popular por su <strong>ligereza y velocidad</strong>. Una de sus grandes ventajas es que puede ejecutarse <strong>sin necesidad de instalacion</strong> (modo portable): simplemente descargas el ejecutable y lo ejecutas.</p>
+
+                    <h3>Instalacion y ejecucion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador y ve a <strong>anydesk.com</strong>.</li>
+                            <li>Haz clic en <strong>"Descargar ahora"</strong> (para Windows).</li>
+                            <li>El archivo descargado es un ejecutable pequeno (unos 3-5 MB).</li>
+                            <li><strong>Puedes ejecutarlo directamente sin instalar</strong> (modo portable). Simplemente haz doble clic en el .exe descargado.</li>
+                            <li>Al abrirse, AnyDesk te asignara una <strong>direccion numerica</strong> (ej: 123 456 789).</li>
+                            <li>Si prefieres instalarlo de forma permanente, haz clic en <strong>"Instalar AnyDesk"</strong> dentro de la aplicacion.</li>
+                            <li>Repite en el segundo equipo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Conexion remota</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>El <strong>cliente</strong> comunica su <strong>direccion de AnyDesk</strong> al tecnico.</li>
+                            <li>El <strong>tecnico</strong> introduce esa direccion en el campo "Escritorio remoto" y pulsa <strong>"Conectar"</strong>.</li>
+                            <li>El cliente debe <strong>aceptar la conexion</strong> en su pantalla.</li>
+                            <li>Una vez conectado, prueba las mismas funciones que con TeamViewer:</li>
+                        </ol>
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Control remoto:</strong> Mueve el raton, abre aplicaciones.</li>
+                            <li><strong>Transferencia de archivos:</strong> Usa el icono de carpeta en la barra de herramientas.</li>
+                            <li><strong>Chat:</strong> Usa el icono de mensaje en la barra de herramientas.</li>
+                            <li><strong>Portapapeles compartido:</strong> Copia texto en un equipo y pegalo en el otro.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Ventaja del modo portable:</strong> Al no requerir instalacion, AnyDesk es ideal para situaciones de emergencia. Puedes descargarlo en el PC del cliente en menos de un minuto y empezar a dar soporte sin necesidad de permisos de administrador para instalar software.
+                    </div>
+
+                    <h3>Comparativa TeamViewer vs AnyDesk</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Aspecto</th>
+                            <th style="width:35%">TeamViewer</th>
+                            <th style="width:35%">AnyDesk</th>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de uso (1-10)</td>
+                            <td><input type="text" placeholder="Tu valoracion..."></td>
+                            <td><input type="text" placeholder="Tu valoracion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad / fluidez</td>
+                            <td><input type="text" placeholder="Tu observacion..."></td>
+                            <td><input type="text" placeholder="Tu observacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Transferencia de archivos</td>
+                            <td><input type="text" placeholder="Funciona? Velocidad?"></td>
+                            <td><input type="text" placeholder="Funciona? Velocidad?"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano del instalador</td>
+                            <td><input type="text" placeholder="Ej: ~30 MB"></td>
+                            <td><input type="text" placeholder="Ej: ~3 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Requiere cuenta para usarlo?</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                        <tr>
+                            <td>Puede ejecutarse sin instalar?</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                        <tr>
+                            <td>Cual prefieres y por que?</td>
+                            <td colspan="2"><textarea rows="2" placeholder="Explica tu preferencia..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: AnyDesk conectado al escritorio remoto</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de AnyDesk mostrando la conexion activa con el escritorio del cliente</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: RustDesk -->
+            <div class="seccion">
+                <h2>Parte 4 — RustDesk: la alternativa open source (30 min)</h2>
+                <div class="seccion-body">
+                    <p>RustDesk es una herramienta de escritorio remoto <strong>100% gratuita y de codigo abierto</strong>. A diferencia de TeamViewer o AnyDesk, no hay limitaciones de licencia, no hay version de pago, y lo mas importante: <strong>puedes montar tu propio servidor relay</strong> para que todas las conexiones pasen por tu infraestructura, con total privacidad y control.</p>
+
+                    <h3>Instalacion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador y ve a <strong>rustdesk.com</strong>.</li>
+                            <li>Descarga la version para <strong>Windows</strong> (archivo .exe).</li>
+                            <li>Ejecuta el instalador y sigue las instrucciones.</li>
+                            <li>Al abrirse, RustDesk te asignara un <strong>ID numerico</strong> y una <strong>contrasena temporal</strong>.</li>
+                            <li>Repite en el segundo equipo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Conexion remota</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>El <strong>cliente</strong> comunica su <strong>ID</strong> y <strong>contrasena</strong> al tecnico.</li>
+                            <li>El <strong>tecnico</strong> introduce el ID en el campo correspondiente y pulsa <strong>"Conectar"</strong>.</li>
+                            <li>Introduce la contrasena cuando se solicite.</li>
+                            <li>Prueba el control remoto: mueve el raton, abre aplicaciones, prueba la transferencia de archivos.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Ventaja clave del open source:</strong> Una empresa puede instalar su propio servidor RustDesk en su red local o en un servidor en la nube. De esta forma, <strong>ninguna conexion pasa por servidores de terceros</strong>. Esto es fundamental para empresas con politicas estrictas de privacidad, como hospitales, bancos o administraciones publicas.
+                    </div>
+
+                    <h3>Evaluacion de RustDesk</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Pregunta</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Funciona el control remoto correctamente?</td>
+                            <td><input type="text" placeholder="Si / No / Parcialmente..."></td>
+                        </tr>
+                        <tr>
+                            <td>Calidad de imagen comparada con TeamViewer</td>
+                            <td><input type="text" placeholder="Mejor / Igual / Peor..."></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad/fluidez comparada con AnyDesk</td>
+                            <td><input type="text" placeholder="Mejor / Igual / Peor..."></td>
+                        </tr>
+                        <tr>
+                            <td>Funciona la transferencia de archivos?</td>
+                            <td><input type="text" placeholder="Si / No..."></td>
+                        </tr>
+                        <tr>
+                            <td>Que ventajas tiene que sea open source?</td>
+                            <td><textarea rows="2" placeholder="Explica las ventajas del codigo abierto para una empresa..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Podria una empresa montar su propio servidor? Que ventaja tendria?</td>
+                            <td><textarea rows="2" placeholder="Explica por que una empresa querria su propio servidor de conexiones remotas..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: RustDesk conectado al escritorio remoto</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de RustDesk mostrando la conexion activa con el escritorio remoto</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Chrome Remote Desktop -->
+            <div class="seccion">
+                <h2>Parte 5 — Chrome Remote Desktop (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Chrome Remote Desktop es la solucion de Google para acceso remoto. Su gran ventaja es que <strong>funciona desde cualquier dispositivo que tenga el navegador Chrome</strong>, incluyendo tablets y moviles. En el equipo que controla no necesitas instalar nada mas que tener Chrome abierto.</p>
+
+                    <h3>Configuracion en el equipo destino (cliente)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM del <strong>cliente</strong>, abre Google Chrome.</li>
+                            <li>Ve a <strong>remotedesktop.google.com</strong>.</li>
+                            <li>Inicia sesion con una cuenta de Google (Gmail).</li>
+                            <li>En la seccion <strong>"Asistencia remota"</strong>, haz clic en <strong>"Compartir esta pantalla"</strong>.</li>
+                            <li>Se descargara e instalara automaticamente una extension/complemento de Chrome.</li>
+                            <li>Una vez instalado, haz clic en <strong>"Generar codigo"</strong>. Se creara un codigo de 12 digitos.</li>
+                            <li>Comunica ese codigo al tecnico.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Conexion desde el equipo del tecnico</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el equipo del <strong>tecnico</strong>, abre Chrome y ve a <strong>remotedesktop.google.com</strong>.</li>
+                            <li>En la seccion <strong>"Asistencia remota"</strong>, haz clic en <strong>"Conectarse a otro ordenador"</strong>.</li>
+                            <li>Introduce el <strong>codigo de 12 digitos</strong> del cliente.</li>
+                            <li>El cliente debe <strong>aceptar la conexion</strong> en su pantalla.</li>
+                            <li>Ya tienes acceso al escritorio remoto desde el navegador.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Ventaja principal:</strong> Como funciona a traves del navegador Chrome, puedes dar soporte remoto desde cualquier dispositivo: un portatil, un Chromebook, una tablet o incluso un movil. No necesitas instalar ningun programa adicional en el equipo del tecnico. Ideal para situaciones de emergencia cuando estas fuera de la oficina.
+                    </div>
+
+                    <h3>Observaciones de Chrome Remote Desktop</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Aspecto evaluado</th>
+                            <th>Tu observacion</th>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de configuracion (1-10)</td>
+                            <td><input type="text" placeholder="Tu valoracion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Calidad de imagen desde el navegador</td>
+                            <td><input type="text" placeholder="Ej: Buena / Regular..."></td>
+                        </tr>
+                        <tr>
+                            <td>Latencia</td>
+                            <td><input type="text" placeholder="Ej: Aceptable / Mucha..."></td>
+                        </tr>
+                        <tr>
+                            <td>Permite transferencia de archivos?</td>
+                            <td><input type="text" placeholder="Si / No..."></td>
+                        </tr>
+                        <tr>
+                            <td>Requiere cuenta de Google?</td>
+                            <td><input type="text" placeholder="Si / No..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Chrome Remote Desktop conectado desde el navegador</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del navegador Chrome mostrando el escritorio remoto del cliente</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: SSH con PuTTY -->
+            <div class="seccion">
+                <h2>Parte 6 — SSH: acceso remoto por terminal (30 min)</h2>
+                <div class="seccion-body">
+                    <p>SSH (Secure Shell) es el protocolo estandar para acceder a servidores y equipos Linux de forma remota <strong>a traves de la linea de comandos</strong>. No proporciona escritorio grafico, sino una terminal de texto. Es la herramienta fundamental para administrar servidores web, servidores de correo, bases de datos, etc.</p>
+
+                    <h3>Paso 1: Instalar el servidor SSH en Ubuntu</h3>
+                    <p>En la VM con Ubuntu, abre un terminal y ejecuta los siguientes comandos:</p>
+
+                    <pre class="codigo-bloque"># Instalar el servidor SSH
+sudo apt update
+sudo apt install openssh-server -y
+
+# Verificar que el servicio esta activo
+sudo systemctl status ssh
+
+# Comprobar la direccion IP de la maquina Ubuntu
+ip addr show | grep "inet "
+# o tambien:
+hostname -I</pre>
+
+                    <div class="nota">
+                        <strong>Anota la direccion IP de tu VM Ubuntu.</strong> La necesitaras para conectarte desde Windows. Normalmente sera algo como <code>10.0.2.15</code> o <code>192.168.x.x</code> dependiendo de la configuracion de red de VirtualBox. Si usas NAT, necesitaras configurar el reenvio de puertos en VirtualBox (puerto 22).
+                    </div>
+
+                    <h3>Paso 2: Conectar desde Windows con PuTTY</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, abre el navegador y ve a <strong>putty.org</strong>.</li>
+                            <li>Descarga <strong>PuTTY</strong> (el instalador MSI o el ejecutable .exe directamente).</li>
+                            <li>Abre PuTTY. En el campo <strong>"Host Name (or IP address)"</strong> introduce la IP de tu VM Ubuntu.</li>
+                            <li>Asegurate de que el puerto es <strong>22</strong> y el tipo de conexion es <strong>SSH</strong>.</li>
+                            <li>Haz clic en <strong>"Open"</strong>.</li>
+                            <li>La primera vez aparecera un aviso de seguridad sobre la clave del servidor. Haz clic en <strong>"Accept"</strong>.</li>
+                            <li>Introduce tu <strong>nombre de usuario</strong> de Ubuntu (ej: <code>alumno</code>).</li>
+                            <li>Introduce tu <strong>contrasena</strong> (no se muestra mientras escribes, es normal).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Alternativa: SSH desde PowerShell de Windows</h3>
+                    <p>Windows 10/11 incluye un cliente SSH integrado. Puedes conectarte sin PuTTY:</p>
+
+                    <pre class="codigo-bloque"># Desde PowerShell o CMD de Windows:
+ssh alumno@192.168.1.100
+
+# Sustituye "alumno" por tu usuario y "192.168.1.100" por la IP de tu Ubuntu</pre>
+
+                    <h3>Paso 3: Ejecutar comandos remotamente</h3>
+                    <p>Una vez conectado por SSH, ejecuta estos comandos en la terminal remota para verificar que estas controlando el equipo Ubuntu:</p>
+
+                    <pre class="codigo-bloque"># Verificar en que maquina estas
+hostname
+
+# Ver informacion del sistema operativo
+uname -a
+
+# Ver el espacio en disco
+df -h
+
+# Listar archivos del directorio home
+ls -la /home/
+
+# Ver los usuarios conectados
+who
+
+# Ver el uso de memoria
+free -h
+
+# Ver los procesos activos
+top -bn1 | head -15
+
+# Crear un archivo de prueba para demostrar que tienes acceso
+echo "Conexion SSH exitosa desde Windows" > ~/prueba_ssh.txt
+cat ~/prueba_ssh.txt
+
+# Salir de la sesion SSH
+exit</pre>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> SSH es para acceso por terminal (texto), <strong>no para escritorio grafico</strong>. Se usa principalmente para administrar servidores Linux que ni siquiera tienen entorno grafico instalado. Si necesitas ver el escritorio, usa las herramientas de las partes anteriores (TeamViewer, AnyDesk, etc.).
+                    </div>
+
+                    <h3>Datos de la conexion SSH</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>IP de la VM Ubuntu</td>
+                            <td><input type="text" placeholder="Ej: 192.168.1.100"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto utilizado</td>
+                            <td><input type="text" placeholder="Ej: 22"></td>
+                        </tr>
+                        <tr>
+                            <td>Usuario de conexion</td>
+                            <td><input type="text" placeholder="Ej: alumno"></td>
+                        </tr>
+                        <tr>
+                            <td>Metodo usado (PuTTY o PowerShell)</td>
+                            <td><input type="text" placeholder="Ej: PuTTY / PowerShell ssh"></td>
+                        </tr>
+                        <tr>
+                            <td>Salida del comando <code>hostname</code></td>
+                            <td><input type="text" placeholder="Ej: ubuntu-pc"></td>
+                        </tr>
+                        <tr>
+                            <td>Salida del comando <code>uname -a</code></td>
+                            <td><input type="text" placeholder="Ej: Linux ubuntu-pc 6.8.0-..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Sesion SSH abierta desde Windows a Ubuntu</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de PuTTY o PowerShell conectado por SSH a Ubuntu mostrando la salida de comandos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Comparativa final -->
+            <div class="seccion">
+                <h2>Parte 7 — Comparativa final y debate (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora que has probado todas las herramientas, es momento de compararlas de forma objetiva. Rellena la siguiente tabla con tus observaciones reales de cada herramienta.</p>
+
+                    <h3>Tabla comparativa general</h3>
+                    <table>
+                        <tr>
+                            <th>Caracteristica</th>
+                            <th>Quick Assist</th>
+                            <th>TeamViewer</th>
+                            <th>AnyDesk</th>
+                            <th>RustDesk</th>
+                            <th>Chrome RD</th>
+                            <th>SSH</th>
+                        </tr>
+                        <tr>
+                            <td>Gratuito?</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Plataformas</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>GUI / CLI</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de config.</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Transferencia archivos</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Auto-hospedable</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td>Mejor para...</td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                            <td><input type="text" placeholder="..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Escenarios profesionales: que herramienta elegirias?</h3>
+                    <p>Para cada situacion real, indica que herramienta usarias y por que:</p>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Situacion</th>
+                            <th style="width:25%">Herramienta elegida</th>
+                            <th style="width:30%">Por que?</th>
+                        </tr>
+                        <tr>
+                            <td>Tu madre te llama porque su PC Windows va lento y no sabe que hacer</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Administras 50 servidores Linux en una empresa de hosting</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Trabajas en un taller de reparacion y un cliente te llama por telefono</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Estas en un hotel y necesitas acceder urgentemente a tu PC del trabajo</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Una empresa quiere una solucion de acceso remoto con control total y sin depender de terceros</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Tus companeros de oficina (todos Windows) necesitan ayudarse mutuamente</td>
+                            <td><input type="text" placeholder="Herramienta..."></td>
+                            <td><input type="text" placeholder="Justificacion..."></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Tras probar todas las herramientas, cual es tu favorita y por que? Argumenta tu respuesta (minimo 4 lineas).</p>
+                        <textarea rows="5" placeholder="Escribe tu opinion razonada sobre cual te ha parecido la mejor herramienta y por que, teniendo en cuenta facilidad de uso, velocidad, funciones y casos de uso reales..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 8: Seguridad -->
+            <div class="seccion">
+                <h2>Parte 8 — Seguridad en el acceso remoto (20 min)</h2>
+                <div class="seccion-body">
+                    <p>El acceso remoto es una herramienta muy potente, pero tambien puede ser <strong>muy peligrosa</strong> si no se usa correctamente. Un atacante que consiga acceso remoto a tu equipo tiene el mismo control que si estuviera sentado delante de tu pantalla.</p>
+
+                    <div class="aviso">
+                        <strong>ALERTA DE SEGURIDAD:</strong> Las herramientas de acceso remoto son las mas utilizadas en estafas telefonicas. Los estafadores llaman haciendose pasar por "soporte tecnico de Microsoft" y piden a las victimas que instalen TeamViewer o AnyDesk para "arreglar un problema". Una vez conectados, roban datos bancarios, instalan malware o cifran los archivos para pedir un rescate. <strong>NUNCA des acceso remoto a alguien que no conozcas.</strong>
+                    </div>
+
+                    <h3>Riesgos de seguridad y como mitigarlos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Riesgo</th>
+                            <th style="width:35%">Descripcion</th>
+                            <th style="width:35%">Como mitigarlo</th>
+                        </tr>
+                        <tr>
+                            <td>Acceso no autorizado</td>
+                            <td>Alguien obtiene tu ID y contrasena de TeamViewer/AnyDesk</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                        <tr>
+                            <td>Ingenieria social</td>
+                            <td>Un estafador te convence de darle acceso remoto</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                        <tr>
+                            <td>Contrasenas debiles en SSH</td>
+                            <td>Un atacante prueba miles de contrasenas por fuerza bruta</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                        <tr>
+                            <td>Software de acceso remoto siempre activo</td>
+                            <td>TeamViewer se ejecuta al iniciar Windows y queda expuesto 24/7</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                        <tr>
+                            <td>Conexion sin cifrar</td>
+                            <td>Los datos viajan sin proteccion y pueden ser interceptados</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                        <tr>
+                            <td>Sesion abierta sin supervision</td>
+                            <td>Te levantas y dejas la sesion remota abierta</td>
+                            <td><input type="text" placeholder="Como te protegerias?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Preguntas de seguridad</h3>
+
+                    <div class="pregunta">
+                        <p>1. Un cliente te llama diciendo que alguien de "soporte tecnico de Microsoft" le pidio instalar TeamViewer y darle su ID. El cliente lo hizo y ahora cree que le han robado datos. Que le aconsejas que haga inmediatamente? (minimo 4 lineas)</p>
+                        <textarea rows="5" placeholder="Describe los pasos que deberia seguir el cliente para protegerse despues de haber dado acceso remoto a un desconocido..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Por que no es buena idea dejar TeamViewer o AnyDesk ejecutandose permanentemente en un equipo? Que configuracion recomendarias?</p>
+                        <textarea rows="3" placeholder="Explica los riesgos de tener software de acceso remoto siempre activo y que medidas tomarias..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Que ventajas de seguridad tiene SSH con claves publicas/privadas frente a SSH con contrasena? Investigalo brevemente.</p>
+                        <textarea rows="3" placeholder="Explica por que las claves SSH son mas seguras que las contrasenas tradicionales..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Si tuvieras que dar acceso remoto a un companero para que te ayude con un problema, que precauciones tomarias antes, durante y despues de la sesion?</p>
+                        <textarea rows="4" placeholder="Describe las precauciones antes (preparar), durante (supervisar) y despues (cerrar/limpiar) de una sesion remota..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 9: Reto tecnico -->
+            <div class="seccion">
+                <h2>Parte 9 — Reto tecnico: casos reales de soporte y hardening (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Hasta aqui has probado las herramientas. Ahora tienes que <strong>elegir, justificar y endurecer</strong>. Se evalua el razonamiento detras de cada decision, no cuantas herramientas has usado.</p>
+
+                    <h3>Reto 1 — Seleccion justificada segun el caso (15 min)</h3>
+                    <p>Para cada uno de los siguientes escenarios reales, elige <strong>una unica herramienta</strong> de las que has probado en esta practica (Quick Assist, TeamViewer, AnyDesk, RustDesk, Chrome Remote Desktop o SSH) y justifica la eleccion. No repitas la misma en los cuatro casos.</p>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Escenario</th>
+                            <th style="width:18%">Herramienta elegida</th>
+                            <th>Justificacion (1-2 lineas: por que encaja y por que rechazas las demas)</th>
+                        </tr>
+                        <tr>
+                            <td><strong>A)</strong> Cliente en zona rural con 3 Mbps de subida. Windows 10 domestico. Necesita ayuda puntual una vez al mes para instalar actualizaciones. No quiere instalar software que quede residente.</td>
+                            <td><input type="text"></td>
+                            <td><textarea rows="3"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>B)</strong> PYME con 50 empleados. Departamento IT necesita poder entrar a cualquier equipo <strong>sin avisar al usuario</strong> para tareas de mantenimiento nocturno. Presupuesto limitado, no quiere depender de un servicio cloud gratis que pueda cambiar las condiciones.</td>
+                            <td><input type="text"></td>
+                            <td><textarea rows="3"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C)</strong> Servidor Ubuntu sin entorno grafico alojado en un proveedor cloud. Solo necesitas ejecutar comandos puntuales de administracion (reiniciar servicio, editar configuracion, leer logs). Ancho de banda limitado por el cliente a 1 Mbps.</td>
+                            <td><input type="text"></td>
+                            <td><textarea rows="3"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>D)</strong> Familiar mayor al otro lado del mundo. No sabe escribir IDs ni copiar contraseñas. Tu tampoco quieres abrirle puertos ni que tenga que instalar nada complicado.</td>
+                            <td><input type="text"></td>
+                            <td><textarea rows="3"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Reto 2 — Protocolo de atencion de una incidencia remota (15 min)</h3>
+                    <div class="escenario">
+                        <strong>Caso:</strong> Eres tecnico de soporte de una gestoria. Te llama un cliente diciendo que "el programa de contabilidad no le abre". Tienes que atender la incidencia por asistencia remota. El cliente maneja datos sensibles (fiscales, bancarios).
+                    </div>
+                    <p>Redacta tu <strong>protocolo paso a paso</strong> para esta incidencia, agrupado en tres fases. Se valora que cubras los riesgos reales (suplantacion de identidad, mirar datos que no tocan, dejar la puerta abierta al acabar), no solo los pasos tecnicos.</p>
+                    <div class="pregunta">
+                        <p><strong>Antes de conectar</strong> — ¿Como verificas que el cliente es quien dice ser? ¿Que consentimiento necesitas por escrito? ¿Que le pides que cierre antes de iniciar la sesion?</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p><strong>Durante la sesion</strong> — ¿Que precauciones tomas mientras estas conectado? (archivos que no debes abrir, bloqueo de pantalla del cliente mientras ves datos, como dejar constancia de lo que haces).</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p><strong>Al cerrar</strong> — ¿Como te aseguras de que ni tu ni nadie puede volver a entrar sin permiso? (desinstalar / desactivar / cambiar IDs / ticket firmado por el cliente).</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <h3>Reto 3 — Endurecer el SSH de tu VM (15 min)</h3>
+                    <p>Configura el servicio SSH de tu VM Ubuntu aplicando <strong>al menos tres</strong> medidas de hardening reales. Tu VM debera seguir siendo accesible desde la VM o PC del compañero despues de aplicarlas.</p>
+                    <ol style="margin-left: 22px; line-height: 1.8; font-size: 13px;">
+                        <li>Cambia el puerto por defecto a uno no estandar por encima del 1024 (documenta cual).</li>
+                        <li>Desactiva el login directo del usuario <code>root</code>.</li>
+                        <li>Genera un par de claves (<code>ssh-keygen</code>), copia la publica al servidor (<code>ssh-copy-id</code>) y <strong>desactiva la autenticacion por contraseña</strong> una vez verificado que la clave funciona.</li>
+                        <li><em>Opcional para nota:</em> limita los intentos de login por IP con <code>ufw limit</code> o instala <code>fail2ban</code>.</li>
+                    </ol>
+                    <p>Pega las lineas <strong>que has modificado</strong> de <code>/etc/ssh/sshd_config</code> (no todo el fichero) con tu justificacion al lado:</p>
+                    <textarea rows="8" placeholder="Port 2222        # por que: evita escaneos automatizados al 22&#10;PermitRootLogin no    # por que: ...&#10;PasswordAuthentication no    # por que: ..."></textarea>
+                    <div class="pregunta">
+                        <p>Escenario de verificacion: describe el comando exacto que usa el compañero para conectarse despues de tus cambios, y que mensaje de error veria si intentase con el puerto 22 o con contraseña:</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <h3>Captura 7 — Reto tecnico</h3>
+                    <p>Adjunta una unica captura que muestre: (a) la salida de <code>sudo systemctl status ssh</code> con el puerto modificado visible, y (b) una conexion SSH exitosa del compañero usando clave en lugar de contraseña.</p>
+                    <div class="foto-upload">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic, arrastra o pega una imagen (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura reto tecnico">
+                        <button class="btn-remove" onclick="removePhoto(this)">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Criterios de evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Distribucion de la puntuacion</h3>
+                        <table>
+                            <tr>
+                                <th style="width:65%">Criterio</th>
+                                <th>Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1: Quick Assist (conexion + tabla de observaciones)</td>
+                                <td>0.75 puntos (7.5%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2: TeamViewer (instalacion + pruebas + observaciones)</td>
+                                <td>1.5 puntos (15%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3: AnyDesk (uso + comparativa con TeamViewer)</td>
+                                <td>1.0 punto (10%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4: RustDesk (uso + reflexion open source)</td>
+                                <td>1.0 punto (10%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5: Chrome Remote Desktop (configuracion + observaciones)</td>
+                                <td>0.75 puntos (7.5%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 6: SSH con PuTTY (conexion + comandos + datos)</td>
+                                <td>1.0 punto (10%)</td>
+                            </tr>
+                            <tr>
+                                <td>Partes 7 y 8: Comparativa final + Seguridad (tablas + preguntas)</td>
+                                <td>1.5 puntos (15%)</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 9: Reto tecnico (eleccion razonada + protocolo + hardening SSH)</td>
+                                <td>2.5 puntos (25%)</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 6 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3-4 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Quick Assist probado y tabla completada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: TeamViewer instalado, probado y observaciones completadas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: AnyDesk probado y tabla comparativa completada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: RustDesk probado y reflexion sobre open source</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Chrome Remote Desktop configurado y probado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: SSH configurado y comandos ejecutados remotamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: Tabla comparativa general y escenarios completados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte8">
+                            <label for="verif-parte8">Parte 8: Tabla de seguridad y 4 preguntas de seguridad respondidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte9">
+                            <label for="verif-parte9">Parte 9: 4 escenarios justificados, protocolo de incidencia redactado y SSH endurecido</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">7 capturas de pantalla incluidas (6 de las herramientas + 1 del reto tecnico)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento guardado en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre del companero/a de pareja</td>
+                            <td><input type="text" id="firma-pareja" placeholder="Nombre de tu companero/a"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso. Comparte tambien tus impresiones sobre las herramientas en el canal <strong>#debate</strong>.</p>
+            <p style="margin-top:6px; font-style:italic;">Practica 24 — Asistencia remota y soporte tecnico</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 24: Asistencia Remota con Herramientas Profesionales';
+        const PREFIJO_ARCHIVO = 'P24_Asistencia_Remota';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

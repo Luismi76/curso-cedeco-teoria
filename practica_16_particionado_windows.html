@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 16: Particionado de Discos en Windows</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        code {
+            background: #edf2f7;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 16: Particionado de Discos en Windows</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Gestion de discos — particionado y formateo<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Windows 10/11 instalado
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="nota">
+                <strong>Nota informativa:</strong> Esta practica requiere una maquina virtual con Windows 10 u 11 funcionando correctamente y acceso de administrador. Durante la practica anadiremos discos duros virtuales a la VM desde VirtualBox para practicar el particionado sin riesgo para el equipo real.
+            </div>
+
+            <!-- Escenario -->
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico informatico en una empresa. Te han entregado un equipo con un disco duro nuevo que necesitas preparar para su uso: inicializarlo, crear particiones con distintos sistemas de archivos, formatearlas y asignarles letras de unidad. Ademas, deberas demostrar que sabes manejar tanto la herramienta grafica (Administrador de discos) como la herramienta de linea de comandos (<code>diskpart</code>).
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender las diferencias entre los esquemas de particion MBR y GPT.</li>
+                        <li>Utilizar la herramienta grafica Administrador de discos (Disk Management) de Windows.</li>
+                        <li>Utilizar la herramienta de linea de comandos <code>diskpart</code> para gestionar discos y particiones.</li>
+                        <li>Crear, formatear y gestionar particiones en discos virtuales.</li>
+                        <li>Comprender las diferencias entre los sistemas de archivos NTFS, FAT32 y exFAT.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">Maquina virtual con Windows 10/11 funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-admin">
+                            <label for="req-admin">Acceso de administrador en la maquina virtual</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">Oracle VirtualBox instalado y funcionando en el equipo anfitrion</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico -->
+            <div class="seccion">
+                <h2>Contenido teorico — MBR vs GPT y sistemas de archivos</h2>
+                <div class="seccion-body">
+                    <h3>Esquemas de particion: MBR vs GPT</h3>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Caracteristica</th>
+                            <th style="width:37%">MBR (Master Boot Record)</th>
+                            <th style="width:38%">GPT (GUID Partition Table)</th>
+                        </tr>
+                        <tr>
+                            <td>Ano de creacion</td>
+                            <td>1983</td>
+                            <td>Finales de los 2000</td>
+                        </tr>
+                        <tr>
+                            <td>Tamano maximo de disco</td>
+                            <td>2 TB</td>
+                            <td>9.4 ZB (zettabytes)</td>
+                        </tr>
+                        <tr>
+                            <td>Particiones primarias</td>
+                            <td>Maximo 4 (o 3 primarias + 1 extendida)</td>
+                            <td>Hasta 128 particiones</td>
+                        </tr>
+                        <tr>
+                            <td>Compatibilidad BIOS/UEFI</td>
+                            <td>BIOS (legacy)</td>
+                            <td>UEFI (moderno)</td>
+                        </tr>
+                        <tr>
+                            <td>Redundancia</td>
+                            <td>Sin copia de seguridad de la tabla</td>
+                            <td>Copia de seguridad al final del disco</td>
+                        </tr>
+                        <tr>
+                            <td>Uso recomendado</td>
+                            <td>Equipos antiguos, discos pequenos</td>
+                            <td>Equipos modernos, discos grandes</td>
+                        </tr>
+                    </table>
+
+                    <h3>Sistemas de archivos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:20%">Sistema</th>
+                            <th style="width:20%">Tamano max. archivo</th>
+                            <th style="width:20%">Tamano max. volumen</th>
+                            <th>Uso tipico</th>
+                        </tr>
+                        <tr>
+                            <td><strong>NTFS</strong></td>
+                            <td>16 TB</td>
+                            <td>256 TB</td>
+                            <td>Windows (sistema operativo, datos internos). Soporta permisos, cifrado, compresion.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FAT32</strong></td>
+                            <td>4 GB</td>
+                            <td>2 TB</td>
+                            <td>Compatibilidad universal (camaras, consolas antiguas). Limitado a archivos de 4 GB.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>exFAT</strong></td>
+                            <td>16 EB</td>
+                            <td>128 PB</td>
+                            <td>USBs y tarjetas SD modernas. Compatible con Windows, macOS y Linux. Sin limite practico de archivo.</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Consejo:</strong> En la mayoria de situaciones actuales, usaras <strong>GPT + NTFS</strong> para discos internos de Windows y <strong>exFAT</strong> para dispositivos USB que necesiten funcionar en varios sistemas operativos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Explorar el Administrador de discos -->
+            <div class="seccion">
+                <h2>Parte 1 — Explorar el Administrador de discos (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta primera parte vas a familiarizarte con la herramienta grafica de gestion de discos de Windows.</p>
+
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Inicia tu maquina virtual con Windows 10/11.</li>
+                            <li>Haz clic derecho en el boton <strong>Inicio</strong> y selecciona <strong>Administracion de discos</strong> (o pulsa <strong>Win+X</strong> y selecciona <strong>Administracion de discos</strong>).</li>
+                            <li>Tambien puedes abrir la herramienta ejecutando <code>diskmgmt.msc</code> desde el cuadro de dialogo Ejecutar (<strong>Win+R</strong>).</li>
+                            <li>Observa la ventana: en la parte superior aparece la lista de volumenes y en la parte inferior la representacion grafica de los discos.</li>
+                            <li>Identifica el disco donde esta instalado Windows (normalmente <strong>Disco 0</strong>).</li>
+                            <li>Haz clic derecho sobre el disco y selecciona <strong>Propiedades</strong> para ver informacion detallada.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Informacion del disco actual</h3>
+                    <p>Rellena la siguiente tabla con los datos que observas en el Administrador de discos:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Numero de disco</td>
+                            <td><input type="text" placeholder="Ej: Disco 0"></td>
+                        </tr>
+                        <tr>
+                            <td>Esquema de particion (MBR o GPT)</td>
+                            <td><input type="text" placeholder="Ej: GPT"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total del disco</td>
+                            <td><input type="text" placeholder="Ej: 50 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de particiones</td>
+                            <td><input type="text" placeholder="Ej: 4"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la particion de Windows (C:)</td>
+                            <td><input type="text" placeholder="Ej: 45.5 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema de archivos de C:</td>
+                            <td><input type="text" placeholder="Ej: NTFS"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio libre en C:</td>
+                            <td><input type="text" placeholder="Ej: 30.2 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Particion de recuperacion (tamano)</td>
+                            <td><input type="text" placeholder="Ej: 500 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Particion EFI/Sistema (tamano)</td>
+                            <td><input type="text" placeholder="Ej: 100 MB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Administrador de discos mostrando el disco actual</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ventana del Administrador de discos mostrando Disco 0 con todas sus particiones</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Anadir y particionar un disco nuevo -->
+            <div class="seccion">
+                <h2>Parte 2 — Anadir y particionar un disco nuevo (60 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vamos a anadir un disco duro virtual nuevo de 20 GB a la maquina virtual y crear particiones con distintos sistemas de archivos.</p>
+
+                    <h3>Paso 2.1: Anadir un disco virtual en VirtualBox</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la maquina virtual si esta encendida.</li>
+                            <li>En VirtualBox, selecciona la VM y haz clic en <strong>Configuracion</strong>.</li>
+                            <li>Ve a <strong>Almacenamiento</strong> y haz clic en el icono de <strong>Anadir disco duro</strong> (icono de disco con un +) junto al controlador SATA.</li>
+                            <li>Selecciona <strong>Crear un disco nuevo</strong>.</li>
+                            <li>Elige formato <strong>VDI</strong>, <strong>Reservado dinamicamente</strong>, tamano <strong>20 GB</strong>.</li>
+                            <li>Acepta y arranca la maquina virtual.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Al arrancar Windows, el Administrador de discos deberia detectar automaticamente el nuevo disco y ofrecerte inicializarlo. Si no aparece el dialogo, abre el Administrador de discos manualmente.
+                    </div>
+
+                    <h3>Paso 2.2: Inicializar el disco como GPT</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de discos</strong> (<code>diskmgmt.msc</code>).</li>
+                            <li>Aparecera un dialogo para inicializar el nuevo disco. Selecciona <strong>GPT (Tabla de particiones GUID)</strong>.</li>
+                            <li>Haz clic en <strong>Aceptar</strong>.</li>
+                            <li>El disco aparecera como <strong>No asignado</strong> con una barra negra.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2.3: Crear las particiones</h3>
+                    <p>Crea las siguientes tres particiones sobre el nuevo disco:</p>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Tamano</th>
+                            <th>Sistema de archivos</th>
+                            <th>Etiqueta</th>
+                            <th>Letra</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>8 GB (8192 MB)</td>
+                            <td>NTFS</td>
+                            <td>Datos</td>
+                            <td>D:</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>5 GB (5120 MB)</td>
+                            <td>exFAT</td>
+                            <td>USB_simulado</td>
+                            <td>E:</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>7 GB (resto)</td>
+                            <td>NTFS</td>
+                            <td>Backups</td>
+                            <td>F:</td>
+                        </tr>
+                    </table>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho sobre el espacio <strong>No asignado</strong> del nuevo disco y selecciona <strong>Nuevo volumen simple</strong>.</li>
+                            <li>En el asistente, indica el tamano de <strong>8192 MB</strong>.</li>
+                            <li>Asigna la letra de unidad <strong>D:</strong>.</li>
+                            <li>Formatea con <strong>NTFS</strong>, etiqueta <strong>Datos</strong>, y marca <strong>Formato rapido</strong>.</li>
+                            <li>Repite el proceso para la segunda particion: <strong>5120 MB</strong>, letra <strong>E:</strong>, formato <strong>exFAT</strong>, etiqueta <strong>USB_simulado</strong>.</li>
+                            <li>Repite para la tercera particion usando todo el espacio restante: letra <strong>F:</strong>, formato <strong>NTFS</strong>, etiqueta <strong>Backups</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultado: tabla de particiones creadas</h3>
+                    <p>Rellena esta tabla con la informacion real que ves en el Administrador de discos:</p>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Letra</th>
+                            <th>Tamano real</th>
+                            <th>Sistema de archivos</th>
+                            <th>Etiqueta</th>
+                            <th>Estado</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td><input type="text" placeholder="D:"></td>
+                            <td><input type="text" placeholder="Ej: 8.00 GB"></td>
+                            <td><input type="text" placeholder="NTFS"></td>
+                            <td><input type="text" placeholder="Datos"></td>
+                            <td><input type="text" placeholder="Correcto / Con errores"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><input type="text" placeholder="E:"></td>
+                            <td><input type="text" placeholder="Ej: 5.00 GB"></td>
+                            <td><input type="text" placeholder="exFAT"></td>
+                            <td><input type="text" placeholder="USB_simulado"></td>
+                            <td><input type="text" placeholder="Correcto / Con errores"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><input type="text" placeholder="F:"></td>
+                            <td><input type="text" placeholder="Ej: 6.99 GB"></td>
+                            <td><input type="text" placeholder="NTFS"></td>
+                            <td><input type="text" placeholder="Backups"></td>
+                            <td><input type="text" placeholder="Correcto / Con errores"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2.4: Verificar en el Explorador de archivos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Explorador de archivos</strong> (Win+E).</li>
+                            <li>Comprueba que aparecen las tres unidades nuevas: <strong>Datos (D:)</strong>, <strong>USB_simulado (E:)</strong> y <strong>Backups (F:)</strong>.</li>
+                            <li>Crea un archivo de texto de prueba en cada unidad para verificar que son accesibles.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Captura 2: Administrador de discos con las 3 particiones creadas</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Administrador de discos mostrando el nuevo disco con las 3 particiones (Datos, USB_simulado, Backups)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Captura 3: Explorador de archivos con las nuevas unidades</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Explorador de archivos mostrando las unidades D:, E: y F: accesibles</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Particionado con diskpart -->
+            <div class="seccion">
+                <h2>Parte 3 — Particionado con diskpart (60 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vamos a repetir un proceso similar pero utilizando la herramienta de linea de comandos <code>diskpart</code>. Primero anadiremos otro disco virtual de 10 GB.</p>
+
+                    <div class="aviso">
+                        <strong>AVISO IMPORTANTE:</strong> <code>diskpart</code> es una herramienta muy potente y peligrosa. Un error al seleccionar el disco equivocado puede borrar todos los datos, incluyendo el sistema operativo. <strong>Siempre verifica con <code>list disk</code> que tienes seleccionado el disco correcto antes de ejecutar cualquier operacion destructiva.</strong> En esta practica trabajamos en una VM, pero en un equipo real las consecuencias serian graves.
+                    </div>
+
+                    <h3>Paso 3.1: Anadir un segundo disco virtual</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la maquina virtual.</li>
+                            <li>En VirtualBox, anade otro disco duro virtual de <strong>10 GB</strong> (VDI, reservado dinamicamente).</li>
+                            <li>Arranca la maquina virtual.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 3.2: Abrir diskpart</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Simbolo del sistema</strong> como <strong>Administrador</strong> (clic derecho en Inicio > Terminal de Windows (Admin) o busca <code>cmd</code> y ejecuta como administrador).</li>
+                            <li>Escribe <code>diskpart</code> y pulsa Enter. Aparecera el prompt <code>DISKPART></code>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 3.3: Identificar y seleccionar el disco</h3>
+                    <p>Ejecuta los siguientes comandos en el orden indicado:</p>
+                    <div class="code-block">DISKPART> list disk
+DISKPART> select disk 2
+DISKPART> detail disk
+DISKPART> clean
+DISKPART> convert gpt</div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> El numero de disco puede variar. Usa <code>list disk</code> para identificar el disco de 10 GB recien anadido. Asegurate de que NO seleccionas el disco del sistema operativo (Disco 0) ni el disco de la Parte 2.
+                    </div>
+
+                    <h3>Paso 3.4: Crear particiones con diskpart</h3>
+                    <p>Crea dos particiones en el nuevo disco con los siguientes comandos:</p>
+                    <div class="code-block">DISKPART> create partition primary size=6144
+DISKPART> format fs=ntfs label="Trabajo" quick
+DISKPART> assign letter=G
+
+DISKPART> create partition primary
+DISKPART> format fs=exfat label="Intercambio" quick
+DISKPART> assign letter=H</div>
+
+                    <h3>Tabla de comandos ejecutados</h3>
+                    <p>Registra cada comando que ejecutaste y el resultado obtenido:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado / Salida</th>
+                        </tr>
+                        <tr>
+                            <td><code>list disk</code></td>
+                            <td><input type="text" placeholder="Ej: 3 discos listados (Disco 0, Disco 1, Disco 2)"></td>
+                        </tr>
+                        <tr>
+                            <td><code>select disk 2</code></td>
+                            <td><input type="text" placeholder="Ej: El disco 2 es ahora el disco seleccionado"></td>
+                        </tr>
+                        <tr>
+                            <td><code>detail disk</code></td>
+                            <td><input type="text" placeholder="Ej: VBOX HARDDISK, 10 GB, En linea"></td>
+                        </tr>
+                        <tr>
+                            <td><code>clean</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart limpio el disco correctamente"></td>
+                        </tr>
+                        <tr>
+                            <td><code>convert gpt</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart convirtio correctamente el disco a GPT"></td>
+                        </tr>
+                        <tr>
+                            <td><code>create partition primary size=6144</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart creo correctamente la particion"></td>
+                        </tr>
+                        <tr>
+                            <td><code>format fs=ntfs label="Trabajo" quick</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart formateo correctamente el volumen"></td>
+                        </tr>
+                        <tr>
+                            <td><code>assign letter=G</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart asigno correctamente la letra de unidad"></td>
+                        </tr>
+                        <tr>
+                            <td><code>create partition primary</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart creo correctamente la particion"></td>
+                        </tr>
+                        <tr>
+                            <td><code>format fs=exfat label="Intercambio" quick</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart formateo correctamente el volumen"></td>
+                        </tr>
+                        <tr>
+                            <td><code>assign letter=H</code></td>
+                            <td><input type="text" placeholder="Ej: DiskPart asigno correctamente la letra de unidad"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 3.5: Verificar las particiones creadas</h3>
+                    <div class="code-block">DISKPART> list partition
+DISKPART> list volume</div>
+
+                    <h3>Resultado de list volume</h3>
+                    <table>
+                        <tr>
+                            <th>Volumen</th>
+                            <th>Letra</th>
+                            <th>Etiqueta</th>
+                            <th>Sist. archivos</th>
+                            <th>Tamano</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Vol 0"></td>
+                            <td><input type="text" placeholder="G"></td>
+                            <td><input type="text" placeholder="Trabajo"></td>
+                            <td><input type="text" placeholder="NTFS"></td>
+                            <td><input type="text" placeholder="6 GB"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Vol 1"></td>
+                            <td><input type="text" placeholder="H"></td>
+                            <td><input type="text" placeholder="Intercambio"></td>
+                            <td><input type="text" placeholder="exFAT"></td>
+                            <td><input type="text" placeholder="3.8 GB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Sesion de diskpart con los comandos ejecutados</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ventana de diskpart mostrando los comandos ejecutados y sus resultados</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Operaciones avanzadas -->
+            <div class="seccion">
+                <h2>Parte 4 — Operaciones avanzadas (40 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte practicaras operaciones avanzadas de gestion de particiones: reducir, extender, eliminar y convertir entre MBR y GPT.</p>
+
+                    <h3>Ejercicio 4.1: Reducir un volumen (Shrink)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de discos</strong>.</li>
+                            <li>Haz clic derecho sobre la particion <strong>Datos (D:)</strong> de 8 GB.</li>
+                            <li>Selecciona <strong>Reducir volumen</strong>.</li>
+                            <li>Indica que deseas reducir <strong>2048 MB</strong> (2 GB).</li>
+                            <li>Haz clic en <strong>Reducir</strong>.</li>
+                            <li>Observa como aparece un espacio <strong>No asignado</strong> de 2 GB junto a la particion.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Tamano de D: antes de reducir</td>
+                            <td><input type="text" placeholder="Ej: 8.00 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de D: despues de reducir</td>
+                            <td><input type="text" placeholder="Ej: 6.00 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio no asignado generado</td>
+                            <td><input type="text" placeholder="Ej: 2.00 GB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Ejercicio 4.2: Extender un volumen (Extend)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho sobre la particion <strong>Datos (D:)</strong> (que ahora tiene 6 GB).</li>
+                            <li>Selecciona <strong>Extender volumen</strong>.</li>
+                            <li>Usa el asistente para anadir todo el espacio no asignado adyacente (2 GB).</li>
+                            <li>Verifica que la particion D: ha vuelto a su tamano original.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Tamano de D: despues de extender</td>
+                            <td><input type="text" placeholder="Ej: 8.00 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio no asignado restante</td>
+                            <td><input type="text" placeholder="Ej: 0 MB (sin espacio libre)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Ejercicio 4.3: Eliminar y recrear una particion</h3>
+                    <div class="aviso">
+                        <strong>Atencion:</strong> Eliminar una particion borra todos los datos que contiene. En esta practica no hay datos importantes, pero en un entorno real debes asegurarte de tener copia de seguridad antes de eliminar cualquier volumen.
+                    </div>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho sobre la particion <strong>USB_simulado (E:)</strong>.</li>
+                            <li>Selecciona <strong>Eliminar volumen</strong> y confirma.</li>
+                            <li>El espacio aparecera como <strong>No asignado</strong>.</li>
+                            <li>Crea un nuevo volumen simple en ese espacio: <strong>5 GB</strong>, formato <strong>FAT32</strong>, etiqueta <strong>USB_FAT32</strong>, letra <strong>E:</strong>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Operacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Particion eliminada</td>
+                            <td><input type="text" placeholder="Ej: USB_simulado (E:) eliminada correctamente"></td>
+                        </tr>
+                        <tr>
+                            <td>Nueva particion creada</td>
+                            <td><input type="text" placeholder="Ej: USB_FAT32 (E:), 5 GB, FAT32"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Ejercicio 4.4: Convertir entre MBR y GPT (disco vacio)</h3>
+                    <p>Usaremos <code>diskpart</code> para convertir el disco de la Parte 3 (10 GB) de GPT a MBR y de vuelta a GPT.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <code>diskpart</code> como administrador.</li>
+                            <li>Ejecuta <code>list disk</code> para identificar el disco de 10 GB.</li>
+                            <li>Selecciona el disco: <code>select disk 2</code> (ajusta el numero segun corresponda).</li>
+                            <li>Limpia el disco: <code>clean</code> (esto borra todas las particiones).</li>
+                            <li>Convierte a MBR: <code>convert mbr</code>.</li>
+                            <li>Verifica con <code>detail disk</code> que el disco es ahora MBR.</li>
+                            <li>Convierte de nuevo a GPT: <code>clean</code> seguido de <code>convert gpt</code>.</li>
+                            <li>Verifica con <code>detail disk</code> que el disco es GPT de nuevo.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Paso</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Esquema antes de la conversion</td>
+                            <td><input type="text" placeholder="Ej: GPT"></td>
+                        </tr>
+                        <tr>
+                            <td>Despues de convert mbr</td>
+                            <td><input type="text" placeholder="Ej: MBR"></td>
+                        </tr>
+                        <tr>
+                            <td>Despues de convert gpt</td>
+                            <td><input type="text" placeholder="Ej: GPT"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Operaciones avanzadas completadas</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Administrador de discos o diskpart mostrando el resultado de las operaciones avanzadas</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 5 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Escribe al menos 2-3 lineas en cada respuesta.</p>
+
+                    <div class="pregunta">
+                        <p>5.1. Cuando usarias MBR en lugar de GPT? Describe al menos dos situaciones concretas.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5.2. Que ocurre si intentas crear una quinta particion primaria en un disco MBR? Explica por que y como se podria solucionar.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5.3. Por que exFAT es mejor que FAT32 para unidades USB modernas? Indica las limitaciones de FAT32 que exFAT supera.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5.4. Cual es la diferencia entre un formato rapido y un formato completo? En que situaciones usarias cada uno?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Evaluacion y entrega</h2>
+                <div class="seccion-body">
+
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Exploracion del Administrador de discos (Parte 1)</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td>Creacion correcta de particiones (Parte 2)</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>Uso de diskpart (Parte 3)</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>Operaciones avanzadas (Parte 4)</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 5)</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>100%</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>Lista de verificacion antes de entregar</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Tabla de informacion del disco actual completada + captura</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: 3 particiones creadas correctamente + tabla de resultados + 2 capturas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Comandos de diskpart ejecutados + tabla de resultados + captura</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Operaciones de reducir, extender, eliminar y convertir completadas + captura</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: 4 preguntas de reflexion respondidas (minimo 2-3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">5 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <h3>Firma del alumno</h3>
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 16: Particionado de Discos en Windows';
+        const PREFIJO_ARCHIVO = 'P16_Particionado_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

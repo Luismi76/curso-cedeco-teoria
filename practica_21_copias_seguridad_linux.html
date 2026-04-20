@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 21: Copias de Seguridad y Automatizacion en Linux</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+            line-height: 1.7;
+        }
+
+        /* Code inline */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        /* Code blocks (dark) */
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 21: Copias de Seguridad y Automatizacion en Linux</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Clonacion y copias de seguridad<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Ubuntu + Duplicati
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Sesion intensiva de terminal:</strong> Esta practica se desarrolla principalmente en la terminal de Linux. Tendras que escribir comandos, crear scripts y programar tareas automaticas. Asegurate de tener el terminal abierto y listo antes de comenzar. No te preocupes si al principio los comandos parecen complejos: sigue los pasos uno a uno y pronto veras como todo encaja.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Eres el administrador de sistemas de una pequena empresa que utiliza un servidor Linux (Ubuntu). Tu responsable te ha pedido que configures un sistema de copias de seguridad automatizadas para proteger los datos criticos de la empresa. Debes implementar diferentes estrategias de backup (manual, incremental, programado y con cifrado) y documentar todo el proceso para que cualquier companero pueda mantenerlo en el futuro.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Utilizar el comando <code>tar</code> para crear copias de seguridad manuales comprimidas y restaurar archivos.</li>
+                        <li>Utilizar <code>rsync</code> para sincronizar directorios de forma incremental, copiando solo los cambios.</li>
+                        <li>Automatizar tareas de backup mediante <code>cron</code>, el programador de tareas de Linux.</li>
+                        <li>Instalar y configurar <strong>Duplicati</strong> como herramienta grafica de backup con cifrado integrado.</li>
+                        <li>Escribir un script de shell (<code>bash</code>) que realice copias de seguridad automaticas con registro de actividad.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Ubuntu instalada y funcionando en VirtualBox</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-disco">
+                            <label for="req-disco">Segundo disco virtual anadido a la VM y montado en /mnt/backup</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-sudo">
+                            <label for="req-sudo">Acceso con privilegios de administrador (sudo)</label>
+                        </div>
+                    </div>
+                    <div class="nota">
+                        <strong>Preparar el disco de backup:</strong> Si aun no tienes un segundo disco montado, sigue estos pasos para crearlo en VirtualBox y montarlo:
+                        <pre class="codigo-bloque"># 1. Apaga la VM y anade un disco virtual de 10 GB en VirtualBox
+#    (Configuracion > Almacenamiento > Controlador SATA > Anadir disco duro)
+
+# 2. Inicia la VM y formatea el nuevo disco
+sudo fdisk /dev/sdb        # Crea una particion nueva (n, p, 1, Enter, Enter, w)
+sudo mkfs.ext4 /dev/sdb1   # Formatea la particion
+
+# 3. Crea el punto de montaje y monta el disco
+sudo mkdir -p /mnt/backup
+sudo mount /dev/sdb1 /mnt/backup
+
+# 4. Dale permisos al usuario
+sudo chown $USER:$USER /mnt/backup
+
+# 5. (Opcional) Anade al fstab para montaje automatico
+echo '/dev/sdb1 /mnt/backup ext4 defaults 0 2' | sudo tee -a /etc/fstab</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Backup manual con tar -->
+            <div class="seccion">
+                <h2>Parte 1 — Backup manual con tar (40 min)</h2>
+                <div class="seccion-body">
+                    <p>El comando <code>tar</code> (Tape ARchiver) es la herramienta clasica de Linux para crear archivos comprimidos que contienen multiples ficheros y directorios. Es ideal para crear copias de seguridad puntuales.</p>
+
+                    <h3>1.1 Crear archivos de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un terminal con <strong>Ctrl+Alt+T</strong>.</li>
+                            <li>Crea un directorio de trabajo con archivos de ejemplo:</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Crear directorio de datos de prueba
+mkdir -p ~/datos_empresa/{documentos,contabilidad,proyectos}
+
+# Crear archivos de ejemplo
+echo "Informe trimestral Q1 2026" > ~/datos_empresa/documentos/informe_q1.txt
+echo "Presupuesto anual 2026" > ~/datos_empresa/contabilidad/presupuesto.txt
+echo "Plan de proyecto Alpha" > ~/datos_empresa/proyectos/alpha.txt
+echo "Base de datos de clientes" > ~/datos_empresa/clientes.csv
+date > ~/datos_empresa/fecha_creacion.txt
+
+# Verificar la estructura creada
+ls -lR ~/datos_empresa/</pre>
+
+                    <h3>1.2 Crear backup comprimido con tar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta el siguiente comando para crear un archivo <code>.tar.gz</code> comprimido:</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Crear backup comprimido con fecha en el nombre
+tar -czvf /mnt/backup/backup_datos_$(date +%Y%m%d_%H%M%S).tar.gz -C ~/ datos_empresa/
+
+# Explicacion de las opciones:
+#   -c  = Create (crear archivo)
+#   -z  = Comprimir con gzip
+#   -v  = Verbose (mostrar archivos procesados)
+#   -f  = File (nombre del archivo de salida)</pre>
+
+                    <h3>1.3 Listar contenido del backup</h3>
+                    <pre class="codigo-bloque"># Ver el contenido del backup sin extraerlo
+tar -tzvf /mnt/backup/backup_datos_*.tar.gz</pre>
+
+                    <h3>1.4 Eliminar originales y restaurar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Elimina el directorio original para simular una perdida de datos.</li>
+                            <li>Restaura desde el backup y verifica que todo esta correcto.</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Eliminar los datos originales (simular perdida)
+rm -rf ~/datos_empresa/
+
+# Verificar que se han eliminado
+ls ~/datos_empresa/
+# Deberia dar error: No such file or directory
+
+# Restaurar desde el backup
+tar -xzvf /mnt/backup/backup_datos_*.tar.gz -C ~/
+
+# Verificar la restauracion
+ls -lR ~/datos_empresa/
+cat ~/datos_empresa/documentos/informe_q1.txt</pre>
+
+                    <h3>Tabla de comandos y resultados</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando ejecutado</th>
+                            <th style="width:30%">Resultado obtenido</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td><code>tar -czvf</code> (crear backup)</td>
+                            <td><input type="text" placeholder="Ej: 5 archivos comprimidos"></td>
+                            <td><input type="text" placeholder="Tamano del archivo .tar.gz"></td>
+                        </tr>
+                        <tr>
+                            <td><code>tar -tzvf</code> (listar contenido)</td>
+                            <td><input type="text" placeholder="Ej: 5 archivos listados"></td>
+                            <td><input type="text" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td><code>rm -rf</code> (eliminar originales)</td>
+                            <td><input type="text" placeholder="Directorio eliminado"></td>
+                            <td><input type="text" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td><code>tar -xzvf</code> (restaurar)</td>
+                            <td><input type="text" placeholder="Ej: 5 archivos restaurados"></td>
+                            <td><input type="text" placeholder="Datos intactos? Si/No"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Proceso completo de backup y restauracion con tar</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la creacion del tar.gz, listado del contenido, eliminacion y restauracion exitosa</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Sincronizacion con rsync -->
+            <div class="seccion">
+                <h2>Parte 2 — Sincronizacion con rsync (50 min)</h2>
+                <div class="seccion-body">
+                    <p>El comando <code>rsync</code> es una herramienta avanzada de sincronizacion que solo copia los archivos que han cambiado. Esto lo hace mucho mas eficiente que <code>tar</code> para backups diarios, ya que no necesita copiar todo cada vez.</p>
+
+                    <h3>2.1 Crear carpeta de origen con archivos</h3>
+                    <pre class="codigo-bloque"># Crear estructura de archivos de origen
+mkdir -p ~/proyecto_web/{css,js,img,html}
+
+echo "body { margin: 0; }" > ~/proyecto_web/css/estilos.css
+echo "console.log('Hola');" > ~/proyecto_web/js/app.js
+echo "&lt;html&gt;&lt;body&gt;Inicio&lt;/body&gt;&lt;/html&gt;" > ~/proyecto_web/html/index.html
+echo "Logo de la empresa" > ~/proyecto_web/img/logo.txt
+echo "README del proyecto" > ~/proyecto_web/README.md
+
+# Ver la estructura
+ls -lR ~/proyecto_web/</pre>
+
+                    <h3>2.2 Primera sincronizacion con rsync</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea el directorio de destino en el disco de backup.</li>
+                            <li>Ejecuta <code>rsync</code> para hacer la primera copia completa.</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Crear directorio de destino
+mkdir -p /mnt/backup/rsync_proyecto
+
+# Primera sincronizacion (copia completa)
+rsync -avh ~/proyecto_web/ /mnt/backup/rsync_proyecto/
+
+# Explicacion de las opciones:
+#   -a  = Archive (preserva permisos, fechas, enlaces, etc.)
+#   -v  = Verbose (muestra los archivos copiados)
+#   -h  = Human-readable (tamanos legibles)
+
+# Verificar la copia
+ls -lR /mnt/backup/rsync_proyecto/</pre>
+
+                    <h3>2.3 Modificar archivos y re-sincronizar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Modifica algunos archivos del origen.</li>
+                            <li>Ejecuta <code>rsync</code> de nuevo y observa que <strong>solo se copian los archivos modificados</strong>.</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Modificar un archivo existente
+echo "body { margin: 0; padding: 20px; color: #333; }" > ~/proyecto_web/css/estilos.css
+
+# Anadir un archivo nuevo
+echo "function validar() { return true; }" > ~/proyecto_web/js/validacion.js
+
+# Re-sincronizar (solo se copian los cambios)
+rsync -avh ~/proyecto_web/ /mnt/backup/rsync_proyecto/
+
+# Observa la salida: solo aparecen los archivos modificados o nuevos</pre>
+
+                    <h3>2.4 Probar la opcion --delete</h3>
+                    <div class="aviso">
+                        <strong>Precaucion:</strong> La opcion <code>--delete</code> elimina del destino los archivos que ya no existen en el origen. Es muy util para mantener una replica exacta, pero puede causar perdida de datos si se usa incorrectamente. Usala siempre con cuidado.
+                    </div>
+                    <pre class="codigo-bloque"># Eliminar un archivo del origen
+rm ~/proyecto_web/img/logo.txt
+
+# Sincronizar CON --delete (elimina en destino lo que no existe en origen)
+rsync -avh --delete ~/proyecto_web/ /mnt/backup/rsync_proyecto/
+
+# Verificar que logo.txt se ha eliminado tambien del backup
+ls /mnt/backup/rsync_proyecto/img/</pre>
+
+                    <h3>2.5 Sincronizacion remota por SSH (opcional)</h3>
+                    <div class="nota">
+                        <strong>Nota:</strong> Si tienes una segunda VM con Ubuntu disponible, puedes probar la sincronizacion remota. Si no, documenta el comando teoricamente.
+                    </div>
+                    <pre class="codigo-bloque"># Sincronizar a otra maquina via SSH
+rsync -avh -e ssh ~/proyecto_web/ usuario@192.168.1.100:/home/usuario/backup_remoto/
+
+# Para que funcione sin contrasena, puedes configurar claves SSH:
+# ssh-keygen -t rsa
+# ssh-copy-id usuario@192.168.1.100</pre>
+
+                    <h3>Tabla de resultados de rsync</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Operacion</th>
+                            <th style="width:25%">Archivos copiados</th>
+                            <th style="width:20%">Tiempo</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Primera sincronizacion</td>
+                            <td><input type="text" placeholder="Ej: 5 archivos"></td>
+                            <td><input type="text" placeholder="Ej: 0.02s"></td>
+                            <td><input type="text" placeholder="Copia completa"></td>
+                        </tr>
+                        <tr>
+                            <td>Re-sincronizacion (tras cambios)</td>
+                            <td><input type="text" placeholder="Ej: 2 archivos"></td>
+                            <td><input type="text" placeholder="Ej: 0.01s"></td>
+                            <td><input type="text" placeholder="Solo cambios"></td>
+                        </tr>
+                        <tr>
+                            <td>Sincronizacion con --delete</td>
+                            <td><input type="text" placeholder="Ej: 0 copiados, 1 eliminado"></td>
+                            <td><input type="text" placeholder="Ej: 0.01s"></td>
+                            <td><input type="text" placeholder="Archivo eliminado del destino"></td>
+                        </tr>
+                        <tr>
+                            <td>Sincronizacion remota (SSH)</td>
+                            <td><input type="text" placeholder="Archivos o N/A"></td>
+                            <td><input type="text" placeholder="Tiempo o N/A"></td>
+                            <td><input type="text" placeholder="Realizado / No realizado"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Sincronizacion con rsync</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la primera sincronizacion, la re-sincronizacion y el resultado de --delete</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Crear un script de backup -->
+            <div class="seccion">
+                <h2>Parte 3 — Crear un script de backup (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Vamos a crear un script de shell que automatice el proceso de backup. El script utilizara <code>rsync</code>, generara un nombre con fecha y hora, y registrara la actividad en un archivo de log.</p>
+
+                    <h3>3.1 Crear el script backup_diario.sh</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea el archivo del script con <strong>nano</strong>:</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque">nano ~/backup_diario.sh</pre>
+
+                    <h3>3.2 Contenido del script</h3>
+                    <p>Escribe el siguiente contenido en el editor nano. Puedes copiarlo y pegarlo:</p>
+                    <pre class="codigo-bloque">#!/bin/bash
+# =====================================================
+# Script de backup diario automatizado
+# Curso IFCT0309 - Administracion de Sistemas Linux
+# =====================================================
+
+# --- CONFIGURACION ---
+ORIGEN="/home/$USER/datos_empresa"
+DESTINO="/mnt/backup/diario"
+LOG="/mnt/backup/backup.log"
+FECHA=$(date '+%Y-%m-%d %H:%M:%S')
+NOMBRE_BACKUP="backup_$(date '+%Y%m%d_%H%M%S')"
+
+# --- CREAR DIRECTORIO DE DESTINO SI NO EXISTE ---
+mkdir -p "$DESTINO/$NOMBRE_BACKUP"
+
+# --- REGISTRAR INICIO ---
+echo "========================================" >> "$LOG"
+echo "[$FECHA] Inicio del backup" >> "$LOG"
+echo "  Origen:  $ORIGEN" >> "$LOG"
+echo "  Destino: $DESTINO/$NOMBRE_BACKUP" >> "$LOG"
+
+# --- EJECUTAR RSYNC ---
+rsync -avh --stats "$ORIGEN/" "$DESTINO/$NOMBRE_BACKUP/" >> "$LOG" 2>&1
+
+# --- COMPROBAR RESULTADO ---
+if [ $? -eq 0 ]; then
+    echo "[$FECHA] EXITO: Backup completado correctamente" >> "$LOG"
+    echo "Backup completado con exito: $DESTINO/$NOMBRE_BACKUP"
+else
+    echo "[$FECHA] ERROR: El backup ha fallado" >> "$LOG"
+    echo "ERROR: El backup ha fallado. Revisa el log: $LOG"
+fi
+
+# --- ELIMINAR BACKUPS ANTIGUOS (mas de 7 dias) ---
+find "$DESTINO" -maxdepth 1 -type d -mtime +7 -exec rm -rf {} \; 2>/dev/null
+echo "[$FECHA] Limpieza de backups antiguos completada" >> "$LOG"
+echo "========================================" >> "$LOG"</pre>
+
+                    <h3>3.3 Hacer ejecutable y probar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Guarda el archivo en nano con <strong>Ctrl+O</strong>, Enter, <strong>Ctrl+X</strong>.</li>
+                            <li>Dale permisos de ejecucion con <code>chmod</code>.</li>
+                            <li>Ejecuta el script manualmente para probarlo.</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Dar permisos de ejecucion
+chmod +x ~/backup_diario.sh
+
+# Verificar permisos
+ls -l ~/backup_diario.sh
+
+# Ejecutar el script manualmente
+~/backup_diario.sh
+
+# Verificar que se ha creado el backup
+ls -l /mnt/backup/diario/
+
+# Ver el registro de actividad
+cat /mnt/backup/backup.log</pre>
+
+                    <h3>Tabla de resultados del script</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Permisos del script (ls -l)</td>
+                            <td><input type="text" placeholder="Ej: -rwxr-xr-x"></td>
+                        </tr>
+                        <tr>
+                            <td>Mensaje de salida del script</td>
+                            <td><input type="text" placeholder="Ej: Backup completado con exito..."></td>
+                        </tr>
+                        <tr>
+                            <td>Directorio de backup creado</td>
+                            <td><input type="text" placeholder="Ej: backup_20260410_143022"></td>
+                        </tr>
+                        <tr>
+                            <td>Contenido del log (ultima linea)</td>
+                            <td><input type="text" placeholder="Ej: EXITO: Backup completado..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Script de backup ejecutado</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando el script creado, los permisos, la ejecucion exitosa y el contenido del log</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Automatizar con cron -->
+            <div class="seccion">
+                <h2>Parte 4 — Automatizar con cron (30 min)</h2>
+                <div class="seccion-body">
+                    <p><code>cron</code> es el programador de tareas de Linux. Permite ejecutar comandos o scripts de forma automatica en horarios definidos. La configuracion se realiza editando la tabla de tareas con <code>crontab -e</code>.</p>
+
+                    <h3>4.1 Formato del crontab</h3>
+                    <p>Cada linea del crontab tiene 5 campos de tiempo seguidos del comando a ejecutar:</p>
+                    <pre class="codigo-bloque"># Formato:
+# minuto  hora  dia_mes  mes  dia_semana  comando
+#  (0-59) (0-23) (1-31) (1-12)  (0-7)
+#
+# 0 = domingo, 7 = domingo (ambos valen)
+# * = cualquier valor
+# */N = cada N unidades</pre>
+
+                    <h3>Tabla de ejemplos de cron</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Expresion cron</th>
+                            <th>Significado</th>
+                        </tr>
+                        <tr>
+                            <td><code>0 2 * * *</code></td>
+                            <td>Todos los dias a las 2:00 de la manana</td>
+                        </tr>
+                        <tr>
+                            <td><code>30 8 * * 1-5</code></td>
+                            <td>De lunes a viernes a las 8:30</td>
+                        </tr>
+                        <tr>
+                            <td><code>0 0 1 * *</code></td>
+                            <td>El dia 1 de cada mes a medianoche</td>
+                        </tr>
+                        <tr>
+                            <td><code>*/15 * * * *</code></td>
+                            <td>Cada 15 minutos</td>
+                        </tr>
+                        <tr>
+                            <td><code>*/30 * * * *</code></td>
+                            <td>Cada 30 minutos</td>
+                        </tr>
+                        <tr>
+                            <td><code>0 3 * * 0</code></td>
+                            <td>Cada domingo a las 3:00 de la manana</td>
+                        </tr>
+                        <tr>
+                            <td><code>*/5 * * * *</code></td>
+                            <td>Cada 5 minutos</td>
+                        </tr>
+                    </table>
+
+                    <h3>4.2 Programar el script de backup</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el crontab de tu usuario con <strong>crontab -e</strong>.</li>
+                            <li>Si es la primera vez, elige el editor <strong>nano</strong> (opcion 1).</li>
+                            <li>Anade la linea de programacion al final del archivo.</li>
+                            <li>Guarda y cierra (Ctrl+O, Enter, Ctrl+X).</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Abrir el crontab para editar
+crontab -e
+
+# Anadir esta linea al final del archivo (cada 30 minutos, para pruebas):
+*/30 * * * * /home/$USER/backup_diario.sh
+
+# Guardar y salir de nano (Ctrl+O, Enter, Ctrl+X)</pre>
+
+                    <h3>4.3 Verificar y comprobar</h3>
+                    <pre class="codigo-bloque"># Verificar que la tarea esta programada
+crontab -l
+
+# Esperar 30 minutos (o cambiar a */2 para cada 2 minutos como prueba rapida)
+
+# Comprobar el log para verificar la ejecucion automatica
+cat /mnt/backup/backup.log
+
+# Ver los backups creados automaticamente
+ls -lt /mnt/backup/diario/</pre>
+
+                    <div class="nota">
+                        <strong>Consejo para pruebas:</strong> Si quieres verificar mas rapido que cron funciona, cambia <code>*/30</code> por <code>*/2</code> (cada 2 minutos). Recuerda volver a ponerlo en <code>*/30</code> o eliminarlo cuando termines de probar para no llenar el disco.
+                    </div>
+
+                    <h3>Tabla de resultados de cron</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Salida de <code>crontab -l</code></td>
+                            <td><input type="text" placeholder="Ej: */30 * * * * /home/alumno/backup_diario.sh"></td>
+                        </tr>
+                        <tr>
+                            <td>Hora de la primera ejecucion automatica</td>
+                            <td><input type="text" placeholder="Ej: 14:30:00"></td>
+                        </tr>
+                        <tr>
+                            <td>Contenido del log tras ejecucion automatica</td>
+                            <td><input type="text" placeholder="Ej: EXITO: Backup completado correctamente"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de backups en /mnt/backup/diario/</td>
+                            <td><input type="text" placeholder="Ej: 2 directorios"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Crontab configurado y funcionando</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando crontab -l, el log de ejecucion automatica y los backups creados</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Duplicati -->
+            <div class="seccion">
+                <h2>Parte 5 — Duplicati: backup grafico con cifrado (50 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>Duplicati</strong> es una herramienta de backup de codigo abierto con interfaz web. Permite crear copias de seguridad incrementales con cifrado AES-256, programar backups y restaurar archivos facilmente desde un navegador.</p>
+
+                    <h3>5.1 Instalar Duplicati</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Descarga el paquete <code>.deb</code> desde la web oficial de Duplicati.</li>
+                            <li>Instala las dependencias necesarias.</li>
+                            <li>Instala el paquete descargado.</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Instalar dependencias necesarias
+sudo apt update
+sudo apt install -y apt-transport-https nano wget
+
+# Descargar Duplicati (version mas reciente .deb)
+# Visita https://www.duplicati.com/download para obtener el enlace actualizado
+wget https://updates.duplicati.com/beta/duplicati.deb
+
+# Instalar el paquete
+sudo dpkg -i duplicati.deb
+
+# Si hay errores de dependencias, ejecuta:
+sudo apt -f install -y
+
+# Iniciar el servicio de Duplicati
+sudo systemctl enable duplicati
+sudo systemctl start duplicati</pre>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Si la URL de descarga no funciona, visita <a href="https://www.duplicati.com/download" target="_blank" style="color: var(--azul-claro);">duplicati.com/download</a> y descarga la version <code>.deb</code> mas reciente para Ubuntu/Debian.
+                    </div>
+
+                    <h3>5.2 Acceder a la interfaz web</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador web de la VM.</li>
+                            <li>Navega a <strong>http://localhost:8200</strong>.</li>
+                            <li>Deberia aparecer la interfaz de administracion de Duplicati.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.3 Crear un trabajo de backup</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic en <strong>"Anadir copia de seguridad"</strong> (o "Add backup").</li>
+                            <li>Selecciona <strong>"Configurar una nueva copia de seguridad"</strong>.</li>
+                            <li><strong>General:</strong> Ponle un nombre descriptivo (ej: "Backup Documentos Empresa"). Activa el cifrado y escribe una contrasena segura.</li>
+                            <li><strong>Destino:</strong> Selecciona "Carpeta local" y escribe la ruta <code>/mnt/backup/duplicati</code>.</li>
+                            <li><strong>Datos de origen:</strong> Selecciona la carpeta <code>/home/alumno/datos_empresa</code> (o la carpeta de tu usuario).</li>
+                            <li><strong>Programacion:</strong> Configura para que se ejecute cada dia a las 23:00.</li>
+                            <li><strong>Opciones:</strong> Deja las opciones por defecto (tamano de volumen 50 MB).</li>
+                            <li>Haz clic en <strong>"Guardar"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.4 Ejecutar el backup manualmente</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la pantalla principal de Duplicati, localiza tu trabajo de backup.</li>
+                            <li>Haz clic en <strong>"Ejecutar ahora"</strong>.</li>
+                            <li>Espera a que termine y verifica que aparece el mensaje de exito.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.5 Backup incremental</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Modifica algun archivo en <code>~/datos_empresa/</code>:</li>
+                        </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Modificar un archivo
+echo "Actualizacion del informe Q2 2026" >> ~/datos_empresa/documentos/informe_q1.txt
+
+# Crear un archivo nuevo
+echo "Nuevo archivo de notas" > ~/datos_empresa/notas_reunion.txt</pre>
+                    <div class="pasos">
+                        <ol start="2">
+                            <li>Vuelve a Duplicati y ejecuta el backup de nuevo.</li>
+                            <li>Observa que esta vez es <strong>mas rapido</strong> porque solo copia los cambios (incremental).</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.6 Restaurar un archivo desde Duplicati</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Duplicati, haz clic en tu trabajo de backup y selecciona <strong>"Restaurar"</strong>.</li>
+                            <li>Navega por la estructura de archivos y selecciona un archivo para restaurar.</li>
+                            <li>Elige la ubicacion de restauracion (puedes restaurar a una carpeta diferente, por ejemplo <code>/tmp/restaurado/</code>).</li>
+                            <li>Verifica que el archivo restaurado es identico al original.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Tabla de resultados de Duplicati</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Operacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Acceso a http://localhost:8200</td>
+                            <td><input type="text" placeholder="Ej: Interfaz cargada correctamente"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre del trabajo de backup</td>
+                            <td><input type="text" placeholder="Ej: Backup Documentos Empresa"></td>
+                        </tr>
+                        <tr>
+                            <td>Cifrado activado (Si/No)</td>
+                            <td><input type="text" placeholder="Ej: Si, AES-256"></td>
+                        </tr>
+                        <tr>
+                            <td>Primer backup (duracion y tamano)</td>
+                            <td><input type="text" placeholder="Ej: 5 seg, 2.3 KB"></td>
+                        </tr>
+                        <tr>
+                            <td>Segundo backup incremental (duracion)</td>
+                            <td><input type="text" placeholder="Ej: 2 seg (mas rapido)"></td>
+                        </tr>
+                        <tr>
+                            <td>Restauracion exitosa (Si/No)</td>
+                            <td><input type="text" placeholder="Ej: Si, archivo identico"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Duplicati configurado y funcionando</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Interfaz de Duplicati mostrando el trabajo de backup creado, el historial de ejecuciones y la restauracion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. tar vs rsync: ¿Cuando usarias cada uno? Explica las diferencias principales y en que situaciones es mas adecuado cada uno.</p>
+                        <textarea rows="5" placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. ¿Por que rsync es mejor que tar para copias de seguridad diarias? Explica el concepto de "backup incremental".</p>
+                        <textarea rows="5" placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. ¿Que significa la expresion cron <code>*/5 * * * *</code>? Explica cada campo y escribe dos ejemplos mas de expresiones cron con su significado.</p>
+                        <textarea rows="5" placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. ¿Por que es importante cifrar las copias de seguridad? ¿Que podria pasar si alguien accede a un backup sin cifrar?</p>
+                        <textarea rows="5" placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. ¿Que ventajas ofrece Duplicati frente a un script manual de backup? ¿En que situaciones preferirias usar un script y en cuales Duplicati?</p>
+                        <textarea rows="5" placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Reto tecnico -->
+            <div class="seccion">
+                <h2>Parte 7 — Reto tecnico: diseño, scripting avanzado y diagnostico (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Hasta aqui has seguido guiones. Ahora tienes que <strong>decidir tu mismo</strong>: esta parte mide tu capacidad de diseño, depuracion y razonamiento, no tu velocidad copiando comandos. Se valora mas la justificacion que el resultado final.</p>
+
+                    <h3>Reto 1 — Diseña tu estrategia 3-2-1 (15 min)</h3>
+                    <div class="escenario">
+                        <strong>Caso:</strong> Un despacho profesional tiene ~120 GB de datos criticos (contabilidad, contratos, correo exportado). Disponen de: el servidor Ubuntu, un NAS en la red local (500 GB libres, compartido por SMB) y una cuenta de almacenamiento en la nube (100 GB gratis, subida limitada a 10 Mbps). Los datos crecen ~200 MB al dia. El responsable quiere cumplir la regla 3-2-1 y poder recuperar un fichero borrado hasta 30 dias atras.
+                    </div>
+                    <p>Propon tu estrategia respondiendo a estas cuestiones. <strong>No basta con citar herramientas</strong>: tienes que justificar por que, con que frecuencia y donde va cada copia.</p>
+                    <div class="pregunta">
+                        <p>a) ¿Que herramienta usarias para cada uno de los tres destinos (local, NAS, nube) y por que? ¿Copia completa o incremental en cada uno?</p>
+                        <textarea rows="5" placeholder="Justifica tu eleccion por destino..."></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p>b) Planificacion horaria: ¿cuando se ejecuta cada copia y por que a esa hora? Ten en cuenta el ancho de banda de subida y que los 120 GB iniciales no caben en la cuota gratuita de la nube.</p>
+                        <textarea rows="5" placeholder="Calendario semanal y razonamiento..."></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p>c) Retencion: ¿como garantizas los 30 dias de historico sin llenar el NAS? Describe el esquema de rotacion (diario / semanal / mensual) y estima el espacio que ocupara al cabo de un mes.</p>
+                        <textarea rows="5" placeholder="Esquema de rotacion y calculo..."></textarea>
+                    </div>
+
+                    <h3>Reto 2 — Script avanzado con validacion e integridad (20 min)</h3>
+                    <p>Partiendo del script <code>backup_diario.sh</code> de la Parte 3, crea una version nueva llamada <code>backup_robusto.sh</code> que añada, <strong>sin copiar plantillas de internet</strong>, las siguientes mejoras. Se valorara que el bash sea correcto, no la extension del script.</p>
+                    <ol style="margin-left: 22px; line-height: 1.8; font-size: 13px;">
+                        <li>Verifica que el directorio de origen existe; si no, aborta con codigo de salida distinto de 0 y registra el error.</li>
+                        <li>Genera un fichero <code>.sha256</code> con el checksum del archivo de backup tras crearlo. En la siguiente ejecucion, <strong>valida</strong> el checksum del backup anterior antes de sobrescribirlo y registra si la verificacion es correcta o ha fallado.</li>
+                        <li>El log debe incluir: fecha/hora de inicio, fecha/hora de fin, tamaño del backup generado, numero de ficheros copiados y resultado final (OK / ERROR).</li>
+                        <li>Si quedan mas de 7 backups en el destino, elimina automaticamente los mas antiguos.</li>
+                        <li>Envia un mensaje al syslog del sistema con <code>logger</code> indicando el resultado de la ejecucion.</li>
+                    </ol>
+                    <p><strong>Pega a continuacion el contenido completo del script:</strong></p>
+                    <textarea rows="14" placeholder="#!/bin/bash&#10;# backup_robusto.sh&#10;# ..."></textarea>
+                    <p style="margin-top: 10px;"><strong>Explica brevemente que hace cada bloque del script</strong> y por que esta ahi (no que hace linea a linea: la razon detras de cada decision). 4-6 lineas.</p>
+                    <textarea rows="5" placeholder="Explicacion por bloques..."></textarea>
+
+                    <h3>Reto 3 — Diagnostico: el backup que no se ejecutaba (10 min)</h3>
+                    <p>Este reto te obliga a <strong>romper tu propio cron</strong> y diagnosticar el fallo. Haz lo siguiente en orden y documenta cada paso:</p>
+                    <ol style="margin-left: 22px; line-height: 1.8; font-size: 13px;">
+                        <li>Edita tu crontab y sustituye la ruta absoluta del script por una ruta relativa (por ejemplo, <code>backup_robusto.sh</code> en lugar de <code>/home/usuario/scripts/backup_robusto.sh</code>). Programa la ejecucion para dentro de 2-3 minutos.</li>
+                        <li>Espera al momento previsto y comprueba que <strong>no</strong> se ha creado el backup.</li>
+                        <li>Sin volver a poner la ruta absoluta todavia, <strong>diagnostica</strong>: revisa <code>/var/log/syslog</code>, <code>journalctl -u cron</code> y el correo local del usuario (<code>mail</code> o <code>/var/mail/$USER</code>).</li>
+                        <li>Identifica la entrada de log que explica el fallo y razona <strong>por que</strong> cron no ha podido ejecutarlo aunque ejecutado manualmente funciona.</li>
+                    </ol>
+                    <div class="pregunta">
+                        <p>Pega la linea de log relevante y tu diagnostico (causa raiz + por que el PATH de cron no es el mismo que el de tu shell interactiva):</p>
+                        <textarea rows="6" placeholder="Linea de log: ...&#10;Causa raiz: ..."></textarea>
+                    </div>
+                    <p>Una vez documentado, restaura la configuracion correcta y verifica que vuelve a ejecutarse con normalidad.</p>
+
+                    <h3>Captura 6 — Reto tecnico</h3>
+                    <p>Adjunta una unica captura que muestre: (a) el script <code>backup_robusto.sh</code> ejecutado con exito, (b) el fichero <code>.sha256</code> generado, y (c) las ultimas lineas del log del script.</p>
+                    <div class="foto-upload">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic, arrastra o pega una imagen (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura reto tecnico">
+                        <button class="btn-remove" onclick="removePhoto(this)">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega y evaluacion -->
+            <div class="seccion">
+                <h2>Entrega y evaluacion</h2>
+                <div class="seccion-body">
+
+                    <h3>Checklist de capturas requeridas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:15%">Captura</th>
+                            <th>Contenido</th>
+                            <th style="width:80px">Incluida</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Backup y restauracion con tar (crear, listar, eliminar, restaurar)</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Sincronizacion con rsync (primera copia, re-sincronizacion, --delete)</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Script de backup ejecutado (permisos, ejecucion, log)</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Crontab configurado y ejecucion automatica verificada</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Duplicati configurado (trabajo de backup, cifrado, restauracion)</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 6</td>
+                            <td>Reto tecnico: ejecucion de backup_robusto.sh + .sha256 + ultimas lineas del log</td>
+                            <td><input type="checkbox" id="cap-6"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Practica 21 - Copias de Seguridad y Automatizacion en Linux<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Backup manual con tar (Parte 1)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Sincronizacion con rsync (Parte 2)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Script de backup (Parte 3)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Automatizacion con cron (Parte 4)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Duplicati con cifrado (Parte 5)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 6)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Reto tecnico: diseño 3-2-1, script robusto y diagnostico (Parte 7)</td>
+                                <td>2.5 puntos</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 5 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega (firma) -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Backup manual con tar completado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Sincronizacion con rsync realizada y documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Script backup_diario.sh creado, ejecutado y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Tarea cron configurada y verificada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Duplicati instalado, configurado, backup y restauracion realizados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: diseño 3-2-1 justificado, script backup_robusto.sh escrito y diagnostico cron documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 21 - Copias de Seguridad y Automatizacion en Linux</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque de Clonacion y copias de seguridad (Practica 21)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 21: Copias de Seguridad y Automatizacion en Linux';
+        const PREFIJO_ARCHIVO = 'P21_Backup_Linux';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

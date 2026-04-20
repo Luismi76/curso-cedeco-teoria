@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 17: Particionado y Formateo en Linux</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Profesor-only section */
+        .profesor-only {
+            border: 3px solid var(--naranja) !important;
+        }
+
+        .profesor-only h2 {
+            background: var(--naranja) !important;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .profesor-only {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 17: Particionado y Formateo en Linux</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Gestion de discos — particionado y formateo<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Ubuntu instalado + GParted
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota inicial -->
+            <div class="nota">
+                <strong>Requisito:</strong> Para esta practica necesitas tener la maquina virtual con Ubuntu instalada y funcionando en VirtualBox. Vamos a anadir discos virtuales adicionales y a trabajar con el terminal para gestionar particiones, formatear y montar sistemas de archivos.
+            </div>
+
+            <!-- Escenario -->
+            <div class="escenario">
+                <strong>Escenario:</strong> Eres el administrador de sistemas de una pequena empresa. Te han encargado configurar un servidor Linux que necesita multiples particiones para diferentes propositos: datos de la empresa, copias de seguridad y almacenamiento compartido. Utilizaras tanto herramientas de linea de comandos (CLI) como la interfaz grafica de GParted para gestionar los discos.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender el sistema de nombres de discos en Linux (<code>/dev/sdX</code>, <code>/dev/nvmeXnYpZ</code>).</li>
+                        <li>Utilizar comandos de exploracion de discos: <code>lsblk</code>, <code>fdisk -l</code>, <code>blkid</code>.</li>
+                        <li>Particionar un disco desde la linea de comandos con <code>fdisk</code>.</li>
+                        <li>Formatear particiones con diferentes sistemas de archivos usando <code>mkfs</code>.</li>
+                        <li>Montar y desmontar particiones manualmente con <code>mount</code> y <code>umount</code>.</li>
+                        <li>Configurar el montaje automatico de particiones editando <code>/etc/fstab</code>.</li>
+                        <li>Utilizar GParted como herramienta grafica de gestion de particiones.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Ubuntu instalada y funcionando en VirtualBox</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-terminal">
+                            <label for="req-terminal">Acceso al terminal con privilegios de sudo</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-espacio">
+                            <label for="req-espacio">Espacio suficiente en el disco del host para anadir un disco virtual de 10 GB</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Explorar discos en Linux -->
+            <div class="seccion">
+                <h2>Parte 1 — Explorar discos en Linux (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Antes de particionar, necesitamos entender como Linux identifica los discos y particiones. Abre un terminal en tu VM y ejecuta los siguientes comandos.</p>
+
+                    <h3>Nomenclatura de discos en Linux</h3>
+                    <div class="nota">
+                        <strong>Nomenclatura /dev/sdX:</strong> En Linux, los discos se identifican como <code>/dev/sda</code>, <code>/dev/sdb</code>, <code>/dev/sdc</code>, etc. La letra indica el orden del disco (a = primero, b = segundo...). Las particiones se numeran: <code>/dev/sda1</code> es la primera particion del primer disco, <code>/dev/sda2</code> la segunda, y asi sucesivamente. Los discos NVMe usan el formato <code>/dev/nvme0n1p1</code>.
+                    </div>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>lsblk</strong> para listar todos los dispositivos de bloque y sus particiones.</li>
+                            <li>Ejecuta <strong>sudo fdisk -l</strong> para ver informacion detallada de todos los discos y particiones.</li>
+                            <li>Ejecuta <strong>sudo blkid</strong> para ver los UUID y tipos de sistema de archivos de cada particion.</li>
+                            <li>Ejecuta <strong>df -h</strong> para ver los sistemas de archivos montados y su uso de espacio.</li>
+                            <li>Ejecuta <strong>cat /etc/fstab</strong> para ver la configuracion actual de montaje automatico.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida</h3>
+                    <div class="code-block">$ lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0   50G  0 disk
+├─sda1   8:1    0  512M  0 part /boot/efi
+├─sda2   8:2    0    1G  0 part /boot
+└─sda3   8:3    0 48.5G  0 part /
+
+$ sudo fdisk -l /dev/sda
+Disk /dev/sda: 50 GiB, 53687091200 bytes, 104857600 sectors
+Disklabel type: gpt
+Device       Start       End   Sectors  Size Type
+/dev/sda1     2048   1050623   1048576  512M EFI System
+/dev/sda2  1050624   3147775   2097152    1G Linux filesystem
+/dev/sda3  3147776 104857566 101709791 48.5G Linux filesystem
+
+$ sudo blkid
+/dev/sda1: UUID="ABCD-1234" TYPE="vfat" PARTUUID="..."
+/dev/sda2: UUID="a1b2c3d4-..." TYPE="ext4" PARTUUID="..."
+/dev/sda3: UUID="e5f6a7b8-..." TYPE="ext4" PARTUUID="..."
+
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3        48G   12G   34G  26% /
+/dev/sda2       974M  150M  757M  17% /boot
+/dev/sda1       511M  6.1M  505M   2% /boot/efi
+
+$ cat /etc/fstab
+# /etc/fstab: static file system information.
+UUID=e5f6a7b8-...  /          ext4  errors=remount-ro  0  1
+UUID=a1b2c3d4-...  /boot      ext4  defaults           0  2
+UUID=ABCD-1234     /boot/efi  vfat  umask=0077         0  1</div>
+
+                    <h3>Datos de los discos actuales</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Disco principal (nombre del dispositivo)</td>
+                            <td><input type="text" placeholder="Ej: /dev/sda"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total del disco principal</td>
+                            <td><input type="text" placeholder="Ej: 50 GiB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de tabla de particiones (GPT/MBR)</td>
+                            <td><input type="text" placeholder="Ej: gpt"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de particiones existentes</td>
+                            <td><input type="text" placeholder="Ej: 3"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema de archivos de la particion raiz (/)</td>
+                            <td><input type="text" placeholder="Ej: ext4"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio usado en / (porcentaje)</td>
+                            <td><input type="text" placeholder="Ej: 26%"></td>
+                        </tr>
+                        <tr>
+                            <td>UUID de la particion raiz</td>
+                            <td><input type="text" placeholder="Ej: e5f6a7b8-..."></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Explica con tus propias palabras que significa la nomenclatura /dev/sda3. Que indica cada parte del nombre?</p>
+                        <textarea rows="3" placeholder="Explica que es /dev, que es sd, que es la letra 'a' y que es el numero '3'..."></textarea>
+                    </div>
+
+                    <h3>Captura 1: Salida de los comandos de exploracion de discos</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la salida de lsblk, sudo fdisk -l, sudo blkid, df -h y cat /etc/fstab</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Particionar con fdisk -->
+            <div class="seccion">
+                <h2>Parte 2 — Particionar con fdisk (60 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta seccion vamos a anadir un disco virtual de 10 GB a la maquina virtual y a particionarlo desde la linea de comandos con <code>fdisk</code>.</p>
+
+                    <h3>Paso 1: Anadir un disco virtual en VirtualBox</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga</strong> la maquina virtual si esta encendida.</li>
+                            <li>En VirtualBox, selecciona la VM y ve a <strong>Configuracion > Almacenamiento</strong>.</li>
+                            <li>Junto al controlador SATA, haz clic en el icono de <strong>anadir disco duro</strong> (icono de disco con un +).</li>
+                            <li>Selecciona <strong>Crear un disco nuevo</strong>.</li>
+                            <li>Elige formato <strong>VDI</strong>, reservado <strong>dinamicamente</strong>, tamano <strong>10 GB</strong>.</li>
+                            <li>Ponle nombre <strong>disco_datos</strong> y haz clic en <strong>Crear</strong>.</li>
+                            <li><strong>Inicia</strong> la maquina virtual de nuevo.</li>
+                            <li>En el terminal, ejecuta <strong>lsblk</strong> para verificar que aparece el nuevo disco (deberia ser <code>/dev/sdb</code>).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2: Crear tabla de particiones GPT con fdisk</h3>
+                    <div class="nota">
+                        <strong>Sobre fdisk:</strong> <code>fdisk</code> es una herramienta interactiva. Cuando la ejecutas sobre un disco, entras en un modo de comandos donde cada letra ejecuta una accion. Los cambios NO se aplican hasta que escribas <code>w</code> (write). Si cometes un error, puedes salir con <code>q</code> sin guardar.
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>sudo fdisk /dev/sdb</strong> para abrir fdisk sobre el nuevo disco.</li>
+                            <li>Escribe <strong>g</strong> y pulsa Enter para crear una nueva tabla de particiones GPT.</li>
+                            <li>Veras el mensaje: <em>Created a new GPT disklabel.</em></li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 3: Crear las particiones</h3>
+                    <p>Vamos a crear 3 particiones en el disco de 10 GB:</p>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Tamano</th>
+                            <th>Proposito</th>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb1</td>
+                            <td>4 GB</td>
+                            <td>Datos de la empresa (ext4)</td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb2</td>
+                            <td>3 GB</td>
+                            <td>Copias de seguridad (ext4)</td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb3</td>
+                            <td>Resto (~3 GB)</td>
+                            <td>Almacenamiento compartido (NTFS)</td>
+                        </tr>
+                    </table>
+
+                    <h3>Comandos interactivos de fdisk</h3>
+                    <div class="code-block"># Dentro de fdisk /dev/sdb:
+
+# --- Crear particion 1 (4 GB) ---
+Command (m for help): n
+Partition number (1-128, default 1): 1
+First sector (..., default 2048): [Enter para aceptar]
+Last sector ...: +4G
+
+# --- Crear particion 2 (3 GB) ---
+Command (m for help): n
+Partition number (2-128, default 2): 2
+First sector (...): [Enter para aceptar]
+Last sector ...: +3G
+
+# --- Crear particion 3 (resto del espacio) ---
+Command (m for help): n
+Partition number (3-128, default 3): 3
+First sector (...): [Enter para aceptar]
+Last sector ...: [Enter para aceptar el resto]
+
+# --- Verificar las particiones ---
+Command (m for help): p
+
+# --- Guardar y salir ---
+Command (m for help): w</div>
+
+                    <h3>Paso 4: Verificar el particionado</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>lsblk</strong> para verificar que aparecen las 3 particiones nuevas.</li>
+                            <li>Ejecuta <strong>sudo fdisk -l /dev/sdb</strong> para ver los detalles de las particiones creadas.</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">$ lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0   50G  0 disk
+├─sda1   8:1    0  512M  0 part /boot/efi
+├─sda2   8:2    0    1G  0 part /boot
+└─sda3   8:3    0 48.5G  0 part /
+sdb      8:16   0   10G  0 disk
+├─sdb1   8:17   0    4G  0 part
+├─sdb2   8:18   0    3G  0 part
+└─sdb3   8:19   0    3G  0 part</div>
+
+                    <h3>Datos de las particiones creadas</h3>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Tamano real</th>
+                            <th>Sector inicio</th>
+                            <th>Sector fin</th>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb1</td>
+                            <td><input type="text" placeholder="Ej: 4G"></td>
+                            <td><input type="text" placeholder="Ej: 2048"></td>
+                            <td><input type="text" placeholder="Ej: 8390655"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb2</td>
+                            <td><input type="text" placeholder="Ej: 3G"></td>
+                            <td><input type="text" placeholder="Ej: 8390656"></td>
+                            <td><input type="text" placeholder="Ej: 14682111"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb3</td>
+                            <td><input type="text" placeholder="Ej: ~3G"></td>
+                            <td><input type="text" placeholder="Ej: 14682112"></td>
+                            <td><input type="text" placeholder="Ej: 20971486"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Particionado con fdisk</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando lsblk y sudo fdisk -l /dev/sdb con las 3 particiones creadas</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Formatear y montar -->
+            <div class="seccion">
+                <h2>Parte 3 — Formatear y montar particiones (50 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora que tenemos las particiones creadas, vamos a formatearlas con diferentes sistemas de archivos y montarlas en el sistema.</p>
+
+                    <h3>Paso 1: Formatear las particiones</h3>
+                    <div class="nota">
+                        <strong>Sobre ntfs-3g:</strong> Para poder formatear en NTFS desde Linux, necesitamos instalar el paquete <code>ntfs-3g</code>. Ejecuta primero: <code>sudo apt install ntfs-3g -y</code>. Este paquete proporciona soporte completo de lectura/escritura para particiones NTFS en Linux.
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Instala ntfs-3g: <strong>sudo apt install ntfs-3g -y</strong></li>
+                            <li>Formatea la particion 1 en ext4: <strong>sudo mkfs.ext4 -L "Datos" /dev/sdb1</strong></li>
+                            <li>Formatea la particion 2 en ext4: <strong>sudo mkfs.ext4 -L "Backups" /dev/sdb2</strong></li>
+                            <li>Formatea la particion 3 en NTFS: <strong>sudo mkfs.ntfs -f -L "Compartido" /dev/sdb3</strong></li>
+                            <li>Verifica los formatos con: <strong>sudo blkid /dev/sdb*</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">$ sudo mkfs.ext4 -L "Datos" /dev/sdb1
+mke2fs 1.47.0 (5-Feb-2023)
+Creating filesystem with 1048576 4k blocks and 262144 inodes
+...
+Writing superblocks and filesystem accounting information: done
+
+$ sudo mkfs.ext4 -L "Backups" /dev/sdb2
+mke2fs 1.47.0 (5-Feb-2023)
+Creating filesystem with 786432 4k blocks and 196608 inodes
+...
+
+$ sudo mkfs.ntfs -f -L "Compartido" /dev/sdb3
+Cluster size has been automatically set to 4096 bytes.
+Creating NTFS volume structures.
+mkntfs completed successfully.
+
+$ sudo blkid /dev/sdb*
+/dev/sdb1: LABEL="Datos" UUID="11111111-..." TYPE="ext4"
+/dev/sdb2: LABEL="Backups" UUID="22222222-..." TYPE="ext4"
+/dev/sdb3: LABEL="Compartido" UUID="33333333..." TYPE="ntfs"</div>
+
+                    <h3>Paso 2: Crear puntos de montaje y montar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea los directorios de montaje:
+                                <br><strong>sudo mkdir -p /mnt/datos</strong>
+                                <br><strong>sudo mkdir -p /mnt/backups</strong>
+                                <br><strong>sudo mkdir -p /mnt/compartido</strong>
+                            </li>
+                            <li>Monta las particiones:
+                                <br><strong>sudo mount /dev/sdb1 /mnt/datos</strong>
+                                <br><strong>sudo mount /dev/sdb2 /mnt/backups</strong>
+                                <br><strong>sudo mount /dev/sdb3 /mnt/compartido</strong>
+                            </li>
+                            <li>Verifica el montaje: <strong>df -h | grep sdb</strong></li>
+                            <li>Verifica con: <strong>lsblk</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">$ df -h | grep sdb
+/dev/sdb1       3.9G   24K  3.7G   1% /mnt/datos
+/dev/sdb2       2.9G   24K  2.8G   1% /mnt/backups
+/dev/sdb3       3.0G   16K  3.0G   1% /mnt/compartido</div>
+
+                    <h3>Paso 3: Crear archivos de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un archivo en la particion de datos: <strong>sudo bash -c 'echo "Archivo de prueba - Datos de la empresa" > /mnt/datos/prueba.txt'</strong></li>
+                            <li>Crea un archivo en backups: <strong>sudo bash -c 'echo "Archivo de prueba - Backup" > /mnt/backups/prueba.txt'</strong></li>
+                            <li>Crea un archivo en compartido: <strong>sudo bash -c 'echo "Archivo de prueba - Compartido" > /mnt/compartido/prueba.txt'</strong></li>
+                            <li>Verifica que los archivos existen: <strong>ls -la /mnt/datos/ /mnt/backups/ /mnt/compartido/</strong></li>
+                        </ol>
+                    </div>
+
+                    <h3>Datos de las particiones formateadas</h3>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Sistema de archivos</th>
+                            <th>Etiqueta</th>
+                            <th>UUID</th>
+                            <th>Punto de montaje</th>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb1</td>
+                            <td><input type="text" placeholder="Ej: ext4"></td>
+                            <td><input type="text" placeholder="Ej: Datos"></td>
+                            <td><input type="text" placeholder="UUID..."></td>
+                            <td><input type="text" placeholder="/mnt/datos"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb2</td>
+                            <td><input type="text" placeholder="Ej: ext4"></td>
+                            <td><input type="text" placeholder="Ej: Backups"></td>
+                            <td><input type="text" placeholder="UUID..."></td>
+                            <td><input type="text" placeholder="/mnt/backups"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb3</td>
+                            <td><input type="text" placeholder="Ej: ntfs"></td>
+                            <td><input type="text" placeholder="Ej: Compartido"></td>
+                            <td><input type="text" placeholder="UUID..."></td>
+                            <td><input type="text" placeholder="/mnt/compartido"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Formateo y montaje de particiones</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando blkid, df -h y ls de los archivos de prueba en las particiones montadas</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Montaje automatico con fstab -->
+            <div class="seccion">
+                <h2>Parte 4 — Montaje automatico con /etc/fstab (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Las particiones montadas con <code>mount</code> se desmontan al reiniciar. Para que se monten automaticamente al arrancar, debemos configurar <code>/etc/fstab</code>.</p>
+
+                    <div class="aviso">
+                        <strong>ATENCION:</strong> Un error en <code>/etc/fstab</code> puede impedir que el sistema arranque correctamente. Siempre haz una copia de seguridad antes de editar este archivo. Si el sistema no arranca tras un cambio en fstab, puedes acceder al modo de recuperacion para corregirlo.
+                    </div>
+
+                    <h3>Paso 1: Obtener los UUID de las particiones</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>sudo blkid /dev/sdb1 /dev/sdb2 /dev/sdb3</strong> para obtener los UUID.</li>
+                            <li>Anota los UUID de cada particion (los necesitaras para fstab).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2: Hacer copia de seguridad de fstab</h3>
+                    <div class="code-block">$ sudo cp /etc/fstab /etc/fstab.backup
+$ cat /etc/fstab.backup   # Verificar que la copia se creo</div>
+
+                    <h3>Paso 3: Editar /etc/fstab</h3>
+                    <div class="nota">
+                        <strong>Formato de /etc/fstab:</strong> Cada linea tiene 6 columnas:
+                        <br>1. <strong>Dispositivo</strong> — UUID o ruta del dispositivo (<code>UUID=xxxx</code>)
+                        <br>2. <strong>Punto de montaje</strong> — Directorio donde se monta (<code>/mnt/datos</code>)
+                        <br>3. <strong>Sistema de archivos</strong> — Tipo de filesystem (<code>ext4</code>, <code>ntfs</code>)
+                        <br>4. <strong>Opciones</strong> — Opciones de montaje (<code>defaults</code>, <code>noatime</code>, etc.)
+                        <br>5. <strong>Dump</strong> — Copia de seguridad con dump (0 = no, 1 = si)
+                        <br>6. <strong>Pass</strong> — Orden de comprobacion con fsck (0 = no comprobar, 1 = raiz, 2 = otros)
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el archivo fstab con: <strong>sudo nano /etc/fstab</strong></li>
+                            <li>Anade las siguientes lineas al final del archivo (sustituye los UUID por los tuyos):
+                                <div class="code-block"># Disco de datos - Practica 17
+UUID=11111111-xxxx-xxxx-xxxx-xxxxxxxxxxxx  /mnt/datos        ext4   defaults   0  2
+UUID=22222222-xxxx-xxxx-xxxx-xxxxxxxxxxxx  /mnt/backups      ext4   defaults   0  2
+UUID=33333333xxxxxxxxxxxxxxxx              /mnt/compartido   ntfs   defaults   0  0</div>
+                            </li>
+                            <li>Guarda el archivo: <strong>Ctrl+O</strong>, luego <strong>Enter</strong>, luego <strong>Ctrl+X</strong> para salir.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 4: Probar la configuracion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Primero desmonta las particiones: <strong>sudo umount /mnt/datos /mnt/backups /mnt/compartido</strong></li>
+                            <li>Prueba el montaje automatico: <strong>sudo mount -a</strong> (monta todo lo que hay en fstab).</li>
+                            <li>Si no aparece ningun error, la configuracion es correcta.</li>
+                            <li>Verifica con: <strong>df -h | grep sdb</strong></li>
+                            <li>Verifica que los archivos de prueba siguen ahi: <strong>cat /mnt/datos/prueba.txt</strong></li>
+                        </ol>
+                    </div>
+
+                    <h3>Datos de configuracion de fstab</h3>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>UUID utilizado</th>
+                            <th>Punto de montaje</th>
+                            <th>Opciones</th>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb1</td>
+                            <td><input type="text" placeholder="UUID=..."></td>
+                            <td><input type="text" placeholder="/mnt/datos"></td>
+                            <td><input type="text" placeholder="defaults"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb2</td>
+                            <td><input type="text" placeholder="UUID=..."></td>
+                            <td><input type="text" placeholder="/mnt/backups"></td>
+                            <td><input type="text" placeholder="defaults"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb3</td>
+                            <td><input type="text" placeholder="UUID=..."></td>
+                            <td><input type="text" placeholder="/mnt/compartido"></td>
+                            <td><input type="text" placeholder="defaults"></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>El comando <code>sudo mount -a</code> ha funcionado sin errores? Si hubo algun error, describelo aqui y explica como lo solucionaste.</p>
+                        <textarea rows="3" placeholder="Describe si mount -a funciono correctamente o si hubo algun error y como lo resolviste..."></textarea>
+                    </div>
+
+                    <h3>Captura 4: Configuracion de fstab y verificacion</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando cat /etc/fstab con las nuevas lineas y df -h tras mount -a</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: GParted -->
+            <div class="seccion">
+                <h2>Parte 5 — GParted: particionado grafico (40 min)</h2>
+                <div class="seccion-body">
+                    <p>GParted es una herramienta grafica potente para gestionar particiones. Permite ver, crear, eliminar, redimensionar y mover particiones de forma visual.</p>
+
+                    <h3>Paso 1: Instalar y abrir GParted</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Instala GParted: <strong>sudo apt install gparted -y</strong></li>
+                            <li>Abre GParted: <strong>sudo gparted</strong> (o buscalo en el menu de aplicaciones).</li>
+                            <li>En la esquina superior derecha de GParted, selecciona el disco <strong>/dev/sdb</strong> en el desplegable.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2: Explorar las particiones graficamente</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Observa la representacion grafica de las 3 particiones que creaste con fdisk.</li>
+                            <li>Haz clic en cada particion y anota la informacion que muestra GParted en el panel inferior.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Informacion de GParted sobre las particiones</h3>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Tamano (GParted)</th>
+                            <th>Usado</th>
+                            <th>Sin usar</th>
+                            <th>Sistema de archivos</th>
+                            <th>Etiqueta</th>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb1</td>
+                            <td><input type="text" placeholder="Ej: 4.00 GiB"></td>
+                            <td><input type="text" placeholder="Ej: 24 KiB"></td>
+                            <td><input type="text" placeholder="Ej: 3.69 GiB"></td>
+                            <td><input type="text" placeholder="Ej: ext4"></td>
+                            <td><input type="text" placeholder="Ej: Datos"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb2</td>
+                            <td><input type="text" placeholder="Ej: 3.00 GiB"></td>
+                            <td><input type="text" placeholder="Ej: 24 KiB"></td>
+                            <td><input type="text" placeholder="Ej: 2.77 GiB"></td>
+                            <td><input type="text" placeholder="Ej: ext4"></td>
+                            <td><input type="text" placeholder="Ej: Backups"></td>
+                        </tr>
+                        <tr>
+                            <td>/dev/sdb3</td>
+                            <td><input type="text" placeholder="Ej: ~3.00 GiB"></td>
+                            <td><input type="text" placeholder="Ej: 16 KiB"></td>
+                            <td><input type="text" placeholder="Ej: ~3.00 GiB"></td>
+                            <td><input type="text" placeholder="Ej: ntfs"></td>
+                            <td><input type="text" placeholder="Ej: Compartido"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 3: Redimensionar una particion</h3>
+                    <div class="aviso">
+                        <strong>IMPORTANTE:</strong> Antes de redimensionar, debes desmontar la particion. Ejecuta en el terminal: <strong>sudo umount /mnt/backups</strong>. GParted tambien puede hacerlo por ti (clic derecho > Desmontar). Recuerda que los cambios en GParted no se aplican hasta que pulses el boton <strong>Aplicar</strong> (icono de check verde).
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En GParted, desmonta la particion <strong>/dev/sdb2</strong> (clic derecho > Desmontar).</li>
+                            <li>Haz clic derecho en <strong>/dev/sdb2</strong> y selecciona <strong>Redimensionar/Mover</strong>.</li>
+                            <li>Reduce el tamano de /dev/sdb2 a <strong>2 GB</strong> (arrastra el borde derecho o escribe 2048 en "Nuevo tamano (MiB)").</li>
+                            <li>Pulsa <strong>Redimensionar/Mover</strong> para aceptar.</li>
+                            <li>Veras que aparece un espacio "sin asignar" de ~1 GB tras /dev/sdb2.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 4: Crear nueva particion en espacio libre</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho en el espacio <strong>sin asignar</strong> y selecciona <strong>Nueva</strong>.</li>
+                            <li>Configura: sistema de archivos <strong>ext4</strong>, etiqueta <strong>Extra</strong>.</li>
+                            <li>Usa todo el espacio disponible.</li>
+                            <li>Pulsa <strong>Anadir</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 5: Aplicar todos los cambios</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Revisa las operaciones pendientes en la parte inferior de GParted.</li>
+                            <li>Pulsa el boton <strong>Aplicar todas las operaciones</strong> (icono de check verde en la barra de herramientas).</li>
+                            <li>Confirma cuando te lo pregunte.</li>
+                            <li>Espera a que se completen todas las operaciones.</li>
+                            <li>Verifica el resultado final con <strong>lsblk</strong> en el terminal.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Describe las operaciones pendientes que mostraba GParted antes de aplicar los cambios. Cuantas operaciones eran?</p>
+                        <textarea rows="3" placeholder="Describe que operaciones aparecian listadas en la cola de GParted antes de hacer clic en Aplicar..."></textarea>
+                    </div>
+
+                    <h3>Captura 5: GParted con las particiones</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ventana de GParted mostrando todas las particiones del disco /dev/sdb tras aplicar los cambios</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Que significa exactamente el nombre <code>/dev/sdb2</code>? Explica cada parte del nombre (dev, sd, b, 2).</p>
+                        <textarea rows="4" placeholder="Desglosa cada parte del nombre: /dev/ es el directorio de dispositivos, 'sd' indica disco SCSI/SATA, 'b' es el segundo disco, '2' es la segunda particion..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Cual es la diferencia entre montar una particion con <code>mount</code> manualmente y configurarla en <code>/etc/fstab</code>? Cuando usarias cada metodo?</p>
+                        <textarea rows="4" placeholder="Explica que mount es temporal y fstab es permanente. Indica situaciones donde usarias cada metodo..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Que es el journaling en un sistema de archivos? Que sistemas de archivos de los que has usado en esta practica tienen journaling y cuales no?</p>
+                        <textarea rows="4" placeholder="Explica que es el journaling (registro de transacciones), para que sirve y que sistemas de archivos lo implementan..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. En un servidor Linux, cuando elegirías usar ext4, cuando NTFS y cuando FAT32? Da un ejemplo practico para cada caso.</p>
+                        <textarea rows="4" placeholder="ext4 para particiones nativas Linux, NTFS para compatibilidad con Windows, FAT32 para USBs universales. Da ejemplos concretos..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREGA -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Capturas de pantalla requeridas</h3>
+                    <p>Comprueba que tienes todas las capturas necesarias:</p>
+                    <table>
+                        <tr>
+                            <th>Captura</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Exploracion de discos (lsblk, fdisk -l, blkid, df -h, fstab)</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Particionado con fdisk (lsblk y fdisk -l mostrando las 3 particiones)</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Formateo y montaje (blkid, df -h, archivos de prueba)</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Configuracion fstab y verificacion con mount -a</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>GParted mostrando las particiones tras los cambios</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Practica 17 - Particionado y Formateo en Linux<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Exploracion de discos (Parte 1)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Particionado con fdisk (Parte 2)</td>
+                                <td>2.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Formateo y montaje (Parte 3)</td>
+                                <td>2.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Configuracion de fstab (Parte 4)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>GParted y preguntas de reflexion (Partes 5 y 6)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 5 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Exploracion de discos completada y documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Disco virtual anadido y particionado con fdisk (3 particiones)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Particiones formateadas y montadas con archivos de prueba</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Configuracion de fstab completada y verificada con mount -a</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: GParted utilizado para redimensionar y crear particion</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: 4 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">5 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 17 - Particionado y Formateo en Linux</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al modulo MF0219_2 — Gestion de discos: particionado y formateo (Practica 17)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 17: Particionado y Formateo en Linux';
+        const PREFIJO_ARCHIVO = 'P17_Particionado_Linux';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

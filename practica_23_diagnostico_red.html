@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 23: Diagnostico de Red y Seguridad Basica</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 23: Diagnostico de Red y Seguridad Basica</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 — Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Comunicacion por red y comparticion de recursos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual / parejas<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs + Nmap + Wireshark
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Preparacion previa:</strong> Antes de la sesion, descarga e instala <strong>Nmap</strong> (<a href="https://nmap.org" target="_blank">nmap.org</a>) y <strong>Wireshark</strong> (<a href="https://wireshark.org" target="_blank">wireshark.org</a>) en tu equipo anfitrion o en la VM con Windows. Ambas herramientas son gratuitas. Tenerlas instaladas de antemano te permitira aprovechar al maximo el tiempo de la practica.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Acabas de incorporarte como tecnico informatico en una pequena empresa. Tu responsable te pide que realices una auditoria basica de la red local: descubrir los dispositivos conectados, comprobar que puertos tienen abiertos, verificar que las reglas del firewall son correctas y capturar trafico de red para detectar posibles anomalias. Deberas documentar todo el proceso y tus hallazgos.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Utilizar <code>netstat</code> y <code>ss</code> para visualizar conexiones activas y puertos en escucha.</li>
+                        <li>Trazar rutas de red con <code>tracert</code> (Windows) y <code>traceroute</code> (Linux) para analizar el camino de los paquetes.</li>
+                        <li>Escanear redes y descubrir hosts y servicios con <strong>Nmap</strong>.</li>
+                        <li>Configurar reglas de firewall en <strong>Windows Defender Firewall</strong> y <strong>ufw</strong> (Linux).</li>
+                        <li>Realizar capturas basicas de trafico de red con <strong>Wireshark</strong> y aplicar filtros de analisis.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vms">
+                            <label for="req-vms">Ambas VMs (Windows y Ubuntu) configuradas y con conectividad de red entre ellas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-nmap">
+                            <label for="req-nmap">Nmap descargado e instalado (nmap.org)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-wireshark">
+                            <label for="req-wireshark">Wireshark descargado e instalado (wireshark.org)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-red">
+                            <label for="req-red">Las VMs pueden hacer ping entre si y a Internet</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 1: Conexiones activas -->
+            <div class="seccion">
+                <h2>Parte 1 — Conexiones activas (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Vamos a examinar las conexiones de red activas y los puertos en escucha en ambos sistemas operativos.</p>
+
+                    <h3>1.1 Conexiones en Windows con netstat</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una <strong>terminal de comandos</strong> como administrador en la VM con Windows.</li>
+                            <li>Ejecuta <strong>netstat -an</strong> para ver todas las conexiones y puertos en escucha.</li>
+                            <li>Ejecuta <strong>netstat -ano</strong> para ver ademas el PID del proceso asociado a cada conexion.</li>
+                            <li>Ejecuta <strong>netstat -ab</strong> para ver el nombre del programa asociado (requiere administrador).</li>
+                            <li>Identifica las conexiones con estado <strong>ESTABLISHED</strong> (activas) y <strong>LISTENING</strong> (en escucha).</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">C:\> netstat -an
+Proto  Local Address          Foreign Address        State
+TCP    0.0.0.0:135            0.0.0.0:0              LISTENING
+TCP    0.0.0.0:445            0.0.0.0:0              LISTENING
+TCP    192.168.1.10:49712     142.250.185.14:443     ESTABLISHED
+TCP    192.168.1.10:50234     20.189.173.1:443       ESTABLISHED
+
+C:\> netstat -ano
+Proto  Local Address          Foreign Address        State           PID
+TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       1012
+TCP    192.168.1.10:49712     142.250.185.14:443     ESTABLISHED     5840</pre>
+
+                    <h3>1.2 Conexiones en Linux con ss</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>terminal</strong> en la VM con Ubuntu.</li>
+                            <li>Ejecuta <strong>ss -tuln</strong> para ver puertos TCP y UDP en escucha.</li>
+                            <li>Ejecuta <strong>ss -tunap</strong> para ver todas las conexiones con el proceso asociado.</li>
+                            <li>Compara los resultados con lo obtenido en Windows.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ ss -tuln
+Netid  State   Recv-Q  Send-Q  Local Address:Port   Peer Address:Port
+tcp    LISTEN  0       128     0.0.0.0:22            0.0.0.0:*
+tcp    LISTEN  0       5       127.0.0.1:631         0.0.0.0:*
+udp    UNCONN  0       0       0.0.0.0:5353          0.0.0.0:*
+
+$ ss -tunap
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:Port  Process
+tcp   ESTAB  0      0      192.168.1.20:54312  142.250.185.14:443 users:(("firefox",pid=2345,fd=87))</pre>
+
+                    <h3>1.3 Tabla de conexiones encontradas</h3>
+                    <p>Rellena la tabla con al menos 6 conexiones relevantes (3 de Windows y 3 de Linux):</p>
+                    <table>
+                        <tr>
+                            <th>SO</th>
+                            <th>Puerto local</th>
+                            <th>Estado</th>
+                            <th>Servicio / Programa</th>
+                            <th>Direccion remota</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con1-so" placeholder="Windows/Linux"></td>
+                            <td><input type="text" id="con1-puerto" placeholder="Ej: 445"></td>
+                            <td><input type="text" id="con1-estado" placeholder="LISTENING/ESTABLISHED"></td>
+                            <td><input type="text" id="con1-servicio" placeholder="Ej: SMB"></td>
+                            <td><input type="text" id="con1-remota" placeholder="Ej: 0.0.0.0"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con2-so"></td>
+                            <td><input type="text" id="con2-puerto"></td>
+                            <td><input type="text" id="con2-estado"></td>
+                            <td><input type="text" id="con2-servicio"></td>
+                            <td><input type="text" id="con2-remota"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con3-so"></td>
+                            <td><input type="text" id="con3-puerto"></td>
+                            <td><input type="text" id="con3-estado"></td>
+                            <td><input type="text" id="con3-servicio"></td>
+                            <td><input type="text" id="con3-remota"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con4-so"></td>
+                            <td><input type="text" id="con4-puerto"></td>
+                            <td><input type="text" id="con4-estado"></td>
+                            <td><input type="text" id="con4-servicio"></td>
+                            <td><input type="text" id="con4-remota"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con5-so"></td>
+                            <td><input type="text" id="con5-puerto"></td>
+                            <td><input type="text" id="con5-estado"></td>
+                            <td><input type="text" id="con5-servicio"></td>
+                            <td><input type="text" id="con5-remota"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="con6-so"></td>
+                            <td><input type="text" id="con6-puerto"></td>
+                            <td><input type="text" id="con6-estado"></td>
+                            <td><input type="text" id="con6-servicio"></td>
+                            <td><input type="text" id="con6-remota"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura de pantalla — Conexiones activas</h3>
+                    <div class="foto-upload" id="foto-conexiones">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla de netstat o ss</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 2: Trazar rutas -->
+            <div class="seccion">
+                <h2>Parte 2 — Trazar rutas de red (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Utilizaremos <code>tracert</code> (Windows) y <code>traceroute</code> (Linux) para ver el camino que siguen los paquetes hasta llegar a su destino.</p>
+
+                    <h3>2.1 Trazar rutas desde Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>terminal de comandos</strong> en la VM con Windows.</li>
+                            <li>Ejecuta <strong>tracert 8.8.8.8</strong> (DNS de Google).</li>
+                            <li>Ejecuta <strong>tracert google.es</strong>.</li>
+                            <li>Ejecuta <strong>tracert amazon.es</strong>.</li>
+                            <li>Anota el numero de saltos y los tiempos de respuesta de cada ruta.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">C:\> tracert 8.8.8.8
+Tracing route to dns.google [8.8.8.8] over a maximum of 30 hops:
+  1    <1 ms    <1 ms    <1 ms   192.168.1.1
+  2     5 ms     4 ms     5 ms   10.0.0.1
+  3    12 ms    11 ms    12 ms   172.16.0.1
+  ...
+  8    15 ms    14 ms    15 ms   dns.google [8.8.8.8]
+Trace complete.</pre>
+
+                    <h3>2.2 Trazar rutas desde Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>terminal</strong> en la VM con Ubuntu.</li>
+                            <li>Ejecuta <strong>traceroute 8.8.8.8</strong> (si no esta instalado: <code>sudo apt install traceroute -y</code>).</li>
+                            <li>Ejecuta <strong>traceroute google.es</strong> y <strong>traceroute amazon.es</strong>.</li>
+                            <li>Compara los resultados con los obtenidos en Windows.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 Tabla de resultados de traceroute</h3>
+                    <table>
+                        <tr>
+                            <th>Destino</th>
+                            <th>SO</th>
+                            <th>N. saltos</th>
+                            <th>Tiempo medio</th>
+                            <th>Primer salto (gateway)</th>
+                        </tr>
+                        <tr>
+                            <td>8.8.8.8</td>
+                            <td>Windows</td>
+                            <td><input type="text" id="trace1-saltos"></td>
+                            <td><input type="text" id="trace1-tiempo" placeholder="Ej: 15 ms"></td>
+                            <td><input type="text" id="trace1-gateway" placeholder="Ej: 192.168.1.1"></td>
+                        </tr>
+                        <tr>
+                            <td>8.8.8.8</td>
+                            <td>Linux</td>
+                            <td><input type="text" id="trace2-saltos"></td>
+                            <td><input type="text" id="trace2-tiempo"></td>
+                            <td><input type="text" id="trace2-gateway"></td>
+                        </tr>
+                        <tr>
+                            <td>google.es</td>
+                            <td>Windows</td>
+                            <td><input type="text" id="trace3-saltos"></td>
+                            <td><input type="text" id="trace3-tiempo"></td>
+                            <td><input type="text" id="trace3-gateway"></td>
+                        </tr>
+                        <tr>
+                            <td>google.es</td>
+                            <td>Linux</td>
+                            <td><input type="text" id="trace4-saltos"></td>
+                            <td><input type="text" id="trace4-tiempo"></td>
+                            <td><input type="text" id="trace4-gateway"></td>
+                        </tr>
+                        <tr>
+                            <td>amazon.es</td>
+                            <td>Windows</td>
+                            <td><input type="text" id="trace5-saltos"></td>
+                            <td><input type="text" id="trace5-tiempo"></td>
+                            <td><input type="text" id="trace5-gateway"></td>
+                        </tr>
+                        <tr>
+                            <td>amazon.es</td>
+                            <td>Linux</td>
+                            <td><input type="text" id="trace6-saltos"></td>
+                            <td><input type="text" id="trace6-tiempo"></td>
+                            <td><input type="text" id="trace6-gateway"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura de pantalla — Traceroute</h3>
+                    <div class="foto-upload" id="foto-traceroute">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla de tracert o traceroute</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 3: Escaneo con Nmap -->
+            <div class="seccion">
+                <h2>Parte 3 — Escaneo de red con Nmap (60 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>Nmap</strong> (Network Mapper) es una herramienta gratuita y de codigo abierto para descubrimiento de red y auditoria de seguridad. Descargala desde <a href="https://nmap.org" target="_blank">nmap.org</a>.</p>
+
+                    <div class="aviso">
+                        <strong>IMPORTANTE — Etica y legalidad:</strong> Escanear redes y puertos sin autorizacion es <strong>ilegal</strong> en muchos paises. En esta practica SOLO escanearemos nuestra propia red local y nuestras maquinas virtuales. <strong>Nunca</strong> escanees redes ajenas, servidores de Internet u ordenadores de terceros sin permiso explicito por escrito.
+                    </div>
+
+                    <h3>3.1 Instalacion de Nmap</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Windows:</strong> Descarga el instalador desde <a href="https://nmap.org/download" target="_blank">nmap.org/download</a> y ejecutalo. Incluye Zenmap (interfaz grafica).</li>
+                            <li><strong>Linux:</strong> Ejecuta <code>sudo apt install nmap -y</code> en el terminal.</li>
+                            <li>Verifica la instalacion ejecutando <strong>nmap --version</strong> en ambos sistemas.</li>
+                        </ol>
+                    </div>
+
+                    <h3>3.2 Descubrimiento de hosts en la red</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Primero, averigua tu IP y la subred con <code>ipconfig</code> (Windows) o <code>ip a</code> (Linux).</li>
+                            <li>Ejecuta <strong>nmap -sn 192.168.1.0/24</strong> (ajusta la subred a tu caso) para descubrir hosts activos sin escanear puertos.</li>
+                            <li>Anota todos los dispositivos encontrados en la tabla.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ nmap -sn 192.168.1.0/24
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for 192.168.1.1
+Host is up (0.0015s latency).
+Nmap scan report for 192.168.1.10
+Host is up (0.00035s latency).
+Nmap scan report for 192.168.1.20
+Host is up (0.00042s latency).
+Nmap done: 256 IP addresses (3 hosts up) scanned in 2.45 seconds</pre>
+
+                    <h3>Tabla de hosts descubiertos</h3>
+                    <table>
+                        <tr>
+                            <th>IP</th>
+                            <th>Hostname (si aparece)</th>
+                            <th>Tipo de dispositivo</th>
+                            <th>Latencia</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="host1-ip" placeholder="Ej: 192.168.1.1"></td>
+                            <td><input type="text" id="host1-nombre" placeholder="Ej: router.local"></td>
+                            <td><input type="text" id="host1-tipo" placeholder="Ej: Router"></td>
+                            <td><input type="text" id="host1-latencia" placeholder="Ej: 1.5 ms"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="host2-ip"></td>
+                            <td><input type="text" id="host2-nombre"></td>
+                            <td><input type="text" id="host2-tipo"></td>
+                            <td><input type="text" id="host2-latencia"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="host3-ip"></td>
+                            <td><input type="text" id="host3-nombre"></td>
+                            <td><input type="text" id="host3-tipo"></td>
+                            <td><input type="text" id="host3-latencia"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="host4-ip"></td>
+                            <td><input type="text" id="host4-nombre"></td>
+                            <td><input type="text" id="host4-tipo"></td>
+                            <td><input type="text" id="host4-latencia"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="host5-ip"></td>
+                            <td><input type="text" id="host5-nombre"></td>
+                            <td><input type="text" id="host5-tipo"></td>
+                            <td><input type="text" id="host5-latencia"></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.3 Escaneo de puertos de un host especifico</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Elige una de tus VMs como objetivo (por ejemplo, la VM con Windows).</li>
+                            <li>Ejecuta <strong>nmap [IP_de_la_VM]</strong> para un escaneo basico de los 1000 puertos mas comunes.</li>
+                            <li>Ejecuta <strong>nmap -p 1-65535 [IP_de_la_VM]</strong> para un escaneo completo de todos los puertos (tarda mas).</li>
+                            <li>Anota los puertos abiertos en la tabla.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ nmap 192.168.1.10
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for 192.168.1.10
+PORT      STATE  SERVICE
+22/tcp    open   ssh
+80/tcp    open   http
+135/tcp   open   msrpc
+445/tcp   open   microsoft-ds
+3389/tcp  open   ms-wbt-server</pre>
+
+                    <h3>Tabla de puertos abiertos</h3>
+                    <table>
+                        <tr>
+                            <th>Puerto</th>
+                            <th>Protocolo</th>
+                            <th>Estado</th>
+                            <th>Servicio</th>
+                            <th>Necesario? (Si/No)</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port1-num" placeholder="Ej: 22"></td>
+                            <td><input type="text" id="port1-proto" placeholder="TCP/UDP"></td>
+                            <td><input type="text" id="port1-estado" placeholder="open/closed/filtered"></td>
+                            <td><input type="text" id="port1-serv" placeholder="Ej: ssh"></td>
+                            <td><input type="text" id="port1-necesario" placeholder="Si/No"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port2-num"></td>
+                            <td><input type="text" id="port2-proto"></td>
+                            <td><input type="text" id="port2-estado"></td>
+                            <td><input type="text" id="port2-serv"></td>
+                            <td><input type="text" id="port2-necesario"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port3-num"></td>
+                            <td><input type="text" id="port3-proto"></td>
+                            <td><input type="text" id="port3-estado"></td>
+                            <td><input type="text" id="port3-serv"></td>
+                            <td><input type="text" id="port3-necesario"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port4-num"></td>
+                            <td><input type="text" id="port4-proto"></td>
+                            <td><input type="text" id="port4-estado"></td>
+                            <td><input type="text" id="port4-serv"></td>
+                            <td><input type="text" id="port4-necesario"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port5-num"></td>
+                            <td><input type="text" id="port5-proto"></td>
+                            <td><input type="text" id="port5-estado"></td>
+                            <td><input type="text" id="port5-serv"></td>
+                            <td><input type="text" id="port5-necesario"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="port6-num"></td>
+                            <td><input type="text" id="port6-proto"></td>
+                            <td><input type="text" id="port6-estado"></td>
+                            <td><input type="text" id="port6-serv"></td>
+                            <td><input type="text" id="port6-necesario"></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.4 Deteccion de versiones de servicios</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>nmap -sV [IP_de_la_VM]</strong> para detectar la version de los servicios en los puertos abiertos.</li>
+                            <li>Compara los resultados con el escaneo basico anterior.</li>
+                            <li>Documenta las versiones encontradas.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ nmap -sV 192.168.1.10
+PORT      STATE SERVICE       VERSION
+22/tcp    open  ssh           OpenSSH 8.9p1 Ubuntu 3ubuntu0.6
+80/tcp    open  http          Apache httpd 2.4.52
+135/tcp   open  msrpc         Microsoft Windows RPC
+445/tcp   open  microsoft-ds  Microsoft Windows 10 SMB
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services</pre>
+
+                    <h3>Tabla de versiones detectadas</h3>
+                    <table>
+                        <tr>
+                            <th>Puerto</th>
+                            <th>Servicio</th>
+                            <th>Version detectada</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="ver1-puerto"></td>
+                            <td><input type="text" id="ver1-servicio"></td>
+                            <td><input type="text" id="ver1-version"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="ver2-puerto"></td>
+                            <td><input type="text" id="ver2-servicio"></td>
+                            <td><input type="text" id="ver2-version"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="ver3-puerto"></td>
+                            <td><input type="text" id="ver3-servicio"></td>
+                            <td><input type="text" id="ver3-version"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="ver4-puerto"></td>
+                            <td><input type="text" id="ver4-servicio"></td>
+                            <td><input type="text" id="ver4-version"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura de pantalla — Escaneo Nmap</h3>
+                    <div class="foto-upload" id="foto-nmap">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla del escaneo con Nmap</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 4: Firewall en Windows -->
+            <div class="seccion">
+                <h2>Parte 4 — Firewall en Windows (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Vamos a trabajar con <strong>Windows Defender Firewall con Seguridad Avanzada</strong> para crear, probar y eliminar reglas de firewall.</p>
+
+                    <h3>4.1 Abrir la consola de Firewall avanzado</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win + R</strong> y escribe <strong>wf.msc</strong>, luego pulsa Enter.</li>
+                            <li>Se abrira la ventana de <strong>Windows Defender Firewall con Seguridad Avanzada</strong>.</li>
+                            <li>Observa las tres secciones principales: <strong>Reglas de entrada</strong>, <strong>Reglas de salida</strong> y <strong>Reglas de seguridad de conexion</strong>.</li>
+                            <li>Examina algunas de las reglas existentes para familiarizarte con la interfaz.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.2 Crear regla para bloquear puerto 80 (HTTP)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic en <strong>Reglas de entrada</strong> en el panel izquierdo.</li>
+                            <li>Haz clic en <strong>Nueva regla...</strong> en el panel derecho.</li>
+                            <li>Selecciona <strong>Puerto</strong> y haz clic en Siguiente.</li>
+                            <li>Selecciona <strong>TCP</strong> y escribe <strong>80</strong> en "Puertos locales especificos". Haz clic en Siguiente.</li>
+                            <li>Selecciona <strong>Bloquear la conexion</strong>. Haz clic en Siguiente.</li>
+                            <li>Deja marcados los tres perfiles (Dominio, Privado, Publico). Haz clic en Siguiente.</li>
+                            <li>Escribe un nombre descriptivo: <strong>Practica23 - Bloquear HTTP puerto 80</strong>. Haz clic en Finalizar.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.3 Probar la regla</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un navegador en la VM con Windows e intenta acceder a una pagina web HTTP (no HTTPS).</li>
+                            <li>Ejecuta <strong>nmap -p 80 [IP_Windows]</strong> desde la VM con Linux para verificar que el puerto aparece como <strong>filtered</strong>.</li>
+                            <li>Documenta el resultado.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.4 Crear regla para permitir un programa especifico</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic en <strong>Reglas de entrada</strong> > <strong>Nueva regla...</strong></li>
+                            <li>Selecciona <strong>Programa</strong> y haz clic en Siguiente.</li>
+                            <li>Selecciona <strong>Esta ruta de acceso del programa</strong> y busca un ejecutable (por ejemplo, <code>C:\Windows\System32\mspaint.exe</code>).</li>
+                            <li>Selecciona <strong>Permitir la conexion</strong>. Haz clic en Siguiente.</li>
+                            <li>Deja los tres perfiles marcados. Haz clic en Siguiente.</li>
+                            <li>Nombre: <strong>Practica23 - Permitir Paint</strong>. Haz clic en Finalizar.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.5 Eliminar las reglas de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En <strong>Reglas de entrada</strong>, busca las reglas que creaste (busca "Practica23").</li>
+                            <li>Haz clic derecho sobre cada regla y selecciona <strong>Eliminar</strong>.</li>
+                            <li>Confirma la eliminacion.</li>
+                            <li>Verifica que las reglas ya no aparecen en la lista.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Tabla de reglas creadas y probadas</h3>
+                    <table>
+                        <tr>
+                            <th>Regla</th>
+                            <th>Tipo</th>
+                            <th>Accion</th>
+                            <th>Resultado de la prueba</th>
+                        </tr>
+                        <tr>
+                            <td>Bloquear puerto 80</td>
+                            <td>Puerto / TCP</td>
+                            <td>Bloquear</td>
+                            <td><input type="text" id="fw-win1-resultado" placeholder="Describe que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Permitir programa</td>
+                            <td>Programa</td>
+                            <td>Permitir</td>
+                            <td><input type="text" id="fw-win2-resultado" placeholder="Describe que ocurrio"></td>
+                        </tr>
+                        <tr>
+                            <td>Eliminar reglas</td>
+                            <td>-</td>
+                            <td>Eliminar</td>
+                            <td><input type="text" id="fw-win3-resultado" placeholder="Confirma que se eliminaron"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura de pantalla — Firewall Windows</h3>
+                    <div class="foto-upload" id="foto-fw-windows">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla del firewall de Windows (wf.msc)</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 5: Firewall en Linux con ufw -->
+            <div class="seccion">
+                <h2>Parte 5 — Firewall en Linux con ufw (30 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>ufw</strong> (Uncomplicated Firewall) es la herramienta de firewall por defecto en Ubuntu. Proporciona una interfaz sencilla para gestionar reglas de iptables.</p>
+
+                    <h3>5.1 Activar y comprobar ufw</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>terminal</strong> en la VM con Ubuntu.</li>
+                            <li>Ejecuta <strong>sudo ufw enable</strong> para activar el firewall (confirma con "y").</li>
+                            <li>Ejecuta <strong>sudo ufw status verbose</strong> para ver el estado actual y la politica por defecto.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ sudo ufw enable
+Firewall is active and enabled on system startup
+
+$ sudo ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip</pre>
+
+                    <h3>5.2 Crear reglas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>sudo ufw allow 22/tcp</strong> para permitir conexiones SSH.</li>
+                            <li>Ejecuta <strong>sudo ufw deny 80/tcp</strong> para bloquear conexiones HTTP entrantes.</li>
+                            <li>Ejecuta <strong>sudo ufw allow 443/tcp</strong> para permitir conexiones HTTPS.</li>
+                            <li>Ejecuta <strong>sudo ufw status numbered</strong> para ver las reglas con numeros.</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">$ sudo ufw allow 22/tcp
+Rule added
+
+$ sudo ufw deny 80/tcp
+Rule added
+
+$ sudo ufw allow 443/tcp
+Rule added
+
+$ sudo ufw status numbered
+Status: active
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere
+[ 2] 80/tcp                     DENY IN     Anywhere
+[ 3] 443/tcp                    ALLOW IN    Anywhere</pre>
+
+                    <h3>5.3 Probar las reglas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde la VM con Windows, ejecuta <strong>nmap -p 22,80,443 [IP_Linux]</strong>.</li>
+                            <li>Verifica que el puerto 22 aparece como <strong>open</strong>, el 80 como <strong>filtered/closed</strong> y el 443 depende de si hay servicio escuchando.</li>
+                            <li>Documenta los resultados en la tabla.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.4 Eliminar una regla</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>sudo ufw status numbered</strong> para ver los numeros de cada regla.</li>
+                            <li>Ejecuta <strong>sudo ufw delete 2</strong> para eliminar la regla que bloquea el puerto 80 (confirma con "y").</li>
+                            <li>Verifica con <strong>sudo ufw status</strong> que la regla se ha eliminado.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Tabla de comandos ufw y resultados</h3>
+                    <table>
+                        <tr>
+                            <th>Comando</th>
+                            <th>Accion esperada</th>
+                            <th>Resultado obtenido</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw enable</code></td>
+                            <td>Activar el firewall</td>
+                            <td><input type="text" id="ufw1-resultado" placeholder="Firewall activado?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw allow 22/tcp</code></td>
+                            <td>Permitir SSH</td>
+                            <td><input type="text" id="ufw2-resultado" placeholder="Regla anadida?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw deny 80/tcp</code></td>
+                            <td>Bloquear HTTP</td>
+                            <td><input type="text" id="ufw3-resultado" placeholder="Puerto bloqueado?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw allow 443/tcp</code></td>
+                            <td>Permitir HTTPS</td>
+                            <td><input type="text" id="ufw4-resultado" placeholder="Regla anadida?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw status numbered</code></td>
+                            <td>Ver reglas numeradas</td>
+                            <td><input type="text" id="ufw5-resultado" placeholder="Cuantas reglas aparecen?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo ufw delete 2</code></td>
+                            <td>Eliminar regla 2</td>
+                            <td><input type="text" id="ufw6-resultado" placeholder="Regla eliminada?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura de pantalla — ufw</h3>
+                    <div class="foto-upload" id="foto-ufw">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla de ufw status</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 6: Captura con Wireshark -->
+            <div class="seccion">
+                <h2>Parte 6 — Captura de trafico con Wireshark (40 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>Wireshark</strong> es el analizador de protocolos de red mas utilizado del mundo. Es gratuito y se descarga desde <a href="https://wireshark.org" target="_blank">wireshark.org</a>.</p>
+
+                    <h3>6.1 Iniciar una captura</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Wireshark</strong> en tu VM con Windows (o en la de Linux).</li>
+                            <li>Selecciona la <strong>interfaz de red</strong> activa (la que tiene trafico, normalmente "Ethernet" o "eth0").</li>
+                            <li>Haz doble clic en la interfaz o pulsa el boton de <strong>aleta de tiburon</strong> (Start) para iniciar la captura.</li>
+                            <li>Veras que empiezan a aparecer paquetes en tiempo real.</li>
+                        </ol>
+                    </div>
+
+                    <h3>6.2 Generar trafico para capturar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>navegador web</strong> y visita varias paginas: google.es, wikipedia.org, example.com.</li>
+                            <li>Haz un <strong>ping</strong> a 8.8.8.8 desde el terminal.</li>
+                            <li>Deja la captura corriendo durante 1-2 minutos.</li>
+                            <li>Pulsa el boton de <strong>cuadrado rojo</strong> (Stop) para detener la captura.</li>
+                        </ol>
+                    </div>
+
+                    <h3>6.3 Aplicar filtros de visualizacion</h3>
+                    <p>En la barra de filtros de Wireshark, prueba los siguientes filtros:</p>
+                    <table>
+                        <tr>
+                            <th>Filtro</th>
+                            <th>Que muestra</th>
+                            <th>N. de paquetes encontrados</th>
+                        </tr>
+                        <tr>
+                            <td><code>dns</code></td>
+                            <td>Consultas y respuestas DNS</td>
+                            <td><input type="text" id="ws-dns" placeholder="Ej: 45"></td>
+                        </tr>
+                        <tr>
+                            <td><code>http</code></td>
+                            <td>Trafico HTTP (no cifrado)</td>
+                            <td><input type="text" id="ws-http" placeholder="Ej: 12"></td>
+                        </tr>
+                        <tr>
+                            <td><code>tcp.port==443</code></td>
+                            <td>Trafico HTTPS / TLS</td>
+                            <td><input type="text" id="ws-tls" placeholder="Ej: 230"></td>
+                        </tr>
+                        <tr>
+                            <td><code>icmp</code></td>
+                            <td>Paquetes ping (ICMP)</td>
+                            <td><input type="text" id="ws-icmp" placeholder="Ej: 8"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ip.addr==8.8.8.8</code></td>
+                            <td>Todo el trafico con Google DNS</td>
+                            <td><input type="text" id="ws-google" placeholder="Ej: 20"></td>
+                        </tr>
+                    </table>
+
+                    <h3>6.4 Analizar consultas DNS</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Aplica el filtro <strong>dns</strong>.</li>
+                            <li>Busca las consultas que corresponden a las paginas que visitaste.</li>
+                            <li>Haz clic en un paquete DNS y observa los detalles en el panel inferior.</li>
+                            <li>Identifica: dominio consultado, tipo de consulta (A, AAAA), IP resuelta.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Tabla de consultas DNS encontradas</h3>
+                    <table>
+                        <tr>
+                            <th>Dominio consultado</th>
+                            <th>Tipo de consulta</th>
+                            <th>IP resuelta</th>
+                            <th>Servidor DNS usado</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="dns1-dominio" placeholder="Ej: google.es"></td>
+                            <td><input type="text" id="dns1-tipo" placeholder="Ej: A"></td>
+                            <td><input type="text" id="dns1-ip" placeholder="Ej: 142.250.185.3"></td>
+                            <td><input type="text" id="dns1-server" placeholder="Ej: 8.8.8.8"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="dns2-dominio"></td>
+                            <td><input type="text" id="dns2-tipo"></td>
+                            <td><input type="text" id="dns2-ip"></td>
+                            <td><input type="text" id="dns2-server"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="dns3-dominio"></td>
+                            <td><input type="text" id="dns3-tipo"></td>
+                            <td><input type="text" id="dns3-ip"></td>
+                            <td><input type="text" id="dns3-server"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota sobre HTTPS:</strong> El trafico HTTPS esta cifrado con TLS, por lo que Wireshark no puede ver el contenido de las paginas que visitas. Solo podras ver el "handshake" TLS y los datos cifrados. Para ver trafico HTTP legible, necesitas una pagina que use HTTP sin cifrar (cada vez son menos comunes).
+                    </div>
+
+                    <h3>Captura de pantalla — Wireshark</h3>
+                    <div class="foto-upload" id="foto-wireshark">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de pantalla de Wireshark con filtros aplicados</p>
+                        </div>
+                        <button class="btn-remove" onclick="removePhoto(this)">✕</button>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 7: Preguntas -->
+            <div class="seccion">
+                <h2>Parte 7 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>7.1. Cual es la diferencia entre TCP y UDP? Pon un ejemplo de servicio que use cada uno.</p>
+                        <textarea id="preg1" rows="4" placeholder="Escribe tu respuesta (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7.2. Por que podria estar abierto el puerto 445 en un equipo Windows? Que riesgo de seguridad supone?</p>
+                        <textarea id="preg2" rows="4" placeholder="Escribe tu respuesta (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7.3. Contra que amenazas NO protege un firewall? Explica al menos 3 ejemplos.</p>
+                        <textarea id="preg3" rows="4" placeholder="Escribe tu respuesta (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7.4. Que informacion puedes descubrir con Wireshark que no podrias obtener con un simple ping? Da al menos 3 ejemplos concretos.</p>
+                        <textarea id="preg4" rows="4" placeholder="Escribe tu respuesta (minimo 3 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 8: Reto tecnico -->
+            <div class="seccion">
+                <h2>Parte 8 — Reto tecnico: analisis forense y defensa perimetral (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Hasta aqui has usado las herramientas siguiendo pasos. Ahora vas a <strong>analizar, interpretar y justificar</strong>: los datos que recojas tienen que leerse tu mismo, no copiarse. Se valora mas la calidad del razonamiento que la cantidad de salidas pegadas.</p>
+
+                    <h3>Reto 1 — Analisis forense de una captura Wireshark (20 min)</h3>
+                    <p>Abre Wireshark y captura en la interfaz con la que sales a Internet. Mientras captura, abre en el navegador la pagina <code>http://testphp.vulnweb.com/login.php</code> (es un sitio de pruebas publico sin HTTPS) e introduce un usuario y contraseña falsos cualquiera (p.ej. <code>test / 1234</code>). Para la captura. <strong>No uses tu contraseña real de nada.</strong></p>
+                    <p>Localiza en la captura los siguientes elementos y contestate. Filtra con la barra de Wireshark lo que necesites.</p>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Elemento a encontrar</th>
+                            <th style="width:35%">Filtro / numero de paquete</th>
+                            <th>Dato concreto que has visto</th>
+                        </tr>
+                        <tr>
+                            <td>Peticion DNS del dominio</td>
+                            <td><input type="text" placeholder="dns, paquete #..."></td>
+                            <td><input type="text" placeholder="IP resuelta, tipo de registro..."></td>
+                        </tr>
+                        <tr>
+                            <td>3-way handshake TCP (SYN / SYN-ACK / ACK)</td>
+                            <td><input type="text" placeholder="paquetes # - # - #"></td>
+                            <td><input type="text" placeholder="numeros de secuencia inicial..."></td>
+                        </tr>
+                        <tr>
+                            <td>Peticion HTTP POST con credenciales</td>
+                            <td><input type="text" placeholder="http.request.method==POST"></td>
+                            <td><input type="text" placeholder="usuario y contraseña visibles..."></td>
+                        </tr>
+                        <tr>
+                            <td>Cierre de conexion TCP (FIN o RST)</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+                    <div class="pregunta">
+                        <p>Repite la misma prueba accediendo esta vez a <strong>un sitio HTTPS cualquiera</strong> (por ejemplo, <code>https://duckduckgo.com</code>) y filtra por TLS. Explica con tus palabras: ¿por que en la captura HTTPS no puedes leer la contraseña aunque veas que los paquetes siguen pasando? Identifica en que momento del handshake TLS empieza el cifrado.</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <h3>Reto 2 — Nmap con interpretacion critica (15 min)</h3>
+                    <p>Escanea tu propio equipo (o la VM que hayas usado) con <code>nmap -sV -O localhost</code> (o la IP de la VM desde fuera). Si no tienes al menos 3 puertos abiertos, arranca un servicio ligero a proposito antes de escanear: por ejemplo <code>python3 -m http.server 8080</code> en una terminal. <strong>No escanees equipos que no sean tuyos.</strong></p>
+                    <p>Completa la tabla con <strong>lo que Nmap haya encontrado realmente</strong> en tu maquina:</p>
+                    <table>
+                        <tr>
+                            <th style="width:10%">Puerto</th>
+                            <th style="width:15%">Protocolo</th>
+                            <th style="width:25%">Servicio / version</th>
+                            <th style="width:25%">¿Deberia estar abierto en un servidor de produccion expuesto a Internet?</th>
+                            <th>Justificacion</th>
+                        </tr>
+                        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><select><option></option><option>Si</option><option>No</option><option>Solo por VPN</option></select></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><select><option></option><option>Si</option><option>No</option><option>Solo por VPN</option></select></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><select><option></option><option>Si</option><option>No</option><option>Solo por VPN</option></select></td><td><input type="text"></td></tr>
+                    </table>
+                    <div class="pregunta">
+                        <p>De los puertos anteriores, elige <strong>el mas peligroso</strong> si esta maquina estuviera expuesta a Internet: explica que ataque real podria sufrir, y que dos medidas concretas aplicarias para mitigarlo (no digas solo "un firewall": di que regla y por que).</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <h3>Reto 3 — Firewall con regla justificada (10 min)</h3>
+                    <div class="escenario">
+                        <strong>Caso:</strong> Tu jefe quiere permitir SSH a su servidor Linux, pero <strong>solo</strong> desde la IP de la oficina (tu compañero de practicas te sirve como "oficina" para esta prueba; de lo contrario, usa <code>127.0.0.1</code> como IP permitida). Cualquier otra IP debe recibir el puerto cerrado.
+                    </div>
+                    <p>Implementa las reglas con <code>ufw</code>, probando el resultado. Anota aqui los comandos usados y el efecto de cada uno:</p>
+                    <textarea rows="6" placeholder="sudo ufw ...&#10;Resultado esperado:&#10;Verificacion con nmap desde fuera:"></textarea>
+                    <div class="pregunta">
+                        <p>Compara tu solucion con la alternativa "permitir SSH desde cualquier IP y usar solo autenticacion por contraseña fuerte". ¿Por que tu regla es mas segura aunque la contraseña fuera muy buena? Menciona al menos un vector de ataque que tu regla bloquea y la otra no.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <h3>Captura 7 — Reto tecnico</h3>
+                    <p>Adjunta una unica captura combinada que muestre: (a) la ventana de Wireshark con el POST HTTP visible y las credenciales resaltadas, y (b) la salida de <code>sudo ufw status verbose</code> con tu regla del Reto 3 aplicada.</p>
+                    <div class="foto-upload">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic, arrastra o pega una imagen (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura reto tecnico">
+                        <button class="btn-remove" onclick="removePhoto(this)">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Criterios de evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Distribucion de la puntuacion</h3>
+                        <table>
+                            <tr>
+                                <th>Apartado</th>
+                                <th>Peso</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1 — Conexiones activas (netstat / ss)</td>
+                                <td>8%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2 — Trazar rutas (tracert / traceroute)</td>
+                                <td>7%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3 — Escaneo de red con Nmap</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4 — Firewall en Windows</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5 — Firewall en Linux con ufw</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 6 — Captura con Wireshark</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 7 — Preguntas de reflexion</td>
+                                <td>5%</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 8 — Reto tecnico (analisis forense Wireshark + Nmap critico + firewall justificado)</td>
+                                <td>25%</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <table style="margin-top: 14px;">
+                        <tr>
+                            <th>Penalizacion</th>
+                            <th>Descuento</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas de pantalla ausentes</td>
+                            <td>-1.5 puntos por captura</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Conexiones activas documentadas con netstat y ss</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Rutas trazadas y tabla comparativa completada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Escaneo Nmap con hosts, puertos y versiones documentados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Reglas de firewall en Windows creadas, probadas y eliminadas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Reglas de ufw creadas, probadas y eliminadas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: Captura de Wireshark con filtros y analisis DNS</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: 4 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte8">
+                            <label for="verif-parte8">Parte 8: analisis Wireshark (HTTP vs HTTPS), Nmap interpretado y regla ufw justificada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">7 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 23 - Diagnostico de Red y Seguridad Basica</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque Comunicacion por red y comparticion de recursos (Practica 23)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 23: Diagnostico de Red y Seguridad Basica';
+        const PREFIJO_ARCHIVO = 'P23_Diagnostico_Red';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

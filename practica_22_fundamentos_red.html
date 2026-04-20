@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 22: Fundamentos de Red y TCP/IP</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code blocks */
+        code {
+            background: #edf2f7;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 22: Fundamentos de Red y TCP/IP</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 — Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Comunicacion por red y comparticion de recursos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual / parejas<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs de Windows y Ubuntu
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Configuracion previa de VirtualBox:</strong> Antes de comenzar, asegurate de que ambas maquinas virtuales (Windows y Ubuntu) tienen configurados <strong>dos adaptadores de red</strong> en VirtualBox: el <strong>Adaptador 1</strong> en modo <strong>NAT</strong> (para acceso a Internet) y el <strong>Adaptador 2</strong> en modo <strong>Red interna</strong> (para comunicacion entre VMs). Para hacerlo, ve a <em>Configuracion > Red</em> de cada VM.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico informatico y te han encargado configurar la red de una nueva oficina. Antes de instalar nada, necesitas entender como funciona el protocolo TCP/IP, como se asignan las direcciones IP, que papel juegan DHCP y DNS, y como diagnosticar problemas de conectividad. En esta practica simularas todo ese proceso usando tus maquinas virtuales.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender el modelo TCP/IP y sus capas fundamentales.</li>
+                        <li>Identificar y entender las direcciones IP, mascaras de subred y puertas de enlace.</li>
+                        <li>Configurar la red en Windows y en Linux desde la interfaz grafica y la linea de comandos.</li>
+                        <li>Diagnosticar problemas de conectividad usando <code>ping</code>, <code>ipconfig</code>/<code>ip</code> y <code>tracert</code>/<code>traceroute</code>.</li>
+                        <li>Configurar una direccion IP estatica en ambos sistemas operativos.</li>
+                        <li>Comprender el funcionamiento de DHCP y DNS en una red local.</li>
+                        <li>Establecer comunicacion directa entre dos maquinas virtuales en red interna.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vmwin">
+                            <label for="req-vmwin">VM con Windows instalada y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vmubuntu">
+                            <label for="req-vmubuntu">VM con Ubuntu instalada y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado con los adaptadores de red configurados (NAT + Red interna)</label>
+                        </div>
+                    </div>
+                    <div class="aviso">
+                        <strong>Importante:</strong> No olvides activar el segundo adaptador de red (Red interna) en ambas VMs <strong>antes</strong> de encenderlas. Si ya estan encendidas, apagarlas, configurar el adaptador y volver a arrancar.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Identificar la configuracion de red -->
+            <div class="seccion">
+                <h2>Parte 1 — Identificar la configuracion de red (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta primera parte vas a consultar la configuracion de red actual de ambas maquinas virtuales para entender como estan conectadas a la red.</p>
+
+                    <h3>En Windows: comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una ventana de <strong>Simbolo del sistema</strong> (cmd) o <strong>PowerShell</strong>.</li>
+                            <li>Ejecuta <strong>ipconfig /all</strong> para ver toda la configuracion de red detallada.</li>
+                            <li>Identifica el adaptador que tiene conexion a Internet (NAT) y el adaptador de red interna.</li>
+                            <li>Anota los valores que aparecen en la tabla de abajo.</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">C:\> ipconfig /all
+
+Adaptador de Ethernet Ethernet:
+   Descripcion . . . . . . . . : Intel PRO/1000 MT Desktop Adapter
+   Direccion fisica . . . . . . : 08-00-27-XX-XX-XX
+   DHCP habilitado  . . . . . . : Si
+   Direccion IPv4  . . . . . . . : 10.0.2.15
+   Mascara de subred  . . . . . : 255.255.255.0
+   Puerta de enlace . . . . . . : 10.0.2.2
+   Servidores DNS  . . . . . . . : 10.0.2.3
+
+Adaptador de Ethernet Ethernet 2:
+   Descripcion . . . . . . . . : Intel PRO/1000 MT Desktop Adapter #2
+   DHCP habilitado  . . . . . . : Si
+   Configuracion automatica . . : Sin direccion asignada (aun)</div>
+
+                    <h3>En Ubuntu: comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>Terminal</strong> (Ctrl+Alt+T).</li>
+                            <li>Ejecuta <strong>ip addr</strong> para ver las interfaces de red y sus direcciones IP.</li>
+                            <li>Ejecuta <strong>ip route</strong> para ver la tabla de rutas y la puerta de enlace predeterminada.</li>
+                            <li>Ejecuta <strong>cat /etc/resolv.conf</strong> para ver los servidores DNS configurados.</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">$ ip addr
+1: lo: &lt;LOOPBACK,UP&gt; mtu 65536
+    inet 127.0.0.1/8 scope host lo
+2: enp0s3: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1500
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+3: enp0s8: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1500
+    (sin direccion asignada aun)
+
+$ ip route
+default via 10.0.2.2 dev enp0s3
+10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15
+
+$ cat /etc/resolv.conf
+nameserver 127.0.0.53</div>
+
+                    <h3>Tabla de configuracion de red - VM Windows</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Parametro</th>
+                            <th>Valor obtenido (Adaptador NAT)</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del adaptador</td>
+                            <td><input type="text" placeholder="Ej: Ethernet"></td>
+                        </tr>
+                        <tr>
+                            <td>Direccion IPv4</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.15"></td>
+                        </tr>
+                        <tr>
+                            <td>Mascara de subred</td>
+                            <td><input type="text" placeholder="Ej: 255.255.255.0"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace predeterminada</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.2"></td>
+                        </tr>
+                        <tr>
+                            <td>Servidores DNS</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.3"></td>
+                        </tr>
+                        <tr>
+                            <td>Direccion MAC (fisica)</td>
+                            <td><input type="text" placeholder="Ej: 08-00-27-XX-XX-XX"></td>
+                        </tr>
+                        <tr>
+                            <td>DHCP habilitado</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Tabla de configuracion de red - VM Ubuntu</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Parametro</th>
+                            <th>Valor obtenido (Adaptador NAT)</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de la interfaz</td>
+                            <td><input type="text" placeholder="Ej: enp0s3"></td>
+                        </tr>
+                        <tr>
+                            <td>Direccion IPv4</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.15"></td>
+                        </tr>
+                        <tr>
+                            <td>Mascara de subred (en formato CIDR)</td>
+                            <td><input type="text" placeholder="Ej: /24 (equivale a 255.255.255.0)"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace predeterminada</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.2"></td>
+                        </tr>
+                        <tr>
+                            <td>Servidores DNS</td>
+                            <td><input type="text" placeholder="Ej: 127.0.0.53"></td>
+                        </tr>
+                        <tr>
+                            <td>Direccion MAC (link/ether)</td>
+                            <td><input type="text" placeholder="Ej: 08:00:27:xx:xx:xx"></td>
+                        </tr>
+                        <tr>
+                            <td>DHCP habilitado</td>
+                            <td><input type="text" placeholder="Si (dynamic) / No"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Explicacion de cada campo:</strong><br>
+                        - <strong>Direccion IPv4:</strong> Es el identificador unico de tu equipo en la red (como tu "numero de telefono" en la red).<br>
+                        - <strong>Mascara de subred:</strong> Define el tamano de la red local. 255.255.255.0 (/24) significa que los primeros 3 octetos identifican la red y el ultimo identifica al equipo.<br>
+                        - <strong>Puerta de enlace:</strong> Es la direccion del router que conecta tu red local con Internet u otras redes.<br>
+                        - <strong>DNS:</strong> Servidor que traduce nombres de dominio (www.google.es) en direcciones IP.<br>
+                        - <strong>MAC:</strong> Direccion fisica unica de la tarjeta de red, grabada de fabrica.<br>
+                        - <strong>DHCP:</strong> Protocolo que asigna automaticamente la configuracion de red (IP, mascara, gateway, DNS).
+                    </div>
+
+                    <h3>Captura 1: Configuracion de red en ambas VMs</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Salida de ipconfig /all (Windows) y/o ip addr + ip route (Ubuntu)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Diagnostico de conectividad -->
+            <div class="seccion">
+                <h2>Parte 2 — Diagnostico de conectividad (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Vamos a realizar un diagnostico de conectividad paso a paso, siguiendo el orden logico que usaria un tecnico de redes profesional para localizar problemas.</p>
+
+                    <h3>Procedimiento de diagnostico en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Paso 1 - Loopback:</strong> Ejecuta <strong>ping 127.0.0.1</strong> — Comprueba que la pila TCP/IP del propio equipo funciona.</li>
+                            <li><strong>Paso 2 - Gateway:</strong> Ejecuta <strong>ping [tu puerta de enlace]</strong> — Comprueba que llegas al router.</li>
+                            <li><strong>Paso 3 - IP externa:</strong> Ejecuta <strong>ping 8.8.8.8</strong> — Comprueba que tienes acceso a Internet (servidor DNS de Google).</li>
+                            <li><strong>Paso 4 - DNS:</strong> Ejecuta <strong>ping www.google.es</strong> — Comprueba que el DNS resuelve nombres correctamente.</li>
+                            <li><strong>Paso 5 - Ruta:</strong> Ejecuta <strong>tracert 8.8.8.8</strong> — Muestra todos los saltos (routers) hasta llegar al destino.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Procedimiento de diagnostico en Ubuntu</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Paso 1 - Loopback:</strong> Ejecuta <strong>ping -c 4 127.0.0.1</strong></li>
+                            <li><strong>Paso 2 - Gateway:</strong> Ejecuta <strong>ping -c 4 [tu puerta de enlace]</strong></li>
+                            <li><strong>Paso 3 - IP externa:</strong> Ejecuta <strong>ping -c 4 8.8.8.8</strong></li>
+                            <li><strong>Paso 4 - DNS:</strong> Ejecuta <strong>ping -c 4 www.google.es</strong></li>
+                            <li><strong>Paso 5 - Ruta:</strong> Ejecuta <strong>traceroute 8.8.8.8</strong> (instala con <code>sudo apt install traceroute</code> si es necesario)</li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados del diagnostico - Windows</h3>
+                    <table>
+                        <tr>
+                            <th style="width:10%">Paso</th>
+                            <th style="width:30%">Comando</th>
+                            <th style="width:15%">Resultado</th>
+                            <th style="width:20%">Tiempo medio</th>
+                            <th style="width:25%">Paquetes perdidos</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td><code>ping 127.0.0.1</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: <1ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code>ping [gateway]</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 1ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code>ping 8.8.8.8</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 15ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><code>ping www.google.es</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 18ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><code>tracert 8.8.8.8</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Num. saltos"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Resultados del diagnostico - Ubuntu</h3>
+                    <table>
+                        <tr>
+                            <th style="width:10%">Paso</th>
+                            <th style="width:30%">Comando</th>
+                            <th style="width:15%">Resultado</th>
+                            <th style="width:20%">Tiempo medio</th>
+                            <th style="width:25%">Paquetes perdidos</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td><code>ping -c 4 127.0.0.1</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 0.02ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code>ping -c 4 [gateway]</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 0.5ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code>ping -c 4 8.8.8.8</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 12ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><code>ping -c 4 www.google.es</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 14ms"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><code>traceroute 8.8.8.8</code></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Num. saltos"></td>
+                            <td><input type="text" placeholder="Ej: 0%"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Logica de diagnostico:</strong> El orden de las pruebas no es casualidad. Sigue esta logica:<br>
+                        - Si el <strong>Paso 1 falla</strong>: el problema es del propio sistema operativo (TCP/IP no funciona, reinstalar drivers de red).<br>
+                        - Si el <strong>Paso 1 funciona pero el 2 falla</strong>: el problema esta entre tu equipo y el router (cable, adaptador de red, configuracion IP incorrecta).<br>
+                        - Si el <strong>Paso 2 funciona pero el 3 falla</strong>: el router no tiene conexion a Internet o hay un problema en la ruta hacia fuera.<br>
+                        - Si el <strong>Paso 3 funciona pero el 4 falla</strong>: tienes Internet pero el DNS no funciona. Solucion: cambiar los servidores DNS.<br>
+                        - Si <strong>todos funcionan</strong>: la conectividad de red es correcta.
+                    </div>
+
+                    <h3>Captura 2: Diagnostico de conectividad</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Resultados de los comandos ping y tracert/traceroute en cualquiera de las VMs</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Configurar IP estatica -->
+            <div class="seccion">
+                <h2>Parte 3 — Configurar IP estatica (60 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte vas a aprender a configurar manualmente una direccion IP estatica en ambos sistemas operativos, tanto por interfaz grafica como por comandos.</p>
+
+                    <h3>3.1 — Configurar IP estatica en Windows (interfaz grafica)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Panel de control > Centro de redes y recursos compartidos</strong> (o busca "ncpa.cpl" en el menu Inicio).</li>
+                            <li>Haz clic derecho sobre el adaptador <strong>Ethernet</strong> (NAT) y selecciona <strong>Propiedades</strong>.</li>
+                            <li>Selecciona <strong>Protocolo de Internet version 4 (TCP/IPv4)</strong> y haz clic en <strong>Propiedades</strong>.</li>
+                            <li>Marca <strong>"Usar la siguiente direccion IP"</strong> e introduce los valores:
+                                <ul style="margin-left: 20px; margin-top: 6px;">
+                                    <li>Direccion IP: <strong>10.0.2.50</strong></li>
+                                    <li>Mascara de subred: <strong>255.255.255.0</strong></li>
+                                    <li>Puerta de enlace: <strong>10.0.2.2</strong></li>
+                                </ul>
+                            </li>
+                            <li>Marca <strong>"Usar las siguientes direcciones de servidor DNS"</strong>:
+                                <ul style="margin-left: 20px; margin-top: 6px;">
+                                    <li>DNS preferido: <strong>8.8.8.8</strong></li>
+                                    <li>DNS alternativo: <strong>8.8.4.4</strong></li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en <strong>Aceptar</strong> en todas las ventanas.</li>
+                            <li>Verifica con <strong>ipconfig</strong> que los cambios se aplicaron correctamente.</li>
+                            <li>Comprueba que sigues teniendo acceso a Internet con <strong>ping 8.8.8.8</strong> y <strong>ping www.google.es</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>3.2 — Configurar IP estatica en Ubuntu (comandos)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un terminal y comprueba el nombre de tu interfaz con <strong>ip addr</strong> (normalmente <code>enp0s3</code>).</li>
+                            <li>Elimina la IP actual asignada por DHCP:
+                                <div class="code-block">sudo ip addr flush dev enp0s3</div>
+                            </li>
+                            <li>Asigna la nueva IP estatica:
+                                <div class="code-block">sudo ip addr add 10.0.2.60/24 dev enp0s3</div>
+                            </li>
+                            <li>Configura la puerta de enlace:
+                                <div class="code-block">sudo ip route add default via 10.0.2.2</div>
+                            </li>
+                            <li>Verifica la configuracion con <strong>ip addr</strong> e <strong>ip route</strong>.</li>
+                            <li>Comprueba la conectividad con <strong>ping -c 4 8.8.8.8</strong> y <strong>ping -c 4 www.google.es</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Atencion:</strong> La configuracion mediante comandos <code>ip</code> es temporal y se pierde al reiniciar. Para hacerla permanente en Ubuntu se usa el archivo <code>/etc/netplan/*.yaml</code>. En esta practica solo necesitamos la configuracion temporal.
+                    </div>
+
+                    <h3>Tabla comparativa: antes y despues (Windows)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Parametro</th>
+                            <th style="width:35%">Antes (DHCP)</th>
+                            <th style="width:35%">Despues (IP estatica)</th>
+                        </tr>
+                        <tr>
+                            <td>Direccion IPv4</td>
+                            <td><input type="text" placeholder="IP asignada por DHCP"></td>
+                            <td><input type="text" placeholder="10.0.2.50"></td>
+                        </tr>
+                        <tr>
+                            <td>Mascara de subred</td>
+                            <td><input type="text" placeholder="Mascara original"></td>
+                            <td><input type="text" placeholder="255.255.255.0"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace</td>
+                            <td><input type="text" placeholder="Gateway original"></td>
+                            <td><input type="text" placeholder="10.0.2.2"></td>
+                        </tr>
+                        <tr>
+                            <td>DNS</td>
+                            <td><input type="text" placeholder="DNS original"></td>
+                            <td><input type="text" placeholder="8.8.8.8 / 8.8.4.4"></td>
+                        </tr>
+                        <tr>
+                            <td>DHCP habilitado</td>
+                            <td><input type="text" placeholder="Si"></td>
+                            <td><input type="text" placeholder="No"></td>
+                        </tr>
+                        <tr>
+                            <td>Ping a 8.8.8.8</td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Tabla comparativa: antes y despues (Ubuntu)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Parametro</th>
+                            <th style="width:35%">Antes (DHCP)</th>
+                            <th style="width:35%">Despues (IP estatica)</th>
+                        </tr>
+                        <tr>
+                            <td>Direccion IPv4</td>
+                            <td><input type="text" placeholder="IP asignada por DHCP"></td>
+                            <td><input type="text" placeholder="10.0.2.60"></td>
+                        </tr>
+                        <tr>
+                            <td>Mascara de subred</td>
+                            <td><input type="text" placeholder="Mascara original"></td>
+                            <td><input type="text" placeholder="/24"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace</td>
+                            <td><input type="text" placeholder="Gateway original"></td>
+                            <td><input type="text" placeholder="10.0.2.2"></td>
+                        </tr>
+                        <tr>
+                            <td>DNS</td>
+                            <td><input type="text" placeholder="DNS original"></td>
+                            <td><input type="text" placeholder="Depende de config"></td>
+                        </tr>
+                        <tr>
+                            <td>Ping a 8.8.8.8</td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Restaurar DHCP</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>En Windows:</strong> Vuelve a las propiedades de TCP/IPv4 y marca <strong>"Obtener una direccion IP automaticamente"</strong> y <strong>"Obtener la direccion del servidor DNS automaticamente"</strong>.</li>
+                            <li><strong>En Ubuntu:</strong> Reinicia el servicio de red para volver a DHCP:
+                                <div class="code-block">sudo systemctl restart NetworkManager</div>
+                            </li>
+                            <li>Verifica que ambas VMs vuelven a tener IP asignada por DHCP con <strong>ipconfig</strong> (Windows) e <strong>ip addr</strong> (Ubuntu).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Captura 3: Configuracion IP estatica</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Propiedades TCP/IPv4 en Windows y/o salida de ip addr en Ubuntu con la IP estatica configurada</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Explorar DNS -->
+            <div class="seccion">
+                <h2>Parte 4 — Explorar DNS (30 min)</h2>
+                <div class="seccion-body">
+                    <p>El servicio DNS (Domain Name System) es fundamental para navegar por Internet. Traduce nombres de dominio legibles (como www.google.es) en direcciones IP numericas que los equipos necesitan para comunicarse.</p>
+
+                    <h3>En Windows: usar nslookup</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>cmd</strong> o <strong>PowerShell</strong>.</li>
+                            <li>Ejecuta <strong>nslookup www.google.es</strong> para consultar la IP de Google.</li>
+                            <li>Ejecuta <strong>nslookup www.microsoft.com</strong> para consultar la IP de Microsoft.</li>
+                            <li>Ejecuta <strong>nslookup www.google.es 8.8.8.8</strong> para usar el DNS de Google directamente.</li>
+                            <li>Ejecuta <strong>nslookup www.google.es 1.1.1.1</strong> para usar el DNS de Cloudflare.</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">C:\> nslookup www.google.es
+Servidor:  dns.google
+Address:  8.8.8.8
+
+Respuesta no autoritativa:
+Nombre:  www.google.es
+Addresses:  142.250.184.3
+
+C:\> nslookup www.google.es 1.1.1.1
+Servidor:  one.one.one.one
+Address:  1.1.1.1
+
+Respuesta no autoritativa:
+Nombre:  www.google.es
+Addresses:  142.250.184.3</div>
+
+                    <h3>En Ubuntu: usar dig</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre un <strong>Terminal</strong>.</li>
+                            <li>Ejecuta <strong>dig www.google.es</strong> para consultar la IP de Google.</li>
+                            <li>Ejecuta <strong>dig www.microsoft.com</strong> para consultar la IP de Microsoft.</li>
+                            <li>Ejecuta <strong>dig @8.8.8.8 www.google.es</strong> para usar el DNS de Google.</li>
+                            <li>Ejecuta <strong>dig @1.1.1.1 www.google.es</strong> para usar el DNS de Cloudflare.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Si el comando <code>dig</code> no esta disponible, instalalo con: <code>sudo apt install dnsutils</code>
+                    </div>
+
+                    <h3>Tabla de resultados DNS</h3>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Dominio</th>
+                            <th style="width:25%">Servidor DNS usado</th>
+                            <th style="width:25%">IP obtenida</th>
+                            <th style="width:25%">Sistema operativo</th>
+                        </tr>
+                        <tr>
+                            <td>www.google.es</td>
+                            <td><input type="text" placeholder="DNS por defecto"></td>
+                            <td><input type="text" placeholder="Ej: 142.250.x.x"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                        <tr>
+                            <td>www.microsoft.com</td>
+                            <td><input type="text" placeholder="DNS por defecto"></td>
+                            <td><input type="text" placeholder="IP obtenida"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                        <tr>
+                            <td>www.google.es</td>
+                            <td><input type="text" placeholder="8.8.8.8 (Google)"></td>
+                            <td><input type="text" placeholder="IP obtenida"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                        <tr>
+                            <td>www.google.es</td>
+                            <td><input type="text" placeholder="1.1.1.1 (Cloudflare)"></td>
+                            <td><input type="text" placeholder="IP obtenida"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                        <tr>
+                            <td>www.microsoft.com</td>
+                            <td><input type="text" placeholder="8.8.8.8 (Google)"></td>
+                            <td><input type="text" placeholder="IP obtenida"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                        <tr>
+                            <td>www.microsoft.com</td>
+                            <td><input type="text" placeholder="1.1.1.1 (Cloudflare)"></td>
+                            <td><input type="text" placeholder="IP obtenida"></td>
+                            <td><input type="text" placeholder="Windows / Ubuntu"></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Las IPs obtenidas con distintos servidores DNS, son siempre las mismas? Explica por que si o por que no:</p>
+                        <textarea placeholder="Compara los resultados obtenidos con 8.8.8.8 y 1.1.1.1. Explica si las IPs coinciden y por que podrian ser diferentes (CDN, balanceo de carga, ubicacion geografica, cache DNS...)."></textarea>
+                    </div>
+
+                    <h3>Captura 4: Consultas DNS</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Salida de nslookup (Windows) y/o dig (Ubuntu) con diferentes servidores DNS</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Comunicar dos VMs en red interna -->
+            <div class="seccion">
+                <h2>Parte 5 — Comunicar dos VMs en red interna (50 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte vas a configurar el segundo adaptador de red (Red interna) de ambas VMs para que puedan comunicarse directamente entre si, simulando una red local de oficina.</p>
+
+                    <h3>5.1 — Verificar configuracion de VirtualBox</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En VirtualBox, ve a la <strong>Configuracion</strong> de la VM de Windows.</li>
+                            <li>En <strong>Red > Adaptador 2</strong>, verifica que esta habilitado y en modo <strong>Red interna</strong>.</li>
+                            <li>El nombre de la red interna debe ser el mismo en ambas VMs (por defecto: <strong>intnet</strong>).</li>
+                            <li>Repite lo mismo para la VM de Ubuntu.</li>
+                            <li>Arranca ambas VMs si no estan ya encendidas.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 — Asignar IP estatica en la red interna (Windows)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>ncpa.cpl</strong> (Conexiones de red).</li>
+                            <li>Identifica el <strong>segundo adaptador</strong> (Ethernet 2 o similar, el que NO tiene Internet).</li>
+                            <li>Haz clic derecho > <strong>Propiedades</strong> > <strong>TCP/IPv4</strong> > <strong>Propiedades</strong>.</li>
+                            <li>Configura:
+                                <ul style="margin-left: 20px; margin-top: 6px;">
+                                    <li>Direccion IP: <strong>10.0.0.1</strong></li>
+                                    <li>Mascara de subred: <strong>255.255.255.0</strong></li>
+                                    <li>Puerta de enlace: <em>(dejar en blanco)</em></li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en <strong>Aceptar</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.3 — Asignar IP estatica en la red interna (Ubuntu)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Identifica la segunda interfaz con <strong>ip addr</strong> (normalmente <code>enp0s8</code>).</li>
+                            <li>Asigna la IP estatica:
+                                <div class="code-block">sudo ip addr add 10.0.0.2/24 dev enp0s8
+sudo ip link set enp0s8 up</div>
+                            </li>
+                            <li>Verifica con <strong>ip addr show enp0s8</strong> que la IP se ha asignado correctamente.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.4 — Probar la comunicacion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Desde Windows:</strong> Ejecuta <strong>ping 10.0.0.2</strong> para hacer ping a la VM de Ubuntu.</li>
+                            <li><strong>Desde Ubuntu:</strong> Ejecuta <strong>ping -c 4 10.0.0.1</strong> para hacer ping a la VM de Windows.</li>
+                            <li>Si el ping no funciona en Windows, puede ser necesario desactivar temporalmente el <strong>Firewall de Windows</strong> para la red privada:
+                                <div class="code-block">netsh advfirewall set allprofiles state off</div>
+                                <em style="font-size: 12px; color: #718096;">(Recuerda volver a activarlo despues: <code>netsh advfirewall set allprofiles state on</code>)</em>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>Tabla de resultados de comunicacion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Prueba</th>
+                            <th style="width:20%">Resultado</th>
+                            <th style="width:25%">Tiempo medio</th>
+                            <th style="width:25%">Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Ping Windows (10.0.0.1) a Ubuntu (10.0.0.2)</td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: <1ms"></td>
+                            <td><input type="text" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>Ping Ubuntu (10.0.0.2) a Windows (10.0.0.1)</td>
+                            <td><input type="text" placeholder="OK / Fallo"></td>
+                            <td><input type="text" placeholder="Ej: 0.5ms"></td>
+                            <td><input type="text" placeholder="Observaciones..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>5.5 — Transferir un archivo entre VMs</h3>
+                    <p>Ahora que ambas VMs se comunican, vamos a transferir un archivo sencillo usando Python (que viene instalado en Ubuntu y se puede usar tambien en Windows).</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>En Ubuntu (servidor):</strong> Crea un archivo de prueba y lanza un servidor HTTP simple:
+                                <div class="code-block">echo "Hola desde Ubuntu - Practica 22" > /tmp/prueba.txt
+cd /tmp
+python3 -m http.server 8080 --bind 10.0.0.2</div>
+                            </li>
+                            <li><strong>En Windows (cliente):</strong> Abre un navegador y accede a <strong>http://10.0.0.2:8080</strong></li>
+                            <li>Descarga el archivo <strong>prueba.txt</strong> haciendo clic en el.</li>
+                            <li>Verifica que el contenido del archivo es correcto.</li>
+                            <li><strong>En Ubuntu:</strong> Detener el servidor con <strong>Ctrl+C</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Se ha transferido el archivo correctamente? Describe el proceso y si encontraste algun problema:</p>
+                        <textarea placeholder="Describe si pudiste transferir el archivo, que viste en el navegador al acceder a http://10.0.0.2:8080, y si el contenido del archivo descargado era correcto. Menciona cualquier problema que hayas tenido y como lo resolviste."></textarea>
+                    </div>
+
+                    <h3>Captura 5: Comunicacion entre VMs</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ping exitoso entre ambas VMs y/o transferencia de archivo</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Escribe un minimo de 3 lineas por cada respuesta.</p>
+
+                    <div class="pregunta">
+                        <p>1. Cual es la diferencia entre una direccion IP publica y una IP privada? Pon un ejemplo de cada una.</p>
+                        <textarea placeholder="Explica que es una IP publica (visible en Internet, unica a nivel mundial) y una IP privada (solo visible dentro de la red local). Ejemplo de publica: 85.123.45.67. Ejemplo de privada: 192.168.1.100, 10.0.2.15. Menciona los rangos de IPs privadas: 10.x.x.x, 172.16-31.x.x, 192.168.x.x."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Que es NAT (Network Address Translation) y por que es necesario?</p>
+                        <textarea placeholder="Explica que NAT permite que varios dispositivos con IPs privadas compartan una unica IP publica para acceder a Internet. El router hace la traduccion de direcciones. Es necesario porque las IPs publicas son limitadas (agotamiento de IPv4) y por seguridad."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Por que se usa DHCP en lugar de configurar IPs estaticas manualmente en cada equipo?</p>
+                        <textarea placeholder="Explica las ventajas de DHCP: configuracion automatica, evita errores humanos, evita conflictos de IP duplicadas, facilita la gestion cuando hay muchos equipos, permite reutilizar direcciones cuando los equipos se desconectan..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Que ocurre si dos dispositivos de la misma red tienen la misma direccion IP?</p>
+                        <textarea placeholder="Explica el conflicto de IP: ambos equipos tendran problemas de conexion intermitente, los paquetes pueden llegar al equipo equivocado, el sistema operativo suele mostrar un aviso de conflicto de IP, la comunicacion se vuelve inestable o imposible para ambos equipos."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Para que sirve la mascara de subred? Que pasaria si configuras una mascara incorrecta?</p>
+                        <textarea placeholder="Explica que la mascara de subred indica que parte de la IP identifica la red y que parte identifica al equipo. Si la mascara es incorrecta, el equipo puede creer que otros equipos de su misma red estan en otra red (o viceversa), lo que causaria que no pueda comunicarse correctamente con ellos."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Reto tecnico -->
+            <div class="seccion">
+                <h2>Parte 7 — Reto tecnico: diagnostico de red rota y diseño (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Hasta aqui has seguido pasos. En esta parte tienes que <strong>pensar y justificar</strong>: no hay comandos a copiar. Se evalua mas tu razonamiento que el resultado final.</p>
+
+                    <h3>Reto 1 — La red rota (15 min, trabajo en parejas)</h3>
+                    <div class="escenario">
+                        <strong>Dinamica:</strong> Formad parejas. Uno de los dos (el <em>saboteador</em>) cambia en la VM del otro <strong>un unico parametro</strong> de la configuracion de red por un valor coherente en formato pero incorrecto (por ejemplo: IP fuera de la subred, mascara /27 donde toca /24, gateway inexistente, o DNS que no resuelve). Luego intercambiais roles. La <em>victima</em> no debe saber cual parametro se cambio.
+                    </div>
+                    <p>Como victima, debes diagnosticar el fallo <strong>sin preguntar</strong>. Rellena la tabla anotando cada herramienta que usas, que observas y que descarta esa observacion:</p>
+                    <table>
+                        <tr>
+                            <th style="width:20%">Herramienta / comando</th>
+                            <th style="width:35%">Resultado observado</th>
+                            <th style="width:25%">Que descarta</th>
+                            <th style="width:20%">Capa OSI / TCP-IP afectada</th>
+                        </tr>
+                        <tr><td><input type="text"></td><td><textarea rows="2"></textarea></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><textarea rows="2"></textarea></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><textarea rows="2"></textarea></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><textarea rows="2"></textarea></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+                    <div class="pregunta">
+                        <p>Diagnostico final: ¿que parametro estaba mal, cual deberia ser, y como lo has confirmado?</p>
+                        <textarea rows="4" placeholder="Parametro saboteado: ...&#10;Valor correcto: ...&#10;Como lo he confirmado: ..."></textarea>
+                    </div>
+
+                    <h3>Reto 2 — Subnetting para una oficina real (20 min)</h3>
+                    <div class="escenario">
+                        <strong>Caso:</strong> Una PYME con dos departamentos quiere separar el trafico en dos subredes privadas distintas, ambas dentro del rango <code>192.168.10.0/24</code>. Administracion necesita direcciones para 10 equipos, taller para 6. El router principal hace NAT hacia Internet. Un servidor de impresora debe ser accesible <strong>desde las dos subredes</strong>.
+                    </div>
+                    <p>Calcula y justifica:</p>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Dato</th>
+                            <th style="width:35%">Administracion</th>
+                            <th style="width:35%">Taller</th>
+                        </tr>
+                        <tr><td>Mascara (notacion /n) elegida</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Direccion de red</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Direccion de broadcast</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Primera IP util</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Ultima IP util</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Hosts utiles</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+                    <div class="pregunta">
+                        <p>a) ¿Por que has elegido esa mascara y no una mayor (mas restrictiva) o menor (mas permisiva)? Justifica teniendo en cuenta que la oficina podria crecer un 50% en 2 años.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p>b) El servidor de impresora: ¿donde lo colocarias (en una subred, en otra, o en una tercera) y por que? ¿Que dispositivo debe tener configurado para que ambos departamentos lo alcancen?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <h3>Reto 3 — "La red funciona, pero no" (10 min)</h3>
+                    <div class="escenario">
+                        <strong>Situacion:</strong> En una VM configuras una IP estatica correcta, mascara correcta y gateway correcto. <code>ping</code> al gateway funciona. <code>ping</code> a <code>8.8.8.8</code> funciona. Pero cuando haces <code>ping google.com</code> te devuelve "Name or service not known" y el navegador no carga paginas web.
+                    </div>
+                    <div class="pregunta">
+                        <p>a) ¿Que esta pasando exactamente? ¿En que capa se produce el fallo y por que conectividad a nivel IP no implica acceso a Internet para el usuario?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+                    <div class="pregunta">
+                        <p>b) ¿Como lo arreglas <strong>sin tocar la configuracion del router</strong>? Indica los ficheros o ajustes concretos que cambiarias en la VM (Windows y Linux) y verifica reproduciendo el problema en tu VM y corrigiendolo.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <h3>Captura 6 — Reto tecnico</h3>
+                    <p>Adjunta una unica captura que muestre: (a) la salida del comando que confirma tu diagnostico en el Reto 1, y (b) el comando que demuestra que has arreglado el fallo del Reto 3 (por ejemplo, <code>ping google.com</code> respondiendo).</p>
+                    <div class="foto-upload">
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic, arrastra o pega una imagen (Ctrl+V)</p>
+                        </div>
+                        <img class="foto-preview" alt="Captura reto tecnico">
+                        <button class="btn-remove" onclick="removePhoto(this)">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Criterios de evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Distribucion de la puntuacion</h3>
+                        <table>
+                            <tr>
+                                <th style="width:60%">Criterio</th>
+                                <th style="width:20%">Peso</th>
+                                <th style="width:20%">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1: Identificacion de la configuracion de red (tablas completas, captura)</td>
+                                <td>10%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2: Diagnostico de conectividad (procedimiento correcto, resultados)</td>
+                                <td>15%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3: Configuracion IP estatica (antes/despues, restauracion DHCP)</td>
+                                <td>15%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4: Exploracion DNS (consultas, comparacion de servidores)</td>
+                                <td>10%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5: Comunicacion entre VMs (ping, transferencia de archivo)</td>
+                                <td>15%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 6: Preguntas de reflexion (minimo 3 lineas, respuestas razonadas)</td>
+                                <td>10%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 7: Reto tecnico (diagnostico red rota + subnetting + analisis DNS)</td>
+                                <td>25%</td>
+                                <td><input type="text" placeholder="0-10"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>TOTAL</strong></td>
+                                <td><strong>100%</strong></td>
+                                <td><input type="text" placeholder="Total"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th style="width:70%">Motivo</th>
+                            <th>Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Practica entregada sin capturas de pantalla</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Configuracion de red de ambas VMs documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Diagnostico de conectividad completado con resultados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: IP estatica configurada con tablas antes/despues</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Consultas DNS realizadas con diferentes servidores</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Comunicacion entre VMs establecida y archivo transferido</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: diagnostico de red rota, calculo de subnetting y analisis DNS completados y razonados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 22 - Fundamentos de Red y TCP/IP</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque de Comunicacion por red y comparticion de recursos (Practica 22)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 22: Fundamentos de Red y TCP/IP';
+        const PREFIJO_ARCHIVO = 'P22_Fundamentos_Red';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

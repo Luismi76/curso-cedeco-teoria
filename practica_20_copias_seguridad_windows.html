@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 20: Copias de Seguridad en Windows</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code inline */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        /* Code blocks */
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 20: Copias de Seguridad en Windows</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Clonacion y copias de seguridad<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Windows 10/11
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Requisito importante:</strong> Para esta practica necesitas un <strong>segundo disco virtual</strong> en tu maquina virtual que servira como destino de las copias de seguridad. En VirtualBox, ve a <em>Configuracion > Almacenamiento</em> y anade un nuevo disco duro virtual (VDI) de al menos 20 GB al controlador SATA. Despues de arrancar Windows, inicializa y formatea el disco desde <em>Administracion de discos</em> (<code>diskmgmt.msc</code>).
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico informatico en un despacho de abogados llamado <em>Garcia & Asociados</em>. El bufete maneja documentos legales criticos (contratos, expedientes judiciales, escrituras) y no tiene ningun sistema de copias de seguridad. Tras una reciente perdida parcial de datos por un fallo de disco, la direccion te ha encargado configurar una estrategia de backup completa utilizando las herramientas integradas de Windows. Debes implementar y documentar toda la solucion.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender los tipos de copia de seguridad: completa (full), incremental y diferencial.</li>
+                        <li>Configurar y utilizar el <strong>Historial de archivos</strong> de Windows para proteger documentos del usuario.</li>
+                        <li>Crear una <strong>Imagen del sistema</strong> como copia de seguridad completa del disco del sistema operativo.</li>
+                        <li>Crear y utilizar <strong>Puntos de restauracion</strong> para recuperar el sistema ante cambios no deseados.</li>
+                        <li>Disenar un plan de copias de seguridad aplicando la <strong>regla 3-2-1</strong>.</li>
+                        <li>Programar tareas de backup automatizadas con el <strong>Programador de tareas</strong> de Windows.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Windows 10/11 disponible y funcionando en VirtualBox</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-disco">
+                            <label for="req-disco">Segundo disco virtual anadido a la VM (minimo 20 GB)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-admin">
+                            <label for="req-admin">Acceso con cuenta de administrador en la VM</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-formato">
+                            <label for="req-formato">Segundo disco inicializado y formateado (NTFS) en Windows</label>
+                        </div>
+                    </div>
+                    <div class="aviso">
+                        <strong>Atencion:</strong> No realices copias de seguridad en el mismo disco donde esta instalado el sistema operativo. El segundo disco virtual simula un disco externo o una unidad de backup independiente, que es la practica correcta en entornos profesionales.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Disenar un plan de backup -->
+            <div class="seccion">
+                <h2>Parte 1 — Disenar un plan de backup (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Antes de tocar ninguna herramienta, un buen tecnico planifica. En esta parte vas a repasar los conceptos teoricos y disenar un plan de copias de seguridad para el despacho de abogados.</p>
+
+                    <h3>Tipos de copia de seguridad</h3>
+                    <table>
+                        <tr>
+                            <th style="width:22%">Tipo</th>
+                            <th style="width:40%">Descripcion</th>
+                            <th>Ventajas / Inconvenientes</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Completa (Full)</strong></td>
+                            <td>Copia todos los datos seleccionados cada vez que se ejecuta, independientemente de si han cambiado o no.</td>
+                            <td>Restauracion rapida y sencilla. Requiere mucho espacio y tiempo en cada ejecucion.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Incremental</strong></td>
+                            <td>Copia solo los datos que han cambiado desde la <em>ultima copia</em> (ya sea completa o incremental).</td>
+                            <td>Muy rapida y ocupa poco espacio. Restauracion mas lenta (necesita la completa + todas las incrementales).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Diferencial</strong></td>
+                            <td>Copia todos los datos que han cambiado desde la <em>ultima copia completa</em>.</td>
+                            <td>Restauracion mas rapida que la incremental (solo necesita la completa + la ultima diferencial). Crece en tamano con el tiempo.</td>
+                        </tr>
+                    </table>
+
+                    <h3>La regla 3-2-1</h3>
+                    <div class="nota">
+                        <strong>Regla 3-2-1:</strong> Es el estandar de la industria para proteger datos de forma fiable:<br>
+                        <strong>3</strong> copias de los datos (el original + 2 copias de seguridad).<br>
+                        <strong>2</strong> tipos de soporte diferentes (ej: disco duro interno + disco externo, o disco + nube).<br>
+                        <strong>1</strong> copia fuera del sitio (offsite) — en otra ubicacion fisica o en la nube.
+                    </div>
+
+                    <h3>Conceptos clave: RPO y RTO</h3>
+                    <table>
+                        <tr>
+                            <th style="width:20%">Concepto</th>
+                            <th style="width:40%">Definicion</th>
+                            <th>Ejemplo</th>
+                        </tr>
+                        <tr>
+                            <td><strong>RPO</strong><br>(Recovery Point Objective)</td>
+                            <td>Cantidad maxima de datos que una organizacion puede permitirse perder, medida en tiempo.</td>
+                            <td>Si el RPO es de 1 hora, se deben hacer copias al menos cada hora.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RTO</strong><br>(Recovery Time Objective)</td>
+                            <td>Tiempo maximo aceptable para restaurar el sistema y volver a estar operativo.</td>
+                            <td>Si el RTO es de 4 horas, se necesita un metodo de restauracion que no tarde mas de 4 horas.</td>
+                        </tr>
+                    </table>
+
+                    <h3>Ejercicio: Disenando el plan de backup para Garcia & Asociados</h3>
+                    <p>Teniendo en cuenta el escenario del bufete, completa la siguiente tabla con tu propuesta de plan de copias de seguridad:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Elemento del plan</th>
+                            <th>Tu propuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Datos criticos a proteger (enumera al menos 4 tipos)</td>
+                            <td><textarea rows="3" placeholder="Ej: Contratos, expedientes judiciales, escrituras, bases de datos contables..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>RPO propuesto (cada cuanto se deben hacer copias)</td>
+                            <td><input type="text" placeholder="Ej: 1 hora para documentos activos, 24 horas para el sistema"></td>
+                        </tr>
+                        <tr>
+                            <td>RTO propuesto (tiempo maximo para restaurar)</td>
+                            <td><input type="text" placeholder="Ej: 2 horas para documentos, 8 horas para el sistema completo"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de copia para documentos diarios</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="completa">Completa (Full)</option>
+                                    <option value="incremental">Incremental</option>
+                                    <option value="diferencial">Diferencial</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de copia semanal</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="completa">Completa (Full)</option>
+                                    <option value="incremental">Incremental</option>
+                                    <option value="diferencial">Diferencial</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Soportes de almacenamiento (aplica la regla 3-2-1)</td>
+                            <td><textarea rows="3" placeholder="Ej: 1) Disco duro externo en la oficina, 2) NAS en otra sala, 3) Copia en la nube (OneDrive/Google Drive)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Copia offsite: donde y como</td>
+                            <td><input type="text" placeholder="Ej: Copia cifrada en la nube (OneDrive for Business)"></td>
+                        </tr>
+                        <tr>
+                            <td>Frecuencia de verificacion de las copias</td>
+                            <td><input type="text" placeholder="Ej: Prueba de restauracion mensual"></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Justifica brevemente tu plan: por que has elegido esos tipos de copia y esas frecuencias para un bufete de abogados?</p>
+                        <textarea rows="4" placeholder="Explica tu razonamiento teniendo en cuenta la naturaleza critica de los datos legales, la normativa de proteccion de datos, y la necesidad de continuidad del negocio..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Historial de archivos -->
+            <div class="seccion">
+                <h2>Parte 2 — Historial de archivos (60 min)</h2>
+                <div class="seccion-body">
+                    <p>El <strong>Historial de archivos</strong> es la herramienta integrada de Windows que realiza copias de seguridad automaticas de los archivos personales del usuario (Documentos, Escritorio, Imagenes, etc.). Funciona de forma similar a una copia incremental continua.</p>
+
+                    <h3>Paso 1: Preparar el segundo disco</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Si aun no lo has hecho, abre <strong>Administracion de discos</strong> (<code>diskmgmt.msc</code>).</li>
+                            <li>Verifica que el segundo disco esta <strong>En linea</strong>, inicializado (GPT) y formateado como <strong>NTFS</strong>.</li>
+                            <li>Asegurate de que tiene una letra de unidad asignada (ej: <strong>D:</strong> o <strong>E:</strong>).</li>
+                            <li>Anota la letra de unidad asignada al disco de backup.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Letra de unidad del disco de backup</td>
+                            <td><input type="text" placeholder="Ej: E:"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total del disco de backup</td>
+                            <td><input type="text" placeholder="Ej: 20 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema de archivos</td>
+                            <td><input type="text" placeholder="Ej: NTFS"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2: Activar el Historial de archivos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Panel de control > Sistema y seguridad > Historial de archivos</strong>.</li>
+                            <li>Tambien puedes buscar <em>"Historial de archivos"</em> en el menu Inicio.</li>
+                            <li>Selecciona el <strong>segundo disco</strong> como unidad de destino.</li>
+                            <li>Haz clic en <strong>Activar</strong>.</li>
+                            <li>Ve a <strong>Configuracion avanzada</strong> y cambia la frecuencia de copia a <strong>Cada 10 minutos</strong> (para agilizar la practica).</li>
+                            <li>Verifica que las carpetas incluidas son las predeterminadas (Bibliotecas, Escritorio, Contactos, Favoritos).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Captura 1: Historial de archivos activado</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Panel de control mostrando el Historial de archivos activado con el disco de backup seleccionado</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Paso 3: Crear archivos de prueba y modificarlos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre la carpeta <strong>Documentos</strong> de tu usuario.</li>
+                            <li>Crea una carpeta llamada <strong>Bufete_Garcia</strong>.</li>
+                            <li>Dentro, crea 3 archivos de texto con el Bloc de notas:
+                                <ul style="margin-left: 20px; margin-top: 4px;">
+                                    <li><code>contrato_cliente_001.txt</code> — escribe "Version 1: Contrato original"</li>
+                                    <li><code>expediente_caso_042.txt</code> — escribe "Version 1: Expediente inicial"</li>
+                                    <li><code>factura_2024_marzo.txt</code> — escribe "Version 1: Factura borrador"</li>
+                                </ul>
+                            </li>
+                            <li>Espera a que el Historial de archivos realice una copia (comprueba en el panel de control que dice <em>"Los archivos se copiaron por ultima vez en..."</em>).</li>
+                            <li>Modifica los 3 archivos: anade una segunda linea con <em>"Version 2: [descripcion del cambio]"</em>.</li>
+                            <li>Espera otra copia automatica (10 minutos) o fuerza una copia manual con <strong>Ejecutar ahora</strong>.</li>
+                            <li>Modifica de nuevo los archivos con una <em>"Version 3"</em>.</li>
+                            <li>Fuerza otra copia manual.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Archivo</th>
+                            <th style="width:25%">Versiones creadas</th>
+                            <th>Hora de la ultima copia</th>
+                        </tr>
+                        <tr>
+                            <td>contrato_cliente_001.txt</td>
+                            <td><input type="text" placeholder="Ej: 3 versiones"></td>
+                            <td><input type="text" placeholder="Ej: 10:35"></td>
+                        </tr>
+                        <tr>
+                            <td>expediente_caso_042.txt</td>
+                            <td><input type="text" placeholder="Ej: 3 versiones"></td>
+                            <td><input type="text" placeholder="Ej: 10:35"></td>
+                        </tr>
+                        <tr>
+                            <td>factura_2024_marzo.txt</td>
+                            <td><input type="text" placeholder="Ej: 3 versiones"></td>
+                            <td><input type="text" placeholder="Ej: 10:35"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 4: Restaurar una version anterior</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho sobre el archivo <code>contrato_cliente_001.txt</code> y selecciona <strong>Restaurar versiones anteriores</strong>.</li>
+                            <li>Veras una lista con las distintas versiones guardadas por el Historial de archivos.</li>
+                            <li>Selecciona la <strong>Version 1</strong> (la mas antigua).</li>
+                            <li>Haz clic en <strong>Restaurar</strong> (elige <em>Restaurar en...</em> y selecciona una ubicacion diferente para no sobrescribir la actual).</li>
+                            <li>Abre ambos archivos (el actual y el restaurado) y compara su contenido.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Contenido de la version restaurada (Version 1)</td>
+                            <td><input type="text" placeholder="Ej: Version 1: Contrato original"></td>
+                        </tr>
+                        <tr>
+                            <td>Contenido de la version actual (Version 3)</td>
+                            <td><input type="text" placeholder="Ej: Version 1 + Version 2 + Version 3"></td>
+                        </tr>
+                        <tr>
+                            <td>Se ha restaurado correctamente?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Restauracion de version anterior</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ventana de versiones anteriores mostrando las distintas versiones del archivo y/o la comparacion entre version restaurada y actual</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Imagen del sistema -->
+            <div class="seccion">
+                <h2>Parte 3 — Imagen del sistema (50 min)</h2>
+                <div class="seccion-body">
+                    <p>Una <strong>Imagen del sistema</strong> es una copia de seguridad completa (bit a bit) de las particiones del sistema operativo. Permite restaurar el equipo completo en caso de fallo grave del disco o del sistema.</p>
+
+                    <div class="nota">
+                        <strong>Diferencia con la clonacion:</strong> Aunque ambos procesos crean una copia exacta del disco, la <em>clonacion</em> copia un disco a otro disco listo para usar directamente (disco de arranque). La <em>imagen del sistema</em> genera un archivo comprimido que necesita un proceso de restauracion para ser utilizado. La imagen es mas flexible para almacenamiento, mientras que el clon es mas rapido para recuperacion inmediata.
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Sobre el nombre "(Windows 7)":</strong> En Windows 10/11 esta herramienta sigue llamandose <em>"Copias de seguridad y restauracion (Windows 7)"</em> porque Microsoft la mantiene como funcionalidad <strong>legacy</strong> (no la ha actualizado, pero tampoco la ha eliminado). Para copias de archivos personales, Microsoft recomienda <strong>Historial de archivos</strong> (Configuracion > Sistema > Almacenamiento > Opciones avanzadas) o, en Windows 11, <strong>Copia de seguridad de Windows</strong>. Sin embargo, para crear <strong>imagenes completas del sistema</strong> esta sigue siendo la opcion oficial integrada y funciona perfectamente.
+                    </div>
+
+                    <h3>Paso 1: Crear la imagen del sistema</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Panel de control > Sistema y seguridad > Copias de seguridad y restauracion (Windows 7)</strong>.
+                                <br><span style="color:#666; font-size:12px;">Si no la encuentras: pulsa Inicio, escribe <code>copias de seguridad</code> y selecciona "Copias de seguridad y restauracion (Windows 7)". Tambien puedes ir directamente con <code>control /name Microsoft.BackupAndRestoreCenter</code> en CMD.</span>
+                            </li>
+                            <li>En el panel izquierdo, haz clic en <strong>Crear una imagen de sistema</strong>.</li>
+                            <li>Selecciona <strong>En un disco duro</strong> y elige el segundo disco virtual.</li>
+                            <li>Verifica que la unidad del sistema (C:) esta seleccionada para incluirse en la imagen.</li>
+                            <li>Haz clic en <strong>Iniciar copia de seguridad</strong>.</li>
+                            <li>Espera a que finalice el proceso (puede tardar entre 10 y 30 minutos dependiendo del tamano).</li>
+                            <li>Cuando pregunte si deseas crear un <em>disco de reparacion del sistema</em>, selecciona <strong>No</strong> (en una VM no es necesario).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de la imagen del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Hora de inicio de la creacion</td>
+                            <td><input type="text" placeholder="Ej: 11:15"></td>
+                        </tr>
+                        <tr>
+                            <td>Hora de finalizacion</td>
+                            <td><input type="text" placeholder="Ej: 11:32"></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo total del proceso</td>
+                            <td><input type="text" placeholder="Ej: 17 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de la imagen generada</td>
+                            <td><input type="text" placeholder="Ej: 8.5 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Ubicacion de la imagen en el disco de backup</td>
+                            <td><input type="text" placeholder="Ej: E:\WindowsImageBackup\..."></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio libre restante en el disco de backup</td>
+                            <td><input type="text" placeholder="Ej: 11.5 GB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Imagen del sistema creada</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Ventana mostrando que la imagen del sistema se ha creado correctamente y/o la carpeta WindowsImageBackup en el disco de destino</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <div class="pregunta">
+                        <p>En que situaciones usarias una Imagen del sistema en vez de simplemente reinstalar Windows?</p>
+                        <textarea rows="3" placeholder="Piensa en escenarios donde la restauracion rapida con todos los programas y configuraciones es critica..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Puntos de restauracion -->
+            <div class="seccion">
+                <h2>Parte 4 — Puntos de restauracion (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Los <strong>Puntos de restauracion</strong> capturan el estado del sistema operativo (archivos del sistema, registro, programas instalados) en un momento concreto. Permiten revertir cambios del sistema sin afectar los archivos personales del usuario.</p>
+
+                    <div class="nota">
+                        <strong>Importante:</strong> Los puntos de restauracion <strong>no son copias de seguridad de tus archivos personales</strong>. Solo protegen los archivos del sistema, el registro de Windows y los programas instalados. Los documentos, fotos y archivos del usuario <strong>no se ven afectados</strong> por una restauracion del sistema.
+                    </div>
+
+                    <h3>Paso 1: Activar la proteccion del sistema</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho en <strong>Este equipo</strong> (o <em>Mi PC</em>) y selecciona <strong>Propiedades</strong>.</li>
+                            <li>Haz clic en <strong>Proteccion del sistema</strong> (en el panel izquierdo o en <em>Configuracion avanzada del sistema</em>).</li>
+                            <li>Selecciona la unidad <strong>C:</strong> y haz clic en <strong>Configurar</strong>.</li>
+                            <li>Marca <strong>Activar proteccion del sistema</strong>.</li>
+                            <li>Ajusta el uso maximo de espacio en disco al <strong>10%</strong>.</li>
+                            <li>Haz clic en <strong>Aceptar</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Estado de la proteccion del sistema (C:)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="activada">Activada</option>
+                                    <option value="desactivada">Desactivada</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Espacio maximo reservado</td>
+                            <td><input type="text" placeholder="Ej: 10% (5 GB)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2: Crear un punto de restauracion manual</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la misma ventana de <strong>Proteccion del sistema</strong>, haz clic en <strong>Crear...</strong></li>
+                            <li>Escribe como descripcion: <strong>Antes de instalar software de prueba</strong>.</li>
+                            <li>Haz clic en <strong>Crear</strong> y espera a que se complete.</li>
+                            <li>Anota la hora exacta de creacion del punto.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Descripcion del punto de restauracion</td>
+                            <td><input type="text" placeholder="Ej: Antes de instalar software de prueba"></td>
+                        </tr>
+                        <tr>
+                            <td>Hora de creacion</td>
+                            <td><input type="text" placeholder="Ej: 12:05"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Punto de restauracion creado</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Mensaje de confirmacion de creacion del punto de restauracion o la ventana de Proteccion del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Paso 3: Instalar software de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un archivo de texto en el Escritorio llamado <code>archivo_personal_prueba.txt</code> con el contenido <em>"Este archivo NO debe desaparecer tras la restauracion"</em>.</li>
+                            <li>Instala un programa sencillo en la VM. Sugerencia: <strong>7-Zip</strong> (descargalo de <code>7-zip.org</code>) o cualquier otro programa pequeno.</li>
+                            <li>Verifica que el programa se ha instalado correctamente abriendolo.</li>
+                            <li>Anota el nombre del programa instalado.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Programa instalado</td>
+                            <td><input type="text" placeholder="Ej: 7-Zip 24.08"></td>
+                        </tr>
+                        <tr>
+                            <td>Funciona correctamente tras instalarlo?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 4: Restaurar al punto anterior</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Vuelve a <strong>Proteccion del sistema</strong> y haz clic en <strong>Restaurar sistema...</strong></li>
+                            <li>Selecciona el punto de restauracion que creaste (<em>Antes de instalar software de prueba</em>).</li>
+                            <li>Haz clic en <strong>Buscar programas afectados</strong> para ver que se eliminara.</li>
+                            <li>Confirma y haz clic en <strong>Siguiente > Finalizar</strong>.</li>
+                            <li>El sistema se reiniciara automaticamente.</li>
+                            <li>Tras el reinicio, verifica:
+                                <ul style="margin-left: 20px; margin-top: 4px;">
+                                    <li>El programa de prueba ya <strong>no esta instalado</strong>.</li>
+                                    <li>El archivo <code>archivo_personal_prueba.txt</code> del Escritorio <strong>sigue existiendo</strong>.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>Resultados de la restauracion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>El programa de prueba sigue instalado?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si (restauracion fallida)</option>
+                                    <option value="no">No (restauracion correcta)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>El archivo personal del Escritorio se conserva?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si (comportamiento esperado)</option>
+                                    <option value="no">No (comportamiento inesperado)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>El sistema arranca con normalidad?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Verificacion tras la restauracion</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Escritorio mostrando que el archivo personal sigue existiendo y/o la lista de programas donde ya no aparece el software de prueba</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Programador de tareas -->
+            <div class="seccion">
+                <h2>Parte 5 — Programar tareas con el Programador de tareas (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En un entorno profesional, las copias de seguridad deben ejecutarse de forma <strong>automatica</strong> sin intervencion del usuario. El <strong>Programador de tareas</strong> de Windows permite ejecutar scripts o programas de forma programada.</p>
+
+                    <h3>Paso 1: Crear un script de backup sencillo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Bloc de notas</strong>.</li>
+                            <li>Escribe el siguiente script <strong>exactamente</strong> (adapta la letra de la unidad de backup si es diferente):</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">@echo off
+REM Script de backup automatico - Bufete Garcia & Asociados
+REM Fecha de creacion: Practica 20
+
+set ORIGEN=%USERPROFILE%\Documents\Bufete_Garcia
+set DESTINO=E:\Backups\Bufete_Garcia_%date:~6,4%%date:~3,2%%date:~0,2%
+set LOG=E:\Backups\log_backup.txt
+
+echo ============================================ >> "%LOG%"
+echo Backup iniciado: %date% %time% >> "%LOG%"
+echo Origen: %ORIGEN% >> "%LOG%"
+echo Destino: %DESTINO% >> "%LOG%"
+echo ============================================ >> "%LOG%"
+
+if not exist "%DESTINO%" mkdir "%DESTINO%"
+
+xcopy "%ORIGEN%" "%DESTINO%" /E /Y /I >> "%LOG%" 2>&1
+
+echo Backup finalizado: %date% %time% >> "%LOG%"
+echo. >> "%LOG%"
+
+echo Backup completado correctamente.
+pause</pre>
+
+                    <div class="pasos">
+                        <ol start="3">
+                            <li>Guarda el archivo como <strong>backup_bufete.bat</strong> en la carpeta <strong>Documentos</strong>.</li>
+                            <li>Ejecuta el script manualmente haciendo doble clic para verificar que funciona.</li>
+                            <li>Comprueba que se ha creado la carpeta de backup en el disco <strong>E:</strong> y que contiene los archivos.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>El script se ejecuta sin errores?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Carpeta de backup creada en el disco de destino</td>
+                            <td><input type="text" placeholder="Ej: E:\Backups\Bufete_Garcia_20260410"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de archivos copiados</td>
+                            <td><input type="text" placeholder="Ej: 3 archivos"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2: Programar la tarea automatica</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Programador de tareas</strong> (<code>taskschd.msc</code> o busca en el menu Inicio).</li>
+                            <li>En el panel derecho, haz clic en <strong>Crear tarea basica...</strong></li>
+                            <li>Configura la tarea:
+                                <ul style="margin-left: 20px; margin-top: 4px;">
+                                    <li><strong>Nombre:</strong> Backup diario Bufete Garcia</li>
+                                    <li><strong>Descripcion:</strong> Copia de seguridad automatica de los documentos del bufete</li>
+                                    <li><strong>Desencadenador (Trigger):</strong> Diariamente</li>
+                                    <li><strong>Hora de inicio:</strong> 13:00 (o la hora actual + 5 minutos para probar)</li>
+                                    <li><strong>Accion:</strong> Iniciar un programa</li>
+                                    <li><strong>Programa/script:</strong> Ruta completa al archivo <code>backup_bufete.bat</code></li>
+                                </ul>
+                            </li>
+                            <li>Marca la casilla <em>"Abrir el dialogo Propiedades de esta tarea cuando haga clic en Finalizar"</em>.</li>
+                            <li>Haz clic en <strong>Finalizar</strong>.</li>
+                            <li>En las propiedades, marca <strong>Ejecutar tanto si el usuario ha iniciado sesion como si no</strong> (opcional, requiere contrasena).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato de la tarea programada</th>
+                            <th>Valor configurado</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de la tarea</td>
+                            <td><input type="text" placeholder="Ej: Backup diario Bufete Garcia"></td>
+                        </tr>
+                        <tr>
+                            <td>Frecuencia (Trigger)</td>
+                            <td><input type="text" placeholder="Ej: Diariamente a las 13:00"></td>
+                        </tr>
+                        <tr>
+                            <td>Script que ejecuta</td>
+                            <td><input type="text" placeholder="Ej: C:\Users\alumno\Documents\backup_bufete.bat"></td>
+                        </tr>
+                        <tr>
+                            <td>La tarea aparece en la biblioteca del Programador?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Tarea programada en el Programador de tareas</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Programador de tareas mostrando la tarea "Backup diario Bufete Garcia" con su configuracion (trigger y accion)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un minimo de 3 lineas.</p>
+
+                    <div class="pregunta">
+                        <p>1. Cual es la diferencia principal entre el Historial de archivos y la Imagen del sistema? En que situaciones usarias cada uno?</p>
+                        <textarea rows="4" placeholder="Explica las diferencias en cuanto a que protegen, como funcionan y cuando es mas adecuado usar cada herramienta..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Cuando es mas adecuado usar Puntos de restauracion en vez de una Imagen del sistema? Pon un ejemplo practico.</p>
+                        <textarea rows="4" placeholder="Piensa en escenarios donde un punto de restauracion es suficiente frente a situaciones que requieren una imagen completa..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Es un sistema RAID una copia de seguridad? Justifica tu respuesta.</p>
+                        <textarea rows="4" placeholder="Reflexiona sobre la diferencia entre redundancia y backup, y que tipo de fallos protege cada uno..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Por que es importante la regla 3-2-1? Que pasaria si solo tuvieras una copia de seguridad en el mismo disco que los datos originales?</p>
+                        <textarea rows="4" placeholder="Analiza los riesgos de no seguir la regla 3-2-1 y pon ejemplos de desastres que podrian ocurrir (robo, incendio, fallo de disco, ransomware...)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Evaluacion y entrega</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th style="width:50%">Criterio</th>
+                                <th style="width:15%">Peso</th>
+                                <th>Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1: Plan de backup (diseno, justificacion, regla 3-2-1)</td>
+                                <td>15%</td>
+                                <td><input type="text" placeholder="/10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2: Historial de archivos (configuracion, versiones, restauracion)</td>
+                                <td>25%</td>
+                                <td><input type="text" placeholder="/10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3: Imagen del sistema (creacion, documentacion, reflexion)</td>
+                                <td>20%</td>
+                                <td><input type="text" placeholder="/10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4: Puntos de restauracion (creacion, prueba, verificacion)</td>
+                                <td>20%</td>
+                                <td><input type="text" placeholder="/10"></td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5 + Parte 6: Programador de tareas + preguntas de reflexion</td>
+                                <td>20%</td>
+                                <td><input type="text" placeholder="/10"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>Lista de verificacion antes de entregar</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-plan">
+                            <label for="verif-plan">Parte 1: Plan de backup completo con justificacion</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-historial">
+                            <label for="verif-historial">Parte 2: Historial de archivos configurado, versiones creadas y restauracion realizada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-imagen">
+                            <label for="verif-imagen">Parte 3: Imagen del sistema creada con datos de tiempo y tamano</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-puntos">
+                            <label for="verif-puntos">Parte 4: Punto de restauracion creado, software instalado y restauracion verificada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-programador">
+                            <label for="verif-programador">Parte 5: Script de backup creado y tarea programada configurada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-preguntas">
+                            <label for="verif-preguntas">Parte 6: 4 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 20 - Copias de Seguridad en Windows</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque de Clonacion y copias de seguridad (Practica 20)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 20: Copias de Seguridad en Windows';
+        const PREFIJO_ARCHIVO = 'P20_Backup_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

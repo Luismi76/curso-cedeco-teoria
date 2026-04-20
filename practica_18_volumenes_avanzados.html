@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 18: Gestion Avanzada de Volumenes</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Code */
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 18: Gestion Avanzada de Volumenes</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y actualizacion de sistemas operativos<br>
+                <strong>Bloque:</strong> Gestion de discos — RAID, volumenes dinamicos y LVM<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual / parejas<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VMs de Windows y Ubuntu
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota importante -->
+            <div class="nota">
+                <strong>Nota importante:</strong> Esta practica requiere anadir <strong>multiples discos duros virtuales</strong> a tus maquinas virtuales. No utilices los discos donde esta instalado el sistema operativo. Todos los discos adicionales que crees seran de 5 GB cada uno y se anadiran desde la configuracion de almacenamiento de VirtualBox.
+            </div>
+
+            <!-- Escenario -->
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico de sistemas en una pequena empresa. Te han encargado configurar el almacenamiento del servidor: necesitas <strong>redundancia con RAID</strong> para proteger los datos criticos y <strong>volumenes flexibles con LVM</strong> en Linux para poder ampliar el espacio de almacenamiento sin interrupciones. Ademas, debes documentar las ventajas de cada tecnologia para que la direccion pueda tomar decisiones informadas.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Comprender los niveles de RAID mas habituales (RAID 0, RAID 1 y RAID 5) y sus diferencias.</li>
+                        <li>Crear un RAID 1 por software en Windows utilizando Espacios de almacenamiento (reflejo bidireccional).</li>
+                        <li>Entender el concepto de grupo de almacenamiento (storage pool) y los tipos de resiliencia disponibles en Windows.</li>
+                        <li>Utilizar LVM (Logical Volume Manager) en Linux para crear y gestionar volumenes logicos.</li>
+                        <li>Redimensionar volumenes tanto en Windows como en Linux sin perdida de datos.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vmwin">
+                            <label for="req-vmwin">VM con Windows (de la Practica 06) disponible y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vmlinux">
+                            <label for="req-vmlinux">VM con Ubuntu (de la Practica 07) disponible y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-discos">
+                            <label for="req-discos">Se han anadido discos virtuales adicionales a ambas VMs (ver instrucciones en cada parte)</label>
+                        </div>
+                    </div>
+                    <div class="nota">
+                        <strong>Como anadir discos virtuales en VirtualBox:</strong> Con la VM apagada, ve a <strong>Configuracion > Almacenamiento > Controlador SATA</strong>, haz clic en el icono de anadir disco duro, selecciona <strong>Crear nuevo disco</strong>, elige formato VDI, tamano dinamico, y asigna 5 GB. Repite para cada disco necesario.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico -->
+            <div class="seccion">
+                <h2>Contenido teorico — Niveles de RAID</h2>
+                <div class="seccion-body">
+                    <p>RAID (Redundant Array of Independent Disks) combina varios discos fisicos para mejorar el rendimiento, la redundancia o ambos. Estos son los niveles mas comunes:</p>
+                    <table>
+                        <tr>
+                            <th style="width:12%">Nivel</th>
+                            <th style="width:22%">Nombre</th>
+                            <th style="width:12%">Discos min.</th>
+                            <th style="width:18%">Capacidad util</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>RAID 0</strong></td>
+                            <td>Striping (distribucion)</td>
+                            <td>2</td>
+                            <td>100% (suma total)</td>
+                            <td>Los datos se reparten entre los discos. Maximo rendimiento, pero si falla un disco se pierde todo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAID 1</strong></td>
+                            <td>Mirroring (espejo)</td>
+                            <td>2</td>
+                            <td>50% (mitad)</td>
+                            <td>Los datos se duplican en ambos discos. Si uno falla, el otro mantiene toda la informacion.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAID 5</strong></td>
+                            <td>Striping con paridad</td>
+                            <td>3</td>
+                            <td>(N-1)/N del total</td>
+                            <td>Datos y paridad distribuidos. Tolera el fallo de 1 disco. Buen equilibrio entre rendimiento y seguridad.</td>
+                        </tr>
+                    </table>
+
+                    <h3>Espacios de almacenamiento en Windows</h3>
+                    <p>Tradicionalmente, Windows permitia crear volumenes RAID por software convirtiendo los discos a <strong>dinamicos</strong>. Sin embargo, desde Windows 8 Microsoft considera los discos dinamicos <strong>obsoletos</strong> y en Windows 10/11 la opcion "Convertir en disco dinamico" aparece deshabilitada o "Nuevo volumen reflejado" en gris.</p>
+                    <p>La alternativa moderna son los <strong>Espacios de almacenamiento</strong> (<em>Storage Spaces</em>), que permiten agrupar varios discos fisicos en un <strong>grupo de almacenamiento</strong> (pool) y crear dentro volumenes con distintos tipos de <strong>resiliencia</strong>:</p>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Tipo de resiliencia</th>
+                            <th style="width:20%">Discos minimos</th>
+                            <th>Equivalente RAID</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Simple</strong></td>
+                            <td>1</td>
+                            <td>Sin redundancia (similar a RAID 0 con varios discos)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reflejo bidireccional</strong></td>
+                            <td>2</td>
+                            <td>RAID 1 — tolera el fallo de 1 disco</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reflejo tridireccional</strong></td>
+                            <td>5</td>
+                            <td>Espejo triple — tolera el fallo de 2 discos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Paridad</strong></td>
+                            <td>3</td>
+                            <td>RAID 5 — tolera el fallo de 1 disco con mejor aprovechamiento de espacio</td>
+                        </tr>
+                    </table>
+
+                    <h3>LVM en Linux</h3>
+                    <p>LVM (Logical Volume Manager) anade una capa de abstraccion entre los discos fisicos y los sistemas de archivos. Sus componentes principales son:</p>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Componente</th>
+                            <th style="width:30%">Siglas</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Physical Volume</strong></td>
+                            <td>PV</td>
+                            <td>Un disco o particion fisica marcada para uso con LVM (<code>pvcreate</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Volume Group</strong></td>
+                            <td>VG</td>
+                            <td>Agrupa uno o mas PVs en un pool de almacenamiento (<code>vgcreate</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Logical Volume</strong></td>
+                            <td>LV</td>
+                            <td>Un volumen logico creado dentro de un VG, equivalente a una particion (<code>lvcreate</code>).</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Parte 1: RAID 1 en Windows -->
+            <div class="seccion">
+                <h2>Parte 1 — RAID 1 (espejo) en Windows (60 min)</h2>
+                <div class="seccion-body">
+                    <h3>1.1 Preparacion: Anadir discos virtuales</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga la VM de Windows</strong> si esta encendida.</li>
+                            <li>En VirtualBox, ve a <strong>Configuracion > Almacenamiento > Controlador SATA</strong>.</li>
+                            <li>Anade <strong>2 discos duros virtuales nuevos</strong> de <strong>5 GB</strong> cada uno (VDI, tamano dinamico).</li>
+                            <li>Inicia la VM de Windows.</li>
+                        </ol>
+                    </div>
+
+                    <h3>1.2 Verificar los discos nuevos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Administracion de discos</strong> (clic derecho en Inicio > Administracion de discos).</li>
+                            <li>Si aparece el asistente para inicializar los discos nuevos, puedes <strong>cancelarlo</strong>: los Espacios de almacenamiento trabajan con discos sin inicializar.</li>
+                            <li>Confirma que ves el Disco 1 y el Disco 2 con 5 GB de espacio no asignado y cierra Administracion de discos.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Atencion:</strong> En Windows 10/11 los <em>discos dinamicos</em> estan obsoletos y las opciones "Convertir en disco dinamico" y "Nuevo volumen reflejado" pueden aparecer deshabilitadas. Por eso esta practica usa <strong>Espacios de almacenamiento</strong>, que es el metodo oficial de Microsoft para crear RAID por software.
+                    </div>
+
+                    <h3>1.3 Crear espejo con Espacios de almacenamiento (RAID 1)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Inicio</strong> y escribe <strong>Espacios de almacenamiento</strong>. Abre la opcion "Administrar Espacios de almacenamiento" (tambien disponible en <em>Panel de control > Sistema y seguridad > Espacios de almacenamiento</em>).</li>
+                            <li>Haz clic en <strong>Crear un nuevo grupo y espacio de almacenamiento</strong>. Si aparece el aviso de Control de cuentas de usuario, acepta.</li>
+                            <li>Marca los <strong>dos discos de 5 GB</strong> que acabas de anadir (asegurate de no seleccionar el disco del sistema) y pulsa <strong>Crear grupo</strong>.</li>
+                            <li>En la ventana de creacion del espacio de almacenamiento rellena:
+                                <ul>
+                                    <li><strong>Nombre:</strong> RAID1_Datos</li>
+                                    <li><strong>Letra de unidad:</strong> E:</li>
+                                    <li><strong>Sistema de archivos:</strong> NTFS</li>
+                                    <li><strong>Tipo de resiliencia:</strong> <strong>Reflejo bidireccional</strong> (equivale a RAID 1)</li>
+                                    <li><strong>Tamano:</strong> deja el valor por defecto (aproximadamente 5 GB utiles, ya que la mitad se usa para la copia).</li>
+                                </ul>
+                            </li>
+                            <li>Pulsa <strong>Crear espacio de almacenamiento</strong> y espera unos segundos a que se formatee.</li>
+                            <li>Abre el <strong>Explorador de archivos</strong> y confirma que aparece la unidad <strong>E: RAID1_Datos</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Alternativa con PowerShell</strong> (opcional, para los mas avanzados). Abre PowerShell como administrador y ejecuta:
+                        <pre><code>$discos = Get-PhysicalDisk -CanPool $true
+New-StoragePool -FriendlyName "Pool1" -StorageSubSystemFriendlyName "Windows Storage*" -PhysicalDisks $discos
+New-VirtualDisk -StoragePoolFriendlyName "Pool1" -FriendlyName "RAID1_Datos" -ResiliencySettingName Mirror -UseMaximumSize
+Get-VirtualDisk "RAID1_Datos" | Get-Disk | Initialize-Disk -PartitionStyle GPT -PassThru |
+    New-Partition -DriveLetter E -UseMaximumSize |
+    Format-Volume -FileSystem NTFS -NewFileSystemLabel "RAID1_Datos" -Confirm:$false</code></pre>
+                    </div>
+
+                    <p>Documenta los resultados de la creacion del RAID 1:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Letra de unidad asignada</td>
+                            <td><input type="text" id="raid1-letra" placeholder="Ej: E:"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total del volumen reflejado</td>
+                            <td><input type="text" id="raid1-tamano" placeholder="Ej: 4.99 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema de archivos</td>
+                            <td><input type="text" id="raid1-fs" placeholder="Ej: NTFS"></td>
+                        </tr>
+                        <tr>
+                            <td>Estado del volumen tras la sincronizacion</td>
+                            <td><input type="text" id="raid1-estado" placeholder="Ej: Correcto (en buen estado)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>1.4 Probar la tolerancia a fallos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un archivo de texto en la unidad del espejo (<strong>E:\prueba_raid.txt</strong>) con contenido de ejemplo.</li>
+                            <li><strong>Apaga la VM</strong>.</li>
+                            <li>En VirtualBox, <strong>elimina uno de los dos discos</strong> del espejo (Configuracion > Almacenamiento > selecciona un disco y eliminalo). Importante: en el dialogo de confirmacion, elige <strong>mantener</strong> el archivo .vdi por si necesitas restaurarlo.</li>
+                            <li>Inicia la VM de nuevo.</li>
+                            <li>Abre <strong>Espacios de almacenamiento</strong> y comprueba el estado del grupo y del espacio. Deberia aparecer una advertencia indicando que un disco fisico esta ausente.</li>
+                            <li>Abre el Explorador de archivos y verifica si el archivo <strong>E:\prueba_raid.txt</strong> sigue accesible.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comprobacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Estado del volumen tras quitar un disco</td>
+                            <td><input type="text" id="raid1-fallo-estado" placeholder="Ej: Redundancia con error"></td>
+                        </tr>
+                        <tr>
+                            <td>El archivo prueba_raid.txt es accesible?</td>
+                            <td>
+                                <select id="raid1-fallo-accesible">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si, se puede abrir</option>
+                                    <option value="no">No, no se puede acceder</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Que demuestra este resultado?</td>
+                            <td><textarea id="raid1-fallo-explicacion" rows="2" placeholder="Explica que ha pasado y por que"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura: Espacios de almacenamiento con el espejo creado</h3>
+                    <div class="foto-upload" id="foto-raid1">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura de la ventana "Administrar Espacios de almacenamiento" mostrando el grupo y el espacio "RAID1_Datos" con reflejo bidireccional</p>
+                        </div>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 2: Redimensionar particiones en Windows -->
+            <div class="seccion">
+                <h2>Parte 2 — Redimensionar particiones en Windows (30 min)</h2>
+                <div class="seccion-body">
+                    <div class="nota">
+                        <strong>Nota:</strong> Para esta parte, trabaja con el disco del sistema (C:) o con un volumen basico que tengas disponible. No utilices el volumen reflejado de la Parte 1.
+                    </div>
+
+                    <h3>2.1 Reducir un volumen</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Administracion de discos</strong>.</li>
+                            <li>Haz clic derecho sobre el volumen <strong>C:</strong> y selecciona <strong>Reducir volumen</strong>.</li>
+                            <li>Introduce la cantidad a reducir: <strong>2048 MB</strong> (2 GB).</li>
+                            <li>Confirma la operacion y espera a que se complete.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.2 Crear un nuevo volumen en el espacio libre</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic derecho en el <strong>espacio no asignado</strong> resultante.</li>
+                            <li>Selecciona <strong>Nuevo volumen simple</strong>.</li>
+                            <li>Asigna una letra de unidad y formatea con NTFS.</li>
+                            <li>Etiqueta: <strong>DatosExtra</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 Extender el volumen original</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Elimina el volumen <strong>DatosExtra</strong> que acabas de crear (clic derecho > Eliminar volumen).</li>
+                            <li>Haz clic derecho sobre <strong>C:</strong> y selecciona <strong>Extender volumen</strong>.</li>
+                            <li>Recupera el espacio libre para devolver C: a su tamano original.</li>
+                        </ol>
+                    </div>
+
+                    <p>Documenta los resultados de cada paso:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Operacion</th>
+                            <th>Resultado observado</th>
+                        </tr>
+                        <tr>
+                            <td>Tamano de C: antes de reducir</td>
+                            <td><input type="text" id="resize-antes" placeholder="Ej: 50 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de C: despues de reducir</td>
+                            <td><input type="text" id="resize-despues" placeholder="Ej: 48 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano del nuevo volumen DatosExtra</td>
+                            <td><input type="text" id="resize-nuevo" placeholder="Ej: 2 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de C: tras extender de nuevo</td>
+                            <td><input type="text" id="resize-final" placeholder="Ej: 50 GB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura: Proceso de redimensionado</h3>
+                    <div class="foto-upload" id="foto-resize">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura mostrando el proceso de reducir/extender volumen</p>
+                        </div>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 3: LVM en Linux -->
+            <div class="seccion">
+                <h2>Parte 3 — LVM en Linux (90 min)</h2>
+                <div class="seccion-body">
+                    <h3>3.1 Preparacion: Anadir discos y preparar el entorno</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga la VM de Ubuntu</strong> si esta encendida.</li>
+                            <li>En VirtualBox, anade <strong>2 discos duros virtuales nuevos</strong> de <strong>5 GB</strong> cada uno.</li>
+                            <li>Inicia la VM de Ubuntu y abre un terminal.</li>
+                            <li>Comprueba que los discos aparecen con el comando:
+                                <pre class="codigo-bloque">lsblk</pre>
+                                Deberias ver <code>sdb</code> y <code>sdc</code> (o similar) de 5 GB cada uno.
+                            </li>
+                            <li>Instala el paquete LVM si no esta disponible:
+                                <pre class="codigo-bloque">sudo apt update && sudo apt install lvm2 -y</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <p>Anota la salida del comando <code>lsblk</code>:</p>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Dispositivo</th>
+                            <th style="width:20%">Tamano</th>
+                            <th>Tipo / Observacion</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="lvm-dev1" placeholder="Ej: sdb"></td>
+                            <td><input type="text" id="lvm-dev1-tam" placeholder="Ej: 5G"></td>
+                            <td><input type="text" id="lvm-dev1-obs" placeholder="Ej: disco nuevo, sin particiones"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="lvm-dev2" placeholder="Ej: sdc"></td>
+                            <td><input type="text" id="lvm-dev2-tam" placeholder="Ej: 5G"></td>
+                            <td><input type="text" id="lvm-dev2-obs" placeholder="Ej: disco nuevo, sin particiones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.2 Crear Physical Volumes (PV)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea los PVs en ambos discos:
+                                <pre class="codigo-bloque">sudo pvcreate /dev/sdb /dev/sdc</pre>
+                            </li>
+                            <li>Verifica con:
+                                <pre class="codigo-bloque">sudo pvs</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Comando ejecutado</th>
+                            <th>Salida / Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo pvcreate /dev/sdb /dev/sdc</code></td>
+                            <td><textarea id="lvm-pvcreate" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo pvs</code></td>
+                            <td><textarea id="lvm-pvs" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.3 Crear Volume Group (VG)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un VG llamado <strong>almacen</strong> que agrupe los dos PVs:
+                                <pre class="codigo-bloque">sudo vgcreate almacen /dev/sdb /dev/sdc</pre>
+                            </li>
+                            <li>Verifica con:
+                                <pre class="codigo-bloque">sudo vgs</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Comando ejecutado</th>
+                            <th>Salida / Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo vgcreate almacen /dev/sdb /dev/sdc</code></td>
+                            <td><textarea id="lvm-vgcreate" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo vgs</code></td>
+                            <td><textarea id="lvm-vgs" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.4 Crear Logical Volumes (LV)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un LV de 3 GB llamado <strong>datos</strong>:
+                                <pre class="codigo-bloque">sudo lvcreate -L 3G -n datos almacen</pre>
+                            </li>
+                            <li>Crea otro LV de 2 GB llamado <strong>backup</strong>:
+                                <pre class="codigo-bloque">sudo lvcreate -L 2G -n backup almacen</pre>
+                            </li>
+                            <li>Verifica con:
+                                <pre class="codigo-bloque">sudo lvs</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Comando ejecutado</th>
+                            <th>Salida / Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo lvcreate -L 3G -n datos almacen</code></td>
+                            <td><textarea id="lvm-lv-datos" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo lvcreate -L 2G -n backup almacen</code></td>
+                            <td><textarea id="lvm-lv-backup" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo lvs</code></td>
+                            <td><textarea id="lvm-lvs" rows="2" placeholder="Pega la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.5 Formatear y montar los volumenes</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Formatea ambos LVs con ext4:
+                                <pre class="codigo-bloque">sudo mkfs.ext4 /dev/almacen/datos
+sudo mkfs.ext4 /dev/almacen/backup</pre>
+                            </li>
+                            <li>Crea los puntos de montaje:
+                                <pre class="codigo-bloque">sudo mkdir -p /mnt/datos /mnt/backup</pre>
+                            </li>
+                            <li>Monta los volumenes:
+                                <pre class="codigo-bloque">sudo mount /dev/almacen/datos /mnt/datos
+sudo mount /dev/almacen/backup /mnt/backup</pre>
+                            </li>
+                            <li>Verifica con:
+                                <pre class="codigo-bloque">df -h | grep almacen</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Punto de montaje</th>
+                            <th style="width:20%">Tamano</th>
+                            <th>Disponible</th>
+                        </tr>
+                        <tr>
+                            <td>/mnt/datos</td>
+                            <td><input type="text" id="lvm-mount-datos-tam" placeholder="Ej: 2.9G"></td>
+                            <td><input type="text" id="lvm-mount-datos-disp" placeholder="Ej: 2.8G"></td>
+                        </tr>
+                        <tr>
+                            <td>/mnt/backup</td>
+                            <td><input type="text" id="lvm-mount-backup-tam" placeholder="Ej: 1.9G"></td>
+                            <td><input type="text" id="lvm-mount-backup-disp" placeholder="Ej: 1.8G"></td>
+                        </tr>
+                    </table>
+
+                    <h3>3.6 Redimensionar un volumen logico</h3>
+                    <p>Vamos a ampliar el LV <strong>datos</strong> usando espacio libre del VG. Si no queda espacio libre, primero reduciremos el LV <strong>backup</strong>.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba el espacio libre en el VG:
+                                <pre class="codigo-bloque">sudo vgs</pre>
+                            </li>
+                            <li>Si hay espacio libre, extiende el LV <strong>datos</strong> en 2 GB mas:
+                                <pre class="codigo-bloque">sudo lvextend -L +2G /dev/almacen/datos</pre>
+                            </li>
+                            <li>Redimensiona el sistema de archivos para que ocupe todo el espacio del LV:
+                                <pre class="codigo-bloque">sudo resize2fs /dev/almacen/datos</pre>
+                            </li>
+                            <li>Verifica el nuevo tamano:
+                                <pre class="codigo-bloque">df -h /mnt/datos</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Espacio libre en VG antes de extender</td>
+                            <td><input type="text" id="lvm-vg-libre" placeholder="Ej: 4.99 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de /mnt/datos antes de extender</td>
+                            <td><input type="text" id="lvm-datos-antes" placeholder="Ej: 2.9G"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de /mnt/datos despues de extender</td>
+                            <td><input type="text" id="lvm-datos-despues" placeholder="Ej: 4.9G"></td>
+                        </tr>
+                        <tr>
+                            <td>Los archivos existentes se mantienen intactos?</td>
+                            <td>
+                                <select id="lvm-datos-intactos">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura: LVM configurado y montado</h3>
+                    <div class="foto-upload" id="foto-lvm">
+                        <button class="btn-remove" onclick="removePhoto(this)">X</button>
+                        <div class="placeholder">
+                            <div class="icon">📷</div>
+                            <p>Haz clic o arrastra una captura del terminal mostrando la salida de <code>lvs</code> y <code>df -h</code></p>
+                        </div>
+                        <img class="foto-preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte 4: Comparativa de escenarios -->
+            <div class="seccion">
+                <h2>Parte 4 — Comparativa de escenarios (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Para cada escenario, indica que nivel de RAID (0, 1 o 5) recomendarias y justifica tu eleccion. Considera factores como rendimiento, redundancia, coste y tipo de datos.</p>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Escenario</th>
+                            <th style="width:15%">RAID recomendado</th>
+                            <th>Justificacion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Servidor web</strong> de una empresa con base de datos de clientes</td>
+                            <td>
+                                <select id="esc-web">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="raid0">RAID 0</option>
+                                    <option value="raid1">RAID 1</option>
+                                    <option value="raid5">RAID 5</option>
+                                </select>
+                            </td>
+                            <td><textarea id="esc-web-just" rows="2" placeholder="Justifica tu eleccion"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PC de edicion de video</strong> que necesita maximo rendimiento de disco</td>
+                            <td>
+                                <select id="esc-video">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="raid0">RAID 0</option>
+                                    <option value="raid1">RAID 1</option>
+                                    <option value="raid5">RAID 5</option>
+                                </select>
+                            </td>
+                            <td><textarea id="esc-video-just" rows="2" placeholder="Justifica tu eleccion"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAS domestico</strong> para almacenar fotos familiares y copias de seguridad</td>
+                            <td>
+                                <select id="esc-nas">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="raid0">RAID 0</option>
+                                    <option value="raid1">RAID 1</option>
+                                    <option value="raid5">RAID 5</option>
+                                </select>
+                            </td>
+                            <td><textarea id="esc-nas-just" rows="2" placeholder="Justifica tu eleccion"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PC de estudiante</strong> con presupuesto limitado y un solo disco</td>
+                            <td>
+                                <select id="esc-estudiante">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="ninguno">Ninguno (no es viable)</option>
+                                    <option value="raid0">RAID 0</option>
+                                    <option value="raid1">RAID 1</option>
+                                    <option value="raid5">RAID 5</option>
+                                </select>
+                            </td>
+                            <td><textarea id="esc-estudiante-just" rows="2" placeholder="Justifica tu eleccion"></textarea></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Parte 5: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 5 — Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>1. Que ventajas e inconvenientes tiene RAID 0 frente a RAID 1? En que situaciones usarias cada uno?</p>
+                        <textarea id="preg-1" rows="4" placeholder="Responde con al menos 3 lineas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Es RAID un sustituto de las copias de seguridad (backups)? Razona tu respuesta con ejemplos concretos.</p>
+                        <textarea id="preg-2" rows="4" placeholder="Responde con al menos 3 lineas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Que ventajas ofrece LVM frente a las particiones tradicionales en Linux? Cuando merece la pena usarlo?</p>
+                        <textarea id="preg-3" rows="4" placeholder="Responde con al menos 3 lineas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. En que situaciones usarias discos dinamicos en Windows? Que limitaciones tienen respecto a los discos basicos?</p>
+                        <textarea id="preg-4" rows="4" placeholder="Responde con al menos 3 lineas..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Criterios de evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Distribucion de la calificacion</h3>
+                        <table>
+                            <tr>
+                                <th style="width:50%">Criterio</th>
+                                <th style="width:15%">Peso</th>
+                                <th>Detalles</th>
+                            </tr>
+                            <tr>
+                                <td>Parte 1: RAID 1 en Windows</td>
+                                <td><strong>25%</strong></td>
+                                <td>Creacion correcta del volumen reflejado, prueba de tolerancia a fallos documentada.</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 2: Redimensionado de particiones</td>
+                                <td><strong>15%</strong></td>
+                                <td>Reduccion, creacion y extension de volumenes correctamente documentados.</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 3: LVM en Linux</td>
+                                <td><strong>30%</strong></td>
+                                <td>PVs, VG, LVs creados correctamente. Formateo, montaje y redimensionado documentados.</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 4: Comparativa de escenarios</td>
+                                <td><strong>15%</strong></td>
+                                <td>Elecciones coherentes y bien justificadas para cada escenario.</td>
+                            </tr>
+                            <tr>
+                                <td>Parte 5: Preguntas de reflexion</td>
+                                <td><strong>15%</strong></td>
+                                <td>Respuestas completas (minimo 3 lineas cada una) que demuestren comprension.</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th style="width:60%">Motivo</th>
+                            <th>Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo sin justificacion</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas de pantalla ausentes</td>
+                            <td>-1 punto por captura</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: RAID 1 creado, tolerancia a fallos probada y documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Redimensionado de particiones en Windows documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: LVM completo (PV, VG, LV, formateo, montaje, redimensionado)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Comparativa de escenarios completada con justificaciones</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: 4 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">3 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 18 - Gestion Avanzada de Volumenes</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque Gestion de discos — RAID, volumenes dinamicos y LVM (Practica 18)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 18: Gestion Avanzada de Volumenes';
+        const PREFIJO_ARCHIVO = 'P18_Volumenes_Avanzados';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

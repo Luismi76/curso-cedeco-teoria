@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a365d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Guía de estudio - UF0861</title>
+    <title>Teoría IFCT0309 · Curso Cedeco</title>
     <style>
         :root {
             --azul: #1a365d;
@@ -16,6 +16,9 @@
             --rojo: #c53030;
             --morado: #553c9a;
             --teal: #234e52;
+            --rosa: #b83280;
+            --ocre: #975a16;
+            --indigo: #434190;
             --gb: #e2e8f0;
             --tx: #2d3748;
             --bg: #f7fafc;
@@ -23,661 +26,164 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.6; }
 
-        /* ===== PROGRESS BAR ===== */
-        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #63b3ed, #4299e1, #3182ce); z-index: 200; transition: width .1s; width: 0; }
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 14px 18px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 16px; font-weight: 600; flex: 1; letter-spacing: .2px; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
 
-        /* ===== TOP NAV (mobile) ===== */
-        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
-        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
-        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
-        #btn-idx:active { background: rgba(255,255,255,.15); }
+        .container { max-width: 920px; margin: 0 auto; padding: 20px 16px 60px; }
 
-        /* ===== INDEX DRAWER ===== */
-        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
-        .drawer-bg.show { display: block; opacity: 1; }
-        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 70vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
-        .drawer.show { transform: translateY(0); }
-        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
-        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
-        .drawer a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--tx); text-decoration: none; font-size: 15px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
-        .drawer a:active { background: #ebf8ff; }
-        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--ac) 100%); color: #fff; padding: 32px 26px; border-radius: var(--radius); margin-bottom: 28px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero::before { content: ''; position: absolute; bottom: -50px; left: -30px; width: 140px; height: 140px; background: rgba(255,255,255,.04); border-radius: 50%; }
+        .hero h2 { font-size: 24px; line-height: 1.3; margin-bottom: 10px; position: relative; font-weight: 700; }
+        .hero p { font-size: 14px; opacity: .9; line-height: 1.65; position: relative; max-width: 540px; }
 
-        /* ===== MAIN CONTENT ===== */
-        .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
+        .section-title { font-size: 15px; font-weight: 700; color: var(--azul); margin: 28px 0 14px; letter-spacing: .5px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: var(--ac); border-radius: 2px; }
 
-        /* ===== HEADER CARD ===== */
-        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--ac) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 24px; position: relative; overflow: hidden; }
-        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; }
-        .hero::before { content: ''; position: absolute; bottom: -40px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,.04); border-radius: 50%; }
-        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 14px; position: relative; }
-        .hero .meta { font-size: 13px; opacity: .8; line-height: 1.6; position: relative; }
-        .hero .meta strong { color: #fff; opacity: 1; }
+        .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 
-        /* ===== TOPIC CARDS ===== */
-        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
-        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .topic-header:active { background: #f7fafc; }
-        .topic-num { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
-        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); }
-        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
-        .topic.open .topic-arrow { transform: rotate(180deg); }
-        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
-        .topic.open .topic-body { max-height: none; }
-        .topic-content { padding: 0 18px 20px; }
+        .card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gb); box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+        .card:active { transform: translateY(-1px); }
 
-        /* Topic colors */
+        .card-head { padding: 18px 18px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--gb); }
+        .card-num { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .card-head h3 { flex: 1; font-size: 15px; color: var(--azul); font-weight: 600; line-height: 1.3; }
+        .card-head .arrow { color: #cbd5e0; font-size: 16px; transition: transform .2s, color .2s; }
+        .card:hover .arrow { color: var(--ac); transform: translateX(3px); }
+
+        .card-body { padding: 14px 18px 18px; font-size: 13.5px; color: #4a5568; line-height: 1.55; flex: 1; }
+        .card-body p { margin: 0 0 10px; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .tag { font-size: 10.5px; font-weight: 600; background: #edf2f7; color: #4a5568; padding: 3px 8px; border-radius: 4px; letter-spacing: .3px; text-transform: uppercase; }
+
+        .big-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gb); box-shadow: 0 1px 4px rgba(0,0,0,.05); padding: 22px 22px; margin-bottom: 16px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 18px; transition: transform .2s, box-shadow .2s; }
+        .big-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+        .big-card .icon-box { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; flex-shrink: 0; }
+        .big-card .body { flex: 1; }
+        .big-card h3 { font-size: 17px; color: var(--azul); margin-bottom: 4px; font-weight: 700; }
+        .big-card p { font-size: 13.5px; color: #4a5568; line-height: 1.55; }
+        .big-card .arrow { color: #cbd5e0; font-size: 18px; }
+        .big-card:hover .arrow { color: var(--ac); }
+
         .c1 { background: var(--rojo); }
         .c2 { background: var(--naranja); }
         .c3 { background: var(--ac); }
         .c4 { background: var(--morado); }
         .c5 { background: var(--verde); }
         .c6 { background: var(--teal); }
-        .c7 { background: #718096; }
-        .d1 { background: var(--rojo); }
-        .d2 { background: var(--naranja); }
-        .d3 { background: var(--ac); }
-        .d4 { background: var(--morado); }
-        .d5 { background: var(--verde); }
-        .d6 { background: var(--teal); }
-        .d7 { background: #718096; }
+        .c7 { background: var(--indigo); }
+        .c8 { background: var(--rosa); }
+        .c9 { background: var(--ocre); }
+        .c10 { background: #718096; }
 
-        /* ===== TYPOGRAPHY ===== */
-        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
-        .topic-content h3:first-child { margin-top: 4px; }
-        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
-        .topic-content p { margin: 6px 0; font-size: 15px; }
-        .topic-content strong { color: #1a202c; }
+        .practice-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        .practice-card { background: #fff; border: 1px solid var(--gb); border-radius: 10px; padding: 14px 16px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; transition: background .15s, border-color .15s; }
+        .practice-card:hover { background: #f7fafc; border-color: var(--ac); }
+        .practice-card .num { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; background: var(--ac); }
+        .practice-card .title { font-size: 13.5px; color: var(--tx); line-height: 1.3; flex: 1; font-weight: 500; }
 
-        /* ===== TABLES ===== */
-        .table-wrap { overflow-x: auto; margin: 12px -18px; padding: 0 18px; -webkit-overflow-scrolling: touch; }
-        .topic-content table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 400px; }
-        .topic-content th { background: #edf2f7; color: var(--azul); padding: 10px 10px; text-align: left; font-size: 12px; font-weight: 700; border: 1px solid var(--gb); white-space: nowrap; }
-        .topic-content td { padding: 8px 10px; border: 1px solid var(--gb); vertical-align: top; }
-        .topic-content tr:nth-child(even) { background: #f7fafc; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--gb); color: #718096; font-size: 12.5px; line-height: 1.6; }
+        .footer strong { color: #4a5568; }
 
-        /* ===== LISTS ===== */
-        .topic-content ul, .topic-content ol { margin: 8px 0 8px 20px; font-size: 15px; }
-        .topic-content li { margin: 6px 0; }
-        .topic-content li li { margin: 3px 0; font-size: 14px; }
-        .topic-content ul ul { margin: 4px 0 4px 16px; }
-
-        /* ===== INFO BOXES ===== */
-        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
-        .info p { margin: 3px 0; }
-        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
-        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
-        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
-        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
-        .info-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-        .info-blue .info-title { color: var(--ac); }
-        .info-yellow .info-title { color: #975a16; }
-        .info-red .info-title { color: var(--rojo); }
-        .info-green .info-title { color: var(--verde); }
-
-        /* ===== SVG DIAGRAMS ===== */
-        .diagram { margin: 16px 0; text-align: center; }
-        .diagram svg { max-width: 100%; height: auto; }
-
-        /* ===== SPEED BARS ===== */
-        .speed-compare { margin: 14px 0; }
-        .speed-bar { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
-        .speed-label { width: 80px; font-weight: 600; flex-shrink: 0; text-align: right; }
-        .speed-track { flex: 1; height: 26px; background: #edf2f7; border-radius: 6px; overflow: hidden; position: relative; }
-        .speed-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: 700; color: #fff; transition: width .6s ease; }
-        .speed-fill.hdd { background: linear-gradient(90deg, #fc8181, #e53e3e); width: 3%; }
-        .speed-fill.sata { background: linear-gradient(90deg, #fbd38d, #d69e2e); width: 8%; }
-        .speed-fill.nvme { background: linear-gradient(90deg, #68d391, #276749); width: 100%; }
-
-        /* ===== BACK TO TOP ===== */
-        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--ac); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
-        #bt:active { background: var(--azul); }
-
-        /* ===== DESKTOP ===== */
         @media (min-width: 768px) {
-            .container { padding: 24px 24px 80px; }
-            .hero { padding: 36px 32px; }
-            .hero h1 { font-size: 28px; }
-            .topic-content { padding: 0 24px 24px; }
-            .topic-header { padding: 18px 24px; }
-            .table-wrap { margin: 12px 0; padding: 0; }
-        }
-
-        /* ===== PRINT ===== */
-        @media print {
-            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
-            .topic-body { max-height: none !important; }
-            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
-            body { background: #fff; }
+            .hero { padding: 40px 34px; }
+            .hero h2 { font-size: 28px; }
         }
     </style>
 </head>
 <body>
-    <div id="progress"></div>
 
     <div class="topnav">
-        <h1>UF0861 - Guía de estudio</h1>
-        <span class="badge">Temas 1-6</span>
-        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
-    </div>
-
-    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
-    <div class="drawer" id="drawer">
-        <div class="drawer-handle"></div>
-        <h2>Índice de temas</h2>
-        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Seguridad eléctrica</a>
-        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Herramientas de montaje</a>
-        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. La placa base</a>
-        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. El procesador (CPU)</a>
-        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. La memoria RAM</a>
-        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. Almacenamiento</a>
-        <a href="#consejos" onclick="toggleDrawer()"><span class="dot c7"></span>Consejos para el examen</a>
+        <h1>Teoría · Curso Cedeco</h1>
+        <span class="badge">IFCT0309</span>
     </div>
 
     <div class="container">
 
         <div class="hero">
-            <h1>Guía de estudio<br>Examen Parcial UF0861</h1>
-            <div class="meta">
-                <strong>Certificado:</strong> IFCT0309 - Montaje y Reparación<br>
-                <strong>UF:</strong> UF0861 - Montaje y verificación de componentes<br>
-                <strong>Examen:</strong> Temas 1 a 6 | 20 preguntas tipo test
-            </div>
+            <h2>Material del curso de Montaje y Reparación de Sistemas Microinformáticos</h2>
+            <p>Teoría resumida, guías de estudio y prácticas completas del certificado <strong>IFCT0309</strong>. Todo organizado por bloques para que encuentres lo que necesitas en dos clics.</p>
         </div>
 
-        <!-- ==================== TEMA 1 ==================== -->
-        <div class="topic open" id="s1">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c1">1</div>
-                <div class="topic-title">Seguridad eléctrica y prevención de riesgos</div>
-                <span class="topic-arrow">&#9660;</span>
+        <!-- ==================== BLOQUES DE TEORÍA ==================== -->
+        <div class="section-title">Teoría y guías de estudio</div>
+
+        <a href="uf0861.html" class="big-card">
+            <div class="icon-box c3">&#128187;</div>
+            <div class="body">
+                <h3>UF0861 · Guía de estudio del examen</h3>
+                <p>Temas 1 a 6 en formato tarjetas: seguridad eléctrica, herramientas, placa base, CPU, RAM y almacenamiento. Orientado a la prueba parcial.</p>
             </div>
-            <div class="topic-body">
-                <div class="topic-content">
+            <span class="arrow">&#8594;</span>
+        </a>
 
-                    <h3>Conceptos clave</h3>
-                    <ul>
-                        <li><strong>Descarga electrostática (ESD):</strong> ¿Sabes ese chispazo que a veces notas al tocar algo metálico? Eso es electricidad estática. Para ti no es nada, pero para un chip o un módulo de RAM puede ser mortal. Los componentes se dañan con solo 30V, y tú no empiezas a sentir nada hasta los 3.000V. O sea: puedes cargarte una pieza sin enterarte.</li>
-                        <li><strong>Muñequera antiestática:</strong> Es una pulsera que se conecta con un cable a una toma de tierra o a la carcasa metálica del equipo. Va descargando la electricidad de tu cuerpo de forma continua para que no se acumule y dañe los componentes.</li>
-                        <li><strong>Alfombrilla antiestática:</strong> Una superficie especial donde apoyas los componentes mientras trabajas. Complementa a la muñequera.</li>
-                    </ul>
-
-                    <!-- Diagrama ESD -->
-                    <div class="diagram">
-                        <svg viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg" style="max-width:360px">
-                            <rect x="0" y="0" width="400" height="140" rx="10" fill="#fff5f5" stroke="#fc8181" stroke-width="1.5"/>
-                            <text x="200" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#c53030" letter-spacing=".5">UMBRAL DE DAÑO POR ESD</text>
-                            <!-- Scale -->
-                            <rect x="30" y="40" width="340" height="18" rx="9" fill="#fed7d7"/>
-                            <rect x="30" y="40" width="12" height="18" rx="9" fill="#c53030"/>
-                            <text x="46" y="53" font-size="9" fill="#c53030" font-weight="700">30V</text>
-                            <rect x="30" y="40" width="340" height="18" rx="9" fill="none" stroke="#fc8181" stroke-width="1"/>
-                            <!-- Markers -->
-                            <line x1="42" y1="62" x2="42" y2="75" stroke="#c53030" stroke-width="1.5"/>
-                            <text x="42" y="86" text-anchor="middle" font-size="9" fill="#c53030" font-weight="600">30V</text>
-                            <text x="42" y="97" text-anchor="middle" font-size="8" fill="#718096">Daña chips</text>
-                            <line x1="200" y1="62" x2="200" y2="75" stroke="#d69e2e" stroke-width="1.5"/>
-                            <text x="200" y="86" text-anchor="middle" font-size="9" fill="#d69e2e" font-weight="600">3.000V</text>
-                            <text x="200" y="97" text-anchor="middle" font-size="8" fill="#718096">Empiezas a sentir</text>
-                            <line x1="330" y1="62" x2="330" y2="75" stroke="#2b6cb0" stroke-width="1.5"/>
-                            <text x="330" y="86" text-anchor="middle" font-size="9" fill="#2b6cb0" font-weight="600">25.000V</text>
-                            <text x="330" y="97" text-anchor="middle" font-size="8" fill="#718096">Chispa visible</text>
-                            <!-- Warning -->
-                            <text x="200" y="125" text-anchor="middle" font-size="10" fill="#c53030" font-weight="600">&#9888; Puedes destruir un componente sin sentir nada</text>
-                        </svg>
-                    </div>
-
-                    <h3>¿Qué hacer antes de tocar nada por dentro?</h3>
-                    <ol>
-                        <li>Apagar el equipo del todo</li>
-                        <li><strong>Desenchufar el cable de alimentación</strong> de la corriente</li>
-                        <li>Darle al botón de encendido (ya desenchufado) para vaciar los condensadores</li>
-                        <li>Ponerte la muñequera antiestática conectada a tierra</li>
-                        <li>Trabajar sobre superficie antiestática</li>
-                        <li>Coger los componentes por los bordes, sin tocar los contactos dorados ni los circuitos</li>
-                    </ol>
-
-                    <h3>Seguridad en el taller</h3>
-                    <ul>
-                        <li>Toma de tierra funcional en las instalaciones</li>
-                        <li>Muñequeras y alfombrillas antiestáticas</li>
-                        <li>Bolsas antiestáticas para guardar componentes</li>
-                        <li>Señalización de riesgos eléctricos</li>
-                    </ul>
-                </div>
+        <a href="gestion-discos.html" class="big-card">
+            <div class="icon-box c5">&#128190;</div>
+            <div class="body">
+                <h3>Gestión de discos, redes y asistencia remota</h3>
+                <p>Módulo complementario (50 h, 10 sesiones): particionado, RAID, LVM, clonación, copias de seguridad, redes TCP/IP, diagnóstico y soporte remoto.</p>
             </div>
+            <span class="arrow">&#8594;</span>
+        </a>
+
+        <!-- ==================== PRÁCTICAS ==================== -->
+        <div class="section-title">Prácticas de laboratorio</div>
+
+        <p style="font-size:13.5px;color:#4a5568;margin-bottom:14px;line-height:1.6">Cuadernillos de prácticas para trabajar en VirtualBox con Windows y Ubuntu. Se corresponden con las sesiones del módulo de gestión de discos y redes.</p>
+
+        <div class="practice-grid">
+            <a href="practica_16_particionado_windows.html" class="practice-card">
+                <div class="num">16</div>
+                <div class="title">Particionado en Windows</div>
+            </a>
+            <a href="practica_17_particionado_linux.html" class="practice-card">
+                <div class="num">17</div>
+                <div class="title">Particionado en Linux</div>
+            </a>
+            <a href="practica_18_volumenes_avanzados.html" class="practice-card">
+                <div class="num">18</div>
+                <div class="title">Volúmenes avanzados (RAID, LVM)</div>
+            </a>
+            <a href="practica_19_clonacion_discos.html" class="practice-card">
+                <div class="num">19</div>
+                <div class="title">Clonación de discos</div>
+            </a>
+            <a href="practica_20_copias_seguridad_windows.html" class="practice-card">
+                <div class="num">20</div>
+                <div class="title">Copias de seguridad · Windows</div>
+            </a>
+            <a href="practica_21_copias_seguridad_linux.html" class="practice-card">
+                <div class="num">21</div>
+                <div class="title">Copias de seguridad · Linux</div>
+            </a>
+            <a href="practica_22_fundamentos_red.html" class="practice-card">
+                <div class="num">22</div>
+                <div class="title">Fundamentos de red</div>
+            </a>
+            <a href="practica_23_diagnostico_red.html" class="practice-card">
+                <div class="num">23</div>
+                <div class="title">Diagnóstico de red</div>
+            </a>
+            <a href="practica_24_asistencia_remota.html" class="practice-card">
+                <div class="num">24</div>
+                <div class="title">Asistencia remota</div>
+            </a>
+            <a href="practica_25_comparticion_recursos.html" class="practice-card">
+                <div class="num">25</div>
+                <div class="title">Compartición de recursos</div>
+            </a>
         </div>
 
-        <!-- ==================== TEMA 2 ==================== -->
-        <div class="topic" id="s2">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c2">2</div>
-                <div class="topic-title">Herramientas de montaje</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
-
-                    <h3>Lo que necesitas en el taller</h3>
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Herramienta</th><th>¿Para qué sirve?</th></tr>
-                        <tr><td><strong>Destornillador Phillips (estrella)</strong></td><td>El rey del taller. Sirve para la mayoría de tornillos del PC (placa base, discos, fuente...)</td></tr>
-                        <tr><td><strong>Destornillador plano</strong></td><td>Para algún que otro tornillo de cajas antiguas o palancas</td></tr>
-                        <tr><td><strong>Multímetro</strong></td><td>Mide voltaje, continuidad y resistencia. Imprescindible para comprobar si la fuente da los voltajes correctos</td></tr>
-                        <tr><td><strong>Pasta térmica</strong></td><td>Va entre el procesador y el disipador. <strong>Mejora la transferencia de calor</strong> rellenando las microimperfecciones de ambas superficies</td></tr>
-                        <tr><td><strong>Bridas de nailon</strong></td><td>Para organizar y sujetar los cables por dentro. El cable management importa</td></tr>
-                        <tr><td><strong>Alicates / pinzas</strong></td><td>Para mover jumpers o sacar conectores pequeños a los que no llegas con los dedos</td></tr>
-                    </table>
-                    </div>
-
-                    <div class="info info-red">
-                        <div class="info-title">Ojo con la pasta térmica</div>
-                        <ul style="margin-left:16px;font-size:14px">
-                            <li>Se pone muy poca: como un <strong>grano de arroz</strong></li>
-                            <li><strong>No es pegamento</strong> (no pega el disipador)</li>
-                            <li><strong>No es aislante</strong> eléctrico</li>
-                            <li>Solo sirve para una cosa: eliminar las burbujas de aire entre CPU y disipador para que el calor pase bien</li>
-                        </ul>
-                    </div>
-
-                    <!-- Diagrama pasta térmica -->
-                    <div class="diagram">
-                        <svg viewBox="0 0 340 100" xmlns="http://www.w3.org/2000/svg" style="max-width:320px">
-                            <rect x="0" y="0" width="340" height="100" rx="10" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1"/>
-                            <!-- Disipador -->
-                            <rect x="70" y="10" width="200" height="20" rx="3" fill="#a0aec0" stroke="#718096" stroke-width="1"/>
-                            <text x="170" y="24" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">DISIPADOR</text>
-                            <!-- Pasta -->
-                            <rect x="90" y="30" width="160" height="6" rx="2" fill="#fc8181"/>
-                            <text x="280" y="36" font-size="8" fill="#c53030" font-weight="600">Pasta térmica</text>
-                            <!-- CPU -->
-                            <rect x="100" y="36" width="140" height="24" rx="3" fill="#4299e1" stroke="#2b6cb0" stroke-width="1"/>
-                            <text x="170" y="52" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">PROCESADOR</text>
-                            <!-- Socket -->
-                            <rect x="80" y="60" width="180" height="14" rx="3" fill="#edf2f7" stroke="#cbd5e0" stroke-width="1"/>
-                            <text x="170" y="70" text-anchor="middle" font-size="8" fill="#718096">Socket (placa base)</text>
-                            <!-- Arrow heat -->
-                            <text x="170" y="92" text-anchor="middle" font-size="9" fill="#718096">&#8593; El calor fluye de la CPU al disipador a través de la pasta</text>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+        <div class="footer">
+            <p><strong>IFCT0309</strong> · Montaje y Reparación de Sistemas Microinformáticos</p>
+            <p>teoria.lmsc.es</p>
         </div>
 
-        <!-- ==================== TEMA 3 ==================== -->
-        <div class="topic" id="s3">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c3">3</div>
-                <div class="topic-title">La placa base</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
+    </div>
 
-                    <h3>¿Qué es la placa base?</h3>
-                    <p>Es la pieza más grande del PC. Piensa en ella como una ciudad: tiene calles (buses) que conectan todos los barrios (componentes). Todo pasa por aquí: el procesador, la RAM, las tarjetas gráficas, los discos... <strong>Todo va conectado a la placa base.</strong></p>
-
-                    <!-- Diagrama placa base -->
-                    <div class="diagram">
-                        <svg viewBox="0 0 380 260" xmlns="http://www.w3.org/2000/svg" style="max-width:380px">
-                            <rect x="0" y="0" width="380" height="260" rx="10" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-                            <text x="190" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#276749" letter-spacing=".5">COMPONENTES DE LA PLACA BASE</text>
-                            <!-- Placa -->
-                            <rect x="40" y="35" width="300" height="200" rx="6" fill="#edf2f7" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="4,2"/>
-                            <!-- CPU Socket -->
-                            <rect x="60" y="55" width="80" height="50" rx="4" fill="#805ad5" stroke="#6b46c1" stroke-width="1"/>
-                            <text x="100" y="75" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">Socket CPU</text>
-                            <text x="100" y="95" text-anchor="middle" font-size="7.5" fill="#e9d8fd">LGA 1700 / AM5</text>
-                            <!-- VRM -->
-                            <rect x="60" y="45" width="80" height="8" rx="2" fill="#d69e2e"/>
-                            <text x="155" y="52" font-size="7" fill="#975a16" font-weight="600">VRM</text>
-                            <!-- RAM -->
-                            <rect x="160" y="50" width="12" height="60" rx="2" fill="#4299e1" stroke="#2b6cb0" stroke-width=".5"/>
-                            <rect x="176" y="50" width="12" height="60" rx="2" fill="#4299e1" stroke="#2b6cb0" stroke-width=".5"/>
-                            <rect x="192" y="50" width="12" height="60" rx="2" fill="#ebf8ff" stroke="#90cdf4" stroke-width=".5" stroke-dasharray="2,1"/>
-                            <rect x="208" y="50" width="12" height="60" rx="2" fill="#ebf8ff" stroke="#90cdf4" stroke-width=".5" stroke-dasharray="2,1"/>
-                            <text x="193" y="125" text-anchor="middle" font-size="8" fill="#2b6cb0" font-weight="600">RAM (DIMM)</text>
-                            <!-- Chipset -->
-                            <rect x="150" y="145" width="60" height="35" rx="4" fill="#48bb78" stroke="#276749" stroke-width="1"/>
-                            <text x="180" y="166" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">Chipset</text>
-                            <!-- PCIe -->
-                            <rect x="240" y="55" width="80" height="12" rx="2" fill="#fc8181" stroke="#c53030" stroke-width=".5"/>
-                            <text x="280" y="64" text-anchor="middle" font-size="7" fill="#fff" font-weight="600">PCIe x16 (GPU)</text>
-                            <rect x="240" y="75" width="60" height="8" rx="2" fill="#feb2b2" stroke="#fc8181" stroke-width=".5"/>
-                            <text x="270" y="82" text-anchor="middle" font-size="6" fill="#c53030">PCIe x1</text>
-                            <rect x="240" y="90" width="60" height="8" rx="2" fill="#feb2b2" stroke="#fc8181" stroke-width=".5"/>
-                            <!-- M.2 -->
-                            <rect x="240" y="110" width="50" height="10" rx="2" fill="#4fd1c5" stroke="#234e52" stroke-width=".5"/>
-                            <text x="265" y="118" text-anchor="middle" font-size="6.5" fill="#fff" font-weight="600">M.2 NVMe</text>
-                            <!-- SATA -->
-                            <rect x="240" y="150" width="8" height="12" rx="1" fill="#f6ad55"/>
-                            <rect x="252" y="150" width="8" height="12" rx="1" fill="#f6ad55"/>
-                            <rect x="264" y="150" width="8" height="12" rx="1" fill="#f6ad55"/>
-                            <text x="260" y="176" text-anchor="middle" font-size="7" fill="#c05621" font-weight="600">SATA</text>
-                            <!-- 24-pin -->
-                            <rect x="325" y="60" width="10" height="50" rx="2" fill="#fbd38d" stroke="#d69e2e" stroke-width=".5"/>
-                            <text x="330" y="125" text-anchor="middle" font-size="6.5" fill="#975a16" font-weight="600">24-pin</text>
-                            <!-- CMOS -->
-                            <circle cx="80" cy="175" r="12" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1"/>
-                            <text x="80" y="178" text-anchor="middle" font-size="6" fill="#718096" font-weight="600">CMOS</text>
-                            <!-- EPS -->
-                            <rect x="55" y="120" width="8" height="20" rx="2" fill="#fbd38d" stroke="#d69e2e" stroke-width=".5"/>
-                            <text x="59" y="150" text-anchor="middle" font-size="5.5" fill="#975a16">EPS</text>
-                            <!-- I/O -->
-                            <rect x="40" y="195" width="300" height="18" rx="3" fill="#a0aec0"/>
-                            <text x="190" y="207" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Panel I/O trasero (USB, HDMI, LAN, Audio...)</text>
-                            <!-- Legend -->
-                            <text x="190" y="248" text-anchor="middle" font-size="8" fill="#718096">Las ranuras de color claro/punteado indican slots vacíos</text>
-                        </svg>
-                    </div>
-
-                    <h3>Factores de forma</h3>
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Factor</th><th>Tamaño</th><th>Ranuras</th><th>Uso típico</th></tr>
-                        <tr><td><strong>ATX</strong></td><td>305 x 244 mm</td><td>7</td><td>Escritorio y gaming</td></tr>
-                        <tr><td><strong>Micro-ATX</strong></td><td>244 x 244 mm</td><td>4</td><td>Compactos</td></tr>
-                        <tr><td><strong>Mini-ITX</strong></td><td>170 x 170 mm</td><td>1</td><td>Ultracompactos, HTPC</td></tr>
-                    </table>
-                    </div>
-
-                    <div class="info info-yellow">
-                        <div class="info-title">No confundir</div>
-                        <p>Factor de forma de <strong>placa base</strong> (ATX, Micro-ATX, Mini-ITX) &#8800; Tipo de <strong>caja</strong> (Full-Tower, Mid-Tower, Mini-Tower)</p>
-                        <p>Una caja ATX admite también placas Micro-ATX y Mini-ITX.</p>
-                    </div>
-
-                    <h3>¿Qué hay en la placa base?</h3>
-                    <ul>
-                        <li><strong>Chipset:</strong> El «director de tráfico». Gestiona la comunicación entre la CPU, la memoria y los periféricos. También decide qué procesadores son compatibles, cuántas líneas PCIe hay, qué puertos USB soporta, etc.</li>
-                        <li><strong>VRM:</strong> Regula el voltaje que le llega a la CPU. La fuente le da 12V y el VRM lo baja a lo que necesita el procesador (~0,8-1,4V). Si el VRM es malo, el equipo será inestable.</li>
-                        <li><strong>Socket:</strong> El «enchufe» donde va el procesador. Cada familia tiene el suyo: LGA 1700 para Intel 12ª-14ª gen, AM5 para AMD Ryzen 7000+. <strong>No son intercambiables.</strong></li>
-                        <li><strong>Ranuras DIMM:</strong> Aquí van los módulos de RAM. Suele haber 2 o 4.</li>
-                        <li><strong>Ranuras PCIe:</strong> Para tarjetas de expansión (gráficas, de red, de sonido...).</li>
-                        <li><strong>Pila CMOS:</strong> Esa pila de botón (CR2032) que mantiene la hora y la configuración de la BIOS cuando el PC está apagado.</li>
-                        <li><strong>Conectores de alimentación:</strong> El grande de 24 pines (alimentación principal) y el de 8 pines EPS (para la CPU).</li>
-                    </ul>
-
-                    <h3>Buses del sistema</h3>
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Bus</th><th>Descripción</th></tr>
-                        <tr><td><strong>PCIe</strong></td><td>Bus actual de alta velocidad. Líneas: x1, x4, x8, x16</td></tr>
-                        <tr><td><strong>DMI</strong></td><td>Enlace CPU-chipset (plataformas Intel)</td></tr>
-                        <tr><td><strong>ISA, AGP, PCI</strong></td><td><strong>Obsoletos</strong>, reemplazados por PCIe</td></tr>
-                    </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== TEMA 4 ==================== -->
-        <div class="topic" id="s4">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c4">4</div>
-                <div class="topic-title">El procesador (CPU)</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
-
-                    <h3>Lo que tienes que saber</h3>
-                    <ul>
-                        <li><strong>Arquitectura x86/x64:</strong> x86 = 32 bits (antiguo); <strong>x64</strong> = <strong>64 bits</strong> (el actual). La diferencia clave: un procesador de 32 bits no puede usar más de 4 GB de RAM. Uno de 64 bits sí, y de sobra.</li>
-                        <li><strong>Núcleos (cores):</strong> Cada núcleo es como un trabajador independiente dentro del procesador. Más núcleos = más tareas a la vez.</li>
-                        <li><strong>Hilos (threads):</strong> Es un «truco» (Hyper-Threading en Intel, SMT en AMD) que hace que <strong>cada núcleo físico se comporte como si fuesen dos</strong> de cara al sistema operativo. Por eso un procesador de 8 núcleos puede tener 16 hilos.</li>
-                        <li><strong>Frecuencia (GHz):</strong> La velocidad del reloj. Más GHz = más rápido cada núcleo (dentro de la misma arquitectura).</li>
-                        <li><strong>Memoria caché:</strong> Una memoria <strong>ultrarrápida</strong> integrada dentro de la propia CPU. Guarda los datos que más se usan para no tener que ir a buscarlos a la RAM:
-                            <ul>
-                                <li><strong>L1:</strong> La más rápida, pero muy pequeña (cada núcleo tiene la suya)</li>
-                                <li><strong>L2:</strong> Intermedia (también por núcleo)</li>
-                                <li><strong>L3:</strong> La más grande, compartida entre todos los núcleos</li>
-                            </ul>
-                        </li>
-                        <li><strong>TDP (Thermal Design Power):</strong> Los vatios de calor que suelta el procesador. Si el TDP es de 125W, tu disipador tiene que poder evacuar al menos 125W de calor. <strong>Si no, se sobrecalienta.</strong></li>
-                    </ul>
-
-                    <!-- Diagrama núcleos/hilos -->
-                    <div class="diagram">
-                        <svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg" style="max-width:360px">
-                            <rect x="0" y="0" width="360" height="130" rx="10" fill="#faf5ff" stroke="#e9d8fd" stroke-width="1"/>
-                            <text x="180" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#553c9a">NÚCLEOS vs HILOS (ejemplo: 4 núcleos / 8 hilos)</text>
-                            <!-- Núcleos -->
-                            <rect x="30" y="32" width="60" height="40" rx="6" fill="#805ad5"/>
-                            <text x="60" y="48" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Núcleo 1</text>
-                            <text x="48" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H1</text>
-                            <text x="72" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H2</text>
-                            <rect x="100" y="32" width="60" height="40" rx="6" fill="#805ad5"/>
-                            <text x="130" y="48" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Núcleo 2</text>
-                            <text x="118" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H3</text>
-                            <text x="142" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H4</text>
-                            <rect x="170" y="32" width="60" height="40" rx="6" fill="#805ad5"/>
-                            <text x="200" y="48" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Núcleo 3</text>
-                            <text x="188" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H5</text>
-                            <text x="212" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H6</text>
-                            <rect x="240" y="32" width="60" height="40" rx="6" fill="#805ad5"/>
-                            <text x="270" y="48" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Núcleo 4</text>
-                            <text x="258" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H7</text>
-                            <text x="282" y="63" text-anchor="middle" font-size="7" fill="#e9d8fd">H8</text>
-                            <!-- Cache -->
-                            <rect x="30" y="80" width="270" height="14" rx="4" fill="#d6bcfa"/>
-                            <text x="165" y="90" text-anchor="middle" font-size="8" fill="#553c9a" font-weight="600">Caché L3 compartida</text>
-                            <!-- Labels -->
-                            <text x="165" y="112" text-anchor="middle" font-size="8.5" fill="#718096">4 núcleos físicos = 8 hilos lógicos (Hyper-Threading / SMT)</text>
-                            <text x="165" y="124" text-anchor="middle" font-size="8" fill="#a0aec0">El SO "ve" 8 procesadores</text>
-                        </svg>
-                    </div>
-
-                    <h3>Familias actuales</h3>
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Fabricante</th><th>Familias</th><th>Socket</th></tr>
-                        <tr><td><strong>Intel</strong></td><td>Core i3, i5, i7, i9 (12a-14a gen)</td><td>LGA 1700</td></tr>
-                        <tr><td><strong>AMD</strong></td><td>Ryzen 3, 5, 7, 9 (serie 7000+)</td><td>AM5</td></tr>
-                    </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== TEMA 5 ==================== -->
-        <div class="topic" id="s5">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c5">5</div>
-                <div class="topic-title">La memoria RAM</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
-
-                    <h3>DDR4 vs DDR5: ¿en qué se diferencian?</h3>
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Característica</th><th>DDR4</th><th>DDR5</th></tr>
-                        <tr><td>Voltaje</td><td>1,2 V</td><td>1,1 V</td></tr>
-                        <tr><td>Velocidades</td><td>2400 - 3600 MHz</td><td>4800 - 8000+ MHz</td></tr>
-                        <tr><td>Capacidad max.</td><td>32 GB</td><td><strong>64 GB+</strong></td></tr>
-                        <tr><td>Ancho de banda</td><td>Menor</td><td><strong>Mayor</strong></td></tr>
-                    </table>
-                    </div>
-
-                    <div class="info info-red">
-                        <div class="info-title">¡Cuidado! DDR4 y DDR5 NO son intercambiables</div>
-                        <p>La <strong>muesca (key notch)</strong> está en diferente posición. Es <strong>físicamente imposible</strong> meter un módulo DDR4 en una ranura DDR5 y viceversa. Si no entra, no fuerces: es que no es compatible.</p>
-                    </div>
-
-                    <!-- Diagrama muesca RAM -->
-                    <div class="diagram">
-                        <svg viewBox="0 0 340 100" xmlns="http://www.w3.org/2000/svg" style="max-width:320px">
-                            <rect x="0" y="0" width="340" height="100" rx="10" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
-                            <!-- DDR4 -->
-                            <rect x="20" y="25" width="130" height="22" rx="3" fill="#4299e1"/>
-                            <text x="85" y="40" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">DDR4</text>
-                            <rect x="20" y="47" width="55" height="4" fill="#2b6cb0"/>
-                            <rect x="80" y="47" width="70" height="4" fill="#2b6cb0"/>
-                            <text x="75" y="62" font-size="7" fill="#c53030" font-weight="600">&#8593; muesca</text>
-                            <!-- DDR5 -->
-                            <rect x="190" y="25" width="130" height="22" rx="3" fill="#48bb78"/>
-                            <text x="255" y="40" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">DDR5</text>
-                            <rect x="190" y="47" width="75" height="4" fill="#276749"/>
-                            <rect x="270" y="47" width="50" height="4" fill="#276749"/>
-                            <text x="264" y="62" font-size="7" fill="#c53030" font-weight="600">&#8593; muesca</text>
-                            <!-- Cross -->
-                            <text x="170" y="42" text-anchor="middle" font-size="18" fill="#c53030">&#8800;</text>
-                            <!-- Label -->
-                            <text x="170" y="85" text-anchor="middle" font-size="9" fill="#c53030" font-weight="600">Posición de la muesca diferente = NO intercambiables</text>
-                        </svg>
-                    </div>
-
-                    <h3>Dual Channel: el truco para ir más rápido</h3>
-                    <ul>
-                        <li>Consiste en poner los módulos de RAM <strong>en pares</strong>, en las ranuras del mismo canal (las que tienen el mismo color en la placa)</li>
-                        <li><strong>Duplica el ancho de banda</strong>: la CPU puede leer y escribir en dos módulos a la vez, por canales separados</li>
-                        <li>Lo típico: meter 2 módulos iguales en las ranuras 2 y 4 (consulta el manual de tu placa)</li>
-                    </ul>
-
-                    <h3>Perfiles XMP: sácale todo el jugo a tu RAM</h3>
-                    <ul>
-                        <li>Las memorias vienen configuradas de fábrica a una velocidad «oficialista» (estándar JEDEC), pero muchas pueden ir más rápido</li>
-                        <li><strong>XMP</strong> son perfiles que vienen grabados en el propio módulo con la velocidad, voltaje y latencias óptimas</li>
-                        <li>Se activan <strong>desde la BIOS/UEFI</strong> de la placa base</li>
-                        <li>Ejemplo: compras una DDR4-3600, pero por defecto funciona a 2400 MHz. Activas XMP y sube a los 3600 MHz que promete la caja</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== TEMA 6 ==================== -->
-        <div class="topic" id="s6">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c6">6</div>
-                <div class="topic-title">Dispositivos de almacenamiento</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
-
-                    <h3>HDD: el disco duro mecánico de toda la vida</h3>
-                    <ul>
-                        <li>Funciona con <strong>platos magnéticos que giran</strong> y unos <strong>cabezales</strong> que leen y escriben moviéndose sobre ellos (como un tocadiscos)</li>
-                        <li>Velocidad de giro: 5.400 o 7.200 RPM</li>
-                        <li>Se conecta por <strong>SATA III</strong> (6 Gbps teóricos)</li>
-                        <li>Lo bueno: es barato y cabe muchísimo (hasta 20+ TB)</li>
-                        <li>Lo malo: es lento, le afectan los golpes y tiene piezas móviles que se desgastan</li>
-                    </ul>
-
-                    <h3>SSD: la revolución del almacenamiento</h3>
-                    <ul>
-                        <li>Usa <strong>memoria flash NAND</strong> (como la de un pendrive, pero mucho más rápida)</li>
-                        <li><strong>No tiene piezas móviles</strong>: más rápido, más silencioso, más resistente a golpes</li>
-                    </ul>
-
-                    <div class="table-wrap">
-                    <table>
-                        <tr><th>Tipo</th><th>Bus</th><th>Conector</th><th>Velocidad</th></tr>
-                        <tr><td><strong>SSD SATA</strong></td><td>SATA III</td><td>2,5" o M.2 (B+M)</td><td>~550 MB/s</td></tr>
-                        <tr><td><strong>SSD NVMe</strong></td><td>PCIe (x4)</td><td>M.2 (clave M)</td><td>3.500 - 7.000+ MB/s</td></tr>
-                    </table>
-                    </div>
-
-                    <h3>Comparativa de velocidad</h3>
-                    <div class="speed-compare">
-                        <div class="speed-bar">
-                            <span class="speed-label">HDD</span>
-                            <div class="speed-track"><div class="speed-fill hdd">150</div></div>
-                        </div>
-                        <div class="speed-bar">
-                            <span class="speed-label">SSD SATA</span>
-                            <div class="speed-track"><div class="speed-fill sata">550</div></div>
-                        </div>
-                        <div class="speed-bar">
-                            <span class="speed-label">SSD NVMe</span>
-                            <div class="speed-track"><div class="speed-fill nvme">7.000</div></div>
-                        </div>
-                        <p style="text-align:right;font-size:11px;color:#a0aec0;margin-top:4px">Velocidad en MB/s (lectura secuencial)</p>
-                    </div>
-
-                    <div class="info info-blue">
-                        <div class="info-title">¿Por qué NVMe es tan rápido?</div>
-                        <p>Porque usa el <strong>bus PCIe</strong> en vez del SATA, que es mucho más antiguo y lento. Resultado: entre <strong>5 y 12 veces más rápido</strong> que un SSD SATA. Se conecta por <strong>M.2</strong>, un slot pequeñito directamente en la placa base.</p>
-                    </div>
-
-                    <h3>Conector M.2: el «chicle» del PC</h3>
-                    <ul>
-                        <li>Un formato compacto que va directamente enchufado en la placa base (parece un chicle)</li>
-                        <li>Puede ser SATA o NVMe, según la muesca/clave del conector y lo que soporte tu placa</li>
-                        <li>Tamaños: 2242, 2260, <strong>2280</strong> (el más habitual: 22 mm de ancho x 80 mm de largo)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== CONSEJOS ==================== -->
-        <div class="topic" id="consejos">
-            <div class="topic-header" onclick="toggle(this)">
-                <div class="topic-num c7">&#9733;</div>
-                <div class="topic-title">Consejos para el examen</div>
-                <span class="topic-arrow">&#9660;</span>
-            </div>
-            <div class="topic-body">
-                <div class="topic-content">
-                    <div class="info info-green">
-                        <div class="info-title">Antes del examen, repasa esto</div>
-                        <p>Si has leído esta guía entera, ya tienes todo lo que necesitas. Estos trucos te ayudarán a no fallar:</p>
-                    </div>
-                    <ol style="margin-left:16px">
-                        <li style="margin:12px 0"><strong>Lee cada pregunta con calma.</strong> Fíjate en palabras como «principal», «imprescindible» o «típicamente». Cambian el sentido de la respuesta.</li>
-                        <li style="margin:12px 0"><strong>Descarta primero las absurdas.</strong> En casi todas las preguntas hay una o dos opciones que claramente no tienen sentido. Elimínalas y te quedarás con 2 opciones reales.</li>
-                        <li style="margin:12px 0"><strong>No líes los términos:</strong> factor de forma (ATX) ≠ tipo de caja (torre). Interfaz (SATA) ≠ conector (M.2). Núcleos ≠ hilos. Esto cae seguro.</li>
-                        <li style="margin:12px 0"><strong>Las incompatibilidades físicas son clave:</strong> DDR4 no entra en DDR5 (la muesca está en otro sitio). Cada socket es específico para una familia de procesadores (no vale forzar).</li>
-                        <li style="margin:12px 0"><strong>No dejes nada en blanco.</strong> Las respuestas incorrectas no restan. Si no lo sabes, descarta y prueba suerte.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-    </div><!-- /container -->
-
-    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
-
-    <script>
-    // Toggle topics
-    function toggle(header) {
-        header.closest('.topic').classList.toggle('open');
-    }
-
-    // Drawer
-    function toggleDrawer() {
-        document.getElementById('drawer').classList.toggle('show');
-        document.getElementById('drawer-bg').classList.toggle('show');
-    }
-
-    // Progress bar
-    window.addEventListener('scroll', function() {
-        var h = document.documentElement.scrollHeight - window.innerHeight;
-        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
-        document.getElementById('progress').style.width = pct + '%';
-        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
-    });
-
-    // Animate speed bars on scroll
-    var observed = false;
-    var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(e) {
-            if (e.isIntersecting && !observed) {
-                observed = true;
-                document.querySelector('.speed-fill.hdd').style.width = '2.1%';
-                document.querySelector('.speed-fill.sata').style.width = '7.8%';
-                document.querySelector('.speed-fill.nvme').style.width = '100%';
-            }
-        });
-    }, { threshold: 0.5 });
-    var sc = document.querySelector('.speed-compare');
-    if (sc) observer.observe(sc);
-    </script>
 </body>
 </html>
