@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 11: Diagnostico de Equipos con la Terminal de Ubuntu</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 11: Diagnostico de Equipos con la Terminal de Ubuntu</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 - Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 - Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Diagnostico y reparacion de equipos desde la linea de comandos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Ubuntu instalado (Practica 07)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica requiere tener completada la <strong>Practica 09 (Explorando Ubuntu)</strong>. Trabajaras sobre la misma maquina virtual. Abre la terminal con <strong>Ctrl+Alt+T</strong>.
+            </div>
+
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico de soporte Linux en una empresa. Te llega un equipo con Ubuntu que presenta problemas: el usuario reporta <em>"va lento, se queda sin espacio y a veces pierde la conexion de red"</em>. Tu mision es <strong>diagnosticar el equipo desde la terminal</strong>, identificar el hardware, comprobar el estado de los discos, verificar la red y generar un informe completo.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Identificar todo el hardware de un equipo Linux sin abrirlo (CPU, RAM, disco, placa base, perifericos).</li>
+                        <li>Utilizar dmesg y los logs del sistema para detectar errores de hardware.</li>
+                        <li>Analizar el estado de los discos: particiones, espacio, salud S.M.A.R.T.</li>
+                        <li>Diagnosticar problemas de conectividad de red paso a paso.</li>
+                        <li>Gestionar servicios de hardware con systemctl.</li>
+                        <li>Crear un script Bash de diagnostico automatizado para el taller.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th>Requisito</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Practica 09 (Explorando Ubuntu) completada</td>
+                            <td><input type="checkbox" id="req-p1"></td>
+                        </tr>
+                        <tr>
+                            <td>Maquina virtual con Ubuntu funcionando</td>
+                            <td><input type="checkbox" id="req-vm"></td>
+                        </tr>
+                        <tr>
+                            <td>Conexion a Internet disponible en la VM</td>
+                            <td><input type="checkbox" id="req-net"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Preparacion: instalar herramientas de diagnostico</h3>
+                    <p>Antes de empezar, instala las herramientas que usaremos:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><code>sudo apt update</code></li>
+                            <li><code>sudo apt install smartmontools net-tools traceroute lshw inxi -y</code></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Inventario de hardware -->
+            <div class="seccion">
+                <h2>Parte 1 - Inventario de hardware desde la terminal (40 min)</h2>
+                <div class="seccion-body">
+                    <p>En Linux, existen comandos muy potentes para identificar <strong>todo el hardware</strong> de un equipo sin necesidad de abrirlo. Esto es esencial cuando recibes un equipo en el taller y necesitas saber con que estas trabajando.</p>
+
+                    <h3>Resumen rapido con inxi</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>inxi -Fxz</code></td>
+                            <td><textarea rows="8" placeholder="Pega la salida completa (resumen del sistema: CPU, GPU, RAM, disco, red, audio...)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> <code>inxi -Fxz</code> es el comando mas rapido para tener un resumen completo del equipo. La opcion <code>-z</code> oculta datos sensibles (MAC, serial) por privacidad.
+                    </div>
+
+                    <h3>Procesador (CPU)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th style="width:20%">Que identifica</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>lscpu | grep -i "model name\|socket\|core\|thread\|mhz\|architecture"</code></td>
+                            <td>CPU: modelo, nucleos, hilos, velocidad</td>
+                            <td><textarea rows="3" placeholder="Pega las lineas relevantes"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>cat /proc/cpuinfo | grep "model name" | head -1</code></td>
+                            <td>Nombre exacto del procesador</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i5-10400 @ 2.90GHz"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Memoria RAM</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>free -h</code></td>
+                            <td><textarea rows="2" placeholder="RAM total, usada, libre, disponible"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo dmidecode -t memory | grep -i "size\|speed\|manufacturer\|type:" | head -10</code></td>
+                            <td><textarea rows="3" placeholder="Modulos RAM: tamano, velocidad, fabricante, tipo (DDR3/DDR4)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Placa base y BIOS</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo dmidecode -t baseboard | grep -i "manufacturer\|product\|serial"</code></td>
+                            <td><textarea rows="2" placeholder="Placa base: fabricante, modelo, serie"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo dmidecode -t bios | grep -i "vendor\|version\|release"</code></td>
+                            <td><textarea rows="2" placeholder="BIOS: fabricante, version, fecha"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Dispositivos PCI y USB (tarjetas y perifericos)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:25%">Que identifica</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>lspci</code></td>
+                            <td>Dispositivos PCI (grafica, red, audio, etc.)</td>
+                            <td><textarea rows="4" placeholder="Pega la salida completa"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>lspci | grep -i "vga\|3d\|display"</code></td>
+                            <td>Tarjeta grafica</td>
+                            <td><input type="text" placeholder="Modelo de la tarjeta grafica"></td>
+                        </tr>
+                        <tr>
+                            <td><code>lspci | grep -i "network\|ethernet\|wifi"</code></td>
+                            <td>Tarjeta(s) de red</td>
+                            <td><textarea rows="2" placeholder="Tarjeta(s) de red detectadas"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>lspci | grep -i "audio"</code></td>
+                            <td>Tarjeta de sonido</td>
+                            <td><input type="text" placeholder="Dispositivo de audio"></td>
+                        </tr>
+                        <tr>
+                            <td><code>lsusb</code></td>
+                            <td>Dispositivos USB conectados</td>
+                            <td><textarea rows="3" placeholder="Lista de dispositivos USB (teclado, raton, hub...)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Ficha tecnica del equipo</h3>
+                    <p>Con los datos obtenidos, completa esta ficha tecnica del taller:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Componente</th>
+                            <th>Datos del equipo</th>
+                        </tr>
+                        <tr>
+                            <td>Placa base (fabricante / modelo)</td>
+                            <td><input type="text" placeholder="Ej: Oracle Corporation VirtualBox"></td>
+                        </tr>
+                        <tr>
+                            <td>BIOS (version)</td>
+                            <td><input type="text" placeholder="Ej: VirtualBox 1.2"></td>
+                        </tr>
+                        <tr>
+                            <td>CPU (modelo, nucleos, velocidad)</td>
+                            <td><input type="text" placeholder="Ej: Intel i5-10400, 2 nucleos, 2900 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM (cantidad, tipo, velocidad)</td>
+                            <td><input type="text" placeholder="Ej: 4 GB DDR4, 2400 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta grafica</td>
+                            <td><input type="text" placeholder="Ej: VirtualBox Graphics Adapter"></td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de red</td>
+                            <td><input type="text" placeholder="Ej: Intel PRO/1000 MT Desktop"></td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de sonido</td>
+                            <td><input type="text" placeholder="Ej: Intel 82801AA AC'97"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema operativo y kernel</td>
+                            <td><input type="text" placeholder="Ej: Ubuntu 24.04 LTS, kernel 6.8.0"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Terminal con inventario de hardware (inxi o lspci + lscpu)</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura con comandos de inventario de hardware</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Logs de hardware y deteccion de errores -->
+            <div class="seccion">
+                <h2>Parte 2 - Logs del sistema y deteccion de errores de hardware (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Cuando un equipo tiene problemas intermitentes (cuelgues, reinicios, perifericos que no funcionan), los <strong>logs del sistema</strong> son la clave para encontrar la causa. En Linux, el kernel registra todo lo que ocurre con el hardware.</p>
+
+                    <h3>dmesg - Mensajes del kernel</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg | grep -i "error" | tail -10</code></td>
+                            <td><textarea rows="3" placeholder="Ultimos 10 errores del kernel (si hay alguno)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg | grep -i "fail" | tail -5</code></td>
+                            <td><textarea rows="2" placeholder="Ultimos 5 fallos reportados"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg | grep -i "usb" | tail -10</code></td>
+                            <td><textarea rows="3" placeholder="Ultimos eventos USB (conexiones de dispositivos)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg | grep -i "ata\|sata\|disk\|sda" | tail -10</code></td>
+                            <td><textarea rows="3" placeholder="Eventos relacionados con discos (errores de lectura, deteccion)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg | grep -i "eth\|enp\|wlan\|network" | tail -10</code></td>
+                            <td><textarea rows="3" placeholder="Eventos de la tarjeta de red"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Si un equipo se reinicia solo, busca errores con <code>dmesg | grep -i "error\|fail\|panic"</code>. Si un USB no funciona, busca <code>dmesg | grep -i usb</code>. Si el disco da problemas, busca <code>dmesg | grep -i "ata\|i/o error"</code>.
+                    </div>
+
+                    <h3>Logs del sistema con journalctl</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>journalctl -p err -b --no-pager | tail -10</code></td>
+                            <td><textarea rows="3" placeholder="Ultimos 10 errores del arranque actual"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>journalctl -p err -b --no-pager | wc -l</code></td>
+                            <td><input type="text" placeholder="Numero total de errores en este arranque"></td>
+                        </tr>
+                        <tr>
+                            <td><code>journalctl --list-boots</code></td>
+                            <td><textarea rows="2" placeholder="Lista de arranques del sistema (cuantas veces se ha iniciado?)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Has encontrado errores en los logs? Si es asi, describe el mas relevante. Si no hay errores, que indica eso sobre el estado del equipo?</p>
+                        <textarea rows="2" placeholder="Responde aqui"></textarea>
+                    </div>
+
+                    <h3>Captura 2: Terminal mostrando logs del sistema (dmesg o journalctl)</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de dmesg o journalctl con logs del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Estado de discos -->
+            <div class="seccion">
+                <h2>Parte 3 - Diagnostico de discos y almacenamiento (40 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Escenario:</strong> El usuario reporta que <em>"se le llena el disco y le aparecen errores"</em>. Vamos a analizar las particiones, el espacio disponible, que carpetas ocupan mas y el estado de salud del disco.
+                    </div>
+
+                    <h3>Particiones y espacio en disco</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:20%">Que analiza</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>lsblk -f</code></td>
+                            <td>Discos, particiones y sistema de ficheros</td>
+                            <td><textarea rows="4" placeholder="Pega la salida (disco, particiones, tipo FS, punto montaje)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>df -h</code></td>
+                            <td>Espacio usado/libre por particion</td>
+                            <td><textarea rows="3" placeholder="Pega la salida (tamano, usado, libre, % uso)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo fdisk -l 2>/dev/null | grep "Disk\|/dev/"</code></td>
+                            <td>Tamano fisico del disco y particiones</td>
+                            <td><textarea rows="3" placeholder="Pega la informacion de disco y particiones"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Donde se gasta el espacio?</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo du -sh /var/log /tmp /home /var/cache 2>/dev/null</code></td>
+                            <td><textarea rows="2" placeholder="Espacio de las carpetas que mas suelen crecer"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo du -h /var/log | sort -rh | head -5</code></td>
+                            <td><textarea rows="3" placeholder="Los 5 directorios/archivos de log mas grandes"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo find / -type f -size +50M 2>/dev/null | head -10</code></td>
+                            <td><textarea rows="3" placeholder="Archivos de mas de 50MB en el sistema"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Salud del disco con S.M.A.R.T.</h3>
+                    <p>S.M.A.R.T. (Self-Monitoring, Analysis and Reporting Technology) es un sistema de auto-diagnostico integrado en los discos duros y SSD. Permite predecir fallos <strong>antes de que ocurran</strong>.</p>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo smartctl -i /dev/sda</code></td>
+                            <td><textarea rows="3" placeholder="Informacion del disco (modelo, serie, firmware, capacidad)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo smartctl -H /dev/sda</code></td>
+                            <td><input type="text" placeholder="PASSED / FAILED (estado de salud general)"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Si S.M.A.R.T. reporta <strong>FAILED</strong>, el disco esta a punto de fallar y hay que hacer copia de seguridad inmediata y reemplazarlo. En VirtualBox, los discos virtuales suelen reportar "PASSED" o no soportar S.M.A.R.T.
+                    </div>
+
+                    <h3>Limpieza de espacio (como lo haria un tecnico)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando de limpieza</th>
+                            <th style="width:20%">Que limpia</th>
+                            <th>Espacio liberado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sudo apt clean</code></td>
+                            <td>Cache de paquetes descargados</td>
+                            <td><input type="text" placeholder="Ejecuta 'du -sh /var/cache/apt' antes y despues"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo apt autoremove -y</code></td>
+                            <td>Paquetes huerfanos</td>
+                            <td><input type="text" placeholder="Cuantos paquetes se eliminaron?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>sudo journalctl --vacuum-size=50M</code></td>
+                            <td>Logs antiguos (deja solo 50MB)</td>
+                            <td><input type="text" placeholder="Espacio liberado?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Diagnostico de discos (lsblk, df -h, smartctl)</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura con diagnostico de discos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Diagnostico de red -->
+            <div class="seccion">
+                <h2>Parte 4 - Diagnostico de problemas de red (40 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Escenario:</strong> El usuario dice que <em>"a veces se le cae Internet"</em>. Vamos a realizar un diagnostico sistematico de la red, igual que hicimos en Windows pero con los comandos equivalentes de Linux.
+                    </div>
+
+                    <h3>Paso 1: Identificar la configuracion de red</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>ip addr show</code></td>
+                            <td><textarea rows="3" placeholder="Interfaces de red, IPs asignadas, estado (UP/DOWN)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>ip route show</code></td>
+                            <td><textarea rows="2" placeholder="Gateway (puerta de enlace) y rutas"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>cat /etc/resolv.conf</code></td>
+                            <td><input type="text" placeholder="Servidor(es) DNS configurados"></td>
+                        </tr>
+                    </table>
+
+                    <p style="margin: 8px 0; font-size: 13px;">Extrae estos datos:</p>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Dato</th>
+                            <th>Valor</th>
+                            <th style="width:25%">Es correcto?</th>
+                        </tr>
+                        <tr>
+                            <td>Interfaz de red activa</td>
+                            <td><input type="text" placeholder="Ej: enp0s3"></td>
+                            <td><input type="text" placeholder="Estado: UP?"></td>
+                        </tr>
+                        <tr>
+                            <td>Direccion IP</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.15/24"></td>
+                            <td><input type="text" placeholder="Es una IP valida?"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.2"></td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                        </tr>
+                        <tr>
+                            <td>DNS</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.3"></td>
+                            <td><input type="text" placeholder="Responde correctamente?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2: Probar conectividad por capas (igual que en Windows)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:25%">Que probamos</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 4 127.0.0.1</code></td>
+                            <td>Pila TCP/IP local</td>
+                            <td><input type="text" placeholder="OK? Tiempo medio?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 4 [tu gateway]</code></td>
+                            <td>Conexion al router</td>
+                            <td><input type="text" placeholder="OK? Tiempo medio?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 4 8.8.8.8</code></td>
+                            <td>Internet (sin DNS)</td>
+                            <td><input type="text" placeholder="OK? Paquetes perdidos?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 4 www.google.es</code></td>
+                            <td>Internet + DNS</td>
+                            <td><input type="text" placeholder="OK? IP resuelta?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 3: Trazar ruta y consultar DNS</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>traceroute 8.8.8.8</code></td>
+                            <td><textarea rows="3" placeholder="Pega los primeros 5 saltos"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>nslookup www.google.es</code></td>
+                            <td><textarea rows="2" placeholder="DNS usado e IP resuelta"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>ss -tuln</code></td>
+                            <td><textarea rows="3" placeholder="Puertos en escucha en el sistema"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Equivalencia de comandos de red Linux - Windows</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Linux</th>
+                            <th style="width:30%">Windows equivalente</th>
+                            <th>Funcion</th>
+                        </tr>
+                        <tr>
+                            <td><code>ip addr show</code></td>
+                            <td><input type="text" placeholder="Comando Windows"></td>
+                            <td>Ver configuracion de red</td>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 4</code></td>
+                            <td><input type="text" placeholder="Comando Windows"></td>
+                            <td>Probar conectividad</td>
+                        </tr>
+                        <tr>
+                            <td><code>traceroute</code></td>
+                            <td><input type="text" placeholder="Comando Windows"></td>
+                            <td>Trazar ruta</td>
+                        </tr>
+                        <tr>
+                            <td><code>ss -tuln</code></td>
+                            <td><input type="text" placeholder="Comando Windows"></td>
+                            <td>Ver puertos en escucha</td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Diagnostico de red (ping, traceroute, ss)</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura con diagnostico de red</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Servicios de hardware y monitorizacion -->
+            <div class="seccion">
+                <h2>Parte 5 - Servicios de hardware y monitorizacion del rendimiento (30 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Escenario:</strong> El equipo <em>"va lento"</em>. Necesitamos comprobar que servicios estan consumiendo recursos, si hay algun proceso acaparando CPU o RAM, y verificar que los servicios criticos de hardware funcionan correctamente.
+                    </div>
+
+                    <h3>Servicios de hardware con systemctl</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>systemctl status NetworkManager</code></td>
+                            <td><input type="text" placeholder="active (running) / inactive?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>systemctl status systemd-udevd</code></td>
+                            <td><input type="text" placeholder="Estado del servicio de deteccion de hardware"></td>
+                        </tr>
+                        <tr>
+                            <td><code>systemctl status cups 2>/dev/null || echo "No instalado"</code></td>
+                            <td><input type="text" placeholder="Estado del servicio de impresion"></td>
+                        </tr>
+                        <tr>
+                            <td><code>systemctl list-units --type=service --state=failed</code></td>
+                            <td><textarea rows="2" placeholder="Servicios que han fallado (si hay alguno)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Si hay servicios en estado <strong>failed</strong>, eso puede explicar por que algo no funciona. Por ejemplo, si <code>NetworkManager</code> esta fallado, no habra red. Si <code>cups</code> esta fallado, no podra imprimir.
+                    </div>
+
+                    <h3>Monitorizacion del rendimiento</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th style="width:20%">Que analiza</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>uptime</code></td>
+                            <td>Tiempo encendido y carga</td>
+                            <td><input type="text" placeholder="Tiempo encendido y load average"></td>
+                        </tr>
+                        <tr>
+                            <td><code>free -h</code></td>
+                            <td>RAM en uso</td>
+                            <td><input type="text" placeholder="Usada / total / disponible"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ps aux --sort=-%mem | head -6</code></td>
+                            <td>Top 5 procesos por RAM</td>
+                            <td><textarea rows="3" placeholder="Pega los 5 procesos que mas RAM consumen"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>ps aux --sort=-%cpu | head -6</code></td>
+                            <td>Top 5 procesos por CPU</td>
+                            <td><textarea rows="3" placeholder="Pega los 5 procesos que mas CPU consumen"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>cat /proc/loadavg</code></td>
+                            <td>Carga del sistema (1, 5, 15 min)</td>
+                            <td><input type="text" placeholder="Ej: 0.15 0.10 0.08 1/150 1234"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Interpretacion del load average:</strong> Los 3 numeros representan la carga media del ultimo 1, 5 y 15 minutos. Si el valor supera el numero de nucleos del CPU, el equipo esta sobrecargado. Ejemplo: con 2 nucleos, un load average de 2.5 indica sobrecarga.
+                    </div>
+
+                    <h3>Tiempo de arranque (diagnostico de arranque lento)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>systemd-analyze</code></td>
+                            <td><input type="text" placeholder="Tiempo total de arranque (kernel + userspace)"></td>
+                        </tr>
+                        <tr>
+                            <td><code>systemd-analyze blame | head -10</code></td>
+                            <td><textarea rows="4" placeholder="Los 10 servicios que mas tardan en arrancar"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Monitorizacion de rendimiento y servicios</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura con rendimiento y/o servicios del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Script de diagnostico -->
+            <div class="seccion">
+                <h2>Parte 6 - Script de diagnostico automatizado para el taller (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Igual que hicimos en Windows, vamos a crear un <strong>script Bash</strong> que ejecute todo el diagnostico automaticamente y genere un informe. Este tipo de scripts son herramientas reales que los tecnicos usan en su dia a dia.</p>
+
+                    <h3>Script: Diagnostico completo del equipo Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea el archivo: <code>nano ~/diagnostico_equipo.sh</code></li>
+                            <li>Escribe el siguiente codigo:</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque">#!/bin/bash
+# ==========================================
+# Script de diagnostico de equipos - Taller
+# Curso IFCT0309 - Montaje y Reparacion
+# ==========================================
+
+FECHA=$(date "+%d/%m/%Y %H:%M:%S")
+INFORME="$HOME/diagnostico_$(hostname)_$(date +%Y%m%d).txt"
+
+mostrar() {
+    echo "$1" | tee -a "$INFORME"
+}
+
+mostrar "=========================================="
+mostrar "  INFORME DE DIAGNOSTICO DE EQUIPO"
+mostrar "  Fecha: $FECHA"
+mostrar "  Tecnico: $(whoami) @ $(hostname)"
+mostrar "=========================================="
+
+mostrar ""
+mostrar "=== 1. PROCESADOR ==="
+lscpu | grep -i "model name\|core\|thread\|mhz" | tee -a "$INFORME"
+
+mostrar ""
+mostrar "=== 2. MEMORIA RAM ==="
+free -h | grep -i "mem\|swap" | tee -a "$INFORME"
+
+mostrar ""
+mostrar "=== 3. DISCOS Y PARTICIONES ==="
+lsblk -f | tee -a "$INFORME"
+mostrar ""
+df -h / | tail -1 | tee -a "$INFORME"
+
+mostrar ""
+mostrar "=== 4. TARJETA GRAFICA ==="
+lspci | grep -i "vga\|3d\|display" | tee -a "$INFORME"
+
+mostrar ""
+mostrar "=== 5. TARJETA DE RED ==="
+lspci | grep -i "network\|ethernet" | tee -a "$INFORME"
+echo "IP: $(hostname -I)" | tee -a "$INFORME"
+
+mostrar ""
+mostrar "=== 6. ESTADO DE SALUD ==="
+
+# Verificar disco
+SMART=$(sudo smartctl -H /dev/sda 2>/dev/null | grep "result" || echo "S.M.A.R.T. no disponible")
+echo "Disco S.M.A.R.T.: $SMART" | tee -a "$INFORME"
+
+# Verificar RAM
+RAM_TOTAL=$(free -m | grep Mem | awk '{print $2}')
+RAM_USADA=$(free -m | grep Mem | awk '{print $3}')
+RAM_PCT=$((RAM_USADA * 100 / RAM_TOTAL))
+echo -n "RAM: ${RAM_USADA}MB / ${RAM_TOTAL}MB (${RAM_PCT}%) - " | tee -a "$INFORME"
+if [ "$RAM_PCT" -gt 90 ]; then
+    echo "CRITICO" | tee -a "$INFORME"
+elif [ "$RAM_PCT" -gt 70 ]; then
+    echo "AVISO" | tee -a "$INFORME"
+else
+    echo "OK" | tee -a "$INFORME"
+fi
+
+# Verificar disco
+DISCO_PCT=$(df / | tail -1 | awk '{print $5}' | tr -d '%')
+echo -n "Disco /: ${DISCO_PCT}% usado - " | tee -a "$INFORME"
+if [ "$DISCO_PCT" -gt 90 ]; then
+    echo "CRITICO" | tee -a "$INFORME"
+elif [ "$DISCO_PCT" -gt 70 ]; then
+    echo "AVISO" | tee -a "$INFORME"
+else
+    echo "OK" | tee -a "$INFORME"
+fi
+
+# Verificar red
+echo -n "Conectividad: " | tee -a "$INFORME"
+if ping -c 1 8.8.8.8 &>/dev/null; then
+    echo "OK" | tee -a "$INFORME"
+else
+    echo "SIN CONEXION" | tee -a "$INFORME"
+fi
+
+mostrar ""
+mostrar "=== 7. SERVICIOS CRITICOS ==="
+for SVC in NetworkManager systemd-udevd cron; do
+    ESTADO=$(systemctl is-active "$SVC" 2>/dev/null || echo "no encontrado")
+    printf "  %-25s %s\n" "$SVC:" "$ESTADO" | tee -a "$INFORME"
+done
+
+mostrar ""
+mostrar "=== 8. ERRORES RECIENTES ==="
+ERRORES=$(journalctl -p err -b --no-pager 2>/dev/null | wc -l)
+echo "Errores en este arranque: $ERRORES" | tee -a "$INFORME"
+if [ "$ERRORES" -gt 0 ]; then
+    journalctl -p err -b --no-pager 2>/dev/null | tail -5 | tee -a "$INFORME"
+fi
+
+mostrar ""
+mostrar "=========================================="
+mostrar "  Informe guardado en: $INFORME"
+mostrar "=========================================="</pre>
+
+                    <div class="pasos">
+                        <ol start="3">
+                            <li>Guarda (Ctrl+O) y cierra (Ctrl+X).</li>
+                            <li>Dale permisos: <code>chmod +x ~/diagnostico_equipo.sh</code></li>
+                            <li>Ejecutalo: <code>sudo ~/diagnostico_equipo.sh</code></li>
+                            <li>Revisa el informe: <code>cat ~/diagnostico_*.txt</code></li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Pega aqui la salida completa del script:</p>
+                        <textarea rows="12" placeholder="Pega aqui toda la salida del script de diagnostico"></textarea>
+                    </div>
+
+                    <h3>Analisis del script</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Elemento del script</th>
+                            <th>Explica que hace</th>
+                        </tr>
+                        <tr>
+                            <td><code>| tee -a "$INFORME"</code></td>
+                            <td><input type="text" placeholder="Que hace tee -a?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>if [ "$RAM_PCT" -gt 90 ]; then</code></td>
+                            <td><input type="text" placeholder="Que comprueba esta condicion?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>for SVC in NetworkManager systemd-udevd cron; do</code></td>
+                            <td><input type="text" placeholder="Que hace este bucle?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping -c 1 8.8.8.8 &>/dev/null</code></td>
+                            <td><input type="text" placeholder="Que hace &>/dev/null?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Que mejoras le harias a este script para usarlo en un taller real? (piensa en que informacion falta o que comprobaciones adicionales harias)</p>
+                        <textarea rows="3" placeholder="Describe al menos 2 mejoras"></textarea>
+                    </div>
+
+                    <h3>Captura 6: Script de diagnostico ejecutandose</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del script de diagnostico ejecutandose</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 - Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p style="margin-bottom: 12px;">Responde a cada pregunta con un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Te traen un equipo con Ubuntu que "no detecta el WiFi". Sin abrir la torre, que comandos usarias para diagnosticar si el problema es del hardware, del driver o de la configuracion? Describe el procedimiento paso a paso.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Un servidor Linux muestra que el disco esta al 95% de uso. Describe paso a paso como diagnosticarias que esta ocupando el espacio y que acciones de limpieza realizarias (usando los comandos de esta practica).</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Compara las herramientas de diagnostico de hardware de Linux (lspci, lsusb, dmidecode, dmesg) con las de Windows (Get-CimInstance/Get-PhysicalDisk en PowerShell, driverquery, sfc). Que sistema te parece mas potente para diagnosticar hardware y por que?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Por que es importante que un tecnico de reparacion sepa usar la terminal, si puede diagnosticar hardware abriendo la torre y mirando los componentes fisicamente? Da al menos 3 razones.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <p>Sube tu practica completada al canal <strong>#entrega-practicas</strong> del Discord del curso en formato <strong>PDF</strong>.</p>
+
+                    <h3>Capturas requeridas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px">OK</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Inventario de hardware (inxi, lspci, lscpu)</td>
+                            <td><input type="checkbox" id="entrega-cap1"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Logs del sistema (dmesg o journalctl)</td>
+                            <td><input type="checkbox" id="entrega-cap2"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Diagnostico de discos (lsblk, df, smartctl)</td>
+                            <td><input type="checkbox" id="entrega-cap3"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Diagnostico de red (ping, traceroute, ss)</td>
+                            <td><input type="checkbox" id="entrega-cap4"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Servicios y rendimiento</td>
+                            <td><input type="checkbox" id="entrega-cap5"></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Script de diagnostico ejecutandose</td>
+                            <td><input type="checkbox" id="entrega-cap6"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Diagnostico de Equipos con la Terminal de Ubuntu<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:100px">Puntuacion</th>
+                                <th>Desglose</th>
+                            </tr>
+                            <tr>
+                                <td>Inventario de hardware</td>
+                                <td>2.0 puntos</td>
+                                <td>Comandos ejecutados + ficha tecnica completa + dispositivos PCI/USB</td>
+                            </tr>
+                            <tr>
+                                <td>Logs y deteccion de errores</td>
+                                <td>1.0 punto</td>
+                                <td>dmesg y journalctl usados + errores analizados</td>
+                            </tr>
+                            <tr>
+                                <td>Diagnostico de discos</td>
+                                <td>1.5 puntos</td>
+                                <td>Particiones + espacio + S.M.A.R.T. + limpieza documentada</td>
+                            </tr>
+                            <tr>
+                                <td>Diagnostico de red</td>
+                                <td>1.5 puntos</td>
+                                <td>Procedimiento sistematico + equivalencias Windows-Linux</td>
+                            </tr>
+                            <tr>
+                                <td>Servicios y rendimiento</td>
+                                <td>1.0 punto</td>
+                                <td>Servicios verificados + rendimiento analizado + arranque</td>
+                            </tr>
+                            <tr>
+                                <td>Script de diagnostico</td>
+                                <td>2.0 puntos</td>
+                                <td>Script ejecutado + analisis de codigo + mejoras propuestas</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion</td>
+                                <td>1.0 punto</td>
+                                <td>4 preguntas respondidas con argumentacion (min 3 lineas)</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista verificacion -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Inventario de hardware completo con ficha tecnica (Parte 1)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Logs del sistema analizados (Parte 2)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Diagnostico de discos completado (Parte 3)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Diagnostico de red completado (Parte 4)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Servicios y rendimiento documentados (Parte 5)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Script de diagnostico creado y ejecutado (Parte 6)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">4 preguntas de reflexion respondidas (Parte 7)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">Las 6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Diagnostico de Equipos con la Terminal de Ubuntu</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque Diagnostico y reparacion de equipos</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 11: Diagnostico Equipos con Terminal Ubuntu';
+        const PREFIJO_ARCHIVO = 'P11_Consola_Ubuntu';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

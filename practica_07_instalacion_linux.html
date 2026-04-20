@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 07: Instalacion de Linux (Ubuntu) en Maquina Virtual</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 07: Instalacion de Linux (Ubuntu) en Maquina Virtual</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0852 - Instalacion y Configuracion de los Componentes de Sistemas Operativos<br>
+                <strong>Bloque:</strong> 2 - Instalacion de Sistemas Operativos<br>
+                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + ISO de Ubuntu Desktop (LTS)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica asume que ya has completado la <strong>Practica 06 (Instalacion de Windows)</strong>. Ahora instalaras Linux (Ubuntu) en una nueva maquina virtual para poder comparar ambos sistemas operativos. La comparacion entre Windows y Linux es una parte fundamental de esta practica.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Instalar el sistema operativo Linux (Ubuntu Desktop) en una maquina virtual con VirtualBox.</li>
+                        <li>Comparar el proceso de instalacion y el resultado final con la instalacion de Windows realizada en la Practica 06.</li>
+                        <li>Comprender las diferencias fundamentales entre sistemas operativos propietarios y libres.</li>
+                        <li>Familiarizarse con el entorno de escritorio de Linux y la linea de comandos (terminal).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, comprueba que cumples todos los requisitos:</p>
+                    <table>
+                        <tr>
+                            <th>Requisito</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Practica 06 (Instalacion de Windows) completada</td>
+                            <td><input type="checkbox" id="req-p3"></td>
+                        </tr>
+                        <tr>
+                            <td>Oracle VirtualBox instalado y funcionando</td>
+                            <td><input type="checkbox" id="req-vbox"></td>
+                        </tr>
+                        <tr>
+                            <td>ISO de Ubuntu Desktop LTS descargada desde <strong>ubuntu.com</strong></td>
+                            <td><input type="checkbox" id="req-iso"></td>
+                        </tr>
+                        <tr>
+                            <td>Minimo 8 GB de RAM en el equipo anfitrion</td>
+                            <td><input type="checkbox" id="req-ram"></td>
+                        </tr>
+                        <tr>
+                            <td>Al menos 30 GB de espacio libre en disco</td>
+                            <td><input type="checkbox" id="req-disco"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Contenido teorico previo -->
+            <div class="seccion">
+                <h2>Contenido teorico previo</h2>
+                <div class="seccion-body">
+                    <h3>Comparacion Windows vs Linux</h3>
+                    <p>Antes de comenzar la instalacion, repasa las principales diferencias entre ambos sistemas operativos:</p>
+                    <table>
+                        <tr>
+                            <th>Caracteristica</th>
+                            <th>Windows</th>
+                            <th>Linux (Ubuntu)</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Licencia</strong></td>
+                            <td>Propietario (de pago)</td>
+                            <td>Libre y gratuito (GPL)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Codigo fuente</strong></td>
+                            <td>Cerrado</td>
+                            <td>Abierto</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uso principal</strong></td>
+                            <td>Escritorio, gaming, oficina</td>
+                            <td>Servidores, desarrollo, educacion</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Seguridad</strong></td>
+                            <td>Vulnerable a malware</td>
+                            <td>Mas seguro por diseno</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actualizaciones</strong></td>
+                            <td>Forzadas por Microsoft</td>
+                            <td>Controladas por el usuario</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Personalizacion</strong></td>
+                            <td>Limitada</td>
+                            <td>Muy alta</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gestor de paquetes</strong></td>
+                            <td>No tiene (instaladores .exe/.msi)</td>
+                            <td>apt, snap, Software Center</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Linea de comandos</strong></td>
+                            <td>PowerShell / CMD (opcional)</td>
+                            <td>Terminal (fundamental)</td>
+                        </tr>
+                    </table>
+
+                    <h3>Recursos recomendados para la maquina virtual Ubuntu</h3>
+                    <p>Consulta la siguiente tabla para configurar tu maquina virtual de forma optima:</p>
+                    <table>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Minimo</th>
+                            <th>Recomendado</th>
+                        </tr>
+                        <tr>
+                            <td><strong>RAM</strong></td>
+                            <td>2 GB</td>
+                            <td>4 GB (4096 MB)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CPU</strong></td>
+                            <td>1 nucleo</td>
+                            <td>2 nucleos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Disco</strong></td>
+                            <td>15 GB</td>
+                            <td>25 GB (dinamico)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Video</strong></td>
+                            <td>64 MB</td>
+                            <td>128 MB</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Creacion de la maquina virtual -->
+            <div class="seccion">
+                <h2>Parte 1 - Creacion de la maquina virtual (20 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <p>Crea una nueva maquina virtual en VirtualBox para instalar Ubuntu:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Oracle VirtualBox</strong> y haz clic en <strong>Nueva</strong>.</li>
+                            <li>En el campo <strong>Nombre</strong>, escribe: <strong>Ubuntu_Practica</strong>.</li>
+                            <li>En <strong>Tipo</strong>, selecciona: <strong>Linux</strong>.</li>
+                            <li>En <strong>Version</strong>, selecciona: <strong>Ubuntu (64-bit)</strong>.</li>
+                            <li>Asigna la <strong>RAM</strong> segun la tabla de recursos recomendados (minimo 2 GB, recomendado 4 GB).</li>
+                            <li>Asigna el numero de <strong>nucleos de CPU</strong> (recomendado: 2).</li>
+                            <li>Crea un <strong>disco duro virtual</strong> (recomendado: 25 GB, tipo dinamico).</li>
+                            <li>Configura la <strong>memoria de video</strong> (recomendado: 128 MB).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Configuracion de la maquina virtual</h3>
+                    <p>Documenta los valores que has asignado a tu maquina virtual:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Configuracion</th>
+                            <th>Valor elegido</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de la VM</td>
+                            <td><input type="text" placeholder="Ej: Ubuntu_Practica"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de SO</td>
+                            <td><input type="text" value="Linux" readonly style="background:#edf2f7; font-weight:600;"></td>
+                        </tr>
+                        <tr>
+                            <td>Version</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="ubuntu64">Ubuntu (64-bit)</option>
+                                    <option value="ubuntu2204">Ubuntu 22.04 LTS</option>
+                                    <option value="ubuntu2404">Ubuntu 24.04 LTS</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>RAM asignada (MB)</td>
+                            <td><input type="text" placeholder="Ej: 4096"></td>
+                        </tr>
+                        <tr>
+                            <td>Nucleos de CPU</td>
+                            <td><input type="text" placeholder="Ej: 2"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de disco (GB)</td>
+                            <td><input type="text" placeholder="Ej: 25"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de disco</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="dinamico">Reservado dinamicamente</option>
+                                    <option value="fijo">Tamano fijo</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Memoria de video (MB)</td>
+                            <td><input type="text" placeholder="Ej: 128"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Maquina virtual creada en VirtualBox</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la VM creada con su configuracion visible</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Carga de ISO y arranque -->
+            <div class="seccion">
+                <h2>Parte 2 - Carga de ISO y arranque (10 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <p>Configura la ISO de Ubuntu como medio de arranque e inicia la maquina virtual:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciona la maquina virtual <strong>Ubuntu_Practica</strong> y haz clic en <strong>Configuracion</strong>.</li>
+                            <li>Ve a <strong>Almacenamiento</strong> > Controlador IDE > icono de disco > <strong>Seleccionar archivo de disco</strong>.</li>
+                            <li>Busca y selecciona la <strong>ISO de Ubuntu Desktop</strong> que descargaste.</li>
+                            <li>Acepta los cambios y haz clic en <strong>Iniciar</strong> para arrancar la VM.</li>
+                            <li>Espera a que cargue la pantalla de bienvenida de Ubuntu.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Opciones de arranque:</strong> Al iniciar, Ubuntu muestra dos opciones: <strong>"Probar Ubuntu"</strong> (sesion en vivo sin instalar, ideal para probar el sistema sin modificar el disco) y <strong>"Instalar Ubuntu"</strong> (instalacion completa en el disco virtual). La opcion "Probar" ejecuta Ubuntu directamente desde la ISO en la RAM, sin escribir nada en el disco. Para esta practica, selecciona <strong>"Instalar Ubuntu"</strong>.
+                    </div>
+
+                    <h3>Captura 2: Pantalla de arranque de Ubuntu con las opciones</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la pantalla de bienvenida con "Probar" e "Instalar"</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Instalacion de Ubuntu paso a paso -->
+            <div class="seccion">
+                <h2>Parte 3 - Instalacion de Ubuntu paso a paso (60 min)</h2>
+                <div class="seccion-body">
+
+                    <!-- Paso 3.1 -->
+                    <h3>Paso 3.1 - Seleccion de idioma</h3>
+                    <p>El instalador te pedira que selecciones el idioma para la instalacion y el sistema.</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Idioma elegido para la instalacion</td>
+                            <td><input type="text" placeholder="Ej: Espanol"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Pantalla de seleccion de idioma</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la seleccion de idioma</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.2 -->
+                    <h3>Paso 3.2 - Distribucion de teclado</h3>
+                    <p>Selecciona la distribucion de teclado que corresponda a tu teclado fisico.</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Distribucion de teclado elegida</td>
+                            <td><input type="text" placeholder="Ej: Espanol / Espanol"></td>
+                        </tr>
+                    </table>
+
+                    <!-- Paso 3.3 -->
+                    <h3>Paso 3.3 - Tipo de instalacion</h3>
+                    <p>Ubuntu ofrece dos modos de instalacion y opciones adicionales:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Configuracion</th>
+                            <th>Tu eleccion</th>
+                        </tr>
+                        <tr>
+                            <td>Tipo de instalacion</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="normal">Instalacion normal (navegador, utilidades, office, juegos, reproductores)</option>
+                                    <option value="minima">Instalacion minima (solo navegador y utilidades basicas)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Descargar actualizaciones durante la instalacion</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si (marcado)</option>
+                                    <option value="no">No (desmarcado)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Instalar software de terceros (graficos, Wi-Fi, codecs multimedia)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si (marcado)</option>
+                                    <option value="no">No (desmarcado)</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Pantalla de tipo de instalacion</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de las opciones de instalacion elegidas</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.4 -->
+                    <h3>Paso 3.4 - Particionado del disco</h3>
+                    <p>El instalador ofrece varias opciones para gestionar el disco:</p>
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px; margin-bottom: 10px;">
+                        <li><strong>"Borrar disco e instalar Ubuntu"</strong> - Opcion recomendada para maquinas virtuales. Formatea todo el disco virtual.</li>
+                        <li><strong>"Mas opciones" (particionado manual)</strong> - Permite crear particiones personalizadas (/, /home, swap, etc.).</li>
+                    </ul>
+
+                    <div class="nota">
+                        <strong>Importante:</strong> La opcion "Borrar disco e instalar Ubuntu" es completamente segura en una maquina virtual. Solo afecta al disco virtual creado por VirtualBox, <strong>nunca</strong> al disco real de tu equipo anfitrion.
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Configuracion</th>
+                            <th>Tu eleccion</th>
+                        </tr>
+                        <tr>
+                            <td>Opcion de particionado elegida</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="borrar">Borrar disco e instalar Ubuntu (recomendado)</option>
+                                    <option value="manual">Mas opciones (particionado manual)</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Pantalla de particionado</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la pantalla de particionado con la opcion elegida</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.5 -->
+                    <h3>Paso 3.5 - Zona horaria</h3>
+                    <p>Selecciona tu zona horaria en el mapa o en el desplegable.</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Zona horaria elegida</td>
+                            <td><input type="text" placeholder="Ej: Madrid / Europe/Madrid"></td>
+                        </tr>
+                    </table>
+
+                    <!-- Paso 3.6 -->
+                    <h3>Paso 3.6 - Creacion de usuario</h3>
+                    <p>Crea tu cuenta de usuario para el sistema. Documenta los datos (excepto la contrasena):</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Tu nombre</td>
+                            <td><input type="text" placeholder="Ej: Juan Garcia"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre del equipo</td>
+                            <td><input type="text" placeholder="Ej: ubuntu-pc"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de usuario</td>
+                            <td><input type="text" placeholder="Ej: juan"></td>
+                        </tr>
+                        <tr>
+                            <td>Contrasena</td>
+                            <td><input type="text" value="(no escribir por seguridad)" readonly style="background:#fff5f5; color:#c53030; font-style:italic;"></td>
+                        </tr>
+                        <tr>
+                            <td>Inicio de sesion automatico</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No - Solicitar contrasena para iniciar sesion</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Pantalla de creacion de usuario</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la pantalla de creacion de usuario (oculta la contrasena)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.7 -->
+                    <h3>Paso 3.7 - Copia de archivos</h3>
+                    <p>Ubuntu comienza a copiar los archivos al disco. Durante este proceso, muestra una presentacion con las funciones del sistema. Observa y documenta:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Observacion</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Tiempo aproximado que ha tardado la instalacion</td>
+                            <td><input type="text" placeholder="Ej: 15 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Que informacion mostraba la presentacion durante la copia?</td>
+                            <td><input type="text" placeholder="Ej: Funciones de Ubuntu, apps incluidas..."></td>
+                        </tr>
+                    </table>
+
+                    <!-- Paso 3.8 -->
+                    <h3>Paso 3.8 - Finalizacion y reinicio</h3>
+                    <p>Una vez completada la instalacion:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ubuntu te pedira <strong>reiniciar</strong> el sistema.</li>
+                            <li>Cuando lo indique, <strong>retira la ISO</strong>: Ve a <strong>Dispositivos > Unidades opticas > Expulsar disco</strong> (o VirtualBox lo hara automaticamente).</li>
+                            <li>Pulsa <strong>Enter</strong> cuando lo pida.</li>
+                            <li>Espera a que arranque Ubuntu y aparezca la pantalla de inicio de sesion o el escritorio.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Captura 7: Escritorio de Ubuntu tras el primer inicio de sesion</h3>
+                    <div class="foto-upload" data-foto-id="foto-7">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del escritorio de Ubuntu tras el primer arranque</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Exploracion del escritorio Ubuntu -->
+            <div class="seccion">
+                <h2>Parte 4 - Exploracion del escritorio Ubuntu (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Explora el escritorio de Ubuntu y documenta lo que encuentras en cada elemento. Abre cada aplicacion o seccion y describe brevemente que has visto:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:35%">Elemento</th>
+                            <th>Descripcion (que has encontrado)</th>
+                        </tr>
+                        <tr>
+                            <td>Barra de tareas / Dock</td>
+                            <td><input type="text" placeholder="Ej: Barra lateral izquierda con iconos de apps..."></td>
+                        </tr>
+                        <tr>
+                            <td>Menu de aplicaciones</td>
+                            <td><input type="text" placeholder="Ej: Cuadricula con todas las apps instaladas..."></td>
+                        </tr>
+                        <tr>
+                            <td>Gestor de archivos (Nautilus)</td>
+                            <td><input type="text" placeholder="Ej: Explorador de archivos, similar al de Windows..."></td>
+                        </tr>
+                        <tr>
+                            <td>Navegador web incluido</td>
+                            <td><input type="text" placeholder="Ej: Firefox"></td>
+                        </tr>
+                        <tr>
+                            <td>Terminal</td>
+                            <td><input type="text" placeholder="Ej: Consola de comandos, fondo oscuro..."></td>
+                        </tr>
+                        <tr>
+                            <td>Configuracion del sistema</td>
+                            <td><input type="text" placeholder="Ej: Panel con opciones de red, pantalla, sonido..."></td>
+                        </tr>
+                        <tr>
+                            <td>Centro de software (Software Center)</td>
+                            <td><input type="text" placeholder="Ej: Tienda de aplicaciones tipo App Store..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 8: Escritorio con el menu de aplicaciones abierto</h3>
+                    <div class="foto-upload" data-foto-id="foto-8">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del escritorio mostrando el menu de aplicaciones</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Primeros comandos en terminal -->
+            <div class="seccion">
+                <h2>Parte 5 - Primeros comandos en terminal (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Abre la terminal con el atajo <strong>Ctrl+Alt+T</strong> (o buscala en el menu de aplicaciones). Ejecuta cada uno de los siguientes comandos y documenta el resultado:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:15%">Comando</th>
+                            <th style="width:25%">Que hace</th>
+                            <th>Resultado (copia la salida)</th>
+                        </tr>
+                        <tr>
+                            <td><code>uname -a</code></td>
+                            <td>Muestra informacion del kernel</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>lsb_release -a</code></td>
+                            <td>Muestra la version de Ubuntu</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>df -h</code></td>
+                            <td>Muestra el espacio en disco</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>free -h</code></td>
+                            <td>Muestra el uso de memoria</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>lscpu</code></td>
+                            <td>Muestra informacion del procesador</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>whoami</code></td>
+                            <td>Muestra tu usuario actual</td>
+                            <td><input type="text" placeholder="Ej: juan"></td>
+                        </tr>
+                        <tr>
+                            <td><code>pwd</code></td>
+                            <td>Muestra el directorio actual</td>
+                            <td><input type="text" placeholder="Ej: /home/juan"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ls /home</code></td>
+                            <td>Lista el directorio home</td>
+                            <td><input type="text" placeholder="Ej: juan"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 9: Terminal con los comandos ejecutados</h3>
+                    <div class="foto-upload" data-foto-id="foto-9">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la terminal mostrando algunos de los comandos ejecutados</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Instalacion de Guest Additions -->
+            <div class="seccion">
+                <h2>Parte 6 - Instalacion de Guest Additions (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Las Guest Additions de VirtualBox mejoran la integracion entre la VM y el equipo anfitrion. En Ubuntu, el proceso es diferente al de Windows:</p>
+
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el menu de VirtualBox, ve a <strong>Dispositivos > Insertar imagen de CD de Guest Additions</strong>.</li>
+                            <li>Ubuntu mostrara una notificacion preguntando si deseas ejecutar el software del CD. Acepta la ejecucion automatica.</li>
+                            <li><strong>Alternativa por terminal</strong> (si el autorun no funciona):
+                                <br>Abre una terminal y ejecuta los siguientes comandos:
+                                <br><code style="background:#edf2f7; padding:2px 6px; border-radius:3px; font-size:12px;">sudo apt install build-essential dkms</code>
+                                <br><code style="background:#edf2f7; padding:2px 6px; border-radius:3px; font-size:12px;">sudo /media/$USER/VBox_GAs_*/VBoxLinuxAdditions.run</code>
+                            </li>
+                            <li>Espera a que se complete la instalacion y <strong>reinicia</strong> la maquina virtual.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Verificacion de Guest Additions</h3>
+                    <p>Tras reiniciar, comprueba que las Guest Additions funcionan correctamente:</p>
+                    <table>
+                        <tr>
+                            <th>Funcionalidad</th>
+                            <th style="width:60px">Funciona</th>
+                        </tr>
+                        <tr>
+                            <td>La resolucion de pantalla se ajusta al tamano de la ventana de VirtualBox</td>
+                            <td><input type="checkbox" id="ga-resolucion"></td>
+                        </tr>
+                        <tr>
+                            <td>El portapapeles compartido funciona (copiar en anfitrion, pegar en VM y viceversa)</td>
+                            <td><input type="checkbox" id="ga-clipboard"></td>
+                        </tr>
+                        <tr>
+                            <td>Arrastrar y soltar archivos entre anfitrion y VM funciona</td>
+                            <td><input type="checkbox" id="ga-dragdrop"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 10: Ubuntu con Guest Additions funcionando</h3>
+                    <div class="foto-upload" data-foto-id="foto-10">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura mostrando Ubuntu a pantalla completa o con resolucion ajustada</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Comparacion obligatoria Windows vs Linux -->
+            <div class="seccion">
+                <h2>Parte 7 - Comparacion obligatoria: Windows vs Linux (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Esta es la seccion <strong>mas importante</strong> de la practica. Ahora que has instalado tanto Windows (Practica 06) como Ubuntu (esta practica), debes compararlos basandote en <strong>tu propia experiencia</strong>.</p>
+
+                    <h3>Tabla comparativa (rellena con datos de TUS instalaciones)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Aspecto</th>
+                            <th style="width:35%">Windows (tu Practica 06)</th>
+                            <th style="width:35%">Ubuntu (esta practica)</th>
+                        </tr>
+                        <tr>
+                            <td>Tiempo total de instalacion</td>
+                            <td><input type="text" placeholder="Ej: 30 minutos"></td>
+                            <td><input type="text" placeholder="Ej: 20 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano de disco ocupado tras instalar</td>
+                            <td><input type="text" placeholder="Ej: 18 GB"></td>
+                            <td><input type="text" placeholder="Ej: 8 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM usada en reposo (sin apps abiertas)</td>
+                            <td><input type="text" placeholder="Ej: 2.1 GB"></td>
+                            <td><input type="text" placeholder="Ej: 1.2 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de pasos durante la instalacion</td>
+                            <td><input type="text" placeholder="Ej: 12 pasos"></td>
+                            <td><input type="text" placeholder="Ej: 8 pasos"></td>
+                        </tr>
+                        <tr>
+                            <td>Necesita clave de producto / licencia</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="opcional">Opcional (se puede omitir)</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Navegador web incluido</td>
+                            <td><input type="text" placeholder="Ej: Microsoft Edge"></td>
+                            <td><input type="text" placeholder="Ej: Firefox"></td>
+                        </tr>
+                        <tr>
+                            <td>Suite ofimatica incluida</td>
+                            <td><input type="text" placeholder="Ej: No incluida / Office 365 trial"></td>
+                            <td><input type="text" placeholder="Ej: LibreOffice"></td>
+                        </tr>
+                        <tr>
+                            <td>Antivirus incluido</td>
+                            <td><input type="text" placeholder="Ej: Windows Defender"></td>
+                            <td><input type="text" placeholder="Ej: No necesario / No incluido"></td>
+                        </tr>
+                        <tr>
+                            <td>Terminal / linea de comandos</td>
+                            <td><input type="text" placeholder="Ej: CMD, PowerShell"></td>
+                            <td><input type="text" placeholder="Ej: Terminal GNOME, Bash"></td>
+                        </tr>
+                        <tr>
+                            <td>Facilidad de instalacion (1-5)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy dificil</option>
+                                    <option value="2">2 - Dificil</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Facil</option>
+                                    <option value="5">5 - Muy facil</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy dificil</option>
+                                    <option value="2">2 - Dificil</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Facil</option>
+                                    <option value="5">5 - Muy facil</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Aspecto visual (1-5)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy malo</option>
+                                    <option value="2">2 - Malo</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Bueno</option>
+                                    <option value="5">5 - Muy bueno</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy malo</option>
+                                    <option value="2">2 - Malo</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Bueno</option>
+                                    <option value="5">5 - Muy bueno</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad percibida (1-5)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy lento</option>
+                                    <option value="2">2 - Lento</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Rapido</option>
+                                    <option value="5">5 - Muy rapido</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Puntua --</option>
+                                    <option value="1">1 - Muy lento</option>
+                                    <option value="2">2 - Lento</option>
+                                    <option value="3">3 - Normal</option>
+                                    <option value="4">4 - Rapido</option>
+                                    <option value="5">5 - Muy rapido</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Preguntas de comparacion (responde con un minimo de 3 lineas cada una)</h3>
+
+                    <div class="pregunta">
+                        <p>1. Que sistema operativo te ha resultado mas facil de instalar? Justifica tu respuesta comparando los pasos de ambos.</p>
+                        <textarea rows="4" placeholder="Compara el proceso de instalacion de Windows y Ubuntu. Menciona diferencias en los pasos, tiempo, complejidad..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Que diferencias visuales has observado entre el escritorio de Windows y el de Ubuntu? Describe al menos 3 diferencias concretas.</p>
+                        <textarea rows="4" placeholder="Describe diferencias en la barra de tareas, menu de inicio, gestor de archivos, aspecto general, iconos..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Si tuvieras que elegir un sistema operativo para una empresa con 20 empleados de oficina (Word, Excel, correo, navegador), cual elegirias y por que? Considera coste, facilidad de uso, soporte y seguridad.</p>
+                        <textarea rows="4" placeholder="Argumenta tu eleccion considerando el coste de licencias, la formacion necesaria, el soporte tecnico disponible y la seguridad..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Y si fuera para un servidor web que tiene que funcionar 24/7 sin reiniciarse, cual elegirias? Justifica.</p>
+                        <textarea rows="4" placeholder="Argumenta tu eleccion considerando la estabilidad, el coste, las actualizaciones, el consumo de recursos y la seguridad..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Que ventajas tiene que Linux sea software libre y de codigo abierto? Nombra al menos 3 ventajas concretas.</p>
+                        <textarea rows="4" placeholder="Explica ventajas como el coste, la transparencia, la comunidad, la personalizacion, la auditoria de seguridad..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega de la practica -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Formato de entrega</h3>
+                    <p>Sube tu practica al canal <strong>#entrega-practicas</strong> del servidor de Discord del curso. Tu entrega debe incluir:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Un documento</strong> (PDF preferiblemente, o Word) con todas las tablas completadas, las 5 preguntas de comparacion respondidas y la tabla comparativa Windows vs Linux.</li>
+                            <li><strong>Las capturas de pantalla</strong> (10 capturas):</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30px">N</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px">OK</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Maquina virtual creada en VirtualBox</td>
+                            <td><input type="checkbox" id="entrega-cap1"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Pantalla de arranque de Ubuntu (Probar / Instalar)</td>
+                            <td><input type="checkbox" id="entrega-cap2"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Seleccion de idioma</td>
+                            <td><input type="checkbox" id="entrega-cap3"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Tipo de instalacion elegido</td>
+                            <td><input type="checkbox" id="entrega-cap4"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Pantalla de particionado</td>
+                            <td><input type="checkbox" id="entrega-cap5"></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Creacion de usuario</td>
+                            <td><input type="checkbox" id="entrega-cap6"></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Escritorio de Ubuntu tras primer inicio</td>
+                            <td><input type="checkbox" id="entrega-cap7"></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Escritorio con menu de aplicaciones abierto</td>
+                            <td><input type="checkbox" id="entrega-cap8"></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Terminal con comandos ejecutados</td>
+                            <td><input type="checkbox" id="entrega-cap9"></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Ubuntu con Guest Additions funcionando</td>
+                            <td><input type="checkbox" id="entrega-cap10"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Practica 07 - Instalacion de Linux (Ubuntu)<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:100px">Puntuacion</th>
+                                <th>Desglose</th>
+                            </tr>
+                            <tr>
+                                <td>Creacion y configuracion de la VM</td>
+                                <td>1.0 punto</td>
+                                <td>VM correctamente creada con recursos adecuados documentados</td>
+                            </tr>
+                            <tr>
+                                <td>Instalacion paso a paso documentada</td>
+                                <td>2.0 puntos</td>
+                                <td>Todos los pasos del instalador completados y documentados</td>
+                            </tr>
+                            <tr>
+                                <td>Exploracion del escritorio</td>
+                                <td>1.0 punto</td>
+                                <td>Todos los elementos del escritorio identificados y descritos</td>
+                            </tr>
+                            <tr>
+                                <td>Comandos en terminal</td>
+                                <td>1.5 puntos</td>
+                                <td>Los 8 comandos ejecutados con sus salidas documentadas</td>
+                            </tr>
+                            <tr>
+                                <td>Guest Additions</td>
+                                <td>0.5 puntos</td>
+                                <td>Instalacion completada y verificaciones realizadas</td>
+                            </tr>
+                            <tr>
+                                <td>Comparacion Windows vs Linux (tabla)</td>
+                                <td>1.5 puntos</td>
+                                <td>Tabla comparativa completa con datos reales de ambas practicas</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de comparacion</td>
+                                <td>1.5 puntos</td>
+                                <td>5 preguntas respondidas con argumentacion propia (minimo 3 lineas)</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas</td>
+                                <td>1.0 punto</td>
+                                <td>Las 10 capturas incluidas y relevantes</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 5)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tabla comparativa Windows vs Linux en blanco o incompleta</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Creacion de la VM completada con tabla de configuracion (Parte 1)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Carga de ISO y arranque documentado (Parte 2)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Instalacion paso a paso completa - 8 pasos documentados (Parte 3)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Exploracion del escritorio con 7 elementos descritos (Parte 4)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">8 comandos de terminal ejecutados con resultados (Parte 5)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Guest Additions instaladas y verificadas (Parte 6)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Comparacion Windows vs Linux completa - tabla + 5 preguntas (Parte 7)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">Las 10 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 07 - Instalacion de Linux (Ubuntu)</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque 2 - Instalacion de Sistemas Operativos (Practica 07)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 07: Instalacion de Linux';
+        const PREFIJO_ARCHIVO = 'P07_Instalacion_Linux';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

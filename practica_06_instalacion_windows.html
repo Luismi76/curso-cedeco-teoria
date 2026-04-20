@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 06: Instalacion de Windows 10/11 en Maquina Virtual</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 06: Instalacion de Windows 10/11 en Maquina Virtual</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0852 - Instalacion y Configuracion de los Componentes de Sistemas Operativos<br>
+                <strong>Bloque:</strong> 2 - Instalacion de Sistemas Operativos<br>
+                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + ISO de Windows 10/11
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota informativa sobre maquinas virtuales -->
+            <div class="nota">
+                <strong>Nota sobre maquinas virtuales:</strong> Una maquina virtual (VM) es, en esencia, <strong>un ordenador dentro de otro ordenador</strong>. Es un entorno de software completamente aislado que simula un equipo completo con su propio procesador, memoria, disco duro y tarjeta de video. Todo lo que hagas dentro de la maquina virtual no afecta al sistema operativo real de tu equipo (llamado <em>anfitrion</em> o <em>host</em>). Esto significa que puedes practicar instalaciones, formatear discos, probar configuraciones e incluso cometer errores sin ningun riesgo para tu ordenador. Si algo sale mal, simplemente borras la maquina virtual y creas una nueva en minutos.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Crear y configurar una maquina virtual en Oracle VirtualBox con los recursos adecuados para Windows.</li>
+                        <li>Configurar correctamente los recursos de hardware virtual (RAM, CPU, disco, video).</li>
+                        <li>Realizar la instalacion completa de Windows 10 u 11 paso a paso, documentando cada fase.</li>
+                        <li>Comprender el proceso real de instalacion de un sistema operativo tal como se haria en un equipo fisico.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">Oracle VirtualBox instalado y funcionando en tu equipo</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-iso">
+                            <label for="req-iso">ISO de Windows 10 u 11 descargada (desde la web oficial de Microsoft)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-ram">
+                            <label for="req-ram">Minimo 8 GB de RAM en el equipo anfitrion</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-disco">
+                            <label for="req-disco">Al menos 60 GB de espacio libre en disco</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vt">
+                            <label for="req-vt">Procesador con virtualizacion habilitada (VT-x / AMD-V) en la BIOS</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico previo -->
+            <div class="seccion">
+                <h2>Contenido teorico previo</h2>
+                <div class="seccion-body">
+                    <h3>Que es una maquina virtual y por que usarla</h3>
+                    <table>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Explicacion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Maquina virtual (VM)</strong></td>
+                            <td>Software que emula un ordenador completo dentro del sistema operativo real. Tiene su propia CPU virtual, RAM, disco duro y perifericos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hipervisor</strong></td>
+                            <td>El programa que crea y gestiona las maquinas virtuales. En nuestro caso, Oracle VirtualBox es el hipervisor.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sistema anfitrion (host)</strong></td>
+                            <td>El sistema operativo real de tu equipo fisico, sobre el que se ejecuta VirtualBox.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sistema invitado (guest)</strong></td>
+                            <td>El sistema operativo que se instala dentro de la maquina virtual (en esta practica, Windows 10 u 11).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ventaja principal</strong></td>
+                            <td>Permite practicar instalaciones y configuraciones sin riesgo para el equipo real. Si algo falla, se borra y se empieza de nuevo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uso profesional</strong></td>
+                            <td>Los tecnicos usan VMs para probar software, simular redes, crear entornos de pruebas y dar soporte remoto.</td>
+                        </tr>
+                    </table>
+
+                    <h3>Recursos minimos y recomendados para una VM con Windows</h3>
+                    <table>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Minimo</th>
+                            <th>Recomendado</th>
+                        </tr>
+                        <tr>
+                            <td><strong>RAM</strong></td>
+                            <td>2 GB (2048 MB)</td>
+                            <td>4 GB (4096 MB)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CPU</strong></td>
+                            <td>1 nucleo</td>
+                            <td>2 nucleos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Disco duro</strong></td>
+                            <td>32 GB</td>
+                            <td>50 GB (dinamico)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memoria de video</strong></td>
+                            <td>64 MB</td>
+                            <td>128 MB</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Importante:</strong> Los recursos que asignes a la maquina virtual se "restan" temporalmente de tu equipo real mientras la VM esta encendida. Por ejemplo, si tu equipo tiene 8 GB de RAM y asignas 4 GB a la VM, tu sistema anfitrion solo dispondra de 4 GB mientras la VM este funcionando.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Creacion de la maquina virtual -->
+            <div class="seccion">
+                <h2>Parte 1 - Creacion de la maquina virtual (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento paso a paso</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Oracle VirtualBox</strong> y haz clic en el boton <strong>"Nueva"</strong> (o ve a Maquina > Nueva).</li>
+                            <li>En el campo <strong>Nombre</strong>, escribe: <strong>Windows_Practica</strong> (o el nombre que prefieras).</li>
+                            <li>En <strong>Tipo</strong>, selecciona: <strong>Microsoft Windows</strong>.</li>
+                            <li>En <strong>Version</strong>, selecciona: <strong>Windows 10 (64-bit)</strong> o <strong>Windows 11 (64-bit)</strong> segun la ISO que tengas.</li>
+                            <li>Asigna la <strong>memoria RAM</strong> (recomendado: 4096 MB).</li>
+                            <li>Selecciona <strong>"Crear un disco duro virtual ahora"</strong>.</li>
+                            <li>Elige tipo de archivo de disco: <strong>VDI</strong> (VirtualBox Disk Image).</li>
+                            <li>Selecciona <strong>"Reservado dinamicamente"</strong> (el disco crece segun se necesite).</li>
+                            <li>Establece el tamano del disco (recomendado: <strong>50 GB</strong>).</li>
+                            <li>Haz clic en <strong>"Crear"</strong>.</li>
+                            <li>Con la VM seleccionada, ve a <strong>Configuracion > Sistema > Procesador</strong> y asigna <strong>2 nucleos</strong>.</li>
+                            <li>Ve a <strong>Configuracion > Pantalla</strong> y sube la memoria de video a <strong>128 MB</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Configuracion elegida para tu maquina virtual</h3>
+                    <p>Completa la tabla con los valores que has configurado:</p>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Configuracion</th>
+                            <th>Valor elegido</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de la VM</td>
+                            <td><input type="text" placeholder="Ej: Windows_Practica"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de sistema operativo</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="w10">Windows 10 (64-bit)</option>
+                                    <option value="w11">Windows 11 (64-bit)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>RAM asignada (MB)</td>
+                            <td><input type="text" placeholder="Ej: 4096"></td>
+                        </tr>
+                        <tr>
+                            <td>Nucleos de CPU asignados</td>
+                            <td><input type="text" placeholder="Ej: 2"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano del disco duro virtual (GB)</td>
+                            <td><input type="text" placeholder="Ej: 50"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de disco</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="dinamico">Reservado dinamicamente</option>
+                                    <option value="fijo">Tamano fijo</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Memoria de video (MB)</td>
+                            <td><input type="text" placeholder="Ej: 128"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Maquina virtual creada en VirtualBox</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la VM creada en la lista de VirtualBox</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Captura 2: Configuracion de recursos de la VM</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la pantalla de configuracion (RAM, CPU, disco, video)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Carga de la ISO y primer arranque -->
+            <div class="seccion">
+                <h2>Parte 2 - Carga de la ISO y primer arranque (15 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento para cargar la ISO</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Con la VM seleccionada, ve a <strong>Configuracion > Almacenamiento</strong>.</li>
+                            <li>En el apartado <strong>Controlador: IDE</strong>, haz clic en el icono del disco vacio (debajo del controlador).</li>
+                            <li>A la derecha, haz clic en el icono del disco junto a <strong>"Unidad optica"</strong>.</li>
+                            <li>Selecciona <strong>"Elegir un archivo de disco"</strong>.</li>
+                            <li>Busca y selecciona el <strong>archivo ISO de Windows</strong> que descargaste.</li>
+                            <li>Haz clic en <strong>"Aceptar"</strong> para cerrar la configuracion.</li>
+                            <li>Haz clic en <strong>"Iniciar"</strong> para arrancar la maquina virtual.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Alternativa:</strong> Si no has cargado la ISO previamente, al iniciar la VM por primera vez VirtualBox te pedira automaticamente que selecciones un archivo de disco de arranque. Simplemente busca la ISO de Windows y confirma.
+                    </div>
+
+                    <h3>Captura 3: ISO cargada en la configuracion de almacenamiento</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la ISO cargada en Almacenamiento</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Instalacion de Windows paso a paso -->
+            <div class="seccion">
+                <h2>Parte 3 - Instalacion de Windows paso a paso (90 min)</h2>
+                <div class="seccion-body">
+                    <p>Esta es la parte principal de la practica. Sigue cada paso con atencion y documenta todo lo que hagas.</p>
+
+                    <!-- Paso 3.1 -->
+                    <h3>Paso 3.1 - Seleccion de idioma y formato</h3>
+                    <p>Al arrancar desde la ISO, la primera pantalla del instalador te pedira seleccionar el idioma, formato de hora y distribucion de teclado.</p>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Configuracion</th>
+                            <th>Tu eleccion</th>
+                        </tr>
+                        <tr>
+                            <td>Idioma de instalacion</td>
+                            <td><input type="text" placeholder="Ej: Espanol (Espana)"></td>
+                        </tr>
+                        <tr>
+                            <td>Formato de hora y moneda</td>
+                            <td><input type="text" placeholder="Ej: Espanol (Espana)"></td>
+                        </tr>
+                        <tr>
+                            <td>Teclado o metodo de entrada</td>
+                            <td><input type="text" placeholder="Ej: Espanol"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Pantalla de seleccion de idioma</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la pantalla de seleccion de idioma del instalador</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.2 -->
+                    <h3>Paso 3.2 - Inicio de instalacion y clave de producto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Haz clic en <strong>"Instalar ahora"</strong>.</li>
+                            <li>Cuando te pida la clave de producto, selecciona <strong>"No tengo clave de producto"</strong>.</li>
+                            <li>Selecciona la <strong>edicion de Windows</strong> que deseas instalar.</li>
+                            <li>Acepta los <strong>terminos de licencia</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Para esta practica no necesitas una clave de producto. Windows permite instalarse sin clave y funciona con todas sus caracteristicas durante un periodo de evaluacion. Esto es perfectamente valido para entornos de aprendizaje y pruebas.
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Configuracion</th>
+                            <th>Tu eleccion</th>
+                        </tr>
+                        <tr>
+                            <td>Edicion de Windows seleccionada</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="home">Windows Home</option>
+                                    <option value="pro">Windows Pro</option>
+                                    <option value="education">Windows Education</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Paso 3.3 -->
+                    <h3>Paso 3.3 - Tipo de instalacion</h3>
+                    <p>El instalador te ofrece dos opciones:</p>
+                    <table>
+                        <tr>
+                            <th>Opcion</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Actualizacion</strong></td>
+                            <td>Instala Windows conservando archivos, configuraciones y aplicaciones de una instalacion anterior. Solo disponible si ya hay un Windows instalado.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Personalizada (avanzada)</strong></td>
+                            <td>Instala Windows desde cero en un disco limpio. Permite elegir la particion y formatea el disco. Es la opcion correcta para instalaciones nuevas.</td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Has elegido "Personalizada (avanzada)". Explica con tus propias palabras por que es la opcion correcta en este caso:</p>
+                        <textarea rows="3" placeholder="Explica por que elegiste Personalizada en lugar de Actualizacion..."></textarea>
+                    </div>
+
+                    <h3>Captura 5: Pantalla de tipo de instalacion</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la pantalla donde eliges tipo de instalacion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.4 -->
+                    <h3>Paso 3.4 - Particionado del disco</h3>
+                    <p>El <strong>particionado</strong> es el proceso de dividir un disco duro en secciones logicas. Cada seccion (particion) puede tener un uso diferente. Windows necesita al menos una particion para instalarse, pero normalmente crea varias automaticamente.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Veras el disco virtual como <strong>"Espacio sin asignar"</strong> con el tamano total que configuraste.</li>
+                            <li>Selecciona el espacio sin asignar y haz clic en <strong>"Nuevo"</strong>.</li>
+                            <li>Acepta el tamano propuesto (todo el disco) y haz clic en <strong>"Aplicar"</strong>.</li>
+                            <li>Windows te informara de que creara particiones adicionales automaticamente. Haz clic en <strong>"Aceptar"</strong>.</li>
+                            <li>Selecciona la <strong>particion principal</strong> (la mas grande) y haz clic en <strong>"Siguiente"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <p>Documenta las particiones que ha creado Windows:</p>
+                    <table>
+                        <tr>
+                            <th>Particion</th>
+                            <th>Tamano</th>
+                            <th>Tipo</th>
+                            <th>Funcion</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: Particion 1"></td>
+                            <td><input type="text" placeholder="Ej: 100 MB"></td>
+                            <td><input type="text" placeholder="Ej: Sistema EFI"></td>
+                            <td><input type="text" placeholder="Ej: Arranque del sistema"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: Particion 2"></td>
+                            <td><input type="text" placeholder="Ej: 16 MB"></td>
+                            <td><input type="text" placeholder="Ej: MSR"></td>
+                            <td><input type="text" placeholder="Ej: Reservada Microsoft"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: Particion 3"></td>
+                            <td><input type="text" placeholder="Ej: 49.4 GB"></td>
+                            <td><input type="text" placeholder="Ej: Principal"></td>
+                            <td><input type="text" placeholder="Ej: Sistema operativo (C:)"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: Particion 4"></td>
+                            <td><input type="text" placeholder="Ej: 500 MB"></td>
+                            <td><input type="text" placeholder="Ej: Recuperacion"></td>
+                            <td><input type="text" placeholder="Ej: Herramientas de recuperacion"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Pantalla de particionado del disco</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la pantalla de particionado con las particiones creadas</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.5 -->
+                    <h3>Paso 3.5 - Copia de archivos e instalacion</h3>
+                    <p>Tras seleccionar la particion, Windows comienza a copiar archivos e instalarse. Este proceso tarda varios minutos y la maquina virtual se reiniciara automaticamente una o mas veces. <strong>No toques nada</strong> durante este proceso.</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Observacion</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Tiempo aproximado de copia de archivos</td>
+                            <td><input type="text" placeholder="Ej: 15 minutos"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de reinicios durante la instalacion</td>
+                            <td><input type="text" placeholder="Ej: 2"></td>
+                        </tr>
+                        <tr>
+                            <td>Fases visibles durante la instalacion (enumera las que veas)</td>
+                            <td><input type="text" placeholder="Ej: Copiando, Preparando, Instalando..."></td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo total aproximado de la instalacion</td>
+                            <td><input type="text" placeholder="Ej: 30 minutos"></td>
+                        </tr>
+                    </table>
+
+                    <!-- Paso 3.6 -->
+                    <h3>Paso 3.6 - Configuracion inicial de Windows (OOBE)</h3>
+                    <p>Tras la instalacion, Windows inicia el <strong>OOBE</strong> (Out-Of-Box Experience), que es el asistente de configuracion inicial. Aqui debes elegir region, teclado, cuenta de usuario y opciones de privacidad.</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Configuracion OOBE</th>
+                            <th>Opcion elegida</th>
+                        </tr>
+                        <tr>
+                            <td>Region / Pais</td>
+                            <td><input type="text" placeholder="Ej: Espana"></td>
+                        </tr>
+                        <tr>
+                            <td>Distribucion de teclado</td>
+                            <td><input type="text" placeholder="Ej: Espanol"></td>
+                        </tr>
+                        <tr>
+                            <td>Segundo teclado (si anadiste alguno)</td>
+                            <td><input type="text" placeholder="Ej: Omitido / Ingles"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre del equipo</td>
+                            <td><input type="text" placeholder="Ej: PC-PRACTICA"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de cuenta</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="local">Cuenta local (sin Microsoft)</option>
+                                    <option value="microsoft">Cuenta de Microsoft</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de usuario creado</td>
+                            <td><input type="text" placeholder="Ej: Alumno"></td>
+                        </tr>
+                        <tr>
+                            <td>Contrasena</td>
+                            <td><em style="color:#718096; font-size:12px;">No escribir aqui por seguridad</em></td>
+                        </tr>
+                        <tr>
+                            <td>Opciones de privacidad configuradas</td>
+                            <td><textarea rows="2" placeholder="Ej: Desactive ubicacion, desactive diagnostico, desactive publicidad personalizada..." style="min-height:50px;"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Consejo:</strong> Para crear una cuenta local en Windows 11 sin cuenta de Microsoft, puedes desconectar la red de la VM antes del OOBE: ve a Configuracion de la VM > Red y desmarca "Habilitar adaptador de red", o durante el OOBE usa el atajo <strong>Shift + F10</strong> y escribe <strong>oobe\bypassnro</strong> en la consola.
+                    </div>
+
+                    <h3>Captura 7: Pantalla del OOBE (configuracion inicial)</h3>
+                    <div class="foto-upload" data-foto-id="foto-7">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de alguna pantalla del asistente de configuracion inicial (OOBE)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <!-- Paso 3.7 -->
+                    <h3>Paso 3.7 - Escritorio de Windows</h3>
+                    <p>Una vez completado el OOBE, llegaras al <strong>escritorio de Windows</strong>. La instalacion ha finalizado con exito. Toma una captura del escritorio.</p>
+
+                    <h3>Captura 8: Escritorio de Windows tras la instalacion</h3>
+                    <div class="foto-upload" data-foto-id="foto-8">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura del escritorio de Windows una vez finalizada la instalacion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Verificacion post-instalacion -->
+            <div class="seccion">
+                <h2>Parte 4 - Verificacion post-instalacion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora debemos comprobar que Windows se ha instalado correctamente y que detecta los recursos que le asignamos. Ve a <strong>Configuracion > Sistema > Acerca de</strong> (o haz clic derecho en "Este equipo" > Propiedades).</p>
+
+                    <h3>Informacion del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Valor en tu VM</th>
+                        </tr>
+                        <tr>
+                            <td>Edicion de Windows</td>
+                            <td><input type="text" placeholder="Ej: Windows 11 Pro"></td>
+                        </tr>
+                        <tr>
+                            <td>Version</td>
+                            <td><input type="text" placeholder="Ej: 23H2"></td>
+                        </tr>
+                        <tr>
+                            <td>Procesador detectado</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i5-12400 (2 nucleos virtuales)"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM instalada</td>
+                            <td><input type="text" placeholder="Ej: 4,00 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de sistema (32 o 64 bits)</td>
+                            <td><input type="text" placeholder="Ej: Sistema operativo de 64 bits"></td>
+                        </tr>
+                        <tr>
+                            <td>Nombre del equipo</td>
+                            <td><input type="text" placeholder="Ej: PC-PRACTICA"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Espacio en disco</h3>
+                    <p>Abre el <strong>Explorador de archivos</strong> y haz clic en <strong>"Este equipo"</strong> para ver el espacio del disco C:</p>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Valor en tu VM</th>
+                        </tr>
+                        <tr>
+                            <td>Espacio total del disco C:</td>
+                            <td><input type="text" placeholder="Ej: 49,4 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio utilizado</td>
+                            <td><input type="text" placeholder="Ej: 15,2 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio libre disponible</td>
+                            <td><input type="text" placeholder="Ej: 34,2 GB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 9: Pantalla de informacion del sistema</h3>
+                    <div class="foto-upload" data-foto-id="foto-9">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la pantalla "Acerca de" con la informacion del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Instalacion de Guest Additions -->
+            <div class="seccion">
+                <h2>Parte 5 - Instalacion de Guest Additions (20 min)</h2>
+                <div class="seccion-body">
+                    <h3>Que son las Guest Additions</h3>
+                    <p>Las <strong>Guest Additions</strong> (Complementos del invitado) son un conjunto de controladores y aplicaciones que se instalan dentro de la maquina virtual para mejorar significativamente su rendimiento y usabilidad:</p>
+                    <table>
+                        <tr>
+                            <th>Mejora</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Resolucion de pantalla</strong></td>
+                            <td>La pantalla de la VM se adapta automaticamente al tamano de la ventana de VirtualBox.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Integracion del raton</strong></td>
+                            <td>El raton se mueve libremente entre el anfitrion y la VM sin necesidad de pulsar tecla de captura.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Portapapeles compartido</strong></td>
+                            <td>Permite copiar y pegar texto e imagenes entre el anfitrion y la VM.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Carpetas compartidas</strong></td>
+                            <td>Permite acceder a carpetas del equipo anfitrion directamente desde la VM.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Arrastrar y soltar</strong></td>
+                            <td>Permite arrastrar archivos entre el anfitrion y la VM.</td>
+                        </tr>
+                    </table>
+
+                    <h3>Procedimiento de instalacion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Con la VM encendida, ve al menu superior de la ventana de VirtualBox.</li>
+                            <li>Haz clic en <strong>Dispositivos > Insertar imagen de CD de las Guest Additions</strong>.</li>
+                            <li>Dentro de Windows, abre el <strong>Explorador de archivos</strong>.</li>
+                            <li>Navega a la unidad de CD/DVD (normalmente <strong>D:</strong>).</li>
+                            <li>Ejecuta <strong>VBoxWindowsAdditions.exe</strong> como administrador.</li>
+                            <li>Sigue el asistente de instalacion y acepta las opciones por defecto.</li>
+                            <li><strong>Reinicia</strong> la maquina virtual cuando lo pida.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Verificacion de Guest Additions</h3>
+                    <p>Tras reiniciar, comprueba que las mejoras funcionan correctamente:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="ga-resolucion">
+                            <label for="ga-resolucion">La resolucion de pantalla se ajusta al redimensionar la ventana de VirtualBox</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="ga-raton">
+                            <label for="ga-raton">El raton se mueve libremente entre el anfitrion y la VM (sin pulsar tecla Host)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="ga-clipboard">
+                            <label for="ga-clipboard">El portapapeles compartido funciona (copiar en anfitrion, pegar en VM y viceversa)</label>
+                        </div>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Para activar el portapapeles compartido, ve a <strong>Dispositivos > Portapapeles compartido > Bidireccional</strong> en el menu de la ventana de VirtualBox.
+                    </div>
+
+                    <h3>Captura 10: Guest Additions instaladas (pantalla ajustada al tamano de ventana)</h3>
+                    <div class="foto-upload" data-foto-id="foto-10">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">la captura de la VM con Guest Additions funcionando (resolucion adaptada)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Errores comunes -->
+            <div class="seccion">
+                <h2>Parte 6 - Errores comunes (obligatorio)</h2>
+                <div class="seccion-body">
+                    <p>Indica si has experimentado alguno de estos errores frecuentes durante la practica y, en caso afirmativo, como lo solucionaste:</p>
+
+                    <table>
+                        <tr>
+                            <th>Error comun</th>
+                            <th style="width:120px">Lo has experimentado?</th>
+                            <th>Como lo solucionaste</th>
+                        </tr>
+                        <tr>
+                            <td>No asignar suficiente RAM a la VM</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                        <tr>
+                            <td>No cargar la ISO (la VM arranca sin sistema operativo)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Elegir mal el tipo o version de SO en VirtualBox</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                        <tr>
+                            <td>VM muy lenta (pocos recursos asignados)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Virtualizacion no habilitada en BIOS (VT-x / AMD-V)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                        <tr>
+                            <td>Pantalla muy pequena (sin Guest Additions instaladas)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                            <td><input type="text" placeholder="Describe la solucion..."></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 - Preguntas de reflexion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Que diferencia hay entre una instalacion "Actualizacion" y "Personalizada"? Cuando usarias cada una?</p>
+                        <textarea rows="4" placeholder="Explica las diferencias entre ambos tipos de instalacion y da ejemplos de cuando usarias cada una..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Por que es importante elegir "disco dinamico" en lugar de "fijo" para la VM? Que ventaja e inconveniente tiene cada uno?</p>
+                        <textarea rows="4" placeholder="Explica las diferencias entre disco dinamico y fijo, y sus ventajas e inconvenientes..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Durante el particionado, Windows crea automaticamente varias particiones ademas de la principal. Investiga para que sirve cada una (particion de sistema EFI, particion de recuperacion, particion MSR).</p>
+                        <textarea rows="4" placeholder="Investiga y explica la funcion de cada particion que crea Windows automaticamente..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Que ventajas tiene usar maquinas virtuales para practicar instalaciones frente a hacerlo en un equipo real? Nombra al menos 3.</p>
+                        <textarea rows="4" placeholder="Enumera y explica al menos 3 ventajas de usar maquinas virtuales para practicar..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Si un cliente necesita un equipo con Windows para una oficina, que edicion le recomendarias (Home, Pro, Enterprise)? Justifica tu respuesta.</p>
+                        <textarea rows="4" placeholder="Recomienda una edicion y justifica tu eleccion teniendo en cuenta el entorno de oficina..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREGA -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Capturas de pantalla requeridas</h3>
+                    <p>Comprueba que tienes todas las capturas necesarias:</p>
+                    <table>
+                        <tr>
+                            <th>Captura</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>VM creada en VirtualBox</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Configuracion de recursos de la VM</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>ISO cargada en almacenamiento</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Pantalla de seleccion de idioma</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Pantalla de tipo de instalacion</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 6</td>
+                            <td>Pantalla de particionado del disco</td>
+                            <td><input type="checkbox" id="cap-6"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 7</td>
+                            <td>Pantalla del OOBE (configuracion inicial)</td>
+                            <td><input type="checkbox" id="cap-7"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 8</td>
+                            <td>Escritorio de Windows tras la instalacion</td>
+                            <td><input type="checkbox" id="cap-8"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 9</td>
+                            <td>Informacion del sistema (Acerca de)</td>
+                            <td><input type="checkbox" id="cap-9"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 10</td>
+                            <td>Guest Additions instaladas</td>
+                            <td><input type="checkbox" id="cap-10"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Practica 06 - Instalacion de Windows en VM<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Creacion y configuracion correcta de la VM (Parte 1 y 2)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Instalacion paso a paso documentada (Parte 3)</td>
+                                <td>3.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Verificacion post-instalacion completa (Parte 4)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Guest Additions instaladas y verificadas (Parte 5)</td>
+                                <td>0.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Errores comunes identificados (Parte 6)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 7)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas y claras (10 capturas)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 5 de las 10 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de configuracion incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: VM creada y configurada correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: ISO cargada y primer arranque documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Instalacion completa paso a paso con todas las tablas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Verificacion post-instalacion (info del sistema y disco)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Guest Additions instaladas y verificadas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: Tabla de errores comunes completada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">10 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Practica 06 - Instalacion de Windows en VM</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque 2 - Instalacion de Sistemas Operativos (Practica 06)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 06: Instalacion de Windows';
+        const PREFIJO_ARCHIVO = 'P06_Instalacion_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

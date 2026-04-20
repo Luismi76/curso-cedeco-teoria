@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 04: Comprobacion de Fuentes de Alimentacion ATX</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Aviso seguridad */
+        .aviso-seguridad {
+            background: #fff5f5;
+            border: 2px solid var(--rojo);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+
+        .aviso-seguridad h3 {
+            color: var(--rojo) !important;
+            border: none !important;
+            margin: 0 0 8px 0 !important;
+            padding: 0 !important;
+            font-size: 15px;
+        }
+
+        .aviso-seguridad ul {
+            margin-left: 20px;
+            color: #742a2a;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td.color-muestra {
+            width: 30px;
+            text-align: center;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #999;
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        /* Esquema ATX */
+        .esquema-atx {
+            background: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 12px 0;
+            line-height: 1.6;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Tabla voltaje-componentes rellenable */
+        .tabla-componentes td:last-child input {
+            min-width: 200px;
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Validacion automatica */
+        .dentro-rango {
+            background: #f0fff4 !important;
+        }
+
+        .fuera-rango {
+            background: #fff5f5 !important;
+        }
+
+        .resultado-auto {
+            font-weight: 600;
+            font-size: 12px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .resultado-auto.ok {
+            color: var(--verde);
+        }
+
+        .resultado-auto.nok {
+            color: var(--rojo);
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 04: Comprobacion de Fuentes de Alimentacion ATX</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0861 - Montaje y Verificacion de Componentes<br>
+                <strong>Duracion estimada:</strong> 2 horas
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Aviso de seguridad -->
+            <div class="aviso-seguridad">
+                <h3>IMPORTANTE - Normas de seguridad</h3>
+                <ul>
+                    <li>La fuente de alimentacion trabaja internamente con <strong>230 V AC</strong>. NUNCA abras la carcasa de una fuente conectada a la red.</li>
+                    <li>Trabaja siempre con la fuente <strong>desconectada</strong> de la red electrica cuando manipules conectores.</li>
+                    <li>Usa guantes aislantes si estan disponibles.</li>
+                    <li>No toques componentes internos de la fuente bajo ningun concepto.</li>
+                    <li>En caso de duda, consulta al profesor antes de continuar.</li>
+                </ul>
+            </div>
+
+            <!-- PARTE 1: Inspeccion visual -->
+            <div class="seccion">
+                <h2>Parte 1 - Inspeccion visual (15 min)</h2>
+                <div class="seccion-body">
+                    <p>Examina la fuente de alimentacion asignada y completa la siguiente ficha:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Marca y modelo</td>
+                            <td><input type="text" placeholder="Ej: Corsair RM750x"></td>
+                        </tr>
+                        <tr>
+                            <td>Potencia (W)</td>
+                            <td><input type="text" id="potencia-fuente" placeholder="Ej: 750"></td>
+                        </tr>
+                        <tr>
+                            <td>Certificacion 80 Plus (si la tiene)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="no">No tiene</option>
+                                    <option value="white">80 Plus (White)</option>
+                                    <option value="bronze">80 Plus Bronze</option>
+                                    <option value="silver">80 Plus Silver</option>
+                                    <option value="gold">80 Plus Gold</option>
+                                    <option value="platinum">80 Plus Platinum</option>
+                                    <option value="titanium">80 Plus Titanium</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de cableado</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="no-modular">No modular</option>
+                                    <option value="semi-modular">Semi-modular</option>
+                                    <option value="modular">Modular</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Interruptor trasero I/O</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Estado del ventilador</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="ok">Gira libremente</option>
+                                    <option value="atascado">Atascado</option>
+                                    <option value="ruidoso">Ruidoso</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Estado de los cables</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="bueno">Buen estado</option>
+                                    <option value="pelados">Pelados / danados</option>
+                                    <option value="doblados">Doblados</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Conectores disponibles (marca los que tenga)</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="con-atx24">
+                            <label for="con-atx24">24 pin ATX (placa base)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="con-eps">
+                            <label for="con-eps">4+4 pin EPS (CPU)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="con-pcie">
+                            <label for="con-pcie">PCIe 6+2 pin (grafica)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="con-sata">
+                            <label for="con-sata">SATA</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="con-molex">
+                            <label for="con-molex">Molex 4 pin</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="con-otros">
+                            <label for="con-otros">Otros: </label>
+                            <input type="text" style="width:120px; padding:3px 6px; font-size:12px;" placeholder="Especificar">
+                        </div>
+                    </div>
+
+                    <h3>Foto de la etiqueta de la fuente</h3>
+                    <div class="foto-upload" data-foto-id="foto-etiqueta">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una foto (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Foto de la etiqueta de la fuente</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Foto general de la fuente</h3>
+                    <div class="foto-upload" data-foto-id="foto-general">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una foto (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Foto general de la fuente con sus cables</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Prueba del clip -->
+            <div class="seccion">
+                <h2>Parte 2 - Prueba de encendido / Jumper Test (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Esta prueba comprueba si la fuente enciende <strong>sin necesidad de placa base</strong>.</p>
+
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Desconecta</strong> la fuente de la red electrica y de cualquier componente.</li>
+                            <li>Localiza el conector principal de <strong>24 pines ATX</strong>.</li>
+                            <li>Identifica el cable <strong style="color:green">verde</strong> (PS_ON, pin 16) y cualquier cable <strong>negro</strong> (GND / tierra).</li>
+                            <li>Con la fuente <strong>desconectada de la red</strong>, inserta el clip entre el pin <strong style="color:green">verde</strong> (PS_ON) y un pin <strong>negro</strong> (GND) adyacente:</li>
+                        </ol>
+                    </div>
+
+                    <div class="esquema-atx">
+<pre style="display:inline-block; text-align:left;">
+  Conector 24 pines ATX (vista frontal del conector)
+
+  +-------------------------------------------------+
+  |                                                 |
+  |  <span style="color:#f6ad55">+3.3V</span>  <span style="color:#f6ad55">+3.3V</span>   GND   <span style="color:#fc8181">+5V</span>    GND   <span style="color:#fc8181">+5V</span>    GND   PW_OK |
+  |    1      2      3     4      5     6      7      8   |
+  |    o      o      o     o      o     o      o      o   |
+  |                                                       |
+  |    9     10     11    12     13    14     15     16    |
+  |    o      o      o     o      o     o      o      o   |
+  |  <span style="color:#fc8181">+5VSB</span>  <span style="color:#fbd38d">+12V</span>  <span style="color:#fbd38d">+12V</span>  <span style="color:#f6ad55">+3.3V</span>   GND    GND    GND  <span style="color:#68d391">PS_ON</span> |
+  |                                                       |
+  |                                          <span style="color:#68d391">pin 16</span>  <span style="color:white">pin 15</span>|
+  |                                            <span style="color:#68d391">|</span>      <span style="color:white">|</span>    |
+  |                                            <span style="color:#fbd38d">+------+</span>    |
+  |                                             <span style="color:#fbd38d">CLIP</span>        |
+  +-------------------------------------------------+
+
+  Puentear pin 16 (<span style="color:#68d391">VERDE</span> = PS_ON) con pin 15 (<span style="color:white">NEGRO</span> = GND)
+</pre>
+                    </div>
+
+                    <div class="pasos">
+                        <ol start="5">
+                            <li><strong>Conecta</strong> la fuente a la red electrica y pon el interruptor trasero en <strong>I</strong> (ON).</li>
+                            <li>Si la fuente funciona, el ventilador deberia empezar a girar.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> El pin 16 (verde, PS_ON) debe puentearse con cualquier pin negro (GND). El pin 15 es el mas comun por ser adyacente.
+                    </div>
+
+                    <h3>Resultado de la prueba</h3>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Pregunta</th>
+                            <th>Respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>El ventilador gira al puentear PS_ON con GND</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Se escucha algun ruido anormal</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="no">No, funcionamiento normal</option>
+                                    <option value="si">Si (describir abajo)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Hay algun olor a quemado</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="no">No</option>
+                                    <option value="si">Si - DESCONECTAR INMEDIATAMENTE</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size:13px; font-weight:600; color: var(--azul);">Observaciones sobre la prueba del clip:</label>
+                        <textarea placeholder="Describe cualquier anomalia observada durante la prueba (ruidos, vibraciones, etc.)." rows="2"></textarea>
+                    </div>
+
+                    <h3>Foto del montaje (clip en conector 24 pines)</h3>
+                    <div class="foto-upload" data-foto-id="foto-jumper">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una foto (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Foto del montaje del clip en el conector 24 pines</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        Cuando termines, <strong>apaga la fuente</strong> (interruptor en O), <strong>desconectala</strong> de la red y retira el clip.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Medicion de voltajes -->
+            <div class="seccion">
+                <h2>Parte 3 - Medicion de voltajes con polimetro (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Con la fuente encendida (clip puesto y conectada a la red), mide los voltajes de salida en el conector de 24 pines ATX.</p>
+
+                    <h3>Configuracion del polimetro</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Coloca el polimetro en modo <strong>voltaje continuo (V DC)</strong>.</li>
+                            <li>Selecciona el rango de <strong>20 V</strong> (o rango automatico).</li>
+                            <li>Conecta la <strong>punta negra</strong> (COM) a un cable <strong>negro</strong> (GND) del conector de 24 pines.</li>
+                            <li>Con la <strong>punta roja</strong> ve midiendo cada cable de color.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Mediciones en conector ATX 24 pines</h3>
+                    <table id="tabla-voltajes-atx">
+                        <tr>
+                            <th style="width:40px">Color</th>
+                            <th>Cable</th>
+                            <th>V nominal</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            <th style="width:100px">Tu medicion (V)</th>
+                            <th style="width:80px">Resultado</th>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#ed8936"></span></td>
+                            <td><strong>Naranja</strong></td>
+                            <td>+3.3 V</td>
+                            <td>+3.14 V</td>
+                            <td>+3.47 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="3.14" data-max="3.47" placeholder="Ej: 3.31" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#e53e3e"></span></td>
+                            <td><strong>Rojo</strong></td>
+                            <td>+5 V</td>
+                            <td>+4.75 V</td>
+                            <td>+5.25 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="4.75" data-max="5.25" placeholder="Ej: 5.04" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#ecc94b"></span></td>
+                            <td><strong>Amarillo</strong></td>
+                            <td>+12 V</td>
+                            <td>+11.40 V</td>
+                            <td>+12.60 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="11.40" data-max="12.60" placeholder="Ej: 12.08" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#3182ce"></span></td>
+                            <td><strong>Azul</strong></td>
+                            <td>-12 V</td>
+                            <td>-13.20 V</td>
+                            <td>-10.80 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="-13.20" data-max="-10.80" placeholder="Ej: -11.95" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#9f7aea"></span></td>
+                            <td><strong>Morado</strong></td>
+                            <td>+5 V SB</td>
+                            <td>+4.75 V</td>
+                            <td>+5.25 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="4.75" data-max="5.25" placeholder="Ej: 5.10" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> El cable morado (+5V SB) tiene voltaje incluso con la fuente "apagada" (standby), siempre que este conectada a la red. Es normal.
+                    </div>
+
+                    <h3>Mediciones en conector SATA (si esta disponible)</h3>
+                    <table id="tabla-voltajes-sata">
+                        <tr>
+                            <th style="width:40px">Color</th>
+                            <th>Cable</th>
+                            <th>V nominal</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            <th style="width:100px">Tu medicion (V)</th>
+                            <th style="width:80px">Resultado</th>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#ed8936"></span></td>
+                            <td><strong>Naranja</strong></td>
+                            <td>+3.3 V</td>
+                            <td>+3.14 V</td>
+                            <td>+3.47 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="3.14" data-max="3.47" placeholder="Ej: 3.29" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#e53e3e"></span></td>
+                            <td><strong>Rojo</strong></td>
+                            <td>+5 V</td>
+                            <td>+4.75 V</td>
+                            <td>+5.25 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="4.75" data-max="5.25" placeholder="Ej: 5.01" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                        <tr>
+                            <td class="color-muestra"><span class="dot" style="background:#ecc94b"></span></td>
+                            <td><strong>Amarillo</strong></td>
+                            <td>+12 V</td>
+                            <td>+11.40 V</td>
+                            <td>+12.60 V</td>
+                            <td><input type="text" class="voltaje-input" data-min="11.40" data-max="12.60" placeholder="Ej: 12.15" oninput="validarVoltaje(this)"></td>
+                            <td class="resultado-auto">-</td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto del polimetro midiendo</h3>
+                    <div class="foto-upload" data-foto-id="foto-polimetro">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una foto (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Foto del polimetro midiendo voltajes</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Diagnostico y conclusiones -->
+            <div class="seccion">
+                <h2>Parte 4 - Diagnostico y conclusiones (20 min)</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>1. Segun los resultados obtenidos, la fuente funciona correctamente? Justifica tu respuesta indicando que mediciones son correctas y cuales no.</p>
+                        <textarea rows="4" placeholder="Justifica si la fuente es apta o no basandote en las mediciones realizadas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Relaciona cada voltaje con los componentes que alimenta:</p>
+                        <table class="tabla-componentes">
+                            <tr>
+                                <th>Voltaje</th>
+                                <th>Componentes que alimenta</th>
+                            </tr>
+                            <tr>
+                                <td>+3.3 V</td>
+                                <td><input type="text" placeholder="Indica que componentes usan esta linea de voltaje"></td>
+                            </tr>
+                            <tr>
+                                <td>+5 V</td>
+                                <td><input type="text" placeholder="Indica que componentes usan esta linea de voltaje"></td>
+                            </tr>
+                            <tr>
+                                <td>+12 V</td>
+                                <td><input type="text" placeholder="Indica que componentes usan esta linea de voltaje"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Un companero te dice que su equipo no enciende. Describe paso a paso como comprobarias si el problema es de la fuente de alimentacion.</p>
+                        <textarea rows="5" placeholder="Paso 1: ...&#10;Paso 2: ...&#10;Paso 3: ..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Por que es importante que una fuente tenga certificacion 80 Plus? Que diferencia hay entre 80 Plus Bronze y 80 Plus Gold en terminos practicos?</p>
+                        <textarea rows="4" placeholder="Explica la importancia de la eficiencia energetica..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. La fuente que has comprobado, seria suficiente para este equipo? Calcula la potencia necesaria (margen del 30%):</p>
+                        <p style="font-weight:normal; font-size:12px; color:#718096; margin-bottom:8px;">
+                            CPU: Intel Core i5-14600K | GPU: NVIDIA RTX 4060 | RAM: 2x16GB DDR5 (~5W) | SSD NVMe 1TB (~5W) | 3 ventiladores (~10W)
+                        </p>
+                        <table id="tabla-potencia">
+                            <tr>
+                                <th>Componente</th>
+                                <th style="width:120px">Consumo (W)</th>
+                            </tr>
+                            <tr>
+                                <td>CPU (Intel Core i5-14600K)</td>
+                                <td><input type="text" class="potencia-input" placeholder="TDP" oninput="calcularPotencia()"></td>
+                            </tr>
+                            <tr>
+                                <td>GPU (NVIDIA RTX 4060)</td>
+                                <td><input type="text" class="potencia-input" placeholder="TDP" oninput="calcularPotencia()"></td>
+                            </tr>
+                            <tr>
+                                <td>RAM (2x16GB DDR5)</td>
+                                <td><input type="text" class="potencia-input" value="5" oninput="calcularPotencia()"></td>
+                            </tr>
+                            <tr>
+                                <td>SSD NVMe 1TB</td>
+                                <td><input type="text" class="potencia-input" value="5" oninput="calcularPotencia()"></td>
+                            </tr>
+                            <tr>
+                                <td>3 ventiladores</td>
+                                <td><input type="text" class="potencia-input" value="10" oninput="calcularPotencia()"></td>
+                            </tr>
+                            <tr style="background:#edf2f7; font-weight:600;">
+                                <td>Total</td>
+                                <td id="potencia-total">- W</td>
+                            </tr>
+                            <tr style="background:#edf2f7; font-weight:600;">
+                                <td>Total x 1.3 (con margen 30%)</td>
+                                <td id="potencia-margen">- W</td>
+                            </tr>
+                            <tr style="font-weight:600;">
+                                <td>La fuente es suficiente?</td>
+                                <td id="potencia-resultado">-</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:100px">Puntuacion</th>
+                            </tr>
+                            <tr><td>Inspeccion visual completa y correcta</td><td>1.5 puntos</td></tr>
+                            <tr><td>Prueba del clip realizada y documentada</td><td>2 puntos</td></tr>
+                            <tr><td>Mediciones con polimetro correctas y completas</td><td>3 puntos</td></tr>
+                            <tr><td>Preguntas de diagnostico bien razonadas</td><td>2.5 puntos</td></tr>
+                            <tr><td>Fotografias claras y completas</td><td>1 punto</td></tr>
+                            <tr style="font-weight:700; background:#c6f6d5"><td>Total</td><td>10 puntos</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Fuentes de alimentacion | <strong>Fuente:</strong> [marca y modelo]</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 04: Fuentes de Alimentacion';
+        const PREFIJO_ARCHIVO = 'P04_Fuentes_Alimentacion';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== VALIDACION DE VOLTAJES ======
+
+        function validarVoltaje(input) {
+            const valor = parseFloat(input.value.replace(',', '.'));
+            const min = parseFloat(input.dataset.min);
+            const max = parseFloat(input.dataset.max);
+            const resultado = input.closest('tr').querySelector('.resultado-auto');
+
+            if (isNaN(valor) || input.value.trim() === '') {
+                resultado.textContent = '-';
+                resultado.className = 'resultado-auto';
+                input.closest('tr').classList.remove('dentro-rango', 'fuera-rango');
+                return;
+            }
+
+            if (valor >= min && valor <= max) {
+                resultado.textContent = 'OK';
+                resultado.className = 'resultado-auto ok';
+                input.closest('tr').classList.add('dentro-rango');
+                input.closest('tr').classList.remove('fuera-rango');
+            } else {
+                resultado.textContent = 'FUERA';
+                resultado.className = 'resultado-auto nok';
+                input.closest('tr').classList.add('fuera-rango');
+                input.closest('tr').classList.remove('dentro-rango');
+            }
+        }
+
+        // Calculo automatico de potencia
+        function calcularPotencia() {
+            const inputs = document.querySelectorAll('.potencia-input');
+            let total = 0;
+            let allFilled = true;
+
+            inputs.forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) {
+                    total += val;
+                } else if (input.value.trim() !== '') {
+                    allFilled = false;
+                }
+            });
+
+            if (total > 0) {
+                const margen = Math.ceil(total * 1.3);
+                document.getElementById('potencia-total').textContent = total + ' W';
+                document.getElementById('potencia-margen').textContent = margen + ' W';
+
+                const potenciaFuente = parseFloat(document.getElementById('potencia-fuente')?.value);
+                if (!isNaN(potenciaFuente) && potenciaFuente > 0) {
+                    if (potenciaFuente >= margen) {
+                        document.getElementById('potencia-resultado').innerHTML = '<span style="color:#276749">Si (' + potenciaFuente + 'W >= ' + margen + 'W)</span>';
+                    } else {
+                        document.getElementById('potencia-resultado').innerHTML = '<span style="color:#c53030">No (' + potenciaFuente + 'W < ' + margen + 'W)</span>';
+                    }
+                } else {
+                    document.getElementById('potencia-resultado').textContent = 'Rellena la potencia de la fuente en la Parte 1';
+                }
+            } else {
+                document.getElementById('potencia-total').textContent = '- W';
+                document.getElementById('potencia-margen').textContent = '- W';
+                document.getElementById('potencia-resultado').textContent = '-';
+            }
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    // Re-validar voltajes
+                    document.querySelectorAll('.voltaje-input').forEach(validarVoltaje);
+                    calcularPotencia();
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+
+        document.getElementById('potencia-fuente')?.addEventListener('input', calcularPotencia);
+    </script>
+</body>
+</html>

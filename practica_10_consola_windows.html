@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 10: Diagnostico de Equipos con la Consola de Windows</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .aviso {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .escenario {
+            background: #fffff0;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        pre.codigo-bloque {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 10: Diagnostico de Equipos con la Consola de Windows</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 - Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 - Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Diagnostico y reparacion de equipos desde la linea de comandos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Windows 10 instalado (Practica 06)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica requiere tener completada la <strong>Practica 08 (Explorando Windows 10)</strong>. Trabajaras sobre la misma maquina virtual. Todos los comandos se ejecutan en <strong>CMD</strong> o <strong>PowerShell</strong> segun se indique.
+            </div>
+
+            <!-- Contexto -->
+            <div class="escenario">
+                <strong>Escenario:</strong> Trabajas como tecnico en un taller de reparacion de equipos informaticos. Un cliente trae su PC con varios problemas: va lento, tiene fallos de red y no sabe que hardware tiene. Tu mision es <strong>diagnosticar el equipo usando la consola</strong>, generar un informe de hardware y verificar que todo funciona correctamente, <strong>sin necesidad de abrir la torre</strong>.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Obtener un inventario completo del hardware de un equipo desde la consola (CPU, RAM, disco, placa base, BIOS).</li>
+                        <li>Utilizar la redireccion y los pipes para generar informes de diagnostico.</li>
+                        <li>Diagnosticar problemas de conectividad de red con ping, tracert, netstat y nslookup.</li>
+                        <li>Consultar drivers instalados y detectar dispositivos con problemas.</li>
+                        <li>Verificar la integridad del sistema con herramientas de reparacion (sfc, DISM, chkdsk).</li>
+                        <li>Crear un script batch de diagnostico automatizado para usar en el taller.</li>
+                        <li>Utilizar PowerShell para obtener informacion detallada del hardware via WMI.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th>Requisito</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Practica 08 (Explorando Windows 10) completada</td>
+                            <td><input type="checkbox" id="req-p1"></td>
+                        </tr>
+                        <tr>
+                            <td>Maquina virtual con Windows 10 funcionando correctamente</td>
+                            <td><input type="checkbox" id="req-vm"></td>
+                        </tr>
+                        <tr>
+                            <td>Acceso de administrador en la maquina virtual</td>
+                            <td><input type="checkbox" id="req-admin"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Inventario de hardware desde CMD -->
+            <div class="seccion">
+                <h2>Parte 1 - Inventario de hardware desde la consola (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Lo primero que hace un tecnico cuando recibe un equipo es identificar su hardware <strong>sin abrirlo</strong>. Windows permite obtener toda esta informacion desde la linea de comandos con <code>systeminfo</code> y <strong>PowerShell</strong> (cmdlet <code>Get-CimInstance</code>).</p>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> El antiguo comando <code>wmic</code> esta <strong>obsoleto desde Windows 10 21H1</strong> y ha sido <strong>eliminado por completo en Windows 11 24H2</strong>. Microsoft recomienda usar <strong>PowerShell con <code>Get-CimInstance</code></strong>, que ofrece la misma informacion de WMI con sintaxis moderna. En esta practica usaremos PowerShell para el inventario de hardware y CMD para el resto de tareas.
+                    </div>
+
+                    <div class="nota">
+                        <strong>Como abrir las dos consolas:</strong>
+                        <ul>
+                            <li><strong>CMD como administrador:</strong> pulsa Inicio, escribe <code>cmd</code>, clic derecho > "Ejecutar como administrador".</li>
+                            <li><strong>PowerShell como administrador:</strong> pulsa Inicio, escribe <code>powershell</code>, clic derecho > "Ejecutar como administrador".</li>
+                        </ul>
+                        Para esta Parte 1 usa <strong>PowerShell</strong>. Para las Partes 3, 4 y 5 usa <strong>CMD</strong>.
+                    </div>
+
+                    <h3>Informacion general del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th style="width:20%">Que identifica</th>
+                            <th>Resultado en tu VM</th>
+                        </tr>
+                        <tr>
+                            <td><code>systeminfo | findstr /i "nombre fabricante modelo"</code></td>
+                            <td>Fabricante y modelo del equipo</td>
+                            <td><textarea rows="2" placeholder="Pega las lineas encontradas"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_BIOS | Select-Object Manufacturer, SMBIOSBIOSVersion, SerialNumber</code></td>
+                            <td>BIOS: fabricante, version, numero de serie</td>
+                            <td><textarea rows="2" placeholder="Pega la salida"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product, SerialNumber</code></td>
+                            <td>Placa base: fabricante y modelo</td>
+                            <td><textarea rows="2" placeholder="Pega la salida"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Procesador (CPU)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando (PowerShell)</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed</code></td>
+                            <td><textarea rows="2" placeholder="Modelo CPU, nucleos, hilos, velocidad maxima"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_Processor | Select-Object CurrentClockSpeed, LoadPercentage</code></td>
+                            <td><input type="text" placeholder="Velocidad actual y % de uso"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Memoria RAM</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_PhysicalMemory | Select-Object @{n='CapacidadGB';e={$_.Capacity/1GB}}, Speed, Manufacturer, PartNumber</code></td>
+                            <td><textarea rows="2" placeholder="Capacidad (GB), velocidad, fabricante, referencia"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>systeminfo | findstr /i "memoria"</code> (CMD)</td>
+                            <td><textarea rows="2" placeholder="Memoria fisica total, disponible, virtual"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> En el comando de PowerShell, <code>$_.Capacity/1GB</code> convierte automaticamente los bytes a gigabytes. Si lo prefieres en bruto (bytes), usa simplemente <code>Capacity</code>.
+                    </div>
+
+                    <h3>Disco duro / SSD</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-PhysicalDisk | Select-Object FriendlyName, MediaType, BusType, @{n='TamanoGB';e={[math]::Round($_.Size/1GB,2)}}</code></td>
+                            <td><textarea rows="2" placeholder="Modelo disco, tipo (HDD/SSD/Unspecified), interfaz (SATA/NVMe), tamano"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-Volume | Select-Object DriveLetter, FileSystemLabel, FileSystem, @{n='TotalGB';e={[math]::Round($_.Size/1GB,2)}}, @{n='LibreGB';e={[math]::Round($_.SizeRemaining/1GB,2)}}</code></td>
+                            <td><textarea rows="2" placeholder="Unidades, etiqueta, sistema de archivos, tamano total y libre"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Ficha tecnica del equipo</h3>
+                    <p>Con los datos obtenidos, completa esta ficha tecnica como harias en un taller de reparacion:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Componente</th>
+                            <th>Datos del equipo</th>
+                        </tr>
+                        <tr>
+                            <td>Fabricante / Modelo del equipo</td>
+                            <td><input type="text" placeholder="Ej: Dell OptiPlex 3080"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de serie</td>
+                            <td><input type="text" placeholder="Ej: ABC123XYZ"></td>
+                        </tr>
+                        <tr>
+                            <td>BIOS (version)</td>
+                            <td><input type="text" placeholder="Ej: American Megatrends v2.17"></td>
+                        </tr>
+                        <tr>
+                            <td>Placa base</td>
+                            <td><input type="text" placeholder="Ej: VirtualBox, Oracle Corporation"></td>
+                        </tr>
+                        <tr>
+                            <td>CPU (modelo, nucleos, velocidad)</td>
+                            <td><input type="text" placeholder="Ej: Intel i5-10400, 6 nucleos, 2900 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM (cantidad, velocidad)</td>
+                            <td><input type="text" placeholder="Ej: 4 GB, 2400 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco (modelo, tamano, tipo)</td>
+                            <td><input type="text" placeholder="Ej: VBOX HARDDISK, 50 GB, SATA"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema operativo</td>
+                            <td><input type="text" placeholder="Ej: Windows 10 Pro 64-bit, version 22H2"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Guardar inventario en un archivo</h3>
+                    <p>Un buen tecnico genera un informe por escrito. Ejecuta estos comandos en <strong>PowerShell</strong> para crear un informe de inventario:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><code>$inf = "$env:USERPROFILE\Documents\inventario_equipo.txt"</code></li>
+                            <li><code>systeminfo | Out-File $inf</code></li>
+                            <li><code>"=== DISCO ===" | Add-Content $inf</code></li>
+                            <li><code>Get-PhysicalDisk | Select-Object FriendlyName, MediaType, BusType, @{n='GB';e={[math]::Round($_.Size/1GB,2)}} | Format-Table | Out-String | Add-Content $inf</code></li>
+                            <li><code>"=== RAM ===" | Add-Content $inf</code></li>
+                            <li><code>Get-CimInstance Win32_PhysicalMemory | Select-Object @{n='GB';e={$_.Capacity/1GB}}, Speed, Manufacturer | Format-Table | Out-String | Add-Content $inf</code></li>
+                            <li>Comprueba el archivo: <code>Get-Content $inf | more</code></li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Se creo el archivo? Que tamano tiene (usa <code>Get-Item $inf | Select-Object Length</code>)?</p>
+                        <textarea rows="2" placeholder="Escribe el tamano del archivo y si contiene toda la informacion"></textarea>
+                    </div>
+
+                    <h3>Captura 1: PowerShell mostrando comandos de inventario de hardware</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de PowerShell con Get-CimInstance / Get-PhysicalDisk</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Drivers y dispositivos -->
+            <div class="seccion">
+                <h2>Parte 2 - Drivers y dispositivos instalados (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Cuando un equipo tiene problemas de hardware (sin sonido, sin red, pantalla con mala resolucion), la causa suele ser un <strong>driver incorrecto o ausente</strong>. Desde CMD podemos consultar todos los drivers instalados y detectar problemas.</p>
+
+                    <h3>Listar drivers instalados</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th style="width:20%">Que muestra</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>driverquery</code></td>
+                            <td>Lista todos los drivers</td>
+                            <td><input type="text" placeholder="Cuantos drivers aparecen aprox.?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>driverquery | findstr /i "running"</code></td>
+                            <td>Solo drivers activos</td>
+                            <td><textarea rows="3" placeholder="Pega los primeros 10 drivers activos"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>driverquery /FO CSV /V > %USERPROFILE%\Documents\drivers_completo.csv</code></td>
+                            <td>Exporta drivers a CSV (para Excel)</td>
+                            <td><input type="text" placeholder="Se creo el archivo? Que tamano tiene?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Dispositivos del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_PnPEntity | Where-Object Status -ne 'OK' | Select-Object Name, Status</code> (PowerShell)</td>
+                            <td><textarea rows="3" placeholder="Dispositivos con estado distinto a 'OK' (posibles problemas)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, Status</code> (PowerShell)</td>
+                            <td><textarea rows="2" placeholder="Tarjeta grafica, version del driver, estado"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_SoundDevice | Select-Object Name, Status</code> (PowerShell)</td>
+                            <td><input type="text" placeholder="Dispositivo de sonido y su estado"></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-NetAdapter | Where-Object Status -eq 'Up' | Select-Object Name, LinkSpeed, MacAddress</code> (PowerShell)</td>
+                            <td><textarea rows="2" placeholder="Tarjeta de red activa, velocidad, MAC"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Si <code>Win32_PnPEntity</code> muestra dispositivos con estado <strong>"Error"</strong> o <strong>"Degraded"</strong>, indica que el driver no funciona correctamente. La solucion seria reinstalar el driver del fabricante o actualizar via Windows Update.
+                    </div>
+
+                    <h3>Captura 2: CMD mostrando drivers y dispositivos del sistema</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de CMD con informacion de drivers y dispositivos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Diagnostico de red -->
+            <div class="seccion">
+                <h2>Parte 3 - Diagnostico de problemas de red (40 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Escenario:</strong> El cliente dice que <em>"Internet no le funciona"</em>. Antes de tocar cables o el router, vamos a diagnosticar el problema paso a paso desde la consola, siguiendo un <strong>procedimiento sistematico</strong> de descarte.
+                    </div>
+
+                    <h3>Paso 1: Comprobar la configuracion de red</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th style="width:20%">Que verificamos</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>ipconfig /all</code></td>
+                            <td>Configuracion completa de red</td>
+                            <td><textarea rows="3" placeholder="Pega: IP, mascara, puerta de enlace, DNS, DHCP"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <p style="margin: 8px 0; font-size: 13px;">Extrae estos datos de la salida anterior:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Dato</th>
+                            <th>Valor</th>
+                            <th style="width:25%">Es correcto?</th>
+                        </tr>
+                        <tr>
+                            <td>Direccion IPv4</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.15"></td>
+                            <td><input type="text" placeholder="Si / No / Explica"></td>
+                        </tr>
+                        <tr>
+                            <td>Mascara de subred</td>
+                            <td><input type="text" placeholder="Ej: 255.255.255.0"></td>
+                            <td><input type="text" placeholder="Si / No / Explica"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerta de enlace (gateway)</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.2"></td>
+                            <td><input type="text" placeholder="Si / No / Explica"></td>
+                        </tr>
+                        <tr>
+                            <td>Servidor DNS</td>
+                            <td><input type="text" placeholder="Ej: 10.0.2.3"></td>
+                            <td><input type="text" placeholder="Si / No / Explica"></td>
+                        </tr>
+                        <tr>
+                            <td>DHCP habilitado?</td>
+                            <td><input type="text" placeholder="Si / No"></td>
+                            <td><input type="text" placeholder="Deberia estarlo?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 2: Probar conectividad por capas</h3>
+                    <p>Seguimos el modelo de diagnostico de red: primero lo mas cercano, despues lo mas lejano:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:30%">Que probamos</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>ping 127.0.0.1</code></td>
+                            <td>Pila TCP/IP local</td>
+                            <td><input type="text" placeholder="Funciona? Tiempo?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping [tu puerta de enlace]</code></td>
+                            <td>Conexion al router</td>
+                            <td><input type="text" placeholder="Funciona? Tiempo?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping 8.8.8.8</code></td>
+                            <td>Conexion a Internet (sin DNS)</td>
+                            <td><input type="text" placeholder="Funciona? Tiempo?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping www.google.es</code></td>
+                            <td>Conexion a Internet + resolucion DNS</td>
+                            <td><input type="text" placeholder="Funciona? IP resuelta?"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Logica de descarte:</strong> Si el ping a 127.0.0.1 falla, el problema es de la pila TCP/IP. Si falla al router, es un problema de cable/WiFi o configuracion IP. Si falla a 8.8.8.8 pero no al router, el problema esta en el router o el ISP. Si falla a google.es pero no a 8.8.8.8, el problema es de DNS.
+                    </div>
+
+                    <h3>Paso 3: Trazar la ruta y consultar DNS</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>tracert 8.8.8.8</code></td>
+                            <td><textarea rows="3" placeholder="Pega los primeros 5 saltos. Donde se corta la ruta (si se corta)?"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>nslookup www.google.es</code></td>
+                            <td><textarea rows="2" placeholder="Servidor DNS usado e IP resuelta"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>nslookup www.google.es 8.8.8.8</code></td>
+                            <td><textarea rows="2" placeholder="Resultado usando el DNS de Google directamente"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 4: Puertos y conexiones activas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>netstat -an | findstr "ESTABLISHED"</code></td>
+                            <td><textarea rows="2" placeholder="Conexiones activas (si hay alguna)"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>netstat -an | findstr "LISTENING" | findstr "445 3389 80 135"</code></td>
+                            <td><textarea rows="2" placeholder="Puertos tipicos de Windows que estan escuchando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 5: Reparacion de red (si hay problemas)</h3>
+                    <p>Si se detectan problemas, estos son los comandos de reparacion de red:</p>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Comando de reparacion</th>
+                            <th style="width:25%">Que hace</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>ipconfig /release</code></td>
+                            <td>Libera la IP actual</td>
+                            <td><input type="text" placeholder="Se libero la IP?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ipconfig /renew</code></td>
+                            <td>Solicita nueva IP al DHCP</td>
+                            <td><input type="text" placeholder="Nueva IP obtenida?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>ipconfig /flushdns</code></td>
+                            <td>Limpia la cache DNS</td>
+                            <td><input type="text" placeholder="Mensaje de confirmacion?"></td>
+                        </tr>
+                        <tr>
+                            <td><code>netsh winsock reset</code></td>
+                            <td>Reinicia la configuracion de red</td>
+                            <td><input type="text" placeholder="Resultado (necesita reiniciar?)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Diagnostico de red completo (ping, tracert o netstat)</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de CMD con el diagnostico de red</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Verificacion y reparacion del sistema -->
+            <div class="seccion">
+                <h2>Parte 4 - Verificacion y reparacion del sistema (30 min)</h2>
+                <div class="seccion-body">
+                    <div class="escenario">
+                        <strong>Escenario:</strong> El cliente se queja de que Windows <em>"va lento y da errores raros"</em>. Vamos a usar las herramientas de verificacion y reparacion integradas en Windows para comprobar la integridad del sistema y del disco.
+                    </div>
+
+                    <h3>sfc - Comprobador de archivos del sistema</h3>
+                    <p><code>sfc</code> (System File Checker) analiza todos los archivos protegidos del sistema y repara los danados:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>sfc /scannow</code></td>
+                            <td><textarea rows="3" placeholder="Pega el resultado final (puede tardar varios minutos). Encontro archivos danados?"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Si <code>sfc</code> encuentra archivos danados y no puede repararlos, el siguiente paso es ejecutar <code>DISM</code> para reparar la imagen del sistema y despues volver a ejecutar <code>sfc</code>.
+                    </div>
+
+                    <h3>DISM - Reparacion de la imagen del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>DISM /Online /Cleanup-Image /CheckHealth</code></td>
+                            <td><input type="text" placeholder="Estado de la imagen (danada o no?)"></td>
+                        </tr>
+                        <tr>
+                            <td><code>DISM /Online /Cleanup-Image /ScanHealth</code></td>
+                            <td><input type="text" placeholder="Resultado del analisis (puede tardar)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>chkdsk - Verificacion del disco</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando</th>
+                            <th style="width:25%">Que hace</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>chkdsk C:</code></td>
+                            <td>Analiza el disco C: (solo lectura)</td>
+                            <td><textarea rows="3" placeholder="Pega el resumen: sectores defectuosos, errores encontrados"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-PhysicalDisk | Select-Object FriendlyName, HealthStatus, OperationalStatus</code> (PowerShell)</td>
+                            <td>Estado S.M.A.R.T. del disco</td>
+                            <td><input type="text" placeholder="Healthy / Warning / Unhealthy"></td>
+                        </tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> <code>chkdsk C: /F</code> (con reparacion) requiere reiniciar el equipo porque la unidad esta en uso. En un taller, se programaria para el siguiente reinicio. <strong>No ejecutes /F en esta practica</strong> salvo que el profesor lo indique.
+                    </div>
+
+                    <h3>Servicios criticos de hardware</h3>
+                    <p>Verifica que los servicios relacionados con el hardware estan funcionando:</p>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Servicio</th>
+                            <th style="width:35%">Comando</th>
+                            <th>Estado</th>
+                        </tr>
+                        <tr>
+                            <td>Plug and Play</td>
+                            <td><code>sc query PlugPlay</code></td>
+                            <td><input type="text" placeholder="RUNNING / STOPPED?"></td>
+                        </tr>
+                        <tr>
+                            <td>Audio de Windows</td>
+                            <td><code>sc query Audiosrv</code></td>
+                            <td><input type="text" placeholder="RUNNING / STOPPED?"></td>
+                        </tr>
+                        <tr>
+                            <td>Cola de impresion</td>
+                            <td><code>sc query Spooler</code></td>
+                            <td><input type="text" placeholder="RUNNING / STOPPED?"></td>
+                        </tr>
+                        <tr>
+                            <td>Windows Update</td>
+                            <td><code>sc query wuauserv</code></td>
+                            <td><input type="text" placeholder="RUNNING / STOPPED?"></td>
+                        </tr>
+                        <tr>
+                            <td>Configuracion automatica WLAN</td>
+                            <td><code>sc query WlanSvc</code></td>
+                            <td><input type="text" placeholder="RUNNING / STOPPED / No existe?"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Herramientas de verificacion (sfc, DISM o chkdsk)</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de CMD con sfc /scannow, DISM o chkdsk</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Script de diagnostico para el taller -->
+            <div class="seccion">
+                <h2>Parte 5 - Script de diagnostico para el taller (.ps1) (40 min)</h2>
+                <div class="seccion-body">
+                    <p>En un taller de reparacion, tener un <strong>script automatizado</strong> que recoja toda la informacion del equipo ahorra mucho tiempo. Vamos a crear un script de <strong>PowerShell</strong> que genere un informe completo. Usamos PowerShell porque <code>wmic</code> esta obsoleto y eliminado en Windows 11 24H2.</p>
+
+                    <h3>Script: Diagnostico completo del equipo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Bloc de notas</strong> (notepad).</li>
+                            <li>Escribe el siguiente codigo <strong>exactamente</strong>:</li>
+                        </ol>
+                    </div>
+
+                    <pre class="codigo-bloque"># Diagnostico de Equipo - Taller de Reparacion IFCT0309
+$Host.UI.RawUI.WindowTitle = "Diagnostico de Equipo - Taller"
+
+$informe = "$env:USERPROFILE\Documents\diagnostico_$env:COMPUTERNAME.txt"
+
+Write-Host "============================================" -ForegroundColor Green
+Write-Host "   HERRAMIENTA DE DIAGNOSTICO DE EQUIPOS" -ForegroundColor Green
+Write-Host "   Taller de Reparacion - IFCT0309" -ForegroundColor Green
+Write-Host "============================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "Generando informe en: $informe"
+Write-Host "Esto puede tardar unos minutos..."
+Write-Host ""
+
+# Cabecera del informe
+@"
+============================================
+ INFORME DE DIAGNOSTICO - $env:COMPUTERNAME
+ Fecha: $(Get-Date)
+ Tecnico: $env:USERNAME
+============================================
+"@ | Out-File $informe
+
+function Add-Seccion($titulo, $datos) {
+    "" | Add-Content $informe
+    "=== $titulo ===" | Add-Content $informe
+    $datos | Format-Table -AutoSize | Out-String | Add-Content $informe
+}
+
+# 1. Placa base y BIOS
+Add-Seccion "1. PLACA BASE Y BIOS" (Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product, SerialNumber)
+Get-CimInstance Win32_BIOS | Select-Object Manufacturer, SMBIOSBIOSVersion |
+    Format-Table -AutoSize | Out-String | Add-Content $informe
+
+# 2. Procesador
+Add-Seccion "2. PROCESADOR" (Get-CimInstance Win32_Processor |
+    Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed)
+Write-Host "[OK] CPU identificada"
+
+# 3. Memoria RAM
+Add-Seccion "3. MEMORIA RAM" (Get-CimInstance Win32_PhysicalMemory |
+    Select-Object @{n='GB';e={$_.Capacity/1GB}}, Speed, Manufacturer, PartNumber)
+Write-Host "[OK] RAM documentada"
+
+# 4. Discos
+Add-Seccion "4. DISCOS FISICOS" (Get-PhysicalDisk |
+    Select-Object FriendlyName, MediaType, BusType,
+        @{n='GB';e={[math]::Round($_.Size/1GB,2)}}, HealthStatus)
+Add-Seccion "   VOLUMENES" (Get-Volume | Where-Object DriveLetter |
+    Select-Object DriveLetter, FileSystemLabel, FileSystem,
+        @{n='TotalGB';e={[math]::Round($_.Size/1GB,2)}},
+        @{n='LibreGB';e={[math]::Round($_.SizeRemaining/1GB,2)}})
+Write-Host "[OK] Disco analizado"
+
+# 5. Tarjeta grafica
+Add-Seccion "5. TARJETA GRAFICA" (Get-CimInstance Win32_VideoController |
+    Select-Object Name, DriverVersion, Status)
+
+# 6. Tarjeta de red
+Add-Seccion "6. TARJETAS DE RED" (Get-NetAdapter | Where-Object Status -eq 'Up' |
+    Select-Object Name, LinkSpeed, MacAddress)
+Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -ne '127.0.0.1' } |
+    Select-Object InterfaceAlias, IPAddress, PrefixLength |
+    Format-Table -AutoSize | Out-String | Add-Content $informe
+Write-Host "[OK] Red documentada"
+
+# 7. Sistema operativo
+Add-Seccion "7. SISTEMA OPERATIVO" (Get-CimInstance Win32_OperatingSystem |
+    Select-Object Caption, Version, OSArchitecture, BuildNumber)
+
+# 8. Estado SMART
+Add-Seccion "8. ESTADO S.M.A.R.T. DEL DISCO" (Get-PhysicalDisk |
+    Select-Object FriendlyName, HealthStatus, OperationalStatus)
+
+@"
+
+============================================
+ FIN DEL INFORME
+============================================
+"@ | Add-Content $informe
+
+Write-Host ""
+Write-Host "============================================" -ForegroundColor Green
+Write-Host "   DIAGNOSTICO COMPLETADO" -ForegroundColor Green
+Write-Host "============================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "El informe se ha guardado en:"
+Write-Host $informe
+Write-Host ""
+Read-Host "Pulsa Enter para salir"</pre>
+
+                    <div class="pasos">
+                        <ol start="3">
+                            <li>Guarda como <code>diagnostico_equipo.ps1</code> en el Escritorio.
+                                <br><span style="color: var(--rojo); font-size: 12px;">Importante: en "Tipo" selecciona "Todos los archivos (*.*)" para que no se guarde como .txt</span></li>
+                            <li>Abre <strong>PowerShell como administrador</strong>.</li>
+                            <li>Permite ejecutar el script en esta sesion: <code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code> y responde S.</li>
+                            <li>Ejecuta el script: <code>cd $env:USERPROFILE\Desktop</code> y luego <code>.\diagnostico_equipo.ps1</code></li>
+                            <li>Abre el archivo de informe generado en Documentos y revisalo.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Por que <code>Set-ExecutionPolicy ... Bypass</code>?</strong> Por seguridad, PowerShell bloquea por defecto los scripts <code>.ps1</code> sin firmar. <code>-Scope Process</code> aplica el cambio <strong>solo a la ventana actual</strong> (no afecta al sistema). Al cerrar PowerShell, vuelve la politica restrictiva.
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Pega aqui las primeras 30 lineas del informe generado (diagnostico_XXXX.txt):</p>
+                        <textarea rows="10" placeholder="Pega aqui el contenido del informe de diagnostico"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Que mejoras le harias a este script para usarlo en un taller real? (piensa en que informacion adicional seria util)</p>
+                        <textarea rows="3" placeholder="Escribe al menos 2 mejoras que anadiras"></textarea>
+                    </div>
+
+                    <h3>Captura 5: Script de diagnostico ejecutandose</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del script de diagnostico ejecutandose</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: PowerShell para diagnostico avanzado -->
+            <div class="seccion">
+                <h2>Parte 6 - PowerShell: diagnostico avanzado de hardware (40 min)</h2>
+                <div class="seccion-body">
+                    <p>PowerShell permite acceder a informacion de hardware mucho mas detallada que CMD, gracias a WMI (Windows Management Instrumentation) y CIM. Abre <strong>PowerShell como administrador</strong>.</p>
+
+                    <h3>Inventario detallado con PowerShell</h3>
+                    <table>
+                        <tr>
+                            <th style="width:60%">Comando PowerShell</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed</code></td>
+                            <td><textarea rows="2" placeholder="CPU: modelo, nucleos, hilos, velocidad"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_PhysicalMemory | Select-Object Manufacturer, Capacity, Speed, MemoryType | Format-Table</code></td>
+                            <td><textarea rows="2" placeholder="Modulos RAM: fabricante, capacidad, velocidad, tipo"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_DiskDrive | Select-Object Model, Size, InterfaceType, MediaType, Status</code></td>
+                            <td><textarea rows="2" placeholder="Discos: modelo, tamano, interfaz, tipo, estado"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_BIOS | Select-Object Manufacturer, SMBIOSBIOSVersion, ReleaseDate</code></td>
+                            <td><textarea rows="2" placeholder="BIOS: fabricante, version, fecha"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product, SerialNumber</code></td>
+                            <td><textarea rows="2" placeholder="Placa base: fabricante, modelo, serie"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Diagnostico de rendimiento</h3>
+                    <table>
+                        <tr>
+                            <th style="width:60%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_OperatingSystem | Select-Object @{N='RAM_Total_GB';E={[math]::Round($_.TotalVisibleMemorySize/1MB,2)}}, @{N='RAM_Libre_GB';E={[math]::Round($_.FreePhysicalMemory/1MB,2)}}</code></td>
+                            <td><input type="text" placeholder="RAM total y libre en GB"></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-CimInstance Win32_LogicalDisk | Select-Object DeviceID, @{N='Total_GB';E={[math]::Round($_.Size/1GB,2)}}, @{N='Libre_GB';E={[math]::Round($_.FreeSpace/1GB,2)}}, @{N='Uso_%';E={[math]::Round(($_.Size-$_.FreeSpace)/$_.Size*100,1)}}</code></td>
+                            <td><textarea rows="2" placeholder="Disco: total, libre, % uso"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 5 Name, @{N='RAM_MB';E={[math]::Round($_.WorkingSet64/1MB,1)}}</code></td>
+                            <td><textarea rows="3" placeholder="Top 5 procesos por consumo de RAM"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Exportar informe de hardware a CSV</h3>
+                    <p>Genera un CSV con el inventario de hardware que se pueda abrir en Excel (util para el registro del taller):</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Exporta los dispositivos Plug and Play:<br>
+                                <code>Get-CimInstance Win32_PnPEntity | Where-Object {$_.Status -ne 'OK'} | Select-Object Name, Status, DeviceID | Export-Csv -Path "$env:USERPROFILE\Documents\dispositivos_con_problemas.csv" -NoTypeInformation -Encoding UTF8</code></li>
+                            <li>Comprueba si hay dispositivos con problemas:<br>
+                                <code>$problemas = Import-Csv "$env:USERPROFILE\Documents\dispositivos_con_problemas.csv"; Write-Host "Dispositivos con problemas: $($problemas.Count)"</code></li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Numero de dispositivos con problemas</td>
+                            <td><input type="text" placeholder="Ej: 0 / 3 / etc."></td>
+                        </tr>
+                        <tr>
+                            <td>Si hay problemas, nombres de los dispositivos</td>
+                            <td><textarea rows="2" placeholder="Pega los nombres o escribe 'Ninguno'"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Consultar el registro de eventos (errores de hardware)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:60%">Comando</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-EventLog -LogName System -EntryType Error -Newest 5 | Select-Object TimeGenerated, Source, Message | Format-List</code></td>
+                            <td><textarea rows="5" placeholder="Pega los ultimos 5 errores del sistema (fecha, origen, mensaje)"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>En un taller real:</strong> Los errores del registro de eventos del sistema (<strong>Event Viewer</strong>) son clave para diagnosticar problemas intermitentes como pantallazos azules (BSOD), cuelgues o reinicios inesperados. Busca eventos con fuente <code>Disk</code>, <code>Ntfs</code>, <code>Whea</code> o <code>Kernel-Power</code>.
+                    </div>
+
+                    <h3>Captura 6: PowerShell con diagnostico avanzado de hardware</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de PowerShell con comandos de diagnostico hardware</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 - Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p style="margin-bottom: 12px;">Responde a cada pregunta con un <strong>minimo de 3 lineas</strong>. Las respuestas deben reflejar tu experiencia personal durante la practica.</p>
+
+                    <div class="pregunta">
+                        <p>1. Un cliente trae un PC que "no enciende la pantalla". Tu lo enciendes y ves que arranca pero con mala resolucion (640x480). Sin abrir la torre, que comandos usarias para diagnosticar si el problema es del driver de la tarjeta grafica? Describe el proceso.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. En que situaciones de un taller de reparacion usarias <code>sfc /scannow</code> y <code>DISM</code>? Describe un caso concreto en el que estas herramientas solucionarian el problema de un cliente.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Un cliente dice que "Internet le va muy lento". Describe paso a paso el procedimiento de diagnostico que seguirias usando los comandos de red que has aprendido (ping, tracert, nslookup, netstat). En que punto del diagnostico podrias determinar si el problema es del equipo, del router o del proveedor de Internet?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Que ventajas tiene tener un script batch de diagnostico automatizado en el taller frente a ejecutar los comandos uno a uno? Que informacion adicional incluirias en el script que hemos creado?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <p>Sube tu practica completada al canal <strong>#entrega-practicas</strong> del Discord del curso en formato <strong>PDF</strong>.</p>
+
+                    <h3>Capturas requeridas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px">OK</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>PowerShell con inventario de hardware (Get-CimInstance / Get-PhysicalDisk)</td>
+                            <td><input type="checkbox" id="entrega-cap1"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>CMD con drivers y dispositivos</td>
+                            <td><input type="checkbox" id="entrega-cap2"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Diagnostico de red (ping, tracert, netstat)</td>
+                            <td><input type="checkbox" id="entrega-cap3"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Verificacion del sistema (sfc, DISM o chkdsk)</td>
+                            <td><input type="checkbox" id="entrega-cap4"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Script de diagnostico ejecutandose</td>
+                            <td><input type="checkbox" id="entrega-cap5"></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>PowerShell con diagnostico avanzado</td>
+                            <td><input type="checkbox" id="entrega-cap6"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Diagnostico de Equipos con la Consola de Windows<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:100px">Puntuacion</th>
+                                <th>Desglose</th>
+                            </tr>
+                            <tr>
+                                <td>Inventario de hardware</td>
+                                <td>2.0 puntos</td>
+                                <td>Comandos Get-CimInstance ejecutados + ficha tecnica completa + informe guardado</td>
+                            </tr>
+                            <tr>
+                                <td>Drivers y dispositivos</td>
+                                <td>1.0 punto</td>
+                                <td>Drivers listados + dispositivos con problemas buscados + CSV exportado</td>
+                            </tr>
+                            <tr>
+                                <td>Diagnostico de red</td>
+                                <td>2.0 puntos</td>
+                                <td>Procedimiento sistematico completo + datos de red documentados + reparacion</td>
+                            </tr>
+                            <tr>
+                                <td>Verificacion y reparacion</td>
+                                <td>1.5 puntos</td>
+                                <td>sfc + DISM + chkdsk ejecutados + servicios verificados</td>
+                            </tr>
+                            <tr>
+                                <td>Script batch de diagnostico</td>
+                                <td>1.5 puntos</td>
+                                <td>Script creado y ejecutado + informe generado + mejoras propuestas</td>
+                            </tr>
+                            <tr>
+                                <td>PowerShell avanzado</td>
+                                <td>1.0 punto</td>
+                                <td>Inventario CIM + diagnostico rendimiento + eventos del sistema</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion</td>
+                                <td>1.0 punto</td>
+                                <td>4 preguntas respondidas con argumentacion (min 3 lineas)</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Inventario de hardware completo con ficha tecnica (Parte 1)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Drivers y dispositivos documentados (Parte 2)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Diagnostico de red completo (Parte 3)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Verificacion y reparacion del sistema (Parte 4)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Script de diagnostico creado y ejecutado (Parte 5)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">PowerShell diagnostico avanzado completado (Parte 6)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">4 preguntas de reflexion respondidas (Parte 7)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">Las 6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Diagnostico de Equipos con la Consola de Windows</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque Diagnostico y reparacion de equipos</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 10: Diagnostico Equipos con Consola Windows';
+        const PREFIJO_ARCHIVO = 'P10_Consola_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

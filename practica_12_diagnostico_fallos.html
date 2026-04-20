@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 12: Diagnostico y Resolucion de Fallos en el Sistema</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Profesor-only section */
+        .profesor-only {
+            border: 3px solid var(--naranja) !important;
+        }
+
+        .profesor-only h2 {
+            background: var(--naranja) !important;
+        }
+
+        .profesor-only .seccion-body {
+            border-color: var(--naranja);
+        }
+
+        .profesor-only h3 {
+            color: var(--naranja);
+        }
+
+        .profesor-only .pasos strong {
+            color: var(--naranja);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .profesor-only {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 12: Diagnostico y Resolucion de Fallos en el Sistema</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 — Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0862 — Instalacion y Configuracion de Perifericos Microinformaticos<br>
+                <strong>Bloque:</strong> 3 — Diagnostico y Reparacion de Sistemas<br>
+                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Windows (de la Practica 06)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota importante -->
+            <div class="nota">
+                <strong>Nota importante:</strong> En esta practica vas a trabajar como un tecnico real. No se te dara la solucion directamente — deberas pensar, investigar y razonar. Un buen tecnico no memoriza soluciones, sigue un proceso: <strong>Detectar sintomas</strong> > <strong>Analizar causas</strong> > <strong>Aplicar solucion</strong> > <strong>Verificar</strong>.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Identificar fallos comunes en sistemas Windows dentro de un entorno virtualizado.</li>
+                        <li>Aplicar un proceso sistematico de diagnostico siguiendo una metodologia profesional.</li>
+                        <li>Resolver problemas reales como lo haria un tecnico de soporte informatico.</li>
+                        <li>Documentar el proceso completo de diagnostico y resolucion de forma clara y ordenada.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-practica3">
+                            <label for="req-practica3">Practica 06 completada (VM con Windows disponible)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-conocimientos">
+                            <label for="req-conocimientos">Conocimientos basicos de Windows (navegacion, configuracion)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico -->
+            <div class="seccion">
+                <h2>Contenido teorico — Metodologia de diagnostico</h2>
+                <div class="seccion-body">
+                    <h3>Las 4 fases del diagnostico sistematico</h3>
+                    <p>Todo tecnico profesional sigue un proceso ordenado para resolver problemas. No se trata de probar cosas al azar, sino de seguir un metodo:</p>
+                    <table>
+                        <tr>
+                            <th style="width:80px">Fase</th>
+                            <th style="width:200px">Descripcion</th>
+                            <th>Preguntas clave</th>
+                        </tr>
+                        <tr>
+                            <td><strong>1. Deteccion</strong></td>
+                            <td>Observar los sintomas sin tocar nada</td>
+                            <td>Que ocurre? Cuando ocurre? Que mensaje aparece?</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Analisis</strong></td>
+                            <td>Plantear hipotesis sobre la causa</td>
+                            <td>Que componente puede estar fallando? Que ha cambiado recientemente?</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Resolucion</strong></td>
+                            <td>Aplicar la solucion mas probable</td>
+                            <td>Que herramienta necesito? Cual es la accion menos invasiva?</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Verificacion</strong></td>
+                            <td>Comprobar que el problema esta resuelto</td>
+                            <td>Funciona correctamente? El problema ha desaparecido? Hay efectos secundarios?</td>
+                        </tr>
+                    </table>
+
+                    <h3>Herramientas de diagnostico en Windows</h3>
+                    <p>Estas son las herramientas principales que puedes utilizar para investigar y resolver problemas en Windows:</p>
+                    <table>
+                        <tr>
+                            <th>Herramienta</th>
+                            <th>Como acceder</th>
+                            <th>Para que sirve</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Administrador de tareas</strong></td>
+                            <td>Ctrl+Shift+Esc</td>
+                            <td>Ver procesos, rendimiento CPU/RAM/disco</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Visor de eventos</strong></td>
+                            <td>eventvwr.msc</td>
+                            <td>Consultar errores y advertencias del sistema</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Configuracion del sistema</strong></td>
+                            <td>msconfig</td>
+                            <td>Gestionar programas de inicio, arranque seguro</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Simbolo del sistema</strong></td>
+                            <td>cmd como administrador</td>
+                            <td>Ejecutar comandos de reparacion (sfc, chkdsk)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Modo seguro</strong></td>
+                            <td>Shift+Reiniciar o msconfig</td>
+                            <td>Arrancar Windows con drivers minimos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Restaurar sistema</strong></td>
+                            <td>rstrui.exe</td>
+                            <td>Volver a un punto de restauracion anterior</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Administrador de discos</strong></td>
+                            <td>diskmgmt.msc</td>
+                            <td>Ver particiones y estado de discos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Informacion del sistema</strong></td>
+                            <td>msinfo32</td>
+                            <td>Ver configuracion completa del hardware/software</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- SECCION SOLO PARA EL PROFESOR -->
+            <!-- ============================================================ -->
+            <div class="seccion profesor-only no-print">
+                <h2>PREPARACION DEL PROFESOR — Fallos a provocar en las VMs</h2>
+                <div class="seccion-body">
+                    <div class="nota" style="background: #fffbeb; border-left-color: var(--naranja);">
+                        <strong>Atencion:</strong> Esta seccion solo es visible en pantalla, no se imprime. Contiene las instrucciones para preparar las VMs de los alumnos con fallos intencionados. Prepara las VMs <strong>antes</strong> de la clase.
+                    </div>
+
+                    <h3>Fallo 1: Error de arranque (no bootable device)</h3>
+                    <p><strong>Pasos para provocarlo:</strong></p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la VM del alumno completamente.</li>
+                            <li>Ve a <strong>VirtualBox > Configuracion > Almacenamiento</strong>.</li>
+                            <li>Selecciona el disco duro virtual que esta conectado al <strong>controlador SATA</strong>.</li>
+                            <li>Haz clic derecho y selecciona <strong>"Eliminar conexion"</strong> (esto desconecta el disco sin borrarlo).</li>
+                            <li>Alternativa: Ve a <strong>Configuracion > Sistema > Orden de arranque</strong> y desmarca <strong>"Disco duro"</strong>, dejando solo "Optica" y "Red".</li>
+                        </ol>
+                    </div>
+                    <p><strong>Sintoma esperado:</strong> La VM muestra "No bootable medium found" o "FATAL: No bootable medium found! System halted."</p>
+                    <p><strong>Solucion esperada:</strong> El alumno debe verificar la configuracion de almacenamiento en VirtualBox y reconectar el disco duro virtual, o corregir el orden de arranque en Configuracion > Sistema.</p>
+
+                    <h3>Fallo 2: Sistema extremadamente lento (programas en inicio)</h3>
+                    <p><strong>Pasos para provocarlo:</strong></p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de Windows en la VM, abre el <strong>Explorador de archivos</strong>.</li>
+                            <li>En la barra de direcciones, escribe <strong>shell:startup</strong> y pulsa Enter.</li>
+                            <li>Crea un archivo llamado <strong>procesos_pesados.bat</strong> con el siguiente contenido:<br>
+                                <code style="display:block; background:#2d3748; color:#e2e8f0; padding:8px; border-radius:4px; margin:6px 0; font-size:12px;">
+                                    @echo off<br>
+                                    start /min cmd /c "for /L %%i in (1,1,999999999) do @echo %%i >nul"<br>
+                                    start /min cmd /c "for /L %%i in (1,1,999999999) do @echo %%i >nul"<br>
+                                    start /min cmd /c "for /L %%i in (1,1,999999999) do @echo %%i >nul"<br>
+                                    start /min cmd /c "for /L %%i in (1,1,999999999) do @echo %%i >nul"
+                                </code>
+                            </li>
+                            <li>Tambien puedes usar <strong>msconfig</strong> para anadir programas pesados al inicio.</li>
+                            <li>Reinicia la VM para verificar que el efecto funciona.</li>
+                        </ol>
+                    </div>
+                    <p><strong>Sintoma esperado:</strong> Windows tarda mucho en arrancar, el sistema va extremadamente lento, CPU al 100%.</p>
+                    <p><strong>Solucion esperada:</strong> El alumno debe abrir el Administrador de tareas (Ctrl+Shift+Esc) > identificar los procesos que consumen CPU > ir a la pestana de Inicio > deshabilitar los programas sospechosos. Tambien eliminar los archivos .bat de la carpeta shell:startup.</p>
+
+                    <h3>Fallo 3: Perfil de usuario danado / sin acceso</h3>
+                    <p><strong>Pasos para provocarlo:</strong></p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de Windows, crea una <strong>cuenta de usuario secundaria</strong> (la que usara el alumno).</li>
+                            <li>Inicia sesion con esa cuenta para que se cree el perfil y luego cierra sesion.</li>
+                            <li>Inicia sesion con la <strong>cuenta de administrador</strong>.</li>
+                            <li>Navega a <strong>C:\Users\</strong> y <strong>renombra</strong> la carpeta del perfil del usuario secundario (ej: de "Alumno" a "Alumno_BAK").</li>
+                            <li>Alternativa: Cambia la contrasena de la cuenta del alumno sin informarle.</li>
+                        </ol>
+                    </div>
+                    <p><strong>Sintoma esperado:</strong> El alumno no puede iniciar sesion, aparece un perfil temporal, o se muestra un error de "No se puede cargar el perfil de usuario".</p>
+                    <p><strong>Solucion esperada:</strong> Entrar en Modo seguro > crear un nuevo usuario administrador o reparar el perfil desde el registro de Windows (regedit > HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList).</p>
+
+                    <h3>Fallo 4 (opcional): Driver de video corrupto</h3>
+                    <p><strong>Pasos para provocarlo:</strong></p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de Windows, ve a <strong>Programas y caracteristicas</strong>.</li>
+                            <li><strong>Desinstala las Guest Additions</strong> de VirtualBox.</li>
+                            <li>Alternativa: Ve al <strong>Administrador de dispositivos</strong>, localiza el adaptador de pantalla y desinstala el driver (marcando "Eliminar el software del controlador").</li>
+                            <li>Reinicia la VM.</li>
+                        </ol>
+                    </div>
+                    <p><strong>Sintoma esperado:</strong> Resolucion fija de 800x600, sin aceleracion grafica, pantalla muy pequena.</p>
+                    <p><strong>Solucion esperada:</strong> Reinstalar las Guest Additions desde el menu Dispositivos de VirtualBox, o actualizar el driver desde el Administrador de dispositivos.</p>
+
+                    <h3>Fallo 5 (opcional): Servicio critico deshabilitado</h3>
+                    <p><strong>Pasos para provocarlo:</strong></p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de Windows, abre <strong>services.msc</strong> (Ejecutar como administrador).</li>
+                            <li>Localiza el servicio <strong>"Cliente DHCP"</strong> (DHCP Client).</li>
+                            <li>Haz doble clic, cambia el tipo de inicio a <strong>"Deshabilitado"</strong> y haz clic en <strong>"Detener"</strong>.</li>
+                            <li>Alternativa: Deshabilita el servicio <strong>"Windows Update"</strong> de la misma manera.</li>
+                            <li>Reinicia la VM.</li>
+                        </ol>
+                    </div>
+                    <p><strong>Sintoma esperado:</strong> Sin conexion de red (si se desactivo DHCP) o sin capacidad de actualizaciones (si se desactivo Windows Update). El icono de red mostrara "Sin acceso a Internet".</p>
+                    <p><strong>Solucion esperada:</strong> Abrir services.msc > localizar el servicio deshabilitado > cambiar tipo de inicio a "Automatico" > hacer clic en "Iniciar".</p>
+                </div>
+            </div>
+            <!-- ============================================================ -->
+            <!-- FIN SECCION PROFESOR -->
+            <!-- ============================================================ -->
+
+            <!-- PARTE 1: Recepcion del equipo y observacion inicial -->
+            <div class="seccion">
+                <h2>Parte 1 — Recepcion del equipo y observacion inicial (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Has recibido una maquina virtual con un fallo desconocido. Tu trabajo como tecnico comienza aqui. <strong>Observa sin tocar nada todavia</strong> — solo enciende la VM y anota lo que ves.</p>
+
+                    <h3>Observacion inicial</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Pregunta</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Numero de fallo asignado por el profesor</td>
+                            <td><input type="text" id="fallo-numero" placeholder="Ej: 1, 2, 3..."></td>
+                        </tr>
+                        <tr>
+                            <td>Al encender la VM, que ocurre exactamente?</td>
+                            <td><textarea rows="3" placeholder="Describe con detalle lo que ves al arrancar la VM..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Aparece algun mensaje de error? Copialo textualmente</td>
+                            <td><textarea rows="2" placeholder="Copia aqui el mensaje exacto que aparece (si lo hay)..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Windows arranca normalmente?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Si arranca, puedes llegar al escritorio?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>El sistema responde a teclado y raton?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="lento">Lento</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Hay algun sonido o pitido inusual?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>En una frase, describe el sintoma principal</td>
+                            <td><textarea rows="2" placeholder="Resume en una frase clara cual es el problema principal que observas..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Sintoma visible (mensaje de error o pantalla que se muestra)</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del sintoma visible (mensaje de error o pantalla que se muestra)</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Diagnostico -->
+            <div class="seccion">
+                <h2>Parte 2 — Diagnostico (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora que has observado los sintomas, es momento de <strong>pensar e investigar</strong>. No toques nada todavia — primero plantea hipotesis.</p>
+
+                    <h3>Hipotesis</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Pregunta</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Basandote en los sintomas, cual crees que es la causa del problema?</td>
+                            <td><textarea rows="4" placeholder="Escribe al menos 3 lineas explicando tu hipotesis sobre la causa del fallo..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Que componente o parte del sistema sospechas que falla?</td>
+                            <td>
+                                <select style="margin-bottom:6px;">
+                                    <option value="">-- Selecciona categoria --</option>
+                                    <option value="hardware-virtual">Hardware virtual (configuracion de VirtualBox)</option>
+                                    <option value="so">Sistema operativo (Windows)</option>
+                                    <option value="software">Software (programas instalados)</option>
+                                    <option value="configuracion">Configuracion (servicios, drivers, registro)</option>
+                                </select>
+                                <textarea rows="2" placeholder="Explica por que sospechas de este componente..."></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Que descartarias primero? Por que?</td>
+                            <td><textarea rows="3" placeholder="Indica que causa descartarias primero y razona por que..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Investigacion — que herramientas has utilizado?</h3>
+                    <p>Marca las herramientas que has usado y describe que informacion te han dado:</p>
+                    <table>
+                        <tr>
+                            <th>Herramienta / Accion</th>
+                            <th style="width:110px">La usaste?</th>
+                            <th>Que encontraste?</th>
+                        </tr>
+                        <tr>
+                            <td>Administrador de tareas (Ctrl+Shift+Esc)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que informacion encontraste..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Visor de eventos (eventvwr.msc)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que errores o advertencias encontraste..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Modo seguro (Shift+Reiniciar)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="El sistema arranco en modo seguro? Que observaste?"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Configuracion del sistema (msconfig)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que configuracion revisaste..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Simbolo del sistema (sfc /scannow)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que resultado dio el comando..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Configuracion de VirtualBox (almacenamiento, red, etc.)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que revisaste en la configuracion de VirtualBox..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Busqueda en Internet del error</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que buscaste y que encontraste? Incluye los terminos de busqueda..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Otra herramienta (especifica): <input type="text" placeholder="Nombre de la herramienta..." style="margin-top:4px;"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="no-aplica">No aplica</option>
+                                </select>
+                            </td>
+                            <td><textarea rows="2" placeholder="Que encontraste con esta herramienta..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Herramienta de diagnostico que mas informacion te dio</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la herramienta de diagnostico que mas informacion te dio</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Resolucion -->
+            <div class="seccion">
+                <h2>Parte 3 — Resolucion (45 min)</h2>
+                <div class="seccion-body">
+                    <p>Con tu diagnostico hecho, es hora de <strong>actuar</strong>. Planifica antes de tocar nada y documenta cada paso que des.</p>
+
+                    <h3>Plan de accion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Pregunta</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Cual es tu diagnostico final? (causa del problema)</td>
+                            <td><textarea rows="3" placeholder="Describe la causa del problema segun tu investigacion..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Que solucion vas a aplicar?</td>
+                            <td><textarea rows="3" placeholder="Describe la solucion que vas a intentar..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Es una solucion invasiva (puede causar perdida de datos) o segura?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="segura">Segura (no hay riesgo de perdida de datos)</option>
+                                    <option value="moderada">Moderada (algun riesgo menor)</option>
+                                    <option value="invasiva">Invasiva (puede causar perdida de datos)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Hay alguna alternativa si esta solucion no funciona?</td>
+                            <td><textarea rows="3" placeholder="Describe un plan B en caso de que la solucion principal no funcione..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Pasos de resolucion</h3>
+                    <p>Documenta <strong>cada paso</strong> que realizas para resolver el problema:</p>
+                    <table>
+                        <tr>
+                            <th style="width:50px">Paso</th>
+                            <th>Accion realizada</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion que realizaste..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio tras esta accion..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion que realizaste..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio tras esta accion..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion que realizaste..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio tras esta accion..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion que realizaste..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio tras esta accion..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion que realizaste..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio tras esta accion..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Momento clave de la resolucion</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del momento clave de la resolucion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Captura 4: Resultado tras aplicar la solucion</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del resultado tras aplicar la solucion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Verificacion -->
+            <div class="seccion">
+                <h2>Parte 4 — Verificacion (15 min)</h2>
+                <div class="seccion-body">
+                    <p>Un buen tecnico <strong>siempre verifica</strong> que el problema esta completamente resuelto antes de devolver el equipo.</p>
+
+                    <h3>Comprobaciones post-reparacion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>El problema original ha desaparecido?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Windows arranca correctamente?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>El escritorio funciona con normalidad?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No han aparecido nuevos problemas?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si, no hay nuevos problemas</option>
+                                    <option value="no">No, han aparecido nuevos problemas</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cuanto tiempo te ha llevado resolver el fallo?</td>
+                            <td><input type="text" placeholder="Ej: 45 minutos"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Sistema funcionando correctamente tras la reparacion</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del sistema funcionando correctamente tras la reparacion</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Segundo fallo -->
+            <div class="seccion">
+                <h2>Parte 5 — Segundo fallo (si el tiempo lo permite) (60 min)</h2>
+                <div class="seccion-body">
+                    <p>Si el profesor te asigna un segundo fallo, repite el proceso de diagnostico y resolucion en esta seccion. Si no hay segundo fallo, deja esta seccion en blanco.</p>
+
+                    <h3>Observacion inicial del segundo fallo</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Pregunta</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Numero de fallo asignado</td>
+                            <td><input type="text" id="fallo2-numero" placeholder="Ej: 1, 2, 3..."></td>
+                        </tr>
+                        <tr>
+                            <td>Que sintomas observas al encender la VM?</td>
+                            <td><textarea rows="3" placeholder="Describe los sintomas del segundo fallo..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Aparece algun mensaje de error?</td>
+                            <td><textarea rows="2" placeholder="Copia el mensaje exacto si lo hay..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>El sintoma principal en una frase</td>
+                            <td><textarea rows="2" placeholder="Resume el problema principal..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Diagnostico del segundo fallo</h3>
+                    <div class="pregunta">
+                        <p>Describe tu proceso de diagnostico: que hipotesis planteaste, que herramientas usaste y que descubriste.</p>
+                        <textarea rows="6" placeholder="Explica todo el proceso de diagnostico del segundo fallo con detalle..."></textarea>
+                    </div>
+
+                    <h3>Pasos de resolucion del segundo fallo</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50px">Paso</th>
+                            <th>Accion realizada</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td><textarea rows="2" placeholder="Describe la accion..."></textarea></td>
+                            <td><textarea rows="2" placeholder="Que ocurrio..."></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Verificacion del segundo fallo</h3>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Verificacion</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>El problema original ha desaparecido?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Windows funciona correctamente?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                    <option value="parcialmente">Parcialmente</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No han aparecido nuevos problemas?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si, no hay nuevos problemas</option>
+                                    <option value="no">No, han aparecido nuevos problemas</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Diagnostico o sintoma del segundo fallo</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del diagnostico o sintoma del segundo fallo</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Captura 7: Segundo fallo resuelto</h3>
+                    <div class="foto-upload" data-foto-id="foto-7">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del sistema funcionando tras resolver el segundo fallo</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 6 — Preguntas de reflexion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Describe tu proceso de diagnostico paso a paso. Que hiciste primero, segundo, tercero? Si volvieras a empezar, cambiarias algo?</p>
+                        <textarea rows="5" placeholder="Describe detalladamente tu proceso de diagnostico y si cambiarias algo en retrospectiva..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Que herramienta de Windows te resulto mas util para diagnosticar? Por que?</p>
+                        <textarea rows="5" placeholder="Indica cual fue la herramienta mas util y justifica tu respuesta..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Cual es la diferencia entre "Modo seguro" y un arranque normal? En que situaciones usarias el Modo seguro?</p>
+                        <textarea rows="5" placeholder="Explica las diferencias entre ambos modos de arranque y cuando conviene usar cada uno..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Si un cliente te describe por telefono que su ordenador "no enciende", que preguntas le harias para empezar a diagnosticar el problema? (minimo 5 preguntas)</p>
+                        <textarea rows="5" placeholder="Escribe al menos 5 preguntas que le harias al cliente para diagnosticar el problema..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Que diferencia hay entre un problema de hardware y un problema de software? Como los distinguirias?</p>
+                        <textarea rows="5" placeholder="Explica las diferencias entre problemas de hardware y software, y como los distinguirias en la practica..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>6. Por que es importante verificar que el problema esta resuelto ANTES de devolver el equipo al cliente? Que podria pasar si no lo haces?</p>
+                        <textarea rows="5" placeholder="Razona la importancia de la verificacion post-reparacion y las consecuencias de omitirla..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREGA -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Capturas de pantalla requeridas</h3>
+                    <p>Comprueba que tienes todas las capturas necesarias:</p>
+                    <table>
+                        <tr>
+                            <th>Captura</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Sintoma visible (mensaje de error o pantalla)</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Herramienta de diagnostico mas informativa</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Momento clave de la resolucion</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Resultado tras aplicar la solucion</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Sistema funcionando correctamente</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 6</td>
+                            <td>Diagnostico o sintoma del segundo fallo (si aplica)</td>
+                            <td><input type="checkbox" id="cap-6"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 7</td>
+                            <td>Segundo fallo resuelto (si aplica)</td>
+                            <td><input type="checkbox" id="cap-7"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Bloque 3, Practica 12 - Diagnostico y Resolucion de Fallos<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Observacion y deteccion de sintomas (Parte 1)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Proceso de diagnostico documentado (Parte 2)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Resolucion del fallo (Parte 3)</td>
+                                <td>2.0 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Verificacion post-reparacion (Parte 4)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Segundo fallo, si se realizo (Parte 5)*</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 6)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas y claras</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                        <p style="font-size:12px; color:#718096; margin-top:8px;">* Si no se realizo el segundo fallo, el punto se reparte proporcionalmente entre los demas criterios.</p>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 5 obligatorias)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de diagnostico incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Observacion inicial completa con todos los campos</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Diagnostico con hipotesis y herramientas documentadas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Resolucion con plan de accion y pasos detallados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Verificacion post-reparacion completada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Segundo fallo (si fue asignado)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: 6 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">7 capturas de pantalla incluidas (minimo 5 obligatorias)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Bloque 3, Practica 12 - Diagnostico y Resolucion de Fallos</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque 3 — Diagnostico y Reparacion de Sistemas (Practica 12)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 12: Diagnostico de Fallos';
+        const PREFIJO_ARCHIVO = 'P12_Diagnostico_Fallos';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

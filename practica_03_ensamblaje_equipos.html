@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 03: Ensamblaje Completo de Equipos PC</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Separadores de sesion */
+        .sesion-header {
+            background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+            color: white;
+            padding: 18px 24px;
+            margin: 32px 0 24px 0;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .sesion-header h2 {
+            background: none;
+            font-size: 20px;
+            border-radius: 0;
+            padding: 0;
+            margin: 0 0 4px 0;
+        }
+
+        .sesion-header p {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* Aviso seguridad */
+        .aviso-seguridad {
+            background: #fff5f5;
+            border: 2px solid var(--rojo);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+
+        .aviso-seguridad h3 {
+            color: var(--rojo) !important;
+            border: none !important;
+            margin: 0 0 8px 0 !important;
+            padding: 0 !important;
+            font-size: 15px;
+        }
+
+        .aviso-seguridad ul {
+            margin-left: 20px;
+            color: #742a2a;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Info box */
+        .info-box {
+            background: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+
+        .info-box h3 {
+            color: var(--azul-claro) !important;
+            border: none !important;
+            margin: 0 0 8px 0 !important;
+            padding: 0 !important;
+            font-size: 14px;
+        }
+
+        .info-box p, .info-box ul {
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .check-list {
+            margin: 8px 0;
+        }
+
+        .check-list .check-group {
+            padding: 6px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .check-list .check-group:last-child {
+            border-bottom: none;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol, .pasos ul {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nota-warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos - recuadro imprimible */
+        .foto-box {
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            page-break-inside: avoid;
+        }
+
+        .foto-box .foto-numero {
+            background: var(--azul-claro);
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .foto-box .foto-info {
+            flex: 1;
+        }
+
+        .foto-box .foto-titulo {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+            margin-bottom: 2px;
+        }
+
+        .foto-box .foto-desc {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-box .foto-archivo {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--azul-claro);
+            background: white;
+            border: 1px solid var(--azul-claro);
+            border-radius: 4px;
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Penalizaciones */
+        .penalizaciones {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .penalizaciones h3 {
+            color: var(--rojo) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+            font-size: 14px;
+        }
+
+        .penalizaciones table {
+            font-size: 13px;
+        }
+
+        .penalizaciones th {
+            background: #fed7d7;
+            color: var(--rojo);
+        }
+
+        /* Firma */
+        .firma-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-top: 24px;
+        }
+
+        .firma-box h3 {
+            color: var(--azul) !important;
+            border: none !important;
+            margin: 0 0 12px 0 !important;
+            padding: 0 !important;
+        }
+
+        .firma-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .firma-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .firma-campo label {
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--azul);
+        }
+
+        .firma-campo input {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .firma-campo .firma-line {
+            border-bottom: 1px solid var(--azul);
+            height: 50px;
+            margin-top: 8px;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 11px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            .sesion-header {
+                page-break-before: always;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .sesion-header {
+                background: linear-gradient(135deg, var(--azul), var(--azul-claro)) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .evaluacion th {
+                background: #c6f6d5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .penalizaciones th {
+                background: #fed7d7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-box {
+                border: 2px solid var(--azul-claro) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-box .foto-numero {
+                background: var(--azul-claro) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 03: Ensamblaje Completo de Equipos PC</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0861 - Montaje y Verificacion de Componentes<br>
+                <strong>Temas:</strong> T9 (Ensamblaje completo) y T10 (Verificacion y testeo)<br>
+                <strong>Duracion estimada:</strong> 10 horas (2 sesiones de 5 horas) &nbsp;|&nbsp; <strong>Modalidad:</strong> Grupo (2-3 alumnos) con entrega individual
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+                <div class="campo">
+                    <label>Grupo (nombres de los miembros)</label>
+                    <input type="text" id="alumno-grupo" placeholder="Ej: Juan Garcia, Ana Lopez, Pedro Martinez">
+                </div>
+                <div class="campo">
+                    <label>Equipo asignado (identificador)</label>
+                    <input type="text" id="equipo-id" placeholder="Ej: PC-03">
+                </div>
+            </div>
+
+            <!-- Info fotos con movil -->
+            <div class="info-box" style="border-color:#c6f6d5; background:#f0fff4;">
+                <h3 style="color:var(--verde) !important;">Instrucciones para las fotografias (movil)</h3>
+                <p>A lo largo de la practica se piden <strong>17 fotografias</strong>. Hazlas con tu movil siguiendo estas indicaciones:</p>
+                <ul>
+                    <li><strong>Nombra cada foto</strong> con el formato indicado: <code>Foto01.jpg</code>, <code>Foto02.jpg</code>, ..., <code>Foto17.jpg</code></li>
+                    <li>Las fotos deben ser <strong>nitidas y bien iluminadas</strong>. Limpia la lente antes de disparar.</li>
+                    <li>Cada recuadro azul de este documento indica <strong>que foto hacer y con que nombre guardarla</strong>.</li>
+                    <li>Al entregar, sube las 17 fotos <strong>junto con el PDF</strong> del documento rellenado en Discord.</li>
+                    <li>Las fotos del grupo pueden ser compartidas, pero cada alumno debe subirlas en su propia entrega.</li>
+                </ul>
+            </div>
+
+            <!-- Info trabajo en grupo -->
+            <div class="info-box">
+                <h3>Trabajo en grupo con entrega individual</h3>
+                <ul>
+                    <li>El montaje se realiza <strong>en grupo</strong>, pero cada alumno entrega <strong>su propio informe</strong>.</li>
+                    <li>Rellena <strong>todas</strong> las tablas y fichas personalmente.</li>
+                    <li>Las fotos pueden ser compartidas, pero las <strong>respuestas escritas deben ser propias</strong>.</li>
+                    <li>Se considerara copia si dos entregas contienen las mismas respuestas textuales en las preguntas abiertas.</li>
+                </ul>
+            </div>
+
+            <!-- Roles -->
+            <div class="seccion">
+                <h2>Distribucion de roles en el grupo</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">Asignad los roles y <strong>rotadlos entre sesiones</strong>:</p>
+                    <table>
+                        <tr>
+                            <th>Rol</th>
+                            <th>Responsabilidad</th>
+                            <th>Sesion 1</th>
+                            <th>Sesion 2</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Operador principal</strong></td>
+                            <td>Realiza el montaje/desmontaje fisico</td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Asistente tecnico</strong></td>
+                            <td>Entrega herramientas, sujeta componentes, ayuda</td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Documentador</strong></td>
+                            <td>Toma fotos, anota observaciones, controla tiempo</td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                            <td><input type="text" placeholder="Nombre"></td>
+                        </tr>
+                    </table>
+                    <div class="nota" style="margin-top:10px;">Si el grupo es de 2 personas, el documentador tambien actua como asistente tecnico.</div>
+                </div>
+            </div>
+
+            <!-- Aviso de seguridad -->
+            <div class="aviso-seguridad">
+                <h3>NORMAS DE SEGURIDAD OBLIGATORIAS</h3>
+                <ul>
+                    <li><strong>Desconecta SIEMPRE</strong> el cable de alimentacion antes de abrir la caja o manipular componentes.</li>
+                    <li><strong>Usa la pulsera antiestatica</strong> conectada a tierra durante toda la manipulacion.</li>
+                    <li><strong>No toques</strong> los contactos dorados de memorias, procesadores o tarjetas. Sujetalos por los bordes.</li>
+                    <li><strong>No fuerces</strong> ningun componente. Si no encaja, comprueba orientacion y tipo de conector.</li>
+                    <li>Manten el area de trabajo <strong>ordenada</strong>. Separa tornilleria por tipo y tamano.</li>
+                    <li><strong>No comas ni bebas</strong> en el puesto de trabajo.</li>
+                    <li>En caso de duda, <strong>pregunta al profesor</strong> antes de continuar.</li>
+                    <li style="color: var(--rojo); font-weight:600;">El incumplimiento de cualquier norma supone la suspension inmediata de la practica.</li>
+                </ul>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SESION 1 -->
+            <!-- ============================================ -->
+            <div class="sesion-header">
+                <h2>SESION 1 - DESMONTAJE E INSPECCION</h2>
+                <p>Duracion: 5 horas</p>
+            </div>
+
+            <!-- PARTE 1: Identificacion externa -->
+            <div class="seccion">
+                <h2>Parte 1 - Identificacion externa del equipo (20 min)</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">Antes de abrir el equipo, examina su exterior y completa la ficha:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Marca y modelo del equipo (si visible)</td>
+                            <td><input type="text" placeholder="Ej: HP Compaq Pro 6300"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de caja</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Torre completa</option>
+                                    <option>Minitorre</option>
+                                    <option>Sobremesa</option>
+                                    <option>SFF (Small Form Factor)</option>
+                                    <option>Otro</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Factor de forma estimado</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>ATX</option>
+                                    <option>Micro-ATX</option>
+                                    <option>Mini-ITX</option>
+                                    <option>Propietario / No estandar</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Estado general de la caja</td>
+                            <td><input type="text" placeholder="Aranyazos, abolladuras, oxido..."></td>
+                        </tr>
+                        <tr>
+                            <td>Bahias de 5.25" visibles en el frontal</td>
+                            <td><input type="text" placeholder="Cantidad"></td>
+                        </tr>
+                        <tr>
+                            <td>Bahias de 3.5" visibles en el frontal</td>
+                            <td><input type="text" placeholder="Cantidad"></td>
+                        </tr>
+                        <tr>
+                            <td>Puertos frontales disponibles</td>
+                            <td><input type="text" placeholder="Ej: 2x USB 2.0, audio, microfono"></td>
+                        </tr>
+                        <tr>
+                            <td>Puertos traseros visibles (sin abrir)</td>
+                            <td><input type="text" placeholder="Ej: VGA, HDMI, 4x USB, RJ45, audio..."></td>
+                        </tr>
+                        <tr>
+                            <td>Interruptor de fuente en la trasera</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Si</option>
+                                    <option>No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cable de alimentacion incluido</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option>Si</option>
+                                    <option>No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">1</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Equipo completo (vista frontal y trasera)</div>
+                            <div class="foto-desc">Foto del equipo cerrado antes de abrirlo, mostrando ambas caras</div>
+                        </div>
+                        <div class="foto-archivo">Foto01.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Desmontaje -->
+            <div class="seccion">
+                <h2>Parte 2 - Apertura y desmontaje sistematico (90 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 - Apertura de la caja</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Desconecta</strong> el cable de alimentacion de la red electrica.</li>
+                            <li><strong>Pulsa</strong> el boton de encendido 5 segundos (drena carga residual).</li>
+                            <li><strong>Colocate</strong> la pulsera antiestatica y conectala a la caja metalica.</li>
+                            <li><strong>Retira</strong> los tornillos del panel lateral (normalmente el izquierdo).</li>
+                            <li><strong>Desliza</strong> el panel y retiralo.</li>
+                            <li><strong>Inspecciona</strong> visualmente el interior antes de tocar nada.</li>
+                        </ol>
+                    </div>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">2</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Interior del equipo ANTES del desmontaje</div>
+                            <div class="foto-desc">Esta foto sera tu referencia para el reensamblaje</div>
+                        </div>
+                        <div class="foto-archivo">Foto02.jpg</div>
+                    </div>
+
+                    <h3>2.2 - Esquema de conexiones (PASO CRITICO)</h3>
+                    <div class="nota-warning">
+                        <strong>ANTES de desconectar ningun cable</strong>, documenta todas las conexiones actuales. Haz fotos de cada conector ANTES de desenchufarlo.
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th>Cable / Conector</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>ATX 24 pines</td>
+                            <td>Fuente</td>
+                            <td>Placa base</td>
+                            <td><input type="text" placeholder="Posicion, color..."></td>
+                        </tr>
+                        <tr>
+                            <td>EPS 4+4 pines (CPU)</td>
+                            <td>Fuente</td>
+                            <td>Placa base (zona CPU)</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>SATA datos (1)</td>
+                            <td><input type="text" placeholder="Puerto SATA n.o..."></td>
+                            <td><input type="text" placeholder="Dispositivo..."></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>SATA datos (2)</td>
+                            <td><input type="text" placeholder="Puerto SATA n.o..."></td>
+                            <td><input type="text" placeholder="Dispositivo..."></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>SATA alimentacion</td>
+                            <td>Fuente</td>
+                            <td><input type="text" placeholder="Dispositivo(s)..."></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>PCIe alimentacion (GPU)</td>
+                            <td>Fuente</td>
+                            <td><input type="text" placeholder="GPU / No tiene"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Power SW</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Pins placa base"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Reset SW</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Pins placa base"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>HDD LED</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Pins placa base"></td>
+                            <td><input type="text" placeholder="Polaridad: + = color"></td>
+                        </tr>
+                        <tr>
+                            <td>Power LED</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Pins placa base"></td>
+                            <td><input type="text" placeholder="Polaridad: + = color"></td>
+                        </tr>
+                        <tr>
+                            <td>USB frontal</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Conector placa base"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Audio frontal (HD Audio)</td>
+                            <td>Panel frontal</td>
+                            <td><input type="text" placeholder="Conector placa base"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Ventilador(es)</td>
+                            <td><input type="text" placeholder="Posicion"></td>
+                            <td><input type="text" placeholder="CPU_FAN / SYS_FAN / Molex"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Otros cables</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">3</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Cables del panel frontal (antes de desmontar)</div>
+                            <div class="foto-desc">Detalle de los cables del panel frontal conectados a la placa base</div>
+                        </div>
+                        <div class="foto-archivo">Foto03.jpg</div>
+                    </div>
+
+                    <h3>2.3 - Orden de desmontaje</h3>
+                    <p style="font-size:13px; margin-bottom:8px;">Desmonta los componentes <strong>en este orden</strong>. Marca cada paso completado:</p>
+
+                    <table>
+                        <tr>
+                            <th style="width:35px">Paso</th>
+                            <th>Accion</th>
+                            <th style="width:35px">&#10004;</th>
+                            <th>Incidencias / Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Desconectar cables de datos (SATA, USB frontal, audio frontal)</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Desconectar cables del panel frontal (Power SW, Reset SW, LEDs)</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Desconectar cables de alimentacion de discos/unidades opticas</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Desconectar cable PCIe de la tarjeta grafica (si tiene)</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Retirar tarjeta grafica: quitar tornillo, abrir clip PCIe, extraer</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Retirar otras tarjetas de expansion (red, sonido, etc.)</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Retirar unidades de almacenamiento (HDD/SSD): quitar tornillos y extraer</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Retirar unidad optica (si tiene)</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Desconectar cable EPS 4+4 pin (CPU) de la placa base</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Desconectar cable ATX 24 pines de la placa base</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>Desconectar cables de ventiladores de la placa base</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>Retirar fuente de alimentacion: quitar 4 tornillos traseros y extraer</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>Retirar modulos de memoria RAM: abrir pestanas y extraer</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>Retirar disipador/ventilador del CPU: liberar anclajes con cuidado</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>Retirar procesador: abrir palanca del socket, extraer sin tocar pines</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>Retirar placa base: quitar todos los tornillos y extraer</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota-warning" style="margin-top:12px;">
+                        <strong>Disipador pegado:</strong> Si esta muy pegado por pasta termica seca, giralo suavemente a izquierda y derecha. No tires con fuerza. Consulta al profesor si no se mueve.
+                    </div>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">4</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Todos los componentes extraidos y ordenados</div>
+                            <div class="foto-desc">Componentes sobre la mesa de trabajo, ordenados e identificables</div>
+                        </div>
+                        <div class="foto-archivo">Foto04.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Inspeccion de componentes -->
+            <div class="seccion">
+                <h2>Parte 3 - Inspeccion y diagnostico de componentes (90 min)</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:16px;">Examina cada componente individualmente. Esta inspeccion determina si cada componente es <strong>apto para el reensamblaje</strong>.</p>
+
+                    <!-- 3.1 Placa base -->
+                    <h3>3.1 - Placa base</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text" placeholder="Ej: ASUS P8H61-M LX"></td></tr>
+                        <tr><td>Factor de forma</td><td>
+                            <select><option value="">-- Selecciona --</option><option>ATX</option><option>Micro-ATX</option><option>Mini-ITX</option></select>
+                        </td></tr>
+                        <tr><td>Socket del procesador (tipo)</td><td><input type="text" placeholder="Ej: LGA 1155, AM4..."></td></tr>
+                        <tr><td>Chipset (si visible)</td><td><input type="text" placeholder="Ej: H61, B450..."></td></tr>
+                        <tr><td>Ranuras de RAM: cantidad y tipo</td><td><input type="text" placeholder="Ej: 2x DDR3, 4x DDR4..."></td></tr>
+                        <tr><td>Ranuras PCIe: cantidad y tipo</td><td><input type="text" placeholder="Ej: 1x PCIe x16, 2x PCIe x1"></td></tr>
+                        <tr><td>Puertos SATA: cantidad</td><td><input type="text" placeholder="Cantidad"></td></tr>
+                        <tr><td>Puerto M.2</td><td>
+                            <select><option value="">-- Selecciona --</option><option>No tiene</option><option>1 puerto</option><option>2 puertos</option></select>
+                        </td></tr>
+                        <tr><td>Conectores de ventilador: cantidad</td><td><input type="text" placeholder="Cantidad"></td></tr>
+                        <tr><td>Puertos USB traseros: cantidad y tipo</td><td><input type="text" placeholder="Ej: 4x USB 2.0, 2x USB 3.0"></td></tr>
+                        <tr><td>Salidas de video integradas</td><td><input type="text" placeholder="Ej: VGA, HDMI, DP / No tiene"></td></tr>
+                        <tr><td>Pila CMOS presente</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                        <tr><td>Estado visual (quemaduras, capacitores hinchados, corrosion)</td><td><input type="text" placeholder="Describe el estado"></td></tr>
+                        <tr><td><strong>Apta para montaje</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                        <tr><td><strong>Justificacion</strong></td><td><input type="text" placeholder="Razon"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">5</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Placa base con componentes identificados</div>
+                            <div class="foto-desc">Placa base mostrando socket, ranuras RAM, PCIe, chipset, conectores</div>
+                        </div>
+                        <div class="foto-archivo">Foto05.jpg</div>
+                    </div>
+
+                    <!-- 3.2 Procesador -->
+                    <h3>3.2 - Procesador (CPU)</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Marca y modelo (lectura del IHS)</td><td><input type="text" placeholder="Ej: Intel Core i5-3470"></td></tr>
+                        <tr><td>Socket compatible</td><td><input type="text" placeholder="Ej: LGA 1155"></td></tr>
+                        <tr><td>Nucleos / hilos (buscar online)</td><td><input type="text" placeholder="Ej: 4 nucleos / 4 hilos"></td></tr>
+                        <tr><td>Frecuencia base / turbo</td><td><input type="text" placeholder="Ej: 3.2 GHz / 3.6 GHz"></td></tr>
+                        <tr><td>TDP</td><td><input type="text" placeholder="Ej: 77 W"></td></tr>
+                        <tr><td>Generacion / arquitectura</td><td><input type="text" placeholder="Ej: 3a gen / Ivy Bridge"></td></tr>
+                        <tr><td>Estado de pines/contactos</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Limpios, buen estado</option><option>Sucios, necesitan limpieza</option><option>Pines doblados</option><option>Danados</option></select>
+                        </td></tr>
+                        <tr><td>Restos de pasta termica en el IHS</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si (limpiar antes de montar)</option><option>No</option></select>
+                        </td></tr>
+                        <tr><td><strong>Apto para montaje</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                        <tr><td><strong>Justificacion</strong></td><td><input type="text" placeholder="Razon"></td></tr>
+                    </table>
+
+                    <!-- 3.3 RAM -->
+                    <h3>3.3 - Memoria RAM</h3>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Dato</th>
+                            <th>Modulo 1</th>
+                            <th>Modulo 2</th>
+                            <th>Modulo 3</th>
+                            <th>Modulo 4</th>
+                        </tr>
+                        <tr>
+                            <td>Marca</td>
+                            <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Capacidad (GB)</td>
+                            <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td><select><option value="">-</option><option>DDR2</option><option>DDR3</option><option>DDR4</option><option>DDR5</option></select></td>
+                            <td><select><option value="">-</option><option>DDR2</option><option>DDR3</option><option>DDR4</option><option>DDR5</option></select></td>
+                            <td><select><option value="">-</option><option>DDR2</option><option>DDR3</option><option>DDR4</option><option>DDR5</option></select></td>
+                            <td><select><option value="">-</option><option>DDR2</option><option>DDR3</option><option>DDR4</option><option>DDR5</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad (MHz)</td>
+                            <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Estado contactos</td>
+                            <td><select><option value="">-</option><option>Bien</option><option>Sucios</option><option>Danados</option></select></td>
+                            <td><select><option value="">-</option><option>Bien</option><option>Sucios</option><option>Danados</option></select></td>
+                            <td><select><option value="">-</option><option>Bien</option><option>Sucios</option><option>Danados</option></select></td>
+                            <td><select><option value="">-</option><option>Bien</option><option>Sucios</option><option>Danados</option></select></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apto</strong></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <!-- 3.4 Almacenamiento -->
+                    <h3>3.4 - Dispositivos de almacenamiento</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Dato</th>
+                            <th>Dispositivo 1</th>
+                            <th>Dispositivo 2</th>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td><select><option value="">-- Selecciona --</option><option>HDD</option><option>SSD SATA</option><option>SSD NVMe M.2</option><option>No tiene</option></select></td>
+                            <td><select><option value="">-- Selecciona --</option><option>HDD</option><option>SSD SATA</option><option>SSD NVMe M.2</option><option>No tiene</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Marca y modelo</td>
+                            <td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Capacidad</td>
+                            <td><input type="text" placeholder="Ej: 500 GB"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Interfaz</td>
+                            <td><input type="text" placeholder="Ej: SATA III"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano</td>
+                            <td><select><option value="">-</option><option>3.5"</option><option>2.5"</option><option>M.2 2280</option></select></td>
+                            <td><select><option value="">-</option><option>3.5"</option><option>2.5"</option><option>M.2 2280</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RPM (solo HDD)</td>
+                            <td><input type="text" placeholder="Ej: 7200"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Estado visual</td>
+                            <td><input type="text" placeholder="Golpes, aranyazos..."></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apto para montaje</strong></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <!-- 3.5 Tarjetas expansion -->
+                    <h3>3.5 - Tarjetas de expansion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Dato</th>
+                            <th>Tarjeta 1</th>
+                            <th>Tarjeta 2</th>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td><select><option value="">-- Selecciona --</option><option>GPU (grafica)</option><option>Red</option><option>Sonido</option><option>Otra</option><option>No tiene</option></select></td>
+                            <td><select><option value="">-- Selecciona --</option><option>GPU (grafica)</option><option>Red</option><option>Sonido</option><option>Otra</option><option>No tiene</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Marca y modelo</td>
+                            <td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Interfaz</td>
+                            <td><select><option value="">-</option><option>PCIe x16</option><option>PCIe x4</option><option>PCIe x1</option><option>PCI</option></select></td>
+                            <td><select><option value="">-</option><option>PCIe x16</option><option>PCIe x4</option><option>PCIe x1</option><option>PCI</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Requiere alimentacion adicional</td>
+                            <td><select><option value="">-</option><option>No</option><option>Si (6 pin)</option><option>Si (8 pin)</option><option>Si (6+2 pin)</option></select></td>
+                            <td><select><option value="">-</option><option>No</option><option>Si (6 pin)</option><option>Si (8 pin)</option><option>Si (6+2 pin)</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Estado visual</td>
+                            <td><input type="text"></td><td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apta para montaje</strong></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <!-- 3.6 Fuente -->
+                    <h3>3.6 - Fuente de alimentacion</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
+                        <tr><td>Potencia (W)</td><td><input type="text" id="potencia-fuente" placeholder="Ej: 500"></td></tr>
+                        <tr><td>Certificacion 80 Plus</td><td>
+                            <select><option value="">-- Selecciona --</option><option>No tiene</option><option>80 Plus (White)</option><option>80 Plus Bronze</option><option>80 Plus Silver</option><option>80 Plus Gold</option></select>
+                        </td></tr>
+                        <tr><td>Tipo de cableado</td><td>
+                            <select><option value="">-- Selecciona --</option><option>No modular</option><option>Semi-modular</option><option>Modular</option></select>
+                        </td></tr>
+                        <tr><td>Conector ATX 24 pin</td><td><select><option value="">-</option><option>Si</option><option>No</option></select></td></tr>
+                        <tr><td>Conector EPS 4+4 pin</td><td><select><option value="">-</option><option>Si</option><option>No</option></select></td></tr>
+                        <tr><td>Conectores PCIe (cantidad)</td><td><input type="text" placeholder="Ej: 2"></td></tr>
+                        <tr><td>Conectores SATA (cantidad)</td><td><input type="text" placeholder="Ej: 4"></td></tr>
+                        <tr><td>Conectores Molex (cantidad)</td><td><input type="text" placeholder="Ej: 2"></td></tr>
+                        <tr><td>Estado del ventilador</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Gira libremente</option><option>Atascado</option><option>Ruidoso</option></select>
+                        </td></tr>
+                        <tr><td>Estado de los cables</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Buen estado</option><option>Pelados / danados</option><option>Doblados</option></select>
+                        </td></tr>
+                        <tr><td><strong>Apta para montaje</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                    </table>
+
+                    <!-- 3.7 Disipador -->
+                    <h3>3.7 - Disipador / Refrigeracion del CPU</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Tipo</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Stock Intel</option><option>Stock AMD</option><option>Torre aftermarket</option><option>AIO refrigeracion liquida</option></select>
+                        </td></tr>
+                        <tr><td>Marca y modelo (si no es stock)</td><td><input type="text" placeholder="Stock / marca y modelo"></td></tr>
+                        <tr><td>Sistema de anclaje</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Push-pin (clavijas)</option><option>Tornillos</option><option>Clips</option></select>
+                        </td></tr>
+                        <tr><td>Pasta termica preaplicada</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No (necesita pasta nueva)</option></select>
+                        </td></tr>
+                        <tr><td>Estado del ventilador</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Gira libremente</option><option>Atascado</option><option>Ruidoso</option></select>
+                        </td></tr>
+                        <tr><td>Estado aletas/radiador</td><td><input type="text" placeholder="Polvo, deformaciones..."></td></tr>
+                        <tr><td><strong>Apto para montaje</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                    </table>
+
+                    <!-- 3.8 Caja -->
+                    <h3>3.8 - Caja y ventilacion</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Marca y modelo de la caja</td><td><input type="text"></td></tr>
+                        <tr><td>Ventiladores incluidos (cantidad y posicion)</td><td><input type="text" placeholder="Ej: 1 trasero 120mm"></td></tr>
+                        <tr><td>Tornillos separadores (standoffs) instalados: cantidad</td><td><input type="text"></td></tr>
+                        <tr><td>I/O Shield (chapa de escudo trasera)</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si, presente</option><option>No, falta</option></select>
+                        </td></tr>
+                        <tr><td>Estado general</td><td><input type="text" placeholder="Golpes, tornillos faltantes..."></td></tr>
+                        <tr><td><strong>Apta para montaje</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si</option><option>No</option></select>
+                        </td></tr>
+                    </table>
+
+                    <!-- 3.9 Resumen -->
+                    <h3>3.9 - Resumen de diagnostico</h3>
+                    <table>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Marca / Modelo</th>
+                            <th>Apto</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Placa base</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Procesador</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM (total)</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Almacenamiento 1</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Almacenamiento 2</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta(s) expansion</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Fuente de alimentacion</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Disipador CPU</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Caja</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+
+                    <div class="pregunta" style="margin-top:16px;">
+                        <p>Si algun componente NO es apto, explica como buscarias un componente compatible de sustitucion:</p>
+                        <textarea rows="3" placeholder="Describe el proceso para buscar un componente compatible (compatibilidad de socket, tipo de RAM, factor de forma, etc.)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SESION 2 -->
+            <!-- ============================================ -->
+            <div class="sesion-header">
+                <h2>SESION 2 - ENSAMBLAJE Y VERIFICACION</h2>
+                <p>Duracion: 5 horas</p>
+            </div>
+
+            <!-- PARTE 4: Preparacion -->
+            <div class="seccion">
+                <h2>Parte 4 - Preparacion para el ensamblaje (15 min)</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">Antes de comenzar, comprueba que:</p>
+                    <div class="check-list">
+                        <div class="check-group"><input type="checkbox"><label>Todos los componentes diagnosticados como aptos estan disponibles</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Pulsera antiestatica colocada y conectada</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Superficie de trabajo limpia y despejada</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Herramientas necesarias a mano</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Tornilleria separada y organizada por tipo</label></div>
+                        <div class="check-group"><input type="checkbox"><label>He revisado la tabla de conexiones de la Parte 2.2</label></div>
+                        <div class="check-group"><input type="checkbox"><label>He revisado la foto del interior original (Foto 2)</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Pasta termica limpia/nueva disponible si es necesario</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Ensamblaje -->
+            <div class="seccion">
+                <h2>Parte 5 - Ensamblaje paso a paso (180 min)</h2>
+                <div class="seccion-body">
+
+                    <!-- Fase 1 -->
+                    <div style="background:#ebf8ff; padding:10px 14px; border-radius:4px; margin-bottom:16px;">
+                        <strong style="color:var(--azul-claro);">FASE 1: Preparacion de la placa base FUERA de la caja (45 min)</strong>
+                        <p style="font-size:12px; margin-top:4px;">Es mas comodo y seguro instalar CPU, disipador y RAM con la placa sobre la mesa.</p>
+                    </div>
+
+                    <h3>Paso 5.1 - Instalacion del procesador</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Coloca la placa base sobre superficie antiestatica (su propia caja).</li>
+                            <li>Abre el mecanismo de retencion del socket:
+                                <ul>
+                                    <li><strong>Intel (LGA):</strong> Levanta palanca → levanta placa de retencion → retira tapa plastica.</li>
+                                    <li><strong>AMD (AM4/AM5):</strong> Levanta la palanca lateral.</li>
+                                </ul>
+                            </li>
+                            <li>Identifica la <strong>marca de orientacion</strong> (triangulo dorado) en CPU y socket.</li>
+                            <li>Alinea y <strong>deposita suavemente</strong>. NO presiones. Debe caer por su propio peso.</li>
+                            <li>Cierra el mecanismo de retencion.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Marca de orientacion identificada y alineada</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Procesador asentado sin forzar</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Mecanismo de retencion cerrado correctamente</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>No hay pines doblados (AMD) / contactos danados (Intel)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">6</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Procesador instalado en el socket</div>
+                            <div class="foto-desc">CPU colocado en el socket antes de instalar el disipador</div>
+                        </div>
+                        <div class="foto-archivo">Foto06.jpg</div>
+                    </div>
+
+                    <h3>Paso 5.2 - Pasta termica</h3>
+                    <div class="nota">Si el disipador tiene pasta preaplicada de fabrica, <strong>salta este paso</strong>.</div>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th></tr>
+                        <tr><td>El disipador tiene pasta preaplicada (saltar al 5.3)</td><td><input type="checkbox"></td></tr>
+                        <tr><td>Cantidad de pasta aplicada: grano de arroz, en el centro del IHS</td><td><input type="checkbox"></td></tr>
+                    </table>
+
+                    <h3>Paso 5.3 - Instalacion del disipador/ventilador CPU</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Alinea el disipador con los puntos de anclaje.</li>
+                            <li>Instala segun tipo:
+                                <ul>
+                                    <li><strong>Push-pin (Intel stock):</strong> Presiona 4 clavijas en diagonal. Verifica "clic".</li>
+                                    <li><strong>Clip (AMD stock):</strong> Engancha un lado, luego el otro, baja palanca.</li>
+                                    <li><strong>Tornillos (torre):</strong> Backplate + tornillos en cruz, alternando.</li>
+                                </ul>
+                            </li>
+                            <li>Conecta el cable del ventilador al conector <strong>CPU_FAN</strong> (4 pines, cerca del socket).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Disipador correctamente anclado (no se mueve)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Presion uniforme sobre el procesador</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Ventilador conectado a CPU_FAN</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Cable del ventilador no interfiere con aspas</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">7</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Disipador instalado</div>
+                            <div class="foto-desc">Disipador anclado con cable de ventilador conectado a CPU_FAN</div>
+                        </div>
+                        <div class="foto-archivo">Foto07.jpg</div>
+                    </div>
+
+                    <h3>Paso 5.4 - Instalacion de la memoria RAM</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Consulta el manual o serigrafia para las ranuras de <strong>Dual Channel</strong> (normalmente posiciones 2 y 4).</li>
+                            <li>Abre pestanas de retencion.</li>
+                            <li>Alinea la <strong>muesca</strong> del modulo con la <strong>guia</strong> de la ranura.</li>
+                            <li>Inserta presionando con ambos pulgares hasta escuchar <strong>"clic"</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Ranuras para Dual Channel seleccionadas (indicar cuales)</td><td><input type="checkbox"></td><td><input type="text" placeholder="Ej: ranuras 2 y 4"></td></tr>
+                        <tr><td>Muesca alineada con la guia de la ranura</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Modulo 1 insertado completamente (pestanas cerradas)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Modulo 2 insertado completamente (pestanas cerradas)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">8</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Modulos de RAM instalados</div>
+                            <div class="foto-desc">Modulos insertados en las ranuras correctas para Dual Channel</div>
+                        </div>
+                        <div class="foto-archivo">Foto08.jpg</div>
+                    </div>
+
+                    <!-- Fase 2 -->
+                    <div style="background:#ebf8ff; padding:10px 14px; border-radius:4px; margin: 20px 0 16px 0;">
+                        <strong style="color:var(--azul-claro);">FASE 2: Preparacion de la caja (15 min)</strong>
+                    </div>
+
+                    <h3>Paso 5.5 - Preparacion de la caja</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Retira ambos paneles laterales.</li>
+                            <li>Verifica que los <strong>standoffs</strong> estan en la posicion correcta segun el factor de forma.</li>
+                            <li>Instala el <strong>I/O Shield</strong> en la apertura trasera (presionar desde dentro hacia fuera).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Standoffs en posicion correcta para factor de forma</td><td><input type="checkbox"></td><td><input type="text" placeholder="Factor de forma y cantidad"></td></tr>
+                        <tr><td>I/O Shield instalado correctamente</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <!-- Fase 3 -->
+                    <div style="background:#ebf8ff; padding:10px 14px; border-radius:4px; margin: 20px 0 16px 0;">
+                        <strong style="color:var(--azul-claro);">FASE 3: Instalacion de componentes en la caja (120 min)</strong>
+                    </div>
+
+                    <h3>Paso 5.6 - Placa base en la caja</h3>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Placa alineada con standoffs</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Puertos traseros accesibles a traves del I/O Shield</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Todos los tornillos colocados (cantidad: ___)</td><td><input type="checkbox"></td><td><input type="text" placeholder="Cantidad de tornillos"></td></tr>
+                        <tr><td>Placa firme pero sin tension excesiva</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">9</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Placa base instalada en la caja</div>
+                            <div class="foto-desc">Placa base atornillada sobre los standoffs dentro de la caja</div>
+                        </div>
+                        <div class="foto-archivo">Foto09.jpg</div>
+                    </div>
+
+                    <h3>Paso 5.7 - Fuente de alimentacion</h3>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Posicion de montaje: superior / inferior</td><td><input type="checkbox"></td><td><input type="text" placeholder="Superior o inferior"></td></tr>
+                        <tr><td>4 tornillos de fijacion colocados</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Fuente firme y estable</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Paso 5.8 - Dispositivos de almacenamiento</h3>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>Almacenamiento 1 instalado y fijado</td><td><input type="checkbox"></td><td><input type="text" placeholder="Tipo y posicion"></td></tr>
+                        <tr><td>Almacenamiento 2 instalado y fijado (si aplica)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>SSD M.2 insertado y atornillado (si aplica)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Paso 5.9 - Tarjetas de expansion</h3>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>GPU instalada en PCIe x16 (clip cerrado)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>GPU fijada con tornillo trasero</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Otras tarjetas instaladas</td><td><input type="checkbox"></td><td><input type="text" placeholder="Detallar cuales"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">10</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Tarjetas de expansion instaladas</div>
+                            <div class="foto-desc">GPU y/o otras tarjetas insertadas en sus ranuras PCIe</div>
+                        </div>
+                        <div class="foto-archivo">Foto10.jpg</div>
+                    </div>
+
+                    <h3>Paso 5.10 - Cables de alimentacion</h3>
+                    <div class="nota">Los conectores tienen forma asimetrica y solo entran en una orientacion. Si no entra, <strong>NO fuerces</strong>.</div>
+                    <table>
+                        <tr><th>Cable</th><th>Destino</th><th style="width:35px">&#10004;</th><th>Observaciones</th></tr>
+                        <tr><td>ATX 24 pines</td><td>Conector principal placa base</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>EPS 4+4 pines</td><td>Conector CPU placa base</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>PCIe 6+2 pines</td><td>Tarjeta grafica (si requiere)</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>SATA alimentacion</td><td>Discos SATA</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                        <tr><td>Molex (si necesario)</td><td>Ventiladores / accesorios</td><td><input type="checkbox"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Paso 5.11 - Cables de datos</h3>
+                    <table>
+                        <tr><th>Cable</th><th>Puerto placa base</th><th>Dispositivo</th><th style="width:35px">&#10004;</th></tr>
+                        <tr><td>SATA datos (1)</td><td><input type="text" placeholder="SATA n.o..."></td><td><input type="text"></td><td><input type="checkbox"></td></tr>
+                        <tr><td>SATA datos (2)</td><td><input type="text" placeholder="SATA n.o..."></td><td><input type="text"></td><td><input type="checkbox"></td></tr>
+                    </table>
+
+                    <h3>Paso 5.12 - Cables del panel frontal</h3>
+                    <div class="nota-warning">
+                        <strong>Parte mas delicada.</strong> Consulta el manual de la placa base o la serigrafia. Los cables de <strong>SW</strong> (switch) no tienen polaridad. Los cables de <strong>LED</strong> si: el cable de color = positivo (+).
+                    </div>
+                    <table>
+                        <tr><th>Cable</th><th>Pins en placa base</th><th>Polaridad</th><th style="width:35px">&#10004;</th></tr>
+                        <tr><td><strong>Power SW</strong></td><td><input type="text"></td><td>Sin polaridad</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>Reset SW</strong></td><td><input type="text"></td><td>Sin polaridad</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>HDD LED</strong></td><td><input type="text"></td><td>+ y - (color = +)</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>Power LED</strong></td><td><input type="text"></td><td>+ y - (color = +)</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>USB frontal</strong></td><td><input type="text"></td><td>Una sola orientacion</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>HD Audio</strong></td><td><input type="text"></td><td>Una sola orientacion</td><td><input type="checkbox"></td></tr>
+                        <tr><td><strong>USB 3.0 frontal</strong></td><td><input type="text"></td><td>Una sola orientacion</td><td><input type="checkbox"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">11</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Cables del panel frontal conectados</div>
+                            <div class="foto-desc">Detalle de Power SW, Reset SW, LEDs y USB conectados a la placa</div>
+                        </div>
+                        <div class="foto-archivo">Foto11.jpg</div>
+                    </div>
+
+                    <h3>Paso 5.13 - Ventiladores</h3>
+                    <table>
+                        <tr><th>Ventilador</th><th>Posicion</th><th>Conectado a</th><th style="width:35px">&#10004;</th></tr>
+                        <tr>
+                            <td>Ventilador 1</td>
+                            <td><select><option value="">-</option><option>Frontal</option><option>Trasero</option><option>Superior</option></select></td>
+                            <td><select><option value="">-</option><option>CPU_FAN</option><option>SYS_FAN1</option><option>SYS_FAN2</option><option>Molex</option></select></td>
+                            <td><input type="checkbox"></td>
+                        </tr>
+                        <tr>
+                            <td>Ventilador 2</td>
+                            <td><select><option value="">-</option><option>Frontal</option><option>Trasero</option><option>Superior</option><option>N/A</option></select></td>
+                            <td><select><option value="">-</option><option>CPU_FAN</option><option>SYS_FAN1</option><option>SYS_FAN2</option><option>Molex</option><option>N/A</option></select></td>
+                            <td><input type="checkbox"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Paso 5.14 - Gestion de cables</h3>
+                    <table>
+                        <tr><th>Verificacion</th><th style="width:35px">&#10004;</th></tr>
+                        <tr><td>Cables agrupados y ordenados con bridas</td><td><input type="checkbox"></td></tr>
+                        <tr><td>Ningun cable interfiere con ventiladores</td><td><input type="checkbox"></td></tr>
+                        <tr><td>Flujo de aire no obstruido</td><td><input type="checkbox"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">12</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Interior completo con gestion de cables</div>
+                            <div class="foto-desc">Vista general del interior del equipo completamente montado</div>
+                        </div>
+                        <div class="foto-archivo">Foto12.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Verificacion pre-arranque -->
+            <div class="seccion">
+                <h2>Parte 6 - Verificacion pre-arranque (15 min)</h2>
+                <div class="seccion-body">
+                    <div class="aviso-seguridad" style="margin-bottom:12px;">
+                        <h3>ANTES de conectar a la corriente</h3>
+                        <p style="font-size:13px; color:#742a2a;">Revisa TODOS los puntos. Un error aqui puede danar componentes.</p>
+                    </div>
+                    <div class="check-list">
+                        <div class="check-group"><input type="checkbox"><label>No hay tornillos sueltos dentro de la caja</label></div>
+                        <div class="check-group"><input type="checkbox"><label>No hay herramientas olvidadas dentro de la caja</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Todos los conectores de alimentacion firmemente insertados</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Todos los conectores de datos firmemente insertados</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Cables del panel frontal conectados</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Procesador y RAM correctamente instalados</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Disipador del CPU bien anclado</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Ventilador CPU conectado a CPU_FAN</label></div>
+                        <div class="check-group"><input type="checkbox"><label>No hay cables en contacto con aspas de ventilador</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Paneles laterales RETIRADOS (para primer arranque de prueba)</label></div>
+                        <div class="check-group"><input type="checkbox"><label>Interruptor trasero de la fuente en OFF (O)</label></div>
+                    </div>
+                    <div class="nota" style="margin-top:10px;">
+                        <strong>Primer arranque con paneles abiertos:</strong> Para observar si algo va mal (humo, chispas) y verificar que todos los ventiladores giran.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Primer arranque -->
+            <div class="seccion">
+                <h2>Parte 7 - Primer arranque y POST (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>7.1 - Secuencia de arranque</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta el cable de alimentacion a la fuente y a la toma de corriente.</li>
+                            <li>Conecta un <strong>monitor</strong> al puerto de video (GPU o integrado).</li>
+                            <li>Conecta un <strong>teclado</strong> (USB o PS/2).</li>
+                            <li>Pon el interruptor trasero en <strong>I</strong> (ON).</li>
+                            <li>Pulsa el boton de <strong>encendido</strong> del panel frontal.</li>
+                        </ol>
+                    </div>
+
+                    <h3>7.2 - Observaciones del primer arranque</h3>
+                    <table>
+                        <tr><th style="width:50%">Observacion</th><th>Resultado</th><th>Detalle</th></tr>
+                        <tr>
+                            <td>Se enciende el LED de Power</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Gira el ventilador del CPU</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Giran los ventiladores de la caja</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Gira el ventilador de la GPU (si tiene)</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Se ilumina algun LED de la placa base</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text" placeholder="Color"></td>
+                        </tr>
+                        <tr>
+                            <td>Se escuchan pitidos (beep codes)</td>
+                            <td><select><option value="">-</option><option>No</option><option>1 pitido corto (OK)</option><option>Pitidos multiples (error)</option></select></td>
+                            <td><input type="text" placeholder="Patron de pitidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Aparece imagen en el monitor</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Se muestra pantalla de POST / logo fabricante</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Se detecta algun error en el POST</td>
+                            <td><select><option value="">-</option><option>No</option><option>Si</option></select></td>
+                            <td><input type="text" placeholder="Mensaje de error"></td>
+                        </tr>
+                    </table>
+
+                    <h3>7.3 - Resolucion de problemas (si los hubo)</h3>
+
+                    <div class="nota-warning">
+                        <strong>Si NO enciende</strong> (ninguna reaccion): verifica cable de alimentacion, interruptor fuente, cable Power SW, puentea pins de Power SW con destornillador, verifica ATX 24 pines y EPS 4+4.
+                    </div>
+                    <div class="nota-warning">
+                        <strong>Si enciende pero NO hay imagen</strong>: verifica monitor encendido y entrada correcta, cable video en GPU (no en placa si hay GPU dedicada), GPU bien insertada con alimentacion, reinserta RAM.
+                    </div>
+                    <div class="nota-warning">
+                        <strong>Si se apaga inmediatamente</strong> (1-2 seg): verifica disipador CPU colocado, ventilador CPU conectado a CPU_FAN, busca cortocircuitos (tornillo suelto, standoff extra).
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Describe cualquier problema encontrado y como lo resolviste:</p>
+                        <textarea rows="4" placeholder="Si no hubo problemas, indica 'Primer arranque exitoso sin incidencias'. Si los hubo, describe el problema, el diagnostico y la solucion aplicada."></textarea>
+                    </div>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">13</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Pantalla de POST / BIOS</div>
+                            <div class="foto-desc">Foto de la pantalla del monitor mostrando el POST o acceso a BIOS/UEFI</div>
+                        </div>
+                        <div class="foto-archivo">Foto13.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 8: BIOS/UEFI -->
+            <div class="seccion">
+                <h2>Parte 8 - Configuracion y verificacion en BIOS/UEFI (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>8.1 - Acceso a BIOS/UEFI</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Tu respuesta</th></tr>
+                        <tr><td>Tecla utilizada para acceder a BIOS/UEFI</td><td>
+                            <select><option value="">-- Selecciona --</option><option>Supr / Del</option><option>F2</option><option>F10</option><option>F12</option><option>Esc</option><option>Otra</option></select>
+                        </td></tr>
+                    </table>
+
+                    <h3>8.2 - Componentes detectados en BIOS</h3>
+                    <table>
+                        <tr><th style="width:40%">Componente</th><th>Detectado</th><th>Informacion mostrada</th></tr>
+                        <tr>
+                            <td>Procesador (modelo y frecuencia)</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Memoria RAM (capacidad y velocidad)</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text" placeholder="Ej: 8 GB DDR3 1600 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>Modo de memoria (Single/Dual Channel)</td>
+                            <td><select><option value="">-</option><option>Dual Channel</option><option>Single Channel</option><option>No indica</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco de almacenamiento 1</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Disco de almacenamiento 2</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Ventiladores (RPM)</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text" placeholder="CPU_FAN: ___ RPM"></td>
+                        </tr>
+                        <tr>
+                            <td>Temperatura del CPU</td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                            <td><input type="text" placeholder="___  grados C"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha y hora del sistema</td>
+                            <td><select><option value="">-</option><option>Correcta</option><option>Incorrecta (ajustada)</option></select></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+
+                    <h3>8.3 - Configuraciones verificadas/ajustadas</h3>
+                    <table>
+                        <tr><th>Configuracion</th><th>Valor actual</th><th>Necesita cambio</th></tr>
+                        <tr>
+                            <td>Orden de arranque (Boot Order)</td>
+                            <td><input type="text" placeholder="Ej: 1o HDD, 2o USB, 3o Red"></td>
+                            <td><select><option value="">-</option><option>No, correcto</option><option>Si, ajustado</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modo SATA</td>
+                            <td><select><option value="">-</option><option>AHCI</option><option>IDE</option><option>RAID</option></select></td>
+                            <td><select><option value="">-</option><option>No, correcto</option><option>Si, cambiado a AHCI</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Perfil XMP/DOCP (si disponible)</td>
+                            <td><select><option value="">-</option><option>No disponible</option><option>Desactivado</option><option>Activado</option></select></td>
+                            <td><select><option value="">-</option><option>No aplica</option><option>Activado</option></select></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">14</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">BIOS/UEFI: informacion del sistema</div>
+                            <div class="foto-desc">Pantalla de BIOS/UEFI donde se vea CPU, RAM y discos detectados</div>
+                        </div>
+                        <div class="foto-archivo">Foto14.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 9: Pruebas funcionales -->
+            <div class="seccion">
+                <h2>Parte 9 - Pruebas funcionales con software de diagnostico (60 min)</h2>
+                <div class="seccion-body">
+                    <div class="nota">El profesor proporcionara los medios necesarios (USB booteable o sistema operativo).</div>
+
+                    <h3>9.1 - Test de memoria RAM (MemTest86)</h3>
+                    <table>
+                        <tr><th style="width:45%">Dato</th><th>Resultado</th></tr>
+                        <tr><td>Memoria total detectada</td><td><input type="text" placeholder="Ej: 8192 MB"></td></tr>
+                        <tr><td>Numero de pasadas completadas</td><td><input type="text" placeholder="Ej: 1"></td></tr>
+                        <tr><td>Errores encontrados</td><td><input type="text" placeholder="Ej: 0"></td></tr>
+                        <tr><td><strong>Test superado (PASS)</strong></td><td>
+                            <select><option value="">-- Selecciona --</option><option>Si - PASS</option><option>No - FAIL</option></select>
+                        </td></tr>
+                    </table>
+                    <div class="nota" style="margin-top:8px;">Si MemTest86 encuentra errores, prueba cada modulo individualmente para identificar el defectuoso.</div>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">15</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">Resultado de MemTest86</div>
+                            <div class="foto-desc">Pantalla de MemTest86 mostrando PASS o errores encontrados</div>
+                        </div>
+                        <div class="foto-archivo">Foto15.jpg</div>
+                    </div>
+
+                    <h3>9.2 - Diagnostico de almacenamiento (CrystalDiskInfo)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Dato</th>
+                            <th>Disco 1</th>
+                            <th>Disco 2</th>
+                        </tr>
+                        <tr><td>Modelo</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Capacidad</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Estado de salud (Health Status)</td>
+                            <td><select><option value="">-</option><option style="color:blue">Good (Bueno)</option><option style="color:orange">Caution (Precaucion)</option><option style="color:red">Bad (Malo)</option></select></td>
+                            <td><select><option value="">-</option><option style="color:blue">Good (Bueno)</option><option style="color:orange">Caution (Precaucion)</option><option style="color:red">Bad (Malo)</option><option>N/A</option></select></td>
+                        </tr>
+                        <tr><td>Temperatura actual</td><td><input type="text" placeholder="grados C"></td><td><input type="text"></td></tr>
+                        <tr><td>Horas de encendido (Power On Hours)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Numero de encendidos (Power On Count)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Sectores reasignados (Reallocated Sectors)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">16</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">CrystalDiskInfo</div>
+                            <div class="foto-desc">CrystalDiskInfo mostrando estado de salud y datos S.M.A.R.T.</div>
+                        </div>
+                        <div class="foto-archivo">Foto16.jpg</div>
+                    </div>
+
+                    <h3>9.3 - Informacion del sistema (HWiNFO / CPU-Z)</h3>
+                    <p style="font-size:13px; margin-bottom:8px;">Verifica que las especificaciones coinciden con lo documentado en la Parte 3:</p>
+                    <table>
+                        <tr><th>Dato</th><th>Documentado (Parte 3)</th><th>Reportado por software</th><th>Coincide</th></tr>
+                        <tr>
+                            <td>Modelo de CPU</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Frecuencia CPU</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RAM total</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad RAM</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modo canal (Single/Dual)</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modelo GPU</td><td><input type="text"></td><td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Si</option><option>No</option><option>N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <div class="foto-box">
+                        <div class="foto-numero">17</div>
+                        <div class="foto-info">
+                            <div class="foto-titulo">CPU-Z o HWiNFO</div>
+                            <div class="foto-desc">Resumen del sistema mostrando CPU, RAM, GPU detectados</div>
+                        </div>
+                        <div class="foto-archivo">Foto17.jpg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 10: Documentacion final -->
+            <div class="seccion">
+                <h2>Parte 10 - Documentacion final y conclusiones (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>10.1 - Ficha tecnica del equipo ensamblado</h3>
+                    <table>
+                        <tr><th style="width:35%">Componente</th><th>Especificacion</th></tr>
+                        <tr><td><strong>Procesador</strong></td><td><input type="text"></td></tr>
+                        <tr><td><strong>Placa base</strong></td><td><input type="text"></td></tr>
+                        <tr><td><strong>RAM</strong></td><td><input type="text" placeholder="Ej: 8 GB DDR3 1600 MHz (2x4GB, Dual Channel)"></td></tr>
+                        <tr><td><strong>Almacenamiento 1</strong></td><td><input type="text"></td></tr>
+                        <tr><td><strong>Almacenamiento 2</strong></td><td><input type="text" placeholder="N/A si no tiene"></td></tr>
+                        <tr><td><strong>Tarjeta grafica</strong></td><td><input type="text" placeholder="Integrada / modelo dedicada"></td></tr>
+                        <tr><td><strong>Fuente de alimentacion</strong></td><td><input type="text" placeholder="Potencia y certificacion"></td></tr>
+                        <tr><td><strong>Caja</strong></td><td><input type="text"></td></tr>
+                        <tr><td><strong>Refrigeracion CPU</strong></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>10.2 - Preguntas de reflexion (respuestas individuales)</h3>
+
+                    <div class="pregunta">
+                        <p>1. Describe el orden correcto de montaje de los componentes y justifica por que se sigue ese orden. Que podria pasar si se altera?</p>
+                        <textarea rows="4" placeholder="Explica la secuencia logica del montaje y las consecuencias de no seguirla..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Que componente te resulto mas dificil de instalar? Por que? Que precauciones tuviste que tomar?</p>
+                        <textarea rows="4" placeholder="Describe tu experiencia personal con el componente mas complejo..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Explica la diferencia entre los conectores del panel frontal con polaridad (LEDs) y sin polaridad (switches). Que ocurre si conectas un LED al reves? Y el Power SW?</p>
+                        <textarea rows="4" placeholder="Explica las diferencias tecnicas y las consecuencias..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Si un cliente te trae un equipo que enciende pero no muestra imagen, describe tu proceso de diagnostico paso a paso (minimo 6 pasos, de mas simple a mas complejo).</p>
+                        <textarea rows="5" placeholder="Paso 1: ...&#10;Paso 2: ...&#10;Paso 3: ...&#10;Paso 4: ...&#10;Paso 5: ...&#10;Paso 6: ..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Que ventaja tiene Dual Channel frente a Single Channel? En que tareas se nota mas? Que requisitos deben cumplir los modulos?</p>
+                        <textarea rows="4" placeholder="Explica el funcionamiento de Dual Channel y sus ventajas..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>6. Observa los resultados de CrystalDiskInfo. Que parametros S.M.A.R.T. son los mas criticos para detectar un disco a punto de fallar? Nombra al menos 3 y explica que indican.</p>
+                        <textarea rows="4" placeholder="Nombra y explica los parametros S.M.A.R.T. criticos..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7. Calcula si la fuente de tu equipo es suficiente para los componentes instalados (margen del 30%):</p>
+                        <table id="tabla-potencia">
+                            <tr><th>Componente</th><th style="width:120px">Consumo (W)</th></tr>
+                            <tr><td>CPU (TDP)</td><td><input type="text" class="potencia-input" placeholder="TDP" oninput="calcularPotencia()"></td></tr>
+                            <tr><td>GPU (TDP) - si tiene</td><td><input type="text" class="potencia-input" placeholder="TDP o 0" oninput="calcularPotencia()"></td></tr>
+                            <tr><td>RAM</td><td><input type="text" class="potencia-input" value="5" oninput="calcularPotencia()"></td></tr>
+                            <tr><td>Almacenamiento</td><td><input type="text" class="potencia-input" value="10" oninput="calcularPotencia()"></td></tr>
+                            <tr><td>Ventiladores y otros</td><td><input type="text" class="potencia-input" value="15" oninput="calcularPotencia()"></td></tr>
+                            <tr><td>Placa base</td><td><input type="text" class="potencia-input" value="30" oninput="calcularPotencia()"></td></tr>
+                            <tr style="background:#edf2f7; font-weight:600;"><td>Total</td><td id="potencia-total">- W</td></tr>
+                            <tr style="background:#edf2f7; font-weight:600;"><td>Total x 1.3 (con margen 30%)</td><td id="potencia-margen">- W</td></tr>
+                            <tr style="font-weight:600;"><td>La fuente es suficiente?</td><td id="potencia-resultado">-</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8. Que mejora harias a este equipo con un presupuesto de 150 euros? Justifica con argumentos tecnicos.</p>
+                        <textarea rows="4" placeholder="Indica que componente cambiarias, por cual, el precio aproximado y por que mejoraria el rendimiento..."></textarea>
+                    </div>
+
+                    <h3>10.3 - Registro de incidencias</h3>
+                    <p style="font-size:13px; margin-bottom:8px;">Documenta TODAS las incidencias durante el montaje:</p>
+                    <table>
+                        <tr>
+                            <th style="width:25px">N.o</th>
+                            <th>Descripcion del problema</th>
+                            <th>Momento</th>
+                            <th>Causa</th>
+                            <th>Solucion aplicada</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Desmontaje</option><option>Montaje</option><option>Arranque</option><option>Pruebas</option></select></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Desmontaje</option><option>Montaje</option><option>Arranque</option><option>Pruebas</option></select></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Desmontaje</option><option>Montaje</option><option>Arranque</option><option>Pruebas</option></select></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Desmontaje</option><option>Montaje</option><option>Arranque</option><option>Pruebas</option></select></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><input type="text"></td>
+                            <td><select><option value="">-</option><option>Desmontaje</option><option>Montaje</option><option>Arranque</option><option>Pruebas</option></select></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+                    <div class="nota" style="margin-top:8px;">Si no hubo incidencias, escribe "Sin incidencias" en la fila 1 y explica que precauciones tomaste para evitar problemas.</div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr><th>Criterio</th><th style="width:100px">Puntuacion</th></tr>
+                            <tr><td>Desmontaje y documentacion de conexiones (tablas completas + orden)</td><td>1.5 puntos</td></tr>
+                            <tr><td>Inspeccion y diagnostico de componentes (fichas + resumen)</td><td>1.5 puntos</td></tr>
+                            <tr><td>Ensamblaje correcto (orden + verificaciones + gestion cables + sin errores)</td><td>2.5 puntos</td></tr>
+                            <tr><td>Primer arranque y resolucion de problemas</td><td>1.0 punto</td></tr>
+                            <tr><td>Verificacion en BIOS/UEFI</td><td>0.5 puntos</td></tr>
+                            <tr><td>Pruebas funcionales (MemTest86 + CrystalDiskInfo + HWiNFO)</td><td>1.0 punto</td></tr>
+                            <tr><td>Preguntas de reflexion (correctas y bien razonadas)</td><td>1.5 puntos</td></tr>
+                            <tr><td>Fotografias completas, claras y bien identificadas</td><td>0.5 puntos</td></tr>
+                            <tr style="font-weight:700; background:#c6f6d5"><td>Total</td><td>10 puntos</td></tr>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p style="margin-top:6px;"><strong>Formato del mensaje:</strong></p>
+            <p><strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Ensamblaje completo | <strong>Grupo:</strong> [miembros] | <strong>Equipo:</strong> [ID]</p>
+            <p style="margin-top:8px; color:#718096;">Adjunta el PDF del documento rellenado + las 17 fotos numeradas (Foto01.jpg a Foto17.jpg)</p>
+        </div>
+    </div>
+
+    <script>
+        // Calculo automatico de potencia
+        function calcularPotencia() {
+            const inputs = document.querySelectorAll('.potencia-input');
+            let total = 0;
+
+            inputs.forEach(input => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) {
+                    total += val;
+                }
+            });
+
+            if (total > 0) {
+                const margen = Math.ceil(total * 1.3);
+                document.getElementById('potencia-total').textContent = total + ' W';
+                document.getElementById('potencia-margen').textContent = margen + ' W';
+
+                const potenciaFuente = parseFloat(document.getElementById('potencia-fuente')?.value);
+                if (!isNaN(potenciaFuente) && potenciaFuente > 0) {
+                    if (potenciaFuente >= margen) {
+                        document.getElementById('potencia-resultado').innerHTML = '<span style="color:#276749">Si (' + potenciaFuente + 'W >= ' + margen + 'W)</span>';
+                    } else {
+                        document.getElementById('potencia-resultado').innerHTML = '<span style="color:#c53030">No (' + potenciaFuente + 'W < ' + margen + 'W)</span>';
+                    }
+                } else {
+                    document.getElementById('potencia-resultado').textContent = 'Rellena la potencia de la fuente en la Parte 3.6';
+                }
+            } else {
+                document.getElementById('potencia-total').textContent = '- W';
+                document.getElementById('potencia-margen').textContent = '- W';
+                document.getElementById('potencia-resultado').textContent = '-';
+            }
+        }
+
+        // Recopilar datos del formulario
+        function recopilarDatos() {
+            const datos = {
+                practica: 'Practica 03: Ensamblaje Completo de Equipos PC',
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            return datos;
+        }
+
+        // Restaurar datos en el formulario
+        function restaurarDatos(datos) {
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                if (datos.campos['campo_' + i] !== undefined) {
+                    el.value = datos.campos['campo_' + i];
+                }
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                if (datos.checks['check_' + i] !== undefined) {
+                    el.checked = datos.checks['check_' + i];
+                }
+            });
+            calcularPotencia();
+        }
+
+        // Mostrar notificacion
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // Guardar borrador como archivo JSON
+        function guardarJSON() {
+            const datos = recopilarDatos();
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            // Nombre del archivo: Borrador_NombreAlumno.json
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_P03_Ensamblaje_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        // Cargar borrador desde archivo JSON
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    restaurarDatos(datos);
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            // Limpiar el input para poder cargar el mismo archivo otra vez
+            input.value = '';
+        }
+
+        // Fecha por defecto: hoy
+        window.addEventListener('load', function() {
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) {
+                fechaInput.valueAsDate = new Date();
+            }
+        });
+
+        // Recalcular potencia al cambiar la fuente
+        document.getElementById('potencia-fuente')?.addEventListener('input', calcularPotencia);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 15: Comprobacion del Rendimiento en Ubuntu 24</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Profesor-only section */
+        .profesor-only {
+            border: 3px solid var(--naranja) !important;
+        }
+
+        .profesor-only h2 {
+            background: var(--naranja) !important;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .profesor-only {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 15: Comprobacion del Rendimiento en Ubuntu 24</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 — Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Bloque:</strong> 3 — Diagnostico y Reparacion de Sistemas<br>
+                <strong>Duracion estimada:</strong> 3 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox + VM con Ubuntu 24
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Aprender a utilizar comandos del terminal de Linux para comprobar el rendimiento de CPU, RAM, disco y sistema en general.</li>
+                        <li>Diagnosticar posibles cuellos de botella en el rendimiento del equipo.</li>
+                        <li>Documentar metricas del sistema de forma estructurada.</li>
+                        <li>Realizar pruebas de estres y monitorizar el comportamiento del sistema bajo carga.</li>
+                        <li>Comparar el estado del sistema en reposo y bajo estres para interpretar los resultados.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Ubuntu 24 de la Practica 07 disponible y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-terminal">
+                            <label for="req-terminal">Terminal disponible y accesible (Ctrl+Alt+T)</label>
+                        </div>
+                    </div>
+                    <div class="nota">
+                        <strong>Instalacion de herramientas necesarias:</strong> Antes de empezar, abre un terminal y ejecuta el siguiente comando para instalar algunas herramientas que usaremos durante la practica:
+                        <div class="code-block">sudo apt install sysstat htop stress -y</div>
+                        Esto instalara <strong>sysstat</strong> (incluye <code>iostat</code>, <code>mpstat</code>, <code>sar</code>), <strong>htop</strong> (monitor interactivo de procesos) y <strong>stress</strong> (herramienta de pruebas de estres).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico -->
+            <div class="seccion">
+                <h2>Contenido teorico — Herramientas de rendimiento en Ubuntu</h2>
+                <div class="seccion-body">
+                    <h3>Comandos principales de monitorizacion</h3>
+                    <table>
+                        <tr>
+                            <th style="width:25%">Comando</th>
+                            <th style="width:20%">Categoria</th>
+                            <th>Descripcion</th>
+                        </tr>
+                        <tr>
+                            <td><code>top</code></td>
+                            <td>General</td>
+                            <td>Monitor de procesos en tiempo real, muestra CPU, RAM y procesos activos</td>
+                        </tr>
+                        <tr>
+                            <td><code>htop</code></td>
+                            <td>General</td>
+                            <td>Version mejorada de top con interfaz visual, barras de colores y navegacion interactiva</td>
+                        </tr>
+                        <tr>
+                            <td><code>free</code></td>
+                            <td>RAM</td>
+                            <td>Muestra la memoria RAM total, usada, libre, compartida, en buffer y en cache</td>
+                        </tr>
+                        <tr>
+                            <td><code>df</code></td>
+                            <td>Disco</td>
+                            <td>Muestra el espacio en disco de los sistemas de archivos montados</td>
+                        </tr>
+                        <tr>
+                            <td><code>du</code></td>
+                            <td>Disco</td>
+                            <td>Muestra el uso de disco de archivos y directorios individuales</td>
+                        </tr>
+                        <tr>
+                            <td><code>vmstat</code></td>
+                            <td>General</td>
+                            <td>Estadisticas de memoria virtual, procesos, CPU, E/S y sistema</td>
+                        </tr>
+                        <tr>
+                            <td><code>iostat</code></td>
+                            <td>Disco</td>
+                            <td>Estadisticas de entrada/salida de dispositivos de almacenamiento y CPU</td>
+                        </tr>
+                        <tr>
+                            <td><code>mpstat</code></td>
+                            <td>CPU</td>
+                            <td>Estadisticas detalladas de uso de cada procesador/nucleo individual</td>
+                        </tr>
+                        <tr>
+                            <td><code>uptime</code></td>
+                            <td>General</td>
+                            <td>Muestra el tiempo de actividad del sistema y la carga media (load average)</td>
+                        </tr>
+                        <tr>
+                            <td><code>ps</code></td>
+                            <td>General</td>
+                            <td>Lista los procesos en ejecucion con informacion detallada</td>
+                        </tr>
+                        <tr>
+                            <td><code>lscpu</code></td>
+                            <td>CPU</td>
+                            <td>Muestra informacion detallada de la arquitectura de la CPU</td>
+                        </tr>
+                        <tr>
+                            <td><code>lsblk</code></td>
+                            <td>Disco</td>
+                            <td>Lista todos los dispositivos de bloque (discos, particiones)</td>
+                        </tr>
+                        <tr>
+                            <td><code>cat /proc/cpuinfo</code></td>
+                            <td>CPU</td>
+                            <td>Informacion detallada del procesador desde el sistema de archivos virtual /proc</td>
+                        </tr>
+                        <tr>
+                            <td><code>cat /proc/meminfo</code></td>
+                            <td>RAM</td>
+                            <td>Informacion detallada de la memoria desde el sistema de archivos virtual /proc</td>
+                        </tr>
+                        <tr>
+                            <td><code>dmesg</code></td>
+                            <td>General</td>
+                            <td>Muestra mensajes del kernel, util para detectar errores de hardware</td>
+                        </tr>
+                        <tr>
+                            <td><code>sar</code></td>
+                            <td>General</td>
+                            <td>Recoge, reporta y guarda estadisticas de actividad del sistema a lo largo del tiempo</td>
+                        </tr>
+                        <tr>
+                            <td><code>nproc</code></td>
+                            <td>CPU</td>
+                            <td>Muestra el numero de nucleos de procesamiento disponibles</td>
+                        </tr>
+                        <tr>
+                            <td><code>uname -a</code></td>
+                            <td>General</td>
+                            <td>Muestra toda la informacion del sistema: nombre del kernel, version, arquitectura</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Informacion general del sistema -->
+            <div class="seccion">
+                <h2>Parte 1 — Informacion general del sistema (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Abre un terminal en tu VM con Ubuntu 24 y ejecuta los siguientes comandos para recopilar la informacion basica del sistema.</p>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>uname -a</strong> para ver la informacion del kernel y sistema.</li>
+                            <li>Ejecuta <strong>lsb_release -a</strong> para ver la version de Ubuntu.</li>
+                            <li>Ejecuta <strong>hostnamectl</strong> para ver el nombre del equipo y detalles del SO.</li>
+                            <li>Ejecuta <strong>lscpu</strong> para ver la informacion del procesador.</li>
+                            <li>Ejecuta <strong>free -h</strong> para ver la memoria RAM en formato legible.</li>
+                            <li>Ejecuta <strong>df -h</strong> para ver el espacio en disco en formato legible.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida de los comandos</h3>
+                    <div class="code-block">$ uname -a
+Linux ubuntu-vm 6.8.0-41-generic #41-Ubuntu SMP PREEMPT_DYNAMIC ... x86_64 GNU/Linux
+
+$ lsb_release -a
+Distributor ID: Ubuntu
+Description:    Ubuntu 24.04.1 LTS
+Release:        24.04
+Codename:       noble
+
+$ hostnamectl
+ Static hostname: ubuntu-vm
+       Icon name: computer-vm
+         Chassis: vm
+      Machine ID: ...
+      Operating System: Ubuntu 24.04.1 LTS
+                Kernel: Linux 6.8.0-41-generic
+          Architecture: x86-64
+
+$ lscpu
+Architecture:             x86_64
+CPU(s):                   2
+Model name:               Intel(R) Core(TM) i7-...
+CPU max MHz:              3600.0000
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       1.2Gi       1.5Gi        50Mi       1.1Gi       2.4Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        50G   12G   36G  25% /</div>
+
+                    <h3>Datos generales del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del equipo (hostname)</td>
+                            <td><input type="text" placeholder="Ej: ubuntu-vm"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema operativo y version</td>
+                            <td><input type="text" placeholder="Ej: Ubuntu 24.04.1 LTS"></td>
+                        </tr>
+                        <tr>
+                            <td>Kernel</td>
+                            <td><input type="text" placeholder="Ej: Linux 6.8.0-41-generic"></td>
+                        </tr>
+                        <tr>
+                            <td>Procesador</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i7-..."></td>
+                        </tr>
+                        <tr>
+                            <td>RAM total</td>
+                            <td><input type="text" placeholder="Ej: 3.8 Gi"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio en disco total</td>
+                            <td><input type="text" placeholder="Ej: 50G"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Salida de los comandos de informacion general</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la salida de uname -a, lsb_release -a, hostnamectl, lscpu, free -h y df -h</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Rendimiento de CPU -->
+            <div class="seccion">
+                <h2>Parte 2 — Rendimiento de CPU (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta seccion vamos a analizar en detalle el rendimiento del procesador utilizando varios comandos especializados.</p>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>lscpu</strong> para obtener la informacion detallada del procesador.</li>
+                            <li>Ejecuta <strong>cat /proc/cpuinfo | grep "model name" | head -1</strong> para ver el modelo exacto de la CPU.</li>
+                            <li>Ejecuta <strong>nproc</strong> para ver el numero de nucleos disponibles.</li>
+                            <li>Ejecuta <strong>mpstat 1 5</strong> para ver estadisticas de CPU cada segundo durante 5 muestras.</li>
+                            <li>Ejecuta <strong>uptime</strong> para ver la carga media del sistema (load average).</li>
+                            <li>Ejecuta <strong>top -bn1 | head -20</strong> para ver un snapshot de los procesos con mayor uso de CPU.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida</h3>
+                    <div class="code-block">$ cat /proc/cpuinfo | grep "model name" | head -1
+model name	: Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz
+
+$ nproc
+2
+
+$ mpstat 1 5
+Linux 6.8.0-41-generic (ubuntu-vm) 	...
+
+Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+Average:     all    2.40    0.00    1.20    0.00    0.00    0.00    0.00    0.00   96.40
+
+$ uptime
+ 10:30:15 up 1:25,  1 user,  load average: 0.05, 0.10, 0.08</div>
+
+                    <h3>Datos de rendimiento de CPU</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Modelo de CPU</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i7-10750H @ 2.60GHz"></td>
+                        </tr>
+                        <tr>
+                            <td>Nucleos fisicos</td>
+                            <td><input type="text" placeholder="Ej: 2"></td>
+                        </tr>
+                        <tr>
+                            <td>Hilos totales (nproc)</td>
+                            <td><input type="text" placeholder="Ej: 2"></td>
+                        </tr>
+                        <tr>
+                            <td>Frecuencia maxima (MHz)</td>
+                            <td><input type="text" placeholder="Ej: 3600.0000 MHz"></td>
+                        </tr>
+                        <tr>
+                            <td>Carga media (load average 1/5/15 min)</td>
+                            <td><input type="text" placeholder="Ej: 0.05, 0.10, 0.08"></td>
+                        </tr>
+                        <tr>
+                            <td>Uso actual de CPU (% idle de mpstat)</td>
+                            <td><input type="text" placeholder="Ej: 96.40% idle = 3.60% uso"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Como interpretar el load average:</strong> El load average muestra la carga del sistema en los ultimos 1, 5 y 15 minutos. Un valor de 1.0 en un sistema con 1 nucleo significa que la CPU esta al 100%. Si tienes 2 nucleos, un load average de 2.0 significa 100% de uso. Valores por encima del numero de nucleos indican que hay procesos en cola esperando CPU.
+                    </div>
+
+                    <h3>Captura 2: Salida de comandos de rendimiento de CPU</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la salida de lscpu, mpstat, uptime y top</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Rendimiento de memoria RAM -->
+            <div class="seccion">
+                <h2>Parte 3 — Rendimiento de memoria RAM (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vamos a analizar el uso de la memoria RAM y la memoria de intercambio (swap) del sistema.</p>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>free -h</strong> para ver la memoria en formato legible (humano).</li>
+                            <li>Ejecuta <strong>free -m</strong> para ver la memoria en megabytes (mas preciso).</li>
+                            <li>Ejecuta <strong>cat /proc/meminfo | head -10</strong> para ver informacion detallada de la memoria del kernel.</li>
+                            <li>Ejecuta <strong>vmstat 1 5</strong> para ver estadisticas de memoria virtual cada segundo durante 5 muestras.</li>
+                            <li>Ejecuta <strong>swapon --show</strong> para ver informacion sobre las particiones de swap activas.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida</h3>
+                    <div class="code-block">$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       1.2Gi       1.5Gi        50Mi       1.1Gi       2.4Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3891        1230        1536          51        1125        2456
+Swap:           2047           0        2047
+
+$ cat /proc/meminfo | head -10
+MemTotal:        3985408 kB
+MemFree:         1572864 kB
+MemAvailable:    2515200 kB
+Buffers:           65536 kB
+Cached:           987136 kB
+...
+
+$ vmstat 1 5
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 1572864 65536 987136    0    0     5     2   50  100  2  1 97  0  0
+...
+
+$ swapon --show
+NAME      TYPE  SIZE USED PRIO
+/swapfile file    2G   0B   -2</div>
+
+                    <h3>Datos de rendimiento de memoria RAM</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>RAM total</td>
+                            <td><input type="text" placeholder="Ej: 3.8 Gi / 3891 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM usada</td>
+                            <td><input type="text" placeholder="Ej: 1.2 Gi / 1230 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM disponible</td>
+                            <td><input type="text" placeholder="Ej: 2.4 Gi / 2456 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM en cache/buffer</td>
+                            <td><input type="text" placeholder="Ej: 1.1 Gi / 1125 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Swap total</td>
+                            <td><input type="text" placeholder="Ej: 2.0 Gi"></td>
+                        </tr>
+                        <tr>
+                            <td>Swap usada</td>
+                            <td><input type="text" placeholder="Ej: 0B"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Diferencia entre "free" y "available":</strong> La memoria "free" es la que no se esta usando para nada. La memoria "available" incluye la memoria libre mas la que esta en cache/buffer y que el sistema puede liberar inmediatamente si un programa la necesita. Por eso, "available" siempre es mayor que "free" y es el valor mas relevante para saber cuanta RAM tienes realmente disponible.
+                    </div>
+
+                    <h3>Captura 3: Salida de comandos de rendimiento de RAM</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la salida de free -h, free -m, cat /proc/meminfo, vmstat y swapon --show</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Rendimiento de disco -->
+            <div class="seccion">
+                <h2>Parte 4 — Rendimiento de disco (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta seccion analizaremos el rendimiento y el estado de los dispositivos de almacenamiento del sistema.</p>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>df -h</strong> para ver el uso de espacio de cada sistema de archivos montado.</li>
+                            <li>Ejecuta <strong>lsblk</strong> para listar todos los dispositivos de bloque y sus particiones.</li>
+                            <li>Ejecuta <strong>sudo fdisk -l</strong> para ver informacion detallada de los discos y particiones.</li>
+                            <li>Ejecuta <strong>iostat -x 1 3</strong> para ver estadisticas extendidas de E/S cada segundo durante 3 muestras.</li>
+                            <li>Ejecuta <strong>du -sh /home/*</strong> para ver cuanto espacio ocupa cada directorio de usuario.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida</h3>
+                    <div class="code-block">$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           391M  1.5M  390M   1% /run
+/dev/sda2        49G   12G   35G  26% /
+tmpfs           2.0G     0  2.0G   0% /dev/shm
+/dev/sda1       512M  6.1M  506M   2% /boot/efi
+
+$ lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0   50G  0 disk
+├─sda1   8:1    0  512M  0 part /boot/efi
+└─sda2   8:2    0 49.5G  0 part /
+
+$ iostat -x 1 3
+...
+Device  r/s  w/s  rkB/s  wkB/s  rrqm/s  wrqm/s  %util
+sda    1.50 3.20  24.00  51.20    0.10    1.50   0.80
+
+$ du -sh /home/*
+4.2G    /home/alumno</div>
+
+                    <h3>Datos de rendimiento de disco</h3>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Dato</th>
+                            <th>Valor obtenido</th>
+                        </tr>
+                        <tr>
+                            <td>Dispositivo principal</td>
+                            <td><input type="text" placeholder="Ej: /dev/sda2"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total</td>
+                            <td><input type="text" placeholder="Ej: 49G"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio usado</td>
+                            <td><input type="text" placeholder="Ej: 12G"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio disponible</td>
+                            <td><input type="text" placeholder="Ej: 35G"></td>
+                        </tr>
+                        <tr>
+                            <td>Porcentaje de uso (%)</td>
+                            <td><input type="text" placeholder="Ej: 26%"></td>
+                        </tr>
+                        <tr>
+                            <td>Lecturas/escrituras por segundo (iostat r/s y w/s)</td>
+                            <td><input type="text" placeholder="Ej: r/s=1.50, w/s=3.20"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Sobre iostat y %util:</strong> El valor <code>%util</code> indica el porcentaje de tiempo que el disco esta ocupado atendiendo peticiones de E/S. Un valor cercano al 100% indica que el disco es un cuello de botella. Los valores <code>r/s</code> y <code>w/s</code> son lecturas y escrituras por segundo respectivamente.
+                    </div>
+
+                    <h3>Captura 4: Salida de comandos de rendimiento de disco</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando la salida de df -h, lsblk, iostat -x y du -sh /home/*</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Procesos y servicios -->
+            <div class="seccion">
+                <h2>Parte 5 — Procesos y servicios (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Vamos a identificar los procesos que mas recursos consumen y los servicios que estan ejecutandose en el sistema.</p>
+
+                    <h3>Comandos a ejecutar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <strong>ps aux --sort=-%cpu | head -11</strong> para ver los 10 procesos con mayor uso de CPU.</li>
+                            <li>Ejecuta <strong>ps aux --sort=-%mem | head -11</strong> para ver los 10 procesos con mayor uso de memoria.</li>
+                            <li>Ejecuta <strong>top -bn1 | head -15</strong> para obtener un snapshot del estado general de procesos.</li>
+                            <li>Ejecuta <strong>systemctl list-units --type=service --state=running | head -20</strong> para ver los servicios activos.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Ejemplo de salida</h3>
+                    <div class="code-block">$ ps aux --sort=-%cpu | head -11
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+alumno    1234  5.2  3.1 456789 12345 ?        Sl   10:00   1:23 /usr/bin/gnome-shell
+alumno    2345  2.1  1.5 234567  6789 ?        Sl   10:00   0:30 /usr/bin/Xwayland
+root       456  1.0  0.5 123456  2345 ?        Ss   09:58   0:15 /usr/lib/xorg/Xorg
+...
+
+$ systemctl list-units --type=service --state=running | head -20
+UNIT                        LOAD   ACTIVE SUB     DESCRIPTION
+accounts-daemon.service     loaded active running Accounts Service
+cron.service                loaded active running Regular background program processing
+NetworkManager.service      loaded active running Network Manager
+ssh.service                 loaded active running OpenBSD Secure Shell server
+...</div>
+
+                    <h3>Top 5 procesos por uso de CPU</h3>
+                    <table>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>PID</th>
+                            <th>CPU (%)</th>
+                            <th>Memoria (%)</th>
+                            <th>Usuario</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: gnome-shell"></td>
+                            <td><input type="text" placeholder="Ej: 1234"></td>
+                            <td><input type="text" placeholder="Ej: 5.2"></td>
+                            <td><input type="text" placeholder="Ej: 3.1"></td>
+                            <td><input type="text" placeholder="Ej: alumno"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Nombre..."></td>
+                            <td><input type="text" placeholder="PID..."></td>
+                            <td><input type="text" placeholder="%CPU..."></td>
+                            <td><input type="text" placeholder="%MEM..."></td>
+                            <td><input type="text" placeholder="Usuario..."></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Nombre..."></td>
+                            <td><input type="text" placeholder="PID..."></td>
+                            <td><input type="text" placeholder="%CPU..."></td>
+                            <td><input type="text" placeholder="%MEM..."></td>
+                            <td><input type="text" placeholder="Usuario..."></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Nombre..."></td>
+                            <td><input type="text" placeholder="PID..."></td>
+                            <td><input type="text" placeholder="%CPU..."></td>
+                            <td><input type="text" placeholder="%MEM..."></td>
+                            <td><input type="text" placeholder="Usuario..."></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Nombre..."></td>
+                            <td><input type="text" placeholder="PID..."></td>
+                            <td><input type="text" placeholder="%CPU..."></td>
+                            <td><input type="text" placeholder="%MEM..."></td>
+                            <td><input type="text" placeholder="Usuario..."></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Salida de comandos de procesos y servicios</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Terminal mostrando ps aux --sort=-%cpu, top -bn1 y systemctl list-units</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Prueba de estres y monitorizacion -->
+            <div class="seccion">
+                <h2>Parte 6 — Prueba de estres y monitorizacion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta seccion vamos a generar carga artificial en el sistema para observar como se comporta bajo estres y aprender a monitorizar en tiempo real.</p>
+
+                    <h3>Procedimiento paso a paso</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>dos terminales</strong> en tu VM (puedes usar Ctrl+Alt+T para abrir uno nuevo).</li>
+                            <li>En el <strong>Terminal 1</strong>, ejecuta <strong>htop</strong> para monitorizar en tiempo real.</li>
+                            <li>En el <strong>Terminal 2</strong>, anota primero los valores en reposo ejecutando <strong>uptime</strong> y <strong>free -h</strong>.</li>
+                            <li>En el <strong>Terminal 2</strong>, lanza la prueba de estres de CPU: <strong>stress --cpu 2 --timeout 30</strong></li>
+                            <li>Mientras se ejecuta el estres (30 segundos), observa en <strong>htop</strong> como cambian las barras de CPU.</li>
+                            <li>Una vez terminada la prueba, ejecuta de nuevo <strong>uptime</strong> y <strong>free -h</strong> para comparar.</li>
+                            <li>Ejecuta <strong>sar -u 1 10</strong> para capturar estadisticas de CPU durante 10 segundos (puedes lanzar otro stress en paralelo si quieres).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Comandos de estres</h3>
+                    <div class="code-block"># Instalar stress (si no lo hiciste antes)
+sudo apt install stress -y
+
+# Verificar los valores en reposo ANTES del estres
+uptime
+free -h
+
+# Lanzar prueba de estres de CPU (2 nucleos, 30 segundos)
+stress --cpu 2 --timeout 30
+
+# Tras el estres, comprobar de nuevo
+uptime
+free -h
+
+# Capturar estadisticas de CPU durante 10 segundos con sar
+sar -u 1 10</div>
+
+                    <h3>Metricas antes y despues del estres</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Metrica</th>
+                            <th>Antes del estres (reposo)</th>
+                            <th>Durante/despues del estres</th>
+                        </tr>
+                        <tr>
+                            <td>Carga media (load average 1 min)</td>
+                            <td><input type="text" placeholder="Ej: 0.05"></td>
+                            <td><input type="text" placeholder="Ej: 2.10"></td>
+                        </tr>
+                        <tr>
+                            <td>Carga media (load average 5 min)</td>
+                            <td><input type="text" placeholder="Ej: 0.10"></td>
+                            <td><input type="text" placeholder="Ej: 0.85"></td>
+                        </tr>
+                        <tr>
+                            <td>Uso de CPU (% idle segun sar o htop)</td>
+                            <td><input type="text" placeholder="Ej: 96% idle"></td>
+                            <td><input type="text" placeholder="Ej: 0% idle"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM usada</td>
+                            <td><input type="text" placeholder="Ej: 1.2 Gi"></td>
+                            <td><input type="text" placeholder="Ej: 1.2 Gi"></td>
+                        </tr>
+                        <tr>
+                            <td>Respuesta del sistema (subjetivo)</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="rapido">Rapido y fluido</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="lento">Algo lento</option>
+                                    <option value="muy-lento">Muy lento</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="rapido">Rapido y fluido</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="lento">Algo lento</option>
+                                    <option value="muy-lento">Muy lento</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Sobre la prueba de estres:</strong> El comando <code>stress --cpu 2</code> crea 2 procesos que consumen CPU al 100%. Si tu VM tiene 2 nucleos, veras ambos al maximo. El parametro <code>--timeout 30</code> hace que se detenga automaticamente tras 30 segundos. Durante la prueba, el sistema puede volverse lento pero deberia recuperarse inmediatamente al terminar.
+                    </div>
+
+                    <h3>Captura 6: htop durante la prueba de estres</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de htop mostrando las barras de CPU al maximo durante la prueba de estres con stress --cpu 2</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 — Preguntas de reflexion (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Compara las herramientas de monitorizacion de rendimiento en Linux (top, htop, free, etc.) con las de Windows (Administrador de tareas, Monitor de recursos). Que ventajas e inconvenientes tiene cada sistema?</p>
+                        <textarea rows="4" placeholder="Compara las herramientas de ambos sistemas, indicando que te resulta mas facil o completo en cada uno..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Explica que significa el "load average" (carga media) en Linux y como interpretar sus tres valores (1, 5 y 15 minutos). Pon un ejemplo practico de cuando seria preocupante.</p>
+                        <textarea rows="4" placeholder="Explica el concepto de load average, como se relaciona con el numero de nucleos y cuando deberia preocuparnos..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. En tu sistema, la memoria swap estaba en uso? Explica que es la swap, por que existe y en que situaciones su uso excesivo indicaria un problema de rendimiento.</p>
+                        <textarea rows="4" placeholder="Explica que es la swap, su funcion, y cuando un uso alto de swap seria una senal de alarma..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Basandote en los datos que has recopilado en esta practica, si tuvieras que recomendar una mejora de hardware para este equipo (mas RAM, mejor CPU o disco mas rapido), cual elegirías y por que? Justifica tu respuesta con datos.</p>
+                        <textarea rows="4" placeholder="Analiza los datos obtenidos y justifica que componente de hardware seria prioritario mejorar y por que..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Que es el sistema de archivos virtual /proc en Linux? Por que es util para obtener informacion del sistema? Menciona al menos 3 archivos dentro de /proc y que informacion proporcionan.</p>
+                        <textarea rows="4" placeholder="Explica que es /proc, por que existe en Linux y menciona archivos utiles que contiene..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREGA -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Capturas de pantalla requeridas</h3>
+                    <p>Comprueba que tienes todas las capturas necesarias:</p>
+                    <table>
+                        <tr>
+                            <th>Captura</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Informacion general del sistema (uname, lsb_release, lscpu, free, df)</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Rendimiento de CPU (lscpu, mpstat, uptime, top)</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Rendimiento de RAM (free, /proc/meminfo, vmstat, swapon)</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Rendimiento de disco (df, lsblk, iostat, du)</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Procesos y servicios (ps aux, top, systemctl)</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 6</td>
+                            <td>htop durante la prueba de estres</td>
+                            <td><input type="checkbox" id="cap-6"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Bloque 3, Practica 15 - Comprobacion del Rendimiento en Ubuntu 24<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Informacion general del sistema (Parte 1)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de CPU (Parte 2)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de memoria RAM (Parte 3)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de disco (Parte 4)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Procesos y servicios (Parte 5)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Prueba de estres y monitorizacion (Parte 6)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 7)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas y claras (6 capturas)</td>
+                                <td>0.5 puntos</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 6 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Informacion general del sistema documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Rendimiento de CPU analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Rendimiento de memoria RAM analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Rendimiento de disco analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Procesos y servicios documentados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: Prueba de estres realizada con datos antes/despues</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Bloque 3, Practica 15 - Comprobacion del Rendimiento en Ubuntu 24</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque 3 - Diagnostico y Reparacion de Sistemas (Practica 15)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 15: Rendimiento en Ubuntu 24';
+        const PREFIJO_ARCHIVO = 'P15_Rendimiento_Ubuntu';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

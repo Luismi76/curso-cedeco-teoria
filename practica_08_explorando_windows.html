@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 08: Explorando Windows 10 en Maquina Virtual</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 08: Explorando Windows 10 en Maquina Virtual</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0219_2 - Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Unidad Formativa:</strong> UF0853 - Explotacion de las funcionalidades del sistema microinformatico<br>
+                <strong>Bloque:</strong> Funcionamiento de Sistemas Operativos<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> Oracle VirtualBox + VM con Windows 10 instalado (Practica 06)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica requiere tener completada la <strong>Practica 06 (Instalacion de Windows)</strong>. Trabajaras sobre la maquina virtual de Windows 10 que ya tienes creada.
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Conocer la estructura de directorios de Windows y gestionar archivos con el Explorador.</li>
+                        <li>Utilizar el Panel de Control y la aplicacion de Configuracion para ajustar el sistema.</li>
+                        <li>Monitorizar procesos y rendimiento con el Administrador de tareas.</li>
+                        <li>Ejecutar comandos basicos en CMD y PowerShell.</li>
+                        <li>Gestionar cuentas de usuario locales.</li>
+                        <li>Utilizar las herramientas de mantenimiento del sistema.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, comprueba que cumples todos los requisitos:</p>
+                    <table>
+                        <tr>
+                            <th>Requisito</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Practica 06 (Instalacion de Windows) completada</td>
+                            <td><input type="checkbox" id="req-p3"></td>
+                        </tr>
+                        <tr>
+                            <td>Maquina virtual con Windows 10 funcionando correctamente</td>
+                            <td><input type="checkbox" id="req-vm"></td>
+                        </tr>
+                        <tr>
+                            <td>Guest Additions de VirtualBox instaladas</td>
+                            <td><input type="checkbox" id="req-ga"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Explorador de archivos y estructura de directorios -->
+            <div class="seccion">
+                <h2>Parte 1 - Explorador de archivos y estructura de directorios (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Inicia la maquina virtual de Windows 10 y abre el <strong>Explorador de archivos</strong> (tecla Windows + E).</li>
+                            <li>Navega hasta la unidad <strong>C:\</strong> y observa las carpetas principales.</li>
+                            <li>Identifica y documenta las siguientes carpetas del sistema.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Carpetas del sistema</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Carpeta</th>
+                            <th>Que contiene</th>
+                            <th style="width:22%">Puedes modificar su contenido?</th>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Windows</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Program Files</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Program Files (x86)</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Users</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Users\[tu usuario]\Desktop</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Users\[tu usuario]\Documents</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Users\[tu usuario]\Downloads</strong></td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                        <tr>
+                            <td><strong>C:\Users\[tu usuario]\AppData</strong> (carpeta oculta)</td>
+                            <td><input type="text" placeholder="Describe que contiene esta carpeta"></td>
+                            <td><input type="text" placeholder="Si / No / Con permisos..."></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Para ver carpetas ocultas, ve a <strong>Ver > Mostrar > Elementos ocultos</strong> en el Explorador de archivos.
+                    </div>
+
+                    <h3>Creacion de estructura de carpetas</h3>
+                    <p>Ahora crea la siguiente estructura de carpetas dentro de Documentos:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de <strong>Documentos</strong>, crea una carpeta llamada <strong>Curso_IFCT0309</strong>.</li>
+                            <li>Dentro de Curso_IFCT0309, crea tres subcarpetas: <strong>Practicas</strong>, <strong>Apuntes</strong> y <strong>Capturas</strong>.</li>
+                            <li>Crea un archivo de texto dentro de <strong>Practicas</strong> llamado <strong>prueba.txt</strong> con el texto "Esto es una prueba de la Practica Windows".</li>
+                            <li><strong>Copia</strong> el archivo prueba.txt a la carpeta <strong>Apuntes</strong>.</li>
+                            <li><strong>Mueve</strong> el archivo original de Practicas a la carpeta <strong>Capturas</strong>.</li>
+                            <li>Comprueba que ahora prueba.txt esta en Apuntes (copia) y Capturas (movido).</li>
+                        </ol>
+                    </div>
+
+                    <h3>Atajos de teclado utilizados</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Accion realizada</th>
+                            <th>Atajo de teclado usado (si lo usaste)</th>
+                        </tr>
+                        <tr>
+                            <td>Crear carpeta</td>
+                            <td><input type="text" placeholder="Ej: Ctrl+Shift+N"></td>
+                        </tr>
+                        <tr>
+                            <td>Copiar archivo</td>
+                            <td><input type="text" placeholder="Ej: Ctrl+C / Ctrl+V"></td>
+                        </tr>
+                        <tr>
+                            <td>Mover archivo (cortar + pegar)</td>
+                            <td><input type="text" placeholder="Ej: Ctrl+X / Ctrl+V"></td>
+                        </tr>
+                        <tr>
+                            <td>Renombrar archivo/carpeta</td>
+                            <td><input type="text" placeholder="Ej: F2"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Explorador mostrando la estructura de carpetas creada dentro de Documentos</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Explorador con la estructura Curso_IFCT0309</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Configuracion del sistema -->
+            <div class="seccion">
+                <h2>Parte 2 - Configuracion del sistema (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Configuracion</strong> (tecla Windows + I).</li>
+                            <li>Ve a <strong>Sistema > Acerca de</strong> y documenta la informacion del equipo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Informacion del equipo</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Valor en tu VM</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del dispositivo</td>
+                            <td><input type="text" placeholder="Ej: DESKTOP-ABC123"></td>
+                        </tr>
+                        <tr>
+                            <td>Procesador</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i5-..."></td>
+                        </tr>
+                        <tr>
+                            <td>RAM instalada</td>
+                            <td><input type="text" placeholder="Ej: 4,00 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Edicion de Windows</td>
+                            <td><input type="text" placeholder="Ej: Windows 10 Pro"></td>
+                        </tr>
+                        <tr>
+                            <td>Version de Windows</td>
+                            <td><input type="text" placeholder="Ej: 23H2"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de sistema (32/64 bits)</td>
+                            <td><input type="text" placeholder="Ej: Sistema operativo de 64 bits"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Exploracion de secciones de Configuracion</h3>
+                    <p>Ahora explora las siguientes secciones de Configuracion y describe brevemente que opciones has encontrado:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Seccion de Configuracion</th>
+                            <th>Opciones principales que has encontrado</th>
+                        </tr>
+                        <tr>
+                            <td>Sistema > Pantalla</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema > Sonido</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema > Notificaciones</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema > Energia y bateria (o Energia)</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Red e Internet</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Personalizacion > Fondo</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Personalizacion > Barra de tareas</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                        <tr>
+                            <td>Privacidad y seguridad</td>
+                            <td><input type="text" placeholder="Describe las opciones principales"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Pantalla "Acerca de" con la informacion del sistema</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la pantalla Acerca de con la informacion del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Administrador de tareas -->
+            <div class="seccion">
+                <h2>Parte 3 - Administrador de tareas (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de tareas</strong> con <strong>Ctrl + Shift + Esc</strong> (o clic derecho en la barra de tareas).</li>
+                            <li>Si aparece en modo simplificado, haz clic en <strong>Mas detalles</strong>.</li>
+                            <li>Explora cada pestana y documenta lo que encuentras.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Pestanas del Administrador de tareas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:20%">Pestana</th>
+                            <th>Que informacion muestra</th>
+                            <th>Dato relevante que observas</th>
+                        </tr>
+                        <tr>
+                            <td>Procesos</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Algun dato que te llame la atencion"></td>
+                        </tr>
+                        <tr>
+                            <td>Rendimiento (CPU)</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Ej: Uso de CPU en reposo: X%"></td>
+                        </tr>
+                        <tr>
+                            <td>Rendimiento (Memoria)</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Ej: RAM usada: X GB de Y GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Rendimiento (Disco)</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Algun dato que te llame la atencion"></td>
+                        </tr>
+                        <tr>
+                            <td>Inicio (Aplicaciones de arranque)</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Ej: Numero de apps en el arranque"></td>
+                        </tr>
+                        <tr>
+                            <td>Servicios</td>
+                            <td><input type="text" placeholder="Que informacion muestra esta pestana"></td>
+                            <td><input type="text" placeholder="Algun dato que te llame la atencion"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> Fijate en el uso de CPU y RAM con el sistema en reposo. Esto te dara una idea de cuantos recursos consume Windows 10 sin aplicaciones abiertas.
+                    </div>
+
+                    <h3>Acciones con procesos</h3>
+                    <p>Realiza las siguientes acciones y documenta el resultado:</p>
+                    <table>
+                        <tr>
+                            <th style="width:45%">Accion</th>
+                            <th>Resultado observado</th>
+                        </tr>
+                        <tr>
+                            <td>Abre el Bloc de notas (notepad) y localizalo en Procesos</td>
+                            <td><input type="text" placeholder="Describe lo que observas"></td>
+                        </tr>
+                        <tr>
+                            <td>Observa cuanta RAM consume el Bloc de notas</td>
+                            <td><input type="text" placeholder="Ej: X,X MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Finaliza el proceso del Bloc de notas desde el Administrador</td>
+                            <td><input type="text" placeholder="Describe lo que ocurre"></td>
+                        </tr>
+                        <tr>
+                            <td>Abre 5 pestanas en el navegador Edge y observa el consumo de RAM</td>
+                            <td><input type="text" placeholder="Ej: RAM de Edge con 5 pestanas: X MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Cierra las pestanas y observa si la RAM se libera inmediatamente</td>
+                            <td><input type="text" placeholder="Describe lo que observas"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Administrador de tareas mostrando la pestana de Rendimiento</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Administrador de tareas en la pestana Rendimiento</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Linea de comandos: CMD y PowerShell -->
+            <div class="seccion">
+                <h2>Parte 4 - Linea de comandos: CMD y PowerShell (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Windows incluye dos interfaces de linea de comandos: <strong>CMD</strong> (Simbolo del sistema, clasico) y <strong>PowerShell</strong> (mas moderno y potente). Abre CMD buscando "cmd" en el menu de inicio.</p>
+
+                    <h3>Comandos en CMD</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:25%">Que hace</th>
+                            <th>Resultado (copia la salida)</th>
+                        </tr>
+                        <tr>
+                            <td><code>hostname</code></td>
+                            <td>Muestra el nombre del equipo</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>ipconfig</code></td>
+                            <td>Muestra la configuracion de red</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>systeminfo | findstr /i "nombre sistema"</code></td>
+                            <td>Muestra info del sistema</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>dir C:\Users</code></td>
+                            <td>Lista el contenido de la carpeta Users</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>cd %USERPROFILE%\Documents</code></td>
+                            <td>Cambia al directorio Documentos</td>
+                            <td><textarea rows="2" placeholder="Escribe el resultado del prompt"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>mkdir CMD_prueba</code></td>
+                            <td>Crea una carpeta llamada CMD_prueba</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>echo Hola desde CMD > saludo.txt</code></td>
+                            <td>Crea un archivo de texto</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>type saludo.txt</code></td>
+                            <td>Muestra el contenido del archivo</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>tree Curso_IFCT0309</code></td>
+                            <td>Muestra arbol de carpetas</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Ventana de CMD con varios comandos ejecutados</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la ventana de CMD con comandos ejecutados</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Comandos en PowerShell</h3>
+                    <p>Ahora abre <strong>PowerShell</strong> buscandolo en el menu de inicio. Ejecuta estos comandos y compara con CMD:</p>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Comando PowerShell</th>
+                            <th style="width:15%">Equivalente en CMD</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>Get-ComputerInfo | Select-Object WindowsProductName, OsArchitecture</code></td>
+                            <td>systeminfo</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-Process | Sort-Object CPU -Descending | Select-Object -First 5</code></td>
+                            <td>tasklist</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-ChildItem C:\Users</code></td>
+                            <td>dir C:\Users</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>Get-NetIPAddress | Where-Object {$_.AddressFamily -eq 'IPv4'}</code></td>
+                            <td>ipconfig</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Ventana de PowerShell con comandos ejecutados</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la ventana de PowerShell con comandos ejecutados</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Gestion de usuarios -->
+            <div class="seccion">
+                <h2>Parte 5 - Gestion de usuarios (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>Procedimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ve a <strong>Configuracion > Cuentas > Otros usuarios</strong> (o <strong>Familia y otros usuarios</strong>).</li>
+                            <li>Haz clic en <strong>Agregar otra persona a este equipo</strong>.</li>
+                            <li>Selecciona <strong>No tengo los datos de inicio de sesion de esta persona</strong>.</li>
+                            <li>Selecciona <strong>Agregar un usuario sin cuenta de Microsoft</strong>.</li>
+                            <li>Crea un usuario local con los siguientes datos.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Datos del nuevo usuario</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Valor que has puesto</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de usuario</td>
+                            <td><input type="text" placeholder="Ej: usuario_prueba"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de cuenta</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="estandar">Estandar</option>
+                                    <option value="administrador">Administrador</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Contrasena</td>
+                            <td><input type="text" value="(no escribir por seguridad)" readonly style="background:#fed7d7; color:var(--rojo); font-weight:600;"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Prueba del nuevo usuario</h3>
+                    <div class="pasos">
+                        <ol start="6">
+                            <li>Cierra sesion e inicia sesion con el nuevo usuario.</li>
+                            <li>Observa que el escritorio esta limpio (nuevo perfil).</li>
+                            <li>Vuelve a iniciar sesion con tu usuario original.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Que diferencias has observado al iniciar sesion con el nuevo usuario?</p>
+                        <textarea placeholder="Describe las diferencias en el escritorio, carpetas, configuracion..."></textarea>
+                    </div>
+
+                    <h3>Comandos de gestion de usuarios (CMD como administrador)</h3>
+                    <p>Desde CMD (como administrador), ejecuta estos comandos de gestion de usuarios:</p>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Comando</th>
+                            <th style="width:25%">Que hace</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td><code>net user</code></td>
+                            <td>Lista todos los usuarios</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>net user usuario_prueba</code></td>
+                            <td>Muestra detalles del usuario</td>
+                            <td><textarea rows="3" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><code>whoami</code></td>
+                            <td>Muestra tu usuario actual</td>
+                            <td><input type="text" placeholder="Ej: DESKTOP-ABC\tu_usuario"></td>
+                        </tr>
+                        <tr>
+                            <td><code>net localgroup administradores</code></td>
+                            <td>Lista los administradores</td>
+                            <td><textarea rows="2" placeholder="Pega aqui la salida del comando"></textarea></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Pantalla de Cuentas mostrando los usuarios del sistema</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la pantalla de Cuentas con los usuarios del sistema</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Herramientas de mantenimiento -->
+            <div class="seccion">
+                <h2>Parte 6 - Herramientas de mantenimiento (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>Liberador de espacio en disco</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Busca <strong>"Liberador de espacio en disco"</strong> en el menu de inicio (o ejecuta <code>cleanmgr</code>).</li>
+                            <li>Selecciona la unidad C: y espera el analisis.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Tipo de archivo</th>
+                            <th>Espacio que ocupa</th>
+                            <th style="width:20%">Marcado para eliminar?</th>
+                        </tr>
+                        <tr>
+                            <td>Archivos temporales de Internet</td>
+                            <td><input type="text" placeholder="Ej: 12,5 MB"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Archivos temporales de Windows</td>
+                            <td><input type="text" placeholder="Ej: 45,2 MB"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Papelera de reciclaje</td>
+                            <td><input type="text" placeholder="Ej: 0 bytes"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Miniaturas</td>
+                            <td><input type="text" placeholder="Ej: 3,1 MB"></td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr style="font-weight:700; background:#edf2f7">
+                            <td>Espacio total que se puede liberar</td>
+                            <td><input type="text" placeholder="Ej: 150 MB"></td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    <h3>Desfragmentacion y optimizacion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Busca <strong>"Desfragmentar y optimizar unidades"</strong>.</li>
+                            <li>Documenta el estado de la unidad:</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th>Unidad</th>
+                            <th>Tipo de medio</th>
+                            <th>Estado</th>
+                            <th>Ultima optimizacion</th>
+                        </tr>
+                        <tr>
+                            <td>C:</td>
+                            <td><input type="text" placeholder="Ej: Unidad de estado solido"></td>
+                            <td><input type="text" placeholder="Ej: Correcto (0% fragmentado)"></td>
+                            <td><input type="text" placeholder="Ej: 05/04/2026"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> En un SSD, Windows no desfragmenta sino que ejecuta un comando <strong>TRIM</strong> para optimizar el rendimiento. La desfragmentacion clasica solo se aplica a discos duros mecanicos (HDD).
+                    </div>
+
+                    <h3>Programador de tareas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Busca <strong>"Programador de tareas"</strong> en el menu de inicio.</li>
+                            <li>Crea una tarea basica:
+                                <ul style="margin-left: 20px; margin-top: 4px; line-height: 1.8;">
+                                    <li>Nombre: <strong>"Practica_tarea_programada"</strong></li>
+                                    <li>Descripcion: <strong>"Tarea de prueba para la practica"</strong></li>
+                                    <li>Desencadenador: <strong>Una vez</strong></li>
+                                    <li>Accion: <strong>Iniciar un programa > notepad.exe</strong></li>
+                                </ul>
+                            </li>
+                            <li>Ejecuta la tarea manualmente (clic derecho > Ejecutar) y comprueba que se abre el Bloc de notas.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:40%">Configuracion de la tarea</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre de la tarea</td>
+                            <td><input type="text" placeholder="Ej: Practica_tarea_programada"></td>
+                        </tr>
+                        <tr>
+                            <td>Desencadenador configurado</td>
+                            <td><input type="text" placeholder="Ej: Una vez, a las 12:00"></td>
+                        </tr>
+                        <tr>
+                            <td>Accion programada</td>
+                            <td><input type="text" placeholder="Ej: Iniciar notepad.exe"></td>
+                        </tr>
+                        <tr>
+                            <td>Se ejecuto correctamente?</td>
+                            <td>
+                                <select>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 7: Programador de tareas mostrando la tarea creada</h3>
+                    <div class="foto-upload" data-foto-id="foto-7">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Programador de tareas con la tarea creada</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 - Preguntas de reflexion</h2>
+                <div class="seccion-body">
+                    <p style="margin-bottom: 12px;">Responde a cada pregunta con un <strong>minimo de 3 lineas</strong>. Las respuestas deben reflejar tu experiencia personal durante la practica.</p>
+
+                    <div class="pregunta">
+                        <p>1. Que utilidad tiene conocer la estructura de directorios de Windows? En que situaciones laborales necesitarias navegar por carpetas del sistema como C:\Windows o C:\Program Files?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Que diferencias has notado entre usar el Explorador de archivos (interfaz grafica) y la linea de comandos (CMD) para gestionar archivos? Cual te parece mas eficiente y por que?</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Por que es importante monitorizar los procesos y el rendimiento del sistema con el Administrador de tareas? Describe un escenario real en el que esta herramienta te seria util.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Que ventajas tiene crear cuentas de usuario separadas en un mismo equipo? Piensa en un entorno domestico y en un entorno de oficina.</p>
+                        <textarea placeholder="Escribe tu respuesta aqui (minimo 3 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <p>Sube tu practica completada al canal <strong>#entrega-practicas</strong> del Discord del curso en formato <strong>PDF</strong>.</p>
+
+                    <h3>Capturas requeridas</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px">OK</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Estructura de carpetas en Documentos</td>
+                            <td><input type="checkbox" id="entrega-cap1"></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Informacion del sistema (Acerca de)</td>
+                            <td><input type="checkbox" id="entrega-cap2"></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Administrador de tareas - Rendimiento</td>
+                            <td><input type="checkbox" id="entrega-cap3"></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>CMD con comandos ejecutados</td>
+                            <td><input type="checkbox" id="entrega-cap4"></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>PowerShell con comandos ejecutados</td>
+                            <td><input type="checkbox" id="entrega-cap5"></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Gestion de usuarios</td>
+                            <td><input type="checkbox" id="entrega-cap6"></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Programador de tareas</td>
+                            <td><input type="checkbox" id="entrega-cap7"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Explorando Windows 10 en Maquina Virtual<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:100px">Puntuacion</th>
+                                <th>Desglose</th>
+                            </tr>
+                            <tr>
+                                <td>Estructura de directorios y gestion de archivos</td>
+                                <td>1.5 puntos</td>
+                                <td>Carpetas identificadas + estructura creada + acciones documentadas</td>
+                            </tr>
+                            <tr>
+                                <td>Configuracion del sistema</td>
+                                <td>1.0 punto</td>
+                                <td>Informacion del sistema documentada + secciones exploradas</td>
+                            </tr>
+                            <tr>
+                                <td>Administrador de tareas</td>
+                                <td>1.5 puntos</td>
+                                <td>Pestanas documentadas + acciones con procesos realizadas</td>
+                            </tr>
+                            <tr>
+                                <td>Linea de comandos (CMD + PowerShell)</td>
+                                <td>2.0 puntos</td>
+                                <td>Todos los comandos ejecutados con resultados</td>
+                            </tr>
+                            <tr>
+                                <td>Gestion de usuarios</td>
+                                <td>1.0 punto</td>
+                                <td>Usuario creado + comandos de gestion ejecutados</td>
+                            </tr>
+                            <tr>
+                                <td>Herramientas de mantenimiento</td>
+                                <td>1.0 punto</td>
+                                <td>Tres herramientas exploradas y documentadas</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion</td>
+                                <td>1.0 punto</td>
+                                <td>4 preguntas respondidas con argumentacion (min 3 lineas)</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas</td>
+                                <td>1.0 punto</td>
+                                <td>Las 7 capturas incluidas y relevantes</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 4)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Explorador de archivos y estructura de directorios completada (Parte 1)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Configuracion del sistema documentada (Parte 2)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Administrador de tareas explorado y acciones documentadas (Parte 3)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Comandos CMD y PowerShell ejecutados con resultados (Parte 4)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Gestion de usuarios completada con comandos (Parte 5)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Herramientas de mantenimiento exploradas y documentadas (Parte 6)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">4 preguntas de reflexion respondidas con minimo 3 lineas (Parte 7)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">Las 7 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Explorando Windows 10 en Maquina Virtual</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque Funcionamiento de Sistemas Operativos</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 08: Explorando Windows 10';
+        const PREFIJO_ARCHIVO = 'P08_Explorando_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>

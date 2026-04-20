@@ -1,0 +1,2890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 05: Control de Calidad y Supervision de Montaje</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .alumno-box .campo-full {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Fase headers */
+        .fase-header {
+            background: linear-gradient(135deg, var(--azul) 0%, var(--azul-claro) 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 32px 0 20px 0;
+        }
+
+        .fase-header h2 {
+            background: none;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+            font-size: 18px;
+        }
+
+        .fase-header p {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        /* Aviso seguridad */
+        .aviso-seguridad {
+            background: #fff5f5;
+            border: 2px solid var(--rojo);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+
+        .aviso-seguridad h3 {
+            color: var(--rojo) !important;
+            border: none !important;
+            margin: 0 0 8px 0 !important;
+            padding: 0 !important;
+            font-size: 15px;
+        }
+
+        .aviso-seguridad ul, .aviso-seguridad ol {
+            margin-left: 20px;
+            color: #742a2a;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Contexto profesional */
+        .contexto-box {
+            background: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .contexto-box h3 {
+            color: var(--azul-claro) !important;
+            border: none !important;
+            margin: 0 0 8px 0 !important;
+            padding: 0 !important;
+            font-size: 15px;
+        }
+
+        .contexto-box ul {
+            margin-left: 20px;
+            margin-top: 6px;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Conformidad visual en select */
+        .conforme-select {
+            min-width: 70px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nota-warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--naranja);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nota-danger {
+            background: #fff5f5;
+            border-left: 4px solid var(--rojo);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nota-success {
+            background: #f0fff4;
+            border-left: 4px solid var(--verde);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .foto-upload:hover {
+            border-color: var(--azul-claro);
+        }
+
+        .foto-upload input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Veredicto */
+        .veredicto-box {
+            border: 3px solid var(--azul);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            background: var(--gris-fondo);
+        }
+
+        .veredicto-box h3 {
+            color: var(--azul) !important;
+            border: none !important;
+            margin: 0 0 12px 0 !important;
+            padding: 0 !important;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .veredicto-options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .veredicto-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border: 2px solid var(--gris-borde);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .veredicto-option:has(input:checked) {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .veredicto-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .veredicto-apto { color: var(--verde); }
+        .veredicto-condiciones { color: var(--naranja); }
+        .veredicto-no-apto { color: var(--rojo); }
+
+        /* Resumen contador */
+        .resumen-contadores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .contador-box {
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        .contador-box.critica { background: #fff5f5; border-color: #feb2b2; }
+        .contador-box.mayor { background: #fffbeb; border-color: #fbd38d; }
+        .contador-box.menor { background: #ebf8ff; border-color: #bee3f8; }
+
+        .contador-box .numero {
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .contador-box.critica .numero { color: var(--rojo); }
+        .contador-box.mayor .numero { color: var(--naranja); }
+        .contador-box.menor .numero { color: var(--azul-claro); }
+
+        .contador-box .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #718096;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Conformidad auto-color */
+        .conf-ok {
+            background: #f0fff4 !important;
+        }
+
+        .conf-nok {
+            background: #fff5f5 !important;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .fase-header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+            }
+
+            .foto-upload input[type="file"],
+            .foto-upload p,
+            .foto-upload .icon {
+                display: none;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 05: Control de Calidad y Supervision de Montaje</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0861 - Montaje y Verificacion de Componentes<br>
+                <strong>Tema:</strong> T10 - Verificacion, testeo y documentacion<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Prerrequisito:</strong> La practica de ensamblaje completo debe estar terminada
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+                <div class="campo">
+                    <label>Grupo revisor (miembros)</label>
+                    <input type="text" id="grupo-revisor" placeholder="Nombres de los miembros de tu grupo">
+                </div>
+                <div class="campo">
+                    <label>Equipo revisado (montado por)</label>
+                    <input type="text" id="equipo-revisado" placeholder="Grupo que monto el equipo">
+                </div>
+                <div class="campo-full">
+                    <label>Distribucion de roles</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:4px;">
+                        <div>
+                            <span style="font-size:12px; color:#718096;">Inspector jefe</span>
+                            <input type="text" placeholder="Nombre" style="padding:4px 8px; font-size:13px; border:1px solid #e2e8f0; border-radius:3px;">
+                        </div>
+                        <div>
+                            <span style="font-size:12px; color:#718096;">Tecnico de pruebas</span>
+                            <input type="text" placeholder="Nombre" style="padding:4px 8px; font-size:13px; border:1px solid #e2e8f0; border-radius:3px;">
+                        </div>
+                        <div>
+                            <span style="font-size:12px; color:#718096;">Documentador / auditor</span>
+                            <input type="text" placeholder="Nombre" style="padding:4px 8px; font-size:13px; border:1px solid #e2e8f0; border-radius:3px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contexto profesional -->
+            <div class="contexto-box">
+                <h3>Contexto profesional</h3>
+                <p>En un entorno profesional, ningun equipo informatico se entrega a un cliente sin pasar un <strong>control de calidad (QC - Quality Control)</strong>. Este proceso lo realiza una persona o equipo <strong>diferente</strong> al que hizo el montaje o reparacion:</p>
+                <ul>
+                    <li>Quien monta un equipo tiende a dar por buenos sus propios pasos (<strong>sesgo de confirmacion</strong>).</li>
+                    <li>Un revisor externo detecta errores que el montador pasa por alto.</li>
+                    <li>El proceso de QC protege a la empresa de reclamaciones, devoluciones y danos a la reputacion.</li>
+                    <li>En certificaciones de calidad (ISO 9001), la separacion entre produccion y control de calidad es un requisito.</li>
+                </ul>
+                <p style="margin-top:8px;">En esta practica, <strong>tu grupo revisara el montaje realizado por otro grupo</strong>. Vuestro trabajo es actuar como el departamento de calidad de un taller profesional.</p>
+            </div>
+
+            <!-- Aviso de normas -->
+            <div class="aviso-seguridad">
+                <h3>IMPORTANTE - Normas durante la inspeccion</h3>
+                <ol>
+                    <li><strong>No desmontes ni recoloques</strong> ningun componente sin autorizacion del profesor. Si detectas algo mal montado, documentalo con foto y anotalo como no conformidad.</li>
+                    <li><strong>Coloca la pulsera antiestatica</strong> antes de tocar el interior del equipo.</li>
+                    <li><strong>No modifiques</strong> la configuracion de BIOS/UEFI. Solo documenta lo que observas.</li>
+                    <li><strong>Si el equipo no enciende</strong> o detectas un problema grave (humo, chispas, olor a quemado), <strong>apagalo inmediatamente</strong> y avisa al profesor.</li>
+                    <li><strong>Documenta todo con fotografias.</strong> Una no conformidad sin evidencia fotografica no tiene validez profesional.</li>
+                    <li>Actua con <strong>rigor pero tambien con respeto</strong>. El objetivo es encontrar defectos, no criticar a los companeros.</li>
+                </ol>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 1: INSPECCION VISUAL EXTERNA -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 1 - Inspeccion Visual Externa</h2>
+                <p>30 minutos - La primera impresion cuenta: un equipo profesional debe tener aspecto limpio y sin defectos.</p>
+            </div>
+
+            <!-- 1.1 Estado general de la caja -->
+            <div class="seccion">
+                <h2>1.1 - Estado general de la caja</h2>
+                <div class="seccion-body">
+                    <p>Inspecciona el exterior del equipo <strong>sin abrirlo</strong>:</p>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>La caja no presenta golpes, aranazos profundos ni abolladuras</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los paneles laterales estan correctamente colocados y fijados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El panel frontal esta bien encajado, sin holguras</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No faltan tapas de bahias en el frontal (o estan cubiertas)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Las patas / gomas antideslizantes estan en buen estado</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay pegatinas, restos de adhesivos o marcas inapropiadas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La caja esta limpia (sin polvo visible en rejillas ni suciedad)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 1: Equipo completo (frontal y trasera)</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.2 Puertos y conectores traseros -->
+            <div class="seccion">
+                <h2>1.2 - Puertos y conectores traseros</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>La chapa de E/S (I/O Shield) esta correctamente instalada</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Ninguna lengueta del I/O Shield bloquea puertos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los puertos USB traseros no estan danados ni obstruidos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los puertos de video son accesibles (HDMI, DP, VGA)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Las tapas ciegas de ranuras de expansion no usadas estan colocadas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La GPU (si hay) esta fijada con tornillo y bracket recto</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La rejilla de la fuente de alimentacion no esta obstruida</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El interruptor de la fuente funciona correctamente</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El conector de alimentacion IEC esta en buen estado</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 2: Panel trasero de conectores</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto del panel trasero</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.3 Puertos y elementos frontales -->
+            <div class="seccion">
+                <h2>1.3 - Puertos y elementos frontales</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>El boton de encendido funciona mecanicamente (se pulsa y vuelve)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El boton de reset funciona mecanicamente (si existe)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los puertos USB frontales no estan danados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La toma de auriculares/microfono frontal no esta danada</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay piezas sueltas al inclinar ligeramente el equipo</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota-warning">
+                        <strong>Prueba del agitado suave:</strong> Inclina el equipo ligeramente hacia los lados (sin levantarlo de la mesa). Si escuchas algo suelto (tornillo, pieza), anotalo como no conformidad.
+                    </div>
+
+                    <h3>Foto 3: Panel frontal</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto del panel frontal</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.4 Valoracion Fase 1 -->
+            <div class="seccion">
+                <h2>1.4 - Valoracion de la inspeccion externa</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th style="width:100px">Conformes</th>
+                            <th style="width:100px">No conformes</th>
+                        </tr>
+                        <tr>
+                            <td>Estado general de la caja (1.1)</td>
+                            <td><input type="text" placeholder="/ 7" style="text-align:center"></td>
+                            <td><input type="text" placeholder="/ 7" style="text-align:center"></td>
+                        </tr>
+                        <tr>
+                            <td>Puertos traseros (1.2)</td>
+                            <td><input type="text" placeholder="/ 9" style="text-align:center"></td>
+                            <td><input type="text" placeholder="/ 9" style="text-align:center"></td>
+                        </tr>
+                        <tr>
+                            <td>Elementos frontales (1.3)</td>
+                            <td><input type="text" placeholder="/ 5" style="text-align:center"></td>
+                            <td><input type="text" placeholder="/ 5" style="text-align:center"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Valoracion global de la Fase 1</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
+                        <div class="check-group"><input type="radio" name="valoracion-f1" id="vf1-exc"><label for="vf1-exc"><strong>EXCELENTE</strong> - 0 no conformidades</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f1" id="vf1-ace"><label for="vf1-ace"><strong>ACEPTABLE</strong> - 1-2 menores</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f1" id="vf1-mej"><label for="vf1-mej"><strong>MEJORABLE</strong> - 3-4, alguna funcional</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f1" id="vf1-ina"><label for="vf1-ina"><strong>INACEPTABLE</strong> - 5+ o impacto grave</label></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 2: INSPECCION VISUAL INTERNA -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 2 - Inspeccion Visual Interna</h2>
+                <p>60 minutos - Abre el panel lateral. Coloca la pulsera antiestatica antes de inspeccionar.</p>
+            </div>
+
+            <div class="seccion">
+                <h2>Foto 4: Interior panoramico (antes de tocar nada)</h2>
+                <div class="seccion-body">
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto panoramica del interior</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.1 Placa base y fijacion -->
+            <div class="seccion">
+                <h2>2.1 - Placa base y fijacion</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>La placa base esta correctamente fijada con todos sus tornillos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="N.o de tornillos: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>La placa no se mueve ni tiene holgura al presionar ligeramente</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay standoffs de mas (riesgo de cortocircuito)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Factor de forma: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>El I/O Shield esta alineado con los puertos de la placa base</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay tornillos sueltos visibles en el interior de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.2 Procesador y refrigeracion -->
+            <div class="seccion">
+                <h2>2.2 - Procesador y sistema de refrigeracion</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>El disipador del CPU esta firmemente anclado (no se mueve al tocarlo)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los 4 puntos de anclaje estan correctamente fijados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Tipo: push-pin / tornillos / clip"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay exceso de pasta termica visible alrededor del procesador</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El ventilador del CPU esta conectado al conector <strong>CPU_FAN</strong></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Conectado a: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>El cable del ventilador esta recogido y no roza las aspas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Las aletas del disipador no estan obstruidas por polvo o cables</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 5: Detalle del disipador del CPU y su anclaje</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto del disipador</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.3 Memoria RAM -->
+            <div class="seccion">
+                <h2>2.3 - Memoria RAM</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Los modulos de RAM estan completamente insertados (pestanas cerradas)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los modulos estan en las ranuras correctas para Dual Channel</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Ranuras usadas: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay modulos parcialmente insertados (una pestana abierta)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Las ranuras no utilizadas tienen las pestanas en posicion abierta</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.4 Tarjetas de expansion -->
+            <div class="seccion">
+                <h2>2.4 - Tarjetas de expansion</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>La GPU esta completamente insertada en la ranura PCIe x16</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El clip de retencion de la ranura PCIe esta cerrado</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La GPU esta fijada con tornillo al bracket trasero</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La GPU no presenta pandeo (sag) excesivo</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Otras tarjetas de expansion correctamente insertadas y fijadas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Cuales: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Las tapas ciegas no usadas estan recolocadas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 6: Tarjeta grafica instalada (si hay)</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de la GPU</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.5 Almacenamiento -->
+            <div class="seccion">
+                <h2>2.5 - Dispositivos de almacenamiento</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Los discos HDD/SSD estan fijados con tornillos o railes (no sueltos)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los discos no vibran ni se mueven al tocarlos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los SSD M.2 (si los hay) estan insertados y atornillados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Las bahias vacias no contienen piezas sueltas</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.6 Fuente de alimentacion -->
+            <div class="seccion">
+                <h2>2.6 - Fuente de alimentacion</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>La fuente esta fijada con sus 4 tornillos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="N.o de tornillos: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>La orientacion del ventilador es correcta (hacia rejilla)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Orientacion: arriba / abajo"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay cables pelados, cortados o con aislamiento danado</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.7 Cableado de alimentacion -->
+            <div class="seccion">
+                <h2>2.7 - Cableado de alimentacion</h2>
+                <div class="seccion-body">
+                    <div class="nota-warning">
+                        <strong>Inspeccion critica:</strong> Un cable de alimentacion mal conectado puede provocar desde mal funcionamiento hasta danos en los componentes. Comprueba la firmeza presionando ligeramente cada conector hacia su enchufe.
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:30%">Cable</th>
+                            <th style="width:80px">Conectado</th>
+                            <th style="width:80px">Firme</th>
+                            <th style="width:80px">Clip OK</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td><strong>ATX 24 pines</strong> (placa base)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>EPS 4+4 pines</strong> (CPU)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PCIe 6+2 pines</strong> (GPU)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SATA alimentacion</strong> - disco 1</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td style="text-align:center; color:#a0aec0">N/A</td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SATA alimentacion</strong> - disco 2</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td style="text-align:center; color:#a0aec0">N/A</td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <table style="margin-top:12px;">
+                        <tr>
+                            <th style="width:55%">Criterio adicional</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Todos los cables de alimentacion necesarios estan conectados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay cables enchufados a componentes inexistentes</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los cables SATA no estan excesivamente doblados en la conexion</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 7: Cables de alimentacion principales (ATX 24 pin y EPS)</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de los cables de alimentacion</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.8 Cableado de datos -->
+            <div class="seccion">
+                <h2>2.8 - Cableado de datos</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:25%">Cable</th>
+                            <th style="width:80px">Conectado</th>
+                            <th style="width:80px">Firme</th>
+                            <th style="width:100px">Puerto placa</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>SATA datos - disco 1</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="SATA n.o" style="text-align:center"></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>SATA datos - disco 2</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="SATA n.o" style="text-align:center"></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Otros cables de datos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="" style="text-align:center"></td>
+                            <td><input type="text" placeholder="Especificar cuales"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.9 Cables del panel frontal -->
+            <div class="seccion">
+                <h2>2.9 - Cables del panel frontal</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:25%">Cable</th>
+                            <th style="width:80px">Conectado</th>
+                            <th style="width:100px">Pines correctos</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Power SW</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="nv">No verificable</option></select></td>
+                            <td><input type="text" placeholder="Sin polaridad"></td>
+                        </tr>
+                        <tr>
+                            <td>Reset SW</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="nv">No verificable</option></select></td>
+                            <td><input type="text" placeholder="Sin polaridad"></td>
+                        </tr>
+                        <tr>
+                            <td>HDD LED</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="nv">No verificable</option></select></td>
+                            <td><input type="text" placeholder="Polaridad correcta?"></td>
+                        </tr>
+                        <tr>
+                            <td>Power LED</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="nv">No verificable</option></select></td>
+                            <td><input type="text" placeholder="Polaridad correcta?"></td>
+                        </tr>
+                        <tr>
+                            <td>USB frontal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                            <td><input type="text" placeholder="Solo encaja en una orientacion"></td>
+                        </tr>
+                        <tr>
+                            <td>HD Audio frontal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                            <td><input type="text" placeholder="Solo encaja en una orientacion"></td>
+                        </tr>
+                        <tr>
+                            <td>USB 3.0 frontal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Conector de 20 pines"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Como verificar los pines:</strong> Consulta la serigrafia de la placa base (impresa junto a los pines) o el manual del fabricante. Si no puedes verificar, marca "No verificable" y lo comprobaras en la fase funcional.
+                    </div>
+
+                    <h3>Foto 8: Cables del panel frontal conectados</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de los cables frontales</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.10 Ventiladores y flujo de aire -->
+            <div class="seccion">
+                <h2>2.10 - Ventiladores y flujo de aire</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Los ventiladores de caja estan fijados con sus tornillos</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Cantidad: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Orientacion correcta: frontales como <strong>entrada</strong> (intake)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Orientacion correcta: trasero/superior como <strong>salida</strong> (exhaust)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los ventiladores estan conectados (a placa base o Molex)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Conectados a: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Ningun cable obstruye las aspas de los ventiladores</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los filtros antipolvo estan limpios y colocados (si los hay)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Como comprobar la orientacion:</strong> La mayoria de ventiladores tienen una flecha en el marco que indica la direccion del flujo. El lado de las aspas es la entrada; el lado del motor es la salida.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.11 Gestion de cables -->
+            <div class="seccion">
+                <h2>2.11 - Gestion de cables (cable management)</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">La gestion de cables indica profesionalidad y afecta al flujo de aire y mantenimiento futuro.</p>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Los cables estan agrupados con bridas o velcro</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los cables se han pasado por detras de la bandeja cuando es posible</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay cables sueltos flotando en la zona de la placa base</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El flujo de aire no esta significativamente obstruido por cables</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Los cables sobrantes no utilizados estan recogidos y fijados</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>La presentacion general del cableado es ordenada</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 9: Gestion de cables (vista panoramica interior)</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de gestion de cables</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.12 Limpieza interna -->
+            <div class="seccion">
+                <h2>2.12 - Limpieza interna</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio de inspeccion</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>No hay huellas dactilares visibles en componentes</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay restos de pasta termica fuera del disipador/procesador</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay polvo acumulado en los componentes</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay restos de embalaje, plasticos o pegatinas dentro de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay tornillos sueltos dentro de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No hay herramientas olvidadas dentro de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.13 Valoracion Fase 2 -->
+            <div class="seccion">
+                <h2>2.13 - Valoracion de la inspeccion interna</h2>
+                <div class="seccion-body">
+                    <h3>Valoracion global de la Fase 2</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
+                        <div class="check-group"><input type="radio" name="valoracion-f2" id="vf2-exc"><label for="vf2-exc"><strong>EXCELENTE</strong> - 0-2 no conformidades menores</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f2" id="vf2-ace"><label for="vf2-ace"><strong>ACEPTABLE</strong> - 3-5 menores, sin impacto funcional</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f2" id="vf2-mej"><label for="vf2-mej"><strong>MEJORABLE</strong> - 6-10, o alguna que afecte al funcionamiento</label></div>
+                        <div class="check-group"><input type="radio" name="valoracion-f2" id="vf2-ina"><label for="vf2-ina"><strong>INACEPTABLE</strong> - 11+ o riesgo de dano a componentes</label></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 3: PRUEBAS FUNCIONALES BASICAS -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 3 - Pruebas Funcionales Basicas</h2>
+                <p>60 minutos - Comprobamos que el equipo funciona correctamente.</p>
+            </div>
+
+            <div class="nota-danger" style="margin-bottom:20px;">
+                <strong>Antes de encender:</strong> Verifica que no has encontrado ningun problema critico en la inspeccion interna (cortocircuitos, cables sueltos, tornillos dentro de la caja). Si lo has encontrado, <strong>no enciendas el equipo</strong> y consulta al profesor.
+            </div>
+
+            <!-- 3.1 Prueba de encendido -->
+            <div class="seccion">
+                <h2>3.1 - Prueba de encendido</h2>
+                <div class="seccion-body">
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta monitor, teclado y raton al equipo.</li>
+                            <li>Conecta el cable de alimentacion a la fuente y a la red electrica.</li>
+                            <li>Pon el interruptor trasero de la fuente en <strong>I</strong> (ON).</li>
+                            <li>Pulsa el boton de <strong>encendido</strong> del panel frontal.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Observacion</th>
+                            <th style="width:100px">Resultado</th>
+                            <th>Detalle</th>
+                        </tr>
+                        <tr>
+                            <td>El equipo enciende al pulsar el boton de Power</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Se enciende el LED de Power del panel frontal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Color: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Se ilumina el LED de actividad de disco (HDD LED)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Gira el ventilador del CPU</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Giran los ventiladores de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Giran ___ de ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Gira el ventilador de la fuente</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Se escucha algun ruido anormal</td>
+                            <td><select><option value="">--</option><option value="no">No</option><option value="si">Si</option></select></td>
+                            <td><input type="text" placeholder="Describir si es si"></td>
+                        </tr>
+                        <tr>
+                            <td>Hay algun olor anormal (quemado, plastico)</td>
+                            <td><select><option value="">--</option><option value="no">No</option><option value="si">Si - APAGAR</option></select></td>
+                            <td><input type="text" placeholder="Describir si es si"></td>
+                        </tr>
+                        <tr>
+                            <td>Se escuchan beep codes</td>
+                            <td><select><option value="">--</option><option value="no">No</option><option value="si">Si</option></select></td>
+                            <td><input type="text" placeholder="Patron: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>Aparece imagen en el monitor</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Se muestra la pantalla de POST</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota-danger">
+                        <strong>Si el equipo NO enciende:</strong> No intentes diagnosticar desmontando componentes. Documentalo como no conformidad critica, haz una foto y avisa al profesor.
+                    </div>
+
+                    <h3>Foto 10: Equipo encendido (ventiladores girando)</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto del equipo encendido</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3.2 Botones y puertos frontales -->
+            <div class="seccion">
+                <h2>3.2 - Verificacion funcional de botones y puertos frontales</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:40%">Elemento</th>
+                            <th style="width:90px">Funciona</th>
+                            <th style="width:120px">Metodo</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>LED de encendido (Power LED)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Se ilumina?</td>
+                            <td><input type="text" placeholder="Color: ___"></td>
+                        </tr>
+                        <tr>
+                            <td>LED de actividad de disco (HDD LED)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Parpadea en arranque?</td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Boton de reset (reinicia el equipo)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td>Pulsa y comprueba</td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto USB frontal 1</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Conecta pendrive</td>
+                            <td><input type="text" placeholder="Lo detecta?"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto USB frontal 2</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td>Conecta pendrive</td>
+                            <td><input type="text" placeholder="Lo detecta?"></td>
+                        </tr>
+                        <tr>
+                            <td>Jack de auriculares frontal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td>Conecta cascos</td>
+                            <td><input type="text" placeholder="Se escucha audio?"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3.3 Verificacion BIOS -->
+            <div class="seccion">
+                <h2>3.3 - Verificacion en BIOS/UEFI</h2>
+                <div class="seccion-body">
+                    <p>Reinicia el equipo y accede a la BIOS/UEFI.</p>
+                    <div style="margin:8px 0;">
+                        <label style="font-weight:600; font-size:13px; color:var(--azul);">Tecla utilizada para acceder:</label>
+                        <input type="text" placeholder="Ej: Supr, F2, F10..." style="width:200px; padding:4px 8px; border:1px solid #e2e8f0; border-radius:3px;">
+                    </div>
+
+                    <h3>Deteccion de componentes</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Componente</th>
+                            <th style="width:80px">Detectado</th>
+                            <th>Informacion mostrada</th>
+                            <th style="width:80px">Coincide</th>
+                        </tr>
+                        <tr>
+                            <td>Procesador (modelo)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Modelo y frecuencia"></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RAM - capacidad total</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="___ GB"></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RAM - velocidad</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="___ MHz"></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RAM - modo (Single/Dual)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><select><option value="">--</option><option value="single">Single Channel</option><option value="dual">Dual Channel</option></select></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Disco almacenamiento 1</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Modelo y capacidad"></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Disco almacenamiento 2</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td><input type="text" placeholder="Modelo y capacidad"></td>
+                            <td><select><option value="">--</option><option value="si">Si</option><option value="no">No</option><option value="na">N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <h3>Temperaturas y ventiladores</h3>
+                    <table>
+                        <tr>
+                            <th>Dato</th>
+                            <th style="width:120px">Valor</th>
+                            <th style="width:120px">Dentro de rango</th>
+                        </tr>
+                        <tr>
+                            <td>Temperatura CPU en reposo</td>
+                            <td><input type="text" placeholder="___  C" style="text-align:center"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme (&lt; 50 C)</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad ventilador CPU (RPM)</td>
+                            <td><input type="text" placeholder="___ RPM" style="text-align:center"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme (&gt; 500)</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad ventilador sistema</td>
+                            <td><input type="text" placeholder="___ RPM" style="text-align:center"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <h3>Configuraciones clave</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Configuracion</th>
+                            <th>Valor actual</th>
+                            <th style="width:100px">Correcto</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Orden de arranque (Boot Order)</td>
+                            <td><input type="text" placeholder="1.o ___, 2.o ___, 3.o ___"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Modo SATA</td>
+                            <td><select><option value="">--</option><option value="ahci">AHCI</option><option value="ide">IDE</option><option value="raid">RAID</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme (AHCI)</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Perfil XMP/DOCP de memoria</td>
+                            <td><select><option value="">--</option><option value="activado">Activado</option><option value="desactivado">Desactivado</option><option value="na">No disponible</option></select></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha y hora del sistema</td>
+                            <td><input type="text" placeholder="Fecha y hora mostrada"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Recuerda:</strong> No modifiques la configuracion de BIOS. Solo documenta lo que observas.
+                    </div>
+
+                    <h3>Foto 11: Pantalla BIOS - informacion del sistema</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de BIOS (sistema)</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+
+                    <h3>Foto 12: Pantalla BIOS - temperaturas y ventiladores</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de BIOS (temperaturas)</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 4: PRUEBAS DE DIAGNOSTICO CON SOFTWARE -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 4 - Pruebas de Diagnostico con Software</h2>
+                <p>90 minutos - Verificamos que los componentes funcionan correctamente bajo carga.</p>
+            </div>
+
+            <!-- 4.1 Informacion del sistema -->
+            <div class="seccion">
+                <h2>4.1 - Informacion del sistema (CPU-Z / HWiNFO) - 15 min</h2>
+                <div class="seccion-body">
+                    <p>Contrasta la informacion con lo documentado por el grupo que monto el equipo:</p>
+                    <table>
+                        <tr>
+                            <th>Dato</th>
+                            <th>Informe del grupo montador</th>
+                            <th>Reportado por CPU-Z / HWiNFO</th>
+                            <th style="width:80px">Coincide</th>
+                        </tr>
+                        <tr>
+                            <td>Modelo de CPU</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Frecuencia base CPU</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Nucleos / Hilos</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>RAM total instalada</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad de RAM</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modo canal (Single/Dual)</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modelo de placa base</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Modelo de GPU</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>VRAM de la GPU</td>
+                            <td><input type="text" placeholder="Segun su informe"></td>
+                            <td><input type="text" placeholder="Segun software"></td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota-warning">
+                        <strong>Si hay discrepancias:</strong> Puede indicar documentacion incorrecta, componente diferente al declarado, o componente no detectado. Documentalo.
+                    </div>
+
+                    <h3>Foto 13: Captura de CPU-Z o HWiNFO</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la captura del sistema</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.2 Diagnostico de almacenamiento -->
+            <div class="seccion">
+                <h2>4.2 - Diagnostico de almacenamiento (CrystalDiskInfo) - 10 min</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th>Dato</th>
+                            <th>Disco 1</th>
+                            <th>Disco 2</th>
+                        </tr>
+                        <tr><td>Modelo detectado</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder="N/A si no hay"></td></tr>
+                        <tr><td>Capacidad</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                        <tr>
+                            <td>Estado de salud (Health)</td>
+                            <td>
+                                <select class="conforme-select" onchange="colorearConformidad(this)">
+                                    <option value="">--</option>
+                                    <option value="si">Good (azul)</option>
+                                    <option value="warning">Caution (amarillo)</option>
+                                    <option value="no">Bad (rojo)</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="conforme-select" onchange="colorearConformidad(this)">
+                                    <option value="">--</option>
+                                    <option value="si">Good (azul)</option>
+                                    <option value="warning">Caution (amarillo)</option>
+                                    <option value="no">Bad (rojo)</option>
+                                    <option value="na">N/A</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr><td>Temperatura actual</td><td><input type="text" placeholder="___ C"></td><td><input type="text" placeholder="___ C"></td></tr>
+                        <tr><td>Horas de encendido</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                        <tr><td>Ciclos de encendido</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                        <tr><td>Sectores reasignados</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                        <tr><td>Sectores pendientes</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                    </table>
+
+                    <div class="nota-danger">
+                        <strong>Criterio de rechazo:</strong> Un disco con estado "Bad" (rojo) <strong>nunca</strong> se debe entregar a un cliente = equipo <strong>NO APTO</strong>.
+                    </div>
+
+                    <h3>Foto 14: Captura de CrystalDiskInfo</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la captura de CrystalDiskInfo</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.3 Test de memoria -->
+            <div class="seccion">
+                <h2>4.3 - Test de memoria RAM (MemTest86) - 30 min</h2>
+                <div class="seccion-body">
+                    <p>Arranca desde el USB con MemTest86 y ejecuta al menos 1 pasada completa:</p>
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr><td>Version de MemTest86 utilizada</td><td><input type="text" placeholder=""></td></tr>
+                        <tr><td>Memoria total detectada</td><td><input type="text" placeholder="___ GB"></td></tr>
+                        <tr><td>Numero de pasadas completadas (minimo 1)</td><td><input type="text" placeholder=""></td></tr>
+                        <tr><td>Numero de errores encontrados</td><td><input type="text" placeholder=""></td></tr>
+                        <tr>
+                            <td><strong>Resultado</strong></td>
+                            <td>
+                                <select class="conforme-select" onchange="colorearConformidad(this)" style="font-weight:600;">
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="si">PASS - Sin errores</option>
+                                    <option value="no">FAIL - Con errores</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="nota-danger">
+                        <strong>Si MemTest86 encuentra errores:</strong> El equipo es <strong>NO APTO</strong> para entrega. Errores de memoria causan pantallazos azules y corrupcion de datos del cliente.
+                    </div>
+
+                    <h3>Foto 15: MemTest86 resultado final</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto de MemTest86</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.4 Rendimiento almacenamiento -->
+            <div class="seccion">
+                <h2>4.4 - Rendimiento de almacenamiento (CrystalDiskMark) - 10 min</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th>Prueba</th>
+                            <th>Disco 1 (Lectura / Escritura)</th>
+                            <th>Disco 2 (Lectura / Escritura)</th>
+                        </tr>
+                        <tr>
+                            <td>Secuencial (SEQ1M Q8T1)</td>
+                            <td><input type="text" placeholder="___ / ___ MB/s"></td>
+                            <td><input type="text" placeholder="___ / ___ MB/s"></td>
+                        </tr>
+                        <tr>
+                            <td>Aleatorio (RND4K Q32T1)</td>
+                            <td><input type="text" placeholder="___ / ___ MB/s"></td>
+                            <td><input type="text" placeholder="___ / ___ MB/s"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Valores de referencia:</strong> HDD: 80-180 MB/s | SSD SATA: 450-560 MB/s | NVMe Gen3: 1.500-3.500 MB/s | NVMe Gen4: 3.500-7.000 MB/s. Un disco significativamente mas lento puede indicar cable defectuoso, puerto lento, o modo IDE en vez de AHCI.
+                    </div>
+
+                    <div style="margin-top:8px;">
+                        <label style="font-weight:600; font-size:13px; color:var(--azul);">El rendimiento es coherente con el tipo de disco?</label>
+                        <select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme - velocidades esperadas</option><option value="no">&#10008; No conforme - rendimiento inferior</option></select>
+                    </div>
+
+                    <h3>Foto 16: Captura de CrystalDiskMark</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la captura de CrystalDiskMark</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.5 Test de estres CPU -->
+            <div class="seccion">
+                <h2>4.5 - Test de estres del procesador - 20 min</h2>
+                <div class="seccion-body">
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>HWiNFO</strong> en modo sensores para monitorizar temperaturas.</li>
+                            <li>Ejecuta <strong>Prime95</strong> (opcion "Small FFTs") o <strong>AIDA64</strong> (test de CPU).</li>
+                            <li>Deja el test funcionando durante <strong>10 minutos</strong>.</li>
+                            <li>Observa las temperaturas y anota los valores maximos.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr><td>Temperatura CPU en reposo (antes del test)</td><td><input type="text" placeholder="___ C"></td></tr>
+                        <tr><td>Temperatura CPU maxima durante el test</td><td><input type="text" placeholder="___ C"></td></tr>
+                        <tr>
+                            <td>Se produjo throttling (reduccion de frecuencia)?</td>
+                            <td><select><option value="">--</option><option value="no">No</option><option value="si">Si</option></select></td>
+                        </tr>
+                        <tr><td>Frecuencia maxima alcanzada</td><td><input type="text" placeholder="___ GHz"></td></tr>
+                        <tr>
+                            <td>Se produjo algun error o se detuvo el test?</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme - sin errores</option><option value="no">&#10008; No conforme - hubo errores</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Se apago o reinicio el equipo?</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme - no ocurrio</option><option value="no">&#10008; No conforme - CRITICO</option></select></td>
+                        </tr>
+                    </table>
+
+                    <h3>Resultado del test de estres CPU</h3>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>Temperatura maxima &lt; 90 C bajo carga</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No se produjo throttling</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Test completado 10 min sin errores</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El equipo no se apago ni reinicio</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Limites de temperatura:</strong> &lt; 80 C = excelente | 80-90 C = aceptable | &gt; 90 C = refrigeracion insuficiente (pasta termica, disipador, ventilador) | Apagado repentino = proteccion termica = NO APTO.
+                    </div>
+
+                    <h3>Foto 17: HWiNFO - temperatura maxima CPU durante estres</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la captura de temperaturas</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.6 Test de estres GPU -->
+            <div class="seccion">
+                <h2>4.6 - Test de estres de la GPU (FurMark) - 10 min</h2>
+                <div class="seccion-body">
+                    <p><em>Solo si el equipo tiene tarjeta grafica dedicada. Si no la tiene, marca N/A.</em></p>
+
+                    <table>
+                        <tr>
+                            <th style="width:50%">Dato</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr><td>Temperatura GPU en reposo</td><td><input type="text" placeholder="___ C"></td></tr>
+                        <tr><td>Temperatura GPU maxima (5 min de test)</td><td><input type="text" placeholder="___ C"></td></tr>
+                        <tr>
+                            <td>Artefactos visuales (lineas, puntos, colores incorrectos)?</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme - sin artefactos</option><option value="no">&#10008; No conforme - GPU defectuosa</option><option value="na">N/A</option></select></td>
+                        </tr>
+                        <tr>
+                            <td>Cuelgue o pantalla negra?</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme - no ocurrio</option><option value="no">&#10008; No conforme - CRITICO</option><option value="na">N/A</option></select></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 18: FurMark durante el test / HWiNFO GPU</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la captura de FurMark / GPU</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.7 Resumen Fase 4 -->
+            <div class="seccion">
+                <h2>4.7 - Resumen de pruebas de diagnostico</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:50%">Prueba</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr><td>Informacion del sistema (4.1)</td><td><select><option value="">--</option><option value="ok">CORRECTO</option><option value="disc">DISCREPANCIAS</option></select></td></tr>
+                        <tr><td>Salud del almacenamiento (4.2)</td><td><select><option value="">--</option><option value="ok">OK</option><option value="adv">ADVERTENCIA</option><option value="fail">FALLO</option></select></td></tr>
+                        <tr><td>Rendimiento almacenamiento (4.4)</td><td><select><option value="">--</option><option value="ok">OK</option><option value="bajo">BAJO</option></select></td></tr>
+                        <tr><td>Test de memoria (4.3)</td><td><select><option value="">--</option><option value="pass">PASS</option><option value="fail">FAIL</option></select></td></tr>
+                        <tr><td>Estres CPU (4.5)</td><td><select><option value="">--</option><option value="ok">ESTABLE</option><option value="fail">INESTABLE</option></select></td></tr>
+                        <tr><td>Estres GPU (4.6)</td><td><select><option value="">--</option><option value="ok">ESTABLE</option><option value="fail">INESTABLE</option><option value="na">N/A</option></select></td></tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 5: PRUEBAS DE ENTREGA AL CLIENTE -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 5 - Pruebas de Entrega al Cliente</h2>
+                <p>30 minutos - Detalles que marcan la diferencia entre un servicio amateur y uno profesional.</p>
+            </div>
+
+            <!-- 5.1 Puertos traseros -->
+            <div class="seccion">
+                <h2>5.1 - Verificacion de puertos traseros</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:35%">Puerto</th>
+                            <th style="width:80px">Funciona</th>
+                            <th style="width:140px">Metodo</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>USB trasero 1</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Conecta pendrive</td>
+                            <td><input type="text" placeholder="Lo detecta?"></td>
+                        </tr>
+                        <tr>
+                            <td>USB trasero 2</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Conecta pendrive</td>
+                            <td><input type="text" placeholder="Lo detecta?"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto de video principal</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td>Muestra imagen?</td>
+                            <td><input type="text" placeholder="Tipo: HDMI / DP / VGA"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto Ethernet</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td>Obtiene conexion?</td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Puerto de audio trasero</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A</option></select></td>
+                            <td>Conecta altavoces</td>
+                            <td><input type="text" placeholder="Se escucha sonido?"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5.2 Ruido y vibraciones -->
+            <div class="seccion">
+                <h2>5.2 - Prueba de ruido y vibraciones</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">Con el equipo encendido y en reposo, situate a 50 cm en silencio:</p>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>El equipo no emite vibraciones perceptibles al tacto</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No se escuchan chirridos ni zumbidos anormales</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El ruido general es aceptable para un entorno de oficina</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>No se escucha el "clic de la muerte" de un HDD</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option><option value="na">N/A (sin HDD)</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5.3 Apagado y reinicio -->
+            <div class="seccion">
+                <h2>5.3 - Prueba de apagado y reinicio</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>El equipo se apaga correctamente</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El equipo se reinicia correctamente</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Al apagar, todos los ventiladores se detienen</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>Al apagar, todos los LEDs se apagan (excepto standby)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5.4 Presentacion final -->
+            <div class="seccion">
+                <h2>5.4 - Comprobacion final de presentacion</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:10px;">Cierra el panel lateral y verifica:</p>
+                    <table>
+                        <tr>
+                            <th style="width:55%">Criterio</th>
+                            <th style="width:80px">Conforme</th>
+                            <th>Observaciones</th>
+                        </tr>
+                        <tr>
+                            <td>No hay herramientas ni objetos ajenos dentro de la caja</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El panel lateral cierra correctamente y queda fijado</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El exterior esta limpio (sin huellas ni suciedad nueva)</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                        <tr>
+                            <td>El equipo tiene aspecto profesional, listo para entregar</td>
+                            <td><select class="conforme-select" onchange="colorearConformidad(this)"><option value="">--</option><option value="si">&#10004; Conforme</option><option value="no">&#10008; No conforme</option></select></td>
+                            <td><input type="text" placeholder="Observaciones"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Foto 19: Equipo cerrado, montado y listo para entrega</h3>
+                    <div class="foto-upload" onclick="this.querySelector('input').click()">
+                        <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                        <div class="icon">&#128247;</div>
+                        <p>Haz clic o arrastra para subir la foto final del equipo</p>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ============================================================ -->
+            <!-- FASE 6: INFORME DE CALIDAD Y VEREDICTO -->
+            <!-- ============================================================ -->
+
+            <div class="fase-header">
+                <h2>FASE 6 - Informe de Calidad y Veredicto</h2>
+                <p>30 minutos - Documenta, clasifica y emite tu veredicto profesional.</p>
+            </div>
+
+            <!-- 6.1 Registro de no conformidades -->
+            <div class="seccion">
+                <h2>6.1 - Registro de no conformidades</h2>
+                <div class="seccion-body">
+                    <div class="nota">
+                        <strong>Clasifica cada no conformidad por gravedad:</strong><br>
+                        <span style="color:var(--rojo)"><strong>Critica (C):</strong></span> Impide el funcionamiento o supone riesgo. Correccion <strong>obligatoria</strong>.<br>
+                        <span style="color:var(--naranja)"><strong>Mayor (M):</strong></span> Afecta fiabilidad o rendimiento. Correccion <strong>recomendada</strong>.<br>
+                        <span style="color:var(--azul-claro)"><strong>Menor (m):</strong></span> Defecto estetico sin impacto funcional. Correccion <strong>opcional</strong>.
+                    </div>
+
+                    <table id="tabla-nc">
+                        <tr>
+                            <th style="width:30px">N.o</th>
+                            <th style="width:60px">Fase</th>
+                            <th style="width:60px">Seccion</th>
+                            <th>Descripcion de la no conformidad</th>
+                            <th style="width:70px">Gravedad</th>
+                            <th>Accion correctiva sugerida</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">1</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">2</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">3</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">4</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">5</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">6</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">7</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">8</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">9</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">10</td>
+                            <td><input type="text" placeholder="F__" style="text-align:center"></td>
+                            <td><input type="text" placeholder="_._ " style="text-align:center"></td>
+                            <td><input type="text" placeholder="Descripcion del defecto"></td>
+                            <td><select style="font-weight:600"><option value="">--</option><option value="c" style="color:#c53030">C</option><option value="m" style="color:#c05621">M</option><option value="me" style="color:#2b6cb0">m</option></select></td>
+                            <td><input type="text" placeholder="Que hacer para corregirlo"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Fotos de no conformidades</h3>
+                    <p style="font-size:13px; margin-bottom:8px;">Sube fotos de evidencia de las no conformidades detectadas (tantas como sean necesarias):</p>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="foto-upload" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                            <div class="icon">&#128247;</div>
+                            <p>NC foto 1</p>
+                            <img class="foto-preview" alt="Preview">
+                        </div>
+                        <div class="foto-upload" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                            <div class="icon">&#128247;</div>
+                            <p>NC foto 2</p>
+                            <img class="foto-preview" alt="Preview">
+                        </div>
+                        <div class="foto-upload" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                            <div class="icon">&#128247;</div>
+                            <p>NC foto 3</p>
+                            <img class="foto-preview" alt="Preview">
+                        </div>
+                        <div class="foto-upload" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*" onchange="previewPhoto(this)">
+                            <div class="icon">&#128247;</div>
+                            <p>NC foto 4</p>
+                            <img class="foto-preview" alt="Preview">
+                        </div>
+                    </div>
+
+                    <h3>Recuento de no conformidades</h3>
+                    <div class="resumen-contadores">
+                        <div class="contador-box critica">
+                            <input type="text" class="numero" id="count-criticas" placeholder="0" style="border:none; background:transparent; text-align:center; width:100%; font-size:28px; font-weight:700; color:var(--rojo);">
+                            <span class="label">Criticas</span>
+                        </div>
+                        <div class="contador-box mayor">
+                            <input type="text" class="numero" id="count-mayores" placeholder="0" style="border:none; background:transparent; text-align:center; width:100%; font-size:28px; font-weight:700; color:var(--naranja);">
+                            <span class="label">Mayores</span>
+                        </div>
+                        <div class="contador-box menor">
+                            <input type="text" class="numero" id="count-menores" placeholder="0" style="border:none; background:transparent; text-align:center; width:100%; font-size:28px; font-weight:700; color:var(--azul-claro);">
+                            <span class="label">Menores</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6.2 Veredicto final -->
+            <div class="seccion">
+                <h2>6.2 - Veredicto final</h2>
+                <div class="seccion-body">
+                    <div class="nota-success">
+                        <strong>Criterios para el veredicto:</strong><br>
+                        <strong style="color:var(--verde)">APTO:</strong> 0 criticas, 0-1 mayores, cualquier n.o de menores<br>
+                        <strong style="color:var(--naranja)">APTO CON CONDICIONES:</strong> 0 criticas, 2-3 mayores corregibles rapidamente<br>
+                        <strong style="color:var(--rojo)">NO APTO:</strong> Al menos 1 critica, O mas de 3 mayores
+                    </div>
+
+                    <div class="veredicto-box">
+                        <h3>VEREDICTO DEL EQUIPO</h3>
+                        <div class="veredicto-options">
+                            <label class="veredicto-option veredicto-apto">
+                                <input type="radio" name="veredicto" value="apto"> APTO PARA ENTREGA
+                            </label>
+                            <label class="veredicto-option veredicto-condiciones">
+                                <input type="radio" name="veredicto" value="condiciones"> APTO CON CONDICIONES
+                            </label>
+                            <label class="veredicto-option veredicto-no-apto">
+                                <input type="radio" name="veredicto" value="no-apto"> NO APTO
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Justificacion del veredicto (minimo 3 lineas):</p>
+                        <textarea rows="5" placeholder="Justifica tu veredicto basandote en los datos recogidos durante toda la inspeccion. Indica las no conformidades mas relevantes y por que llevan a este veredicto..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Acciones correctivas prioritarias (si el veredicto es APTO CON CONDICIONES o NO APTO):</p>
+                        <table>
+                            <tr>
+                                <th style="width:60px">Prioridad</th>
+                                <th>Accion correctiva</th>
+                                <th style="width:60px">NC n.o</th>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:600">1</td>
+                                <td><input type="text" placeholder="Accion mas urgente"></td>
+                                <td><input type="text" placeholder="" style="text-align:center"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:600">2</td>
+                                <td><input type="text" placeholder=""></td>
+                                <td><input type="text" placeholder="" style="text-align:center"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:600">3</td>
+                                <td><input type="text" placeholder=""></td>
+                                <td><input type="text" placeholder="" style="text-align:center"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:600">4</td>
+                                <td><input type="text" placeholder=""></td>
+                                <td><input type="text" placeholder="" style="text-align:center"></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center; font-weight:600">5</td>
+                                <td><input type="text" placeholder=""></td>
+                                <td><input type="text" placeholder="" style="text-align:center"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6.3 Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>6.3 - Preguntas de reflexion profesional</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>1. Cual ha sido la no conformidad mas grave que habeis encontrado? Que consecuencias podria tener para un cliente si el equipo se hubiera entregado sin este control de calidad?</p>
+                        <textarea rows="4" placeholder="Describe la no conformidad mas grave y sus posibles consecuencias para el cliente..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Habeis encontrado algun defecto que el grupo montador no detecto en su propia revision? Por que crees que lo pasaron por alto? Relaciona tu respuesta con el concepto de "sesgo de confirmacion".</p>
+                        <textarea rows="4" placeholder="Analiza por que ciertos defectos pasan desapercibidos para quien monta el equipo..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. En un taller profesional, un tecnico monta y otro revisa. Que ventajas tiene este sistema? Que desventajas puede tener? Como se gestionan los desacuerdos?</p>
+                        <textarea rows="4" placeholder="Analiza las ventajas e inconvenientes de separar montaje y revision..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. Imagina que eres responsable de calidad de un taller que repara 15 equipos al dia. Disena una checklist simplificada (maximo 15 puntos) para un QC rapido en 10 minutos. Justifica cada punto.</p>
+                        <table>
+                            <tr>
+                                <th style="width:30px">N.o</th>
+                                <th>Punto de la checklist rapida</th>
+                                <th>Justificacion</th>
+                            </tr>
+                            <tr><td style="text-align:center">1</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder="Por que es esencial"></td></tr>
+                            <tr><td style="text-align:center">2</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">3</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">4</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">5</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">6</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">7</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">8</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">9</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">10</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">11</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">12</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">13</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">14</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                            <tr><td style="text-align:center">15</td><td><input type="text" placeholder=""></td><td><input type="text" placeholder=""></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Busca informacion sobre las certificaciones ISO 9001 y ISO 45001. Que relacion tienen con el control de calidad y la seguridad en un taller de informatica? Que tipo de documentacion exigen?</p>
+                        <textarea rows="5" placeholder="Responde en 5-8 lineas sobre ISO 9001 (calidad) e ISO 45001 (seguridad)..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>6. Un cliente llama a los 3 dias diciendo que "el ordenador va lento". Como responsable de calidad, que informacion le pedirias? Que datos del QC usarias para responder? Describe tu protocolo de actuacion.</p>
+                        <textarea rows="5" placeholder="Describe paso a paso como gestionarias esta reclamacion..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7. Compara el control de calidad de esta practica con el que haria una empresa como Dell, HP o Lenovo en su linea de fabrica. Que pasos adicionales crees que realizan? Que herramientas automatizadas podrian usar?</p>
+                        <textarea rows="5" placeholder="Compara el QC manual con el QC industrial automatizado (5-8 lineas)..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluacion -->
+            <div class="seccion">
+                <h2>Criterios de evaluacion y entrega</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:80px">Puntos</th>
+                                <th>Desglose</th>
+                            </tr>
+                            <tr><td>Inspeccion visual externa (Fase 1)</td><td>1.0</td><td>Tablas completas (0.5) + valoracion justificada (0.5)</td></tr>
+                            <tr><td>Inspeccion visual interna (Fase 2)</td><td>2.0</td><td>Secciones revisadas (1.0) + rigor (0.5) + valoracion (0.5)</td></tr>
+                            <tr><td>Pruebas funcionales basicas (Fase 3)</td><td>1.5</td><td>Encendido/POST (0.5) + puertos frontales (0.25) + BIOS (0.75)</td></tr>
+                            <tr><td>Pruebas de diagnostico (Fase 4)</td><td>2.0</td><td>CPU-Z (0.25) + CrystalDiskInfo (0.25) + MemTest86 (0.5) + CrystalDiskMark (0.25) + estres CPU (0.5) + estres GPU (0.25)</td></tr>
+                            <tr><td>Pruebas de entrega (Fase 5)</td><td>0.5</td><td>Puertos, ruido, apagado y presentacion</td></tr>
+                            <tr><td>Informe de calidad (Fase 6)</td><td>2.0</td><td>No conformidades clasificadas (0.75) + veredicto coherente (0.5) + reflexion (0.75)</td></tr>
+                            <tr><td>Fotografias de evidencia</td><td>1.0</td><td>Completas, claras y coherentes con las NC</td></tr>
+                            <tr style="font-weight:700; background:#c6f6d5"><td>Total</td><td>10</td><td></td></tr>
+                        </table>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <h3>Penalizaciones</h3>
+                        <table>
+                            <tr><th>Motivo</th><th style="width:100px">Penalizacion</th></tr>
+                            <tr><td>Entrega fuera de plazo (sin justificacion)</td><td>-2 puntos</td></tr>
+                            <tr><td>Fotografias insuficientes (menos de 12)</td><td>-1 punto</td></tr>
+                            <tr><td>No conformidades sin evidencia fotografica</td><td>-0.5 puntos</td></tr>
+                            <tr><td>Veredicto no coherente con los datos</td><td>-1.5 puntos</td></tr>
+                            <tr><td>Respuestas de reflexion copiadas</td><td>-3 puntos (ambos)</td></tr>
+                            <tr><td>Tablas incompletas (mas del 30% en blanco)</td><td>-1.5 puntos</td></tr>
+                            <tr><td>Falta de respeto hacia el grupo revisado</td><td>-2 puntos</td></tr>
+                            <tr><td>Incumplimiento de normas (desmontar sin permiso, modificar BIOS)</td><td>Suspenso</td></tr>
+                        </table>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <h3>Bonificaciones</h3>
+                        <table>
+                            <tr><th>Motivo</th><th style="width:100px">Bonificacion</th></tr>
+                            <tr><td>Deteccion de una no conformidad critica real que otros pasaron por alto</td><td>+0.5 puntos</td></tr>
+                            <tr><td>Checklist de la pregunta 4 especialmente bien disenada</td><td>+0.25 puntos</td></tr>
+                            <tr><td>Documentacion fotografica excepcionalmente detallada</td><td>+0.25 puntos</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Firma -->
+            <div class="seccion">
+                <h2>Verificacion de entrega</h2>
+                <div class="seccion-body">
+                    <p style="font-size:13px; margin-bottom:12px;">Confirma que has incluido todo antes de entregar:</p>
+                    <div style="display:grid; grid-template-columns:1fr; gap:4px;">
+                        <div class="check-group"><input type="checkbox" id="chk-f1"><label for="chk-f1">Inspeccion visual externa completa (Fase 1) con valoracion</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-f2"><label for="chk-f2">Inspeccion visual interna completa - todas las secciones (Fase 2)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-f3"><label for="chk-f3">Pruebas funcionales basicas (Fase 3)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-f4"><label for="chk-f4">Pruebas de diagnostico con software (Fase 4)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-f5"><label for="chk-f5">Pruebas de entrega al cliente (Fase 5)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-nc"><label for="chk-nc">Registro de no conformidades clasificadas (Fase 6.1)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-ver"><label for="chk-ver">Veredicto final con justificacion (Fase 6.2)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-ref"><label for="chk-ref">7 preguntas de reflexion respondidas (Fase 6.3)</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-fot"><label for="chk-fot">Minimo 19 fotografias de evidencia</label></div>
+                        <div class="check-group"><input type="checkbox" id="chk-nc-fot"><label for="chk-nc-fot">Fotografias adicionales de cada no conformidad</label></div>
+                    </div>
+
+                    <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="font-weight:600; font-size:13px; color:var(--azul);">Nombre del alumno:</label>
+                            <input type="text" placeholder="Tu nombre completo" style="width:100%; padding:6px 10px; border:1px solid var(--gris-borde); border-radius:4px; margin-top:4px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:600; font-size:13px; color:var(--azul);">Fecha de entrega:</label>
+                            <input type="date" style="width:100%; padding:6px 10px; border:1px solid var(--gris-borde); border-radius:4px; margin-top:4px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Control de calidad | <strong>Equipo revisado:</strong> [Grupo ___] | <strong>Veredicto:</strong> [APTO / APTO CON CONDICIONES / NO APTO]</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 05: Control de Calidad de Equipos';
+        const PREFIJO_ARCHIVO = 'P05_Control_Calidad';
+
+        // Preview de fotos
+        function previewPhoto(input) {
+            const preview = input.parentElement.querySelector('.foto-preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Colorear filas segun conformidad
+        function colorearConformidad(select) {
+            const tr = select.closest('tr');
+            if (!tr) return;
+
+            if (select.value === 'no') {
+                tr.classList.add('conf-nok');
+                tr.classList.remove('conf-ok');
+            } else if (select.value === 'si') {
+                tr.classList.add('conf-ok');
+                tr.classList.remove('conf-nok');
+            } else {
+                tr.classList.remove('conf-ok', 'conf-nok');
+            }
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                radios: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('input[type="radio"]').forEach((el, i) => {
+                datos.radios['radio_' + i] = el.checked;
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.radios) {
+                        document.querySelectorAll('input[type="radio"]').forEach((el, i) => {
+                            if (datos.radios['radio_' + i] !== undefined) el.checked = datos.radios['radio_' + i];
+                        });
+                    }
+                    // Re-colorear las filas de conformidad
+                    document.querySelectorAll('.conforme-select').forEach(colorearConformidad);
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) {
+                fechaInput.valueAsDate = new Date();
+            }
+        });
+    </script>
+</body>
+</html>

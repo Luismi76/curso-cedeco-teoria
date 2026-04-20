@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 14: Comprobacion del Rendimiento en Windows 10</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+            --amarillo: #975a16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--azul);
+            color: white;
+            padding: 24px 32px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* Datos del alumno */
+        .alumno-box {
+            background: var(--gris-fondo);
+            border: 2px solid var(--azul-claro);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .alumno-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        .alumno-box input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alumno-box .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .seccion h2 {
+            background: var(--azul);
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .seccion-body {
+            border: 1px solid var(--gris-borde);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 16px;
+        }
+
+        .seccion h3 {
+            color: var(--azul-claro);
+            font-size: 14px;
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .seccion h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #edf2f7;
+            color: var(--azul);
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        td input[type="text"],
+        td select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+        }
+
+        td input[type="text"]:focus,
+        td select:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        td textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        td textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Checkboxes */
+        .check-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-group label {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gris-borde);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--azul-claro);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+        }
+
+        /* Procedimiento (pasos) */
+        .pasos {
+            background: #f7fafc;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .pasos ol {
+            margin-left: 20px;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .pasos strong {
+            color: var(--azul);
+        }
+
+        .nota {
+            background: #ebf8ff;
+            border-left: 4px solid var(--azul-claro);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Aviso de seguridad */
+        .aviso-seguridad {
+            background: #fff5f5;
+            border: 3px solid var(--rojo);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .aviso-seguridad strong {
+            color: var(--rojo);
+        }
+
+        /* Fotos */
+        .foto-upload {
+            border: 2px dashed var(--gris-borde);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin: 10px 0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .foto-upload:hover,
+        .foto-upload.drag-over {
+            border-color: var(--azul-claro);
+            background: #ebf8ff;
+        }
+
+        .foto-upload .icon {
+            font-size: 28px;
+            color: var(--gris-borde);
+            margin-bottom: 6px;
+        }
+
+        .foto-upload p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .foto-upload.has-image {
+            border-style: solid;
+            border-color: var(--verde);
+            background: #f0fff4;
+            padding: 8px;
+        }
+
+        .foto-upload.has-image .placeholder {
+            display: none;
+        }
+
+        .foto-upload .btn-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .foto-upload.has-image .btn-remove {
+            display: flex;
+        }
+
+        .foto-preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 4px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Preguntas */
+        .pregunta {
+            margin: 14px 0;
+        }
+
+        .pregunta > p {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--azul);
+        }
+
+        /* Evaluacion */
+        .evaluacion {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .evaluacion h3 {
+            color: var(--verde) !important;
+            border: none !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+        }
+
+        .evaluacion table {
+            font-size: 13px;
+        }
+
+        .evaluacion th {
+            background: #c6f6d5;
+            color: var(--verde);
+        }
+
+        /* Profesor-only section */
+        .profesor-only {
+            border: 3px solid var(--naranja) !important;
+        }
+
+        .profesor-only h2 {
+            background: var(--naranja) !important;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Botones */
+        .botones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 24px 32px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--azul-claro);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--azul);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--azul);
+            border: 1px solid var(--gris-borde);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--verde);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #22543d;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .botones {
+                display: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .profesor-only {
+                display: none !important;
+            }
+
+            .seccion {
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seccion h2 {
+                background: var(--azul) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th {
+                background: #edf2f7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .foto-upload {
+                border-style: solid;
+                min-height: auto;
+                padding: 4px;
+            }
+
+            .foto-upload .placeholder,
+            .foto-upload .btn-remove {
+                display: none !important;
+            }
+
+            .foto-preview {
+                max-height: 180px;
+            }
+
+            .foto-upload:not(.has-image) {
+                min-height: 30px;
+                border-color: #e2e8f0;
+            }
+
+            input[type="text"], select, textarea {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 2px !important;
+            }
+
+            textarea {
+                min-height: auto !important;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Practica 14: Comprobacion del Rendimiento en Windows 10</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 — Montaje de Equipos Microinformaticos<br>
+                <strong>Unidad Formativa:</strong> UF0852 — Instalacion y Configuracion de Sistemas Operativos<br>
+                <strong>Bloque:</strong> 3 — Diagnostico y Reparacion de Sistemas<br>
+                <strong>Duracion estimada:</strong> 3 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox + VM con Windows 10
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- Datos del alumno -->
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" id="alumno-nombre" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date" id="alumno-fecha">
+                </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
+                        <li>Aprender a utilizar comandos y herramientas de Windows 10 para comprobar el rendimiento de CPU, RAM, disco y sistema en general.</li>
+                        <li>Diagnosticar posibles cuellos de botella en el rendimiento del equipo.</li>
+                        <li>Documentar metricas del sistema de forma estructurada.</li>
+                        <li>Interpretar datos de rendimiento para tomar decisiones de mantenimiento o mejora del hardware.</li>
+                        <li>Familiarizarse con herramientas graficas (perfmon, resmon) y de linea de comandos (CMD, PowerShell).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Requisitos previos -->
+            <div class="seccion">
+                <h2>Requisitos previos</h2>
+                <div class="seccion-body">
+                    <p>Antes de comenzar, verifica que cumples todos los requisitos marcando cada casilla:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vm">
+                            <label for="req-vm">VM con Windows 10 de la Practica 06 disponible y funcionando</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-vbox">
+                            <label for="req-vbox">VirtualBox instalado y funcionando correctamente</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="req-cmd">
+                            <label for="req-cmd">Acceso a la consola CMD y PowerShell dentro de la VM</label>
+                        </div>
+                    </div>
+                    <div class="nota">
+                        <strong>Nota:</strong> Todos los comandos de esta practica deben ejecutarse dentro de la maquina virtual con Windows 10. Algunos comandos de PowerShell y WMIC requieren ejecutar la consola como <strong>Administrador</strong> (clic derecho > Ejecutar como administrador).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido teorico -->
+            <div class="seccion">
+                <h2>Contenido teorico — Herramientas de rendimiento en Windows 10</h2>
+                <div class="seccion-body">
+                    <p>Windows 10 incluye diversas herramientas para monitorizar y analizar el rendimiento del sistema. A continuacion se resumen las mas importantes:</p>
+
+                    <h3>Tabla de herramientas y comandos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:30%">Herramienta / Comando</th>
+                            <th style="width:15%">Tipo</th>
+                            <th>Para que sirve</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Administrador de tareas</strong></td>
+                            <td>Grafica</td>
+                            <td>Ver procesos activos, uso de CPU, RAM, disco y red en tiempo real</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Monitor de rendimiento (perfmon)</strong></td>
+                            <td>Grafica</td>
+                            <td>Monitorizar contadores de rendimiento con graficos detallados en tiempo real</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Monitor de recursos (resmon)</strong></td>
+                            <td>Grafica</td>
+                            <td>Ver uso detallado de CPU, memoria, disco y red por cada proceso</td>
+                        </tr>
+                        <tr>
+                            <td><strong>msinfo32</strong></td>
+                            <td>Grafica</td>
+                            <td>Informacion completa del hardware y software del sistema</td>
+                        </tr>
+                        <tr>
+                            <td><strong>systeminfo</strong></td>
+                            <td>CMD</td>
+                            <td>Resumen del sistema: SO, procesador, RAM, red, fecha de instalacion</td>
+                        </tr>
+                        <tr>
+                            <td><strong>tasklist</strong></td>
+                            <td>CMD</td>
+                            <td>Listar todos los procesos en ejecucion con PID y uso de memoria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Get-CimInstance Win32_*</strong></td>
+                            <td>PowerShell</td>
+                            <td>Consultar informacion detallada de CPU, modulos RAM y discos duros (sustituto moderno de <code>wmic</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>typeperf</strong></td>
+                            <td>CMD</td>
+                            <td>Medir contadores de rendimiento desde la linea de comandos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Get-Process</strong></td>
+                            <td>PowerShell</td>
+                            <td>Listar procesos con informacion detallada de CPU y memoria</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Get-Counter</strong></td>
+                            <td>PowerShell</td>
+                            <td>Leer contadores de rendimiento del sistema (CPU, RAM, disco)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Get-ComputerInfo</strong></td>
+                            <td>PowerShell</td>
+                            <td>Obtener informacion completa del equipo (hardware, SO, BIOS)</td>
+                        </tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> El comando <code>wmic</code> esta <strong>obsoleto desde Windows 10 21H1</strong> y ha sido <strong>eliminado en Windows 11 24H2</strong>. En esta practica usaremos <strong>PowerShell con <code>Get-CimInstance</code></strong> como alternativa moderna, que ofrece la misma informacion WMI con sintaxis actual.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Informacion general del sistema -->
+            <div class="seccion">
+                <h2>Parte 1 — Informacion general del sistema (20 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta primera parte vas a obtener la informacion basica de tu sistema utilizando comandos de CMD y la herramienta grafica msinfo32.</p>
+
+                    <h3>Paso 1: Ejecutar systeminfo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una ventana de <strong>CMD</strong> (Simbolo del sistema) como Administrador.</li>
+                            <li>Ejecuta el siguiente comando y espera a que muestre los resultados:</li>
+                        </ol>
+                    </div>
+                    <div class="code-block">systeminfo</div>
+
+                    <h3>Paso 2: Ejecutar msinfo32</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win+R</strong>, escribe <strong>msinfo32</strong> y pulsa Enter.</li>
+                            <li>Revisa la informacion del <strong>Resumen del sistema</strong>.</li>
+                        </ol>
+                    </div>
+                    <div class="code-block">msinfo32</div>
+
+                    <h3>Rellena la tabla con la informacion obtenida</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del equipo</td>
+                            <td><input type="text" placeholder="Ej: DESKTOP-ABC123"></td>
+                        </tr>
+                        <tr>
+                            <td>Sistema operativo y version</td>
+                            <td><input type="text" placeholder="Ej: Windows 10 Pro 10.0.19045"></td>
+                        </tr>
+                        <tr>
+                            <td>Procesador</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i5-10400 @ 2.90GHz"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM total</td>
+                            <td><input type="text" placeholder="Ej: 4096 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Tipo de sistema (32/64 bits)</td>
+                            <td><input type="text" placeholder="Ej: x64-based PC"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de instalacion del SO</td>
+                            <td><input type="text" placeholder="Ej: 15/03/2024"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 1: Salida del comando systeminfo</h3>
+                    <div class="foto-upload" data-foto-id="foto-1">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la salida del comando systeminfo o de la ventana de msinfo32</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Rendimiento de CPU -->
+            <div class="seccion">
+                <h2>Parte 2 — Rendimiento de CPU (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte analizaras el rendimiento del procesador utilizando herramientas graficas y comandos de linea.</p>
+
+                    <h3>Paso 1: Administrador de tareas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Ctrl+Shift+Esc</strong> para abrir el Administrador de tareas.</li>
+                            <li>Ve a la pestana <strong>Rendimiento</strong> y selecciona <strong>CPU</strong>.</li>
+                            <li>Observa el uso de CPU en tiempo real, la velocidad y el numero de nucleos.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2: Comandos de CPU</h3>
+                    <p>Ejecuta los siguientes comandos en <strong>CMD</strong> (como Administrador):</p>
+                    <div class="code-block">typeperf "\Processor(_Total)\% Processor Time" -sc 5</div>
+
+                    <p>Y en <strong>PowerShell</strong> (como Administrador):</p>
+                    <div class="code-block">Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, MaxClockSpeed</div>
+                    <div class="code-block">Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 2 -MaxSamples 5</div>
+
+                    <h3>Paso 3: Identificar el proceso con mas uso de CPU</h3>
+                    <div class="code-block">tasklist /V /FO TABLE | sort /R</div>
+                    <div class="nota">
+                        <strong>Nota:</strong> En el Administrador de tareas, haz clic en la columna <strong>CPU</strong> para ordenar los procesos por consumo de CPU y localizar facilmente el que mas recursos consume.
+                    </div>
+
+                    <h3>Rellena la tabla con los datos obtenidos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Modelo de CPU</td>
+                            <td><input type="text" placeholder="Ej: Intel Core i5-10400"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de nucleos</td>
+                            <td><input type="text" placeholder="Ej: 6"></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad maxima (MHz)</td>
+                            <td><input type="text" placeholder="Ej: 2904"></td>
+                        </tr>
+                        <tr>
+                            <td>Uso actual de CPU (%)</td>
+                            <td><input type="text" placeholder="Ej: 12%"></td>
+                        </tr>
+                        <tr>
+                            <td>Proceso con mas uso de CPU</td>
+                            <td><input type="text" placeholder="Ej: svchost.exe (PID 1234)"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 2: Metricas de CPU</h3>
+                    <div class="foto-upload" data-foto-id="foto-2">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Administrador de tareas mostrando el rendimiento de CPU o de la salida de los comandos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Rendimiento de memoria RAM -->
+            <div class="seccion">
+                <h2>Parte 3 — Rendimiento de memoria RAM (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vas a analizar el uso y las caracteristicas de la memoria RAM del sistema.</p>
+
+                    <h3>Paso 1: Informacion de RAM desde CMD</h3>
+                    <p>Ejecuta el siguiente comando en <strong>CMD</strong> (como Administrador):</p>
+                    <div class="code-block">systeminfo | findstr /C:"Memoria"</div>
+
+                    <h3>Paso 2: Informacion y metricas de RAM desde PowerShell</h3>
+                    <p>Ejecuta en <strong>PowerShell</strong> (como Administrador):</p>
+                    <div class="code-block">Get-CimInstance Win32_PhysicalMemory | Select-Object @{n='GB';e={$_.Capacity/1GB}}, Speed, Manufacturer</div>
+                    <div class="code-block">Get-Counter '\Memory\Available MBytes'</div>
+                    <div class="code-block">Get-Counter '\Memory\% Committed Bytes In Use'</div>
+
+                    <h3>Paso 3: Administrador de tareas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de tareas</strong> (Ctrl+Shift+Esc).</li>
+                            <li>Ve a la pestana <strong>Rendimiento</strong> y selecciona <strong>Memoria</strong>.</li>
+                            <li>Observa la RAM total, en uso, disponible y la velocidad.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Rellena la tabla con los datos obtenidos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>RAM total</td>
+                            <td><input type="text" placeholder="Ej: 4096 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM disponible</td>
+                            <td><input type="text" placeholder="Ej: 2048 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM en uso (%)</td>
+                            <td><input type="text" placeholder="Ej: 55%"></td>
+                        </tr>
+                        <tr>
+                            <td>Velocidad de la RAM (MHz)</td>
+                            <td><input type="text" placeholder="Ej: 2400"></td>
+                        </tr>
+                        <tr>
+                            <td>Numero de modulos</td>
+                            <td><input type="text" placeholder="Ej: 1"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 3: Metricas de RAM</h3>
+                    <div class="foto-upload" data-foto-id="foto-3">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Administrador de tareas mostrando el rendimiento de memoria o de la salida de los comandos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Rendimiento de disco -->
+            <div class="seccion">
+                <h2>Parte 4 — Rendimiento de disco (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte analizaras el estado y rendimiento de los discos duros del sistema.</p>
+
+                    <h3>Paso 1: Informacion de disco desde CMD</h3>
+                    <p>Ejecuta el siguiente comando en <strong>CMD</strong> (como Administrador):</p>
+                    <div class="code-block">fsutil volume diskfree C:</div>
+
+                    <h3>Paso 2: Informacion de disco desde PowerShell</h3>
+                    <p>Ejecuta en <strong>PowerShell</strong> (como Administrador):</p>
+                    <div class="code-block">Get-PhysicalDisk | Select-Object FriendlyName, MediaType, BusType, @{n='GB';e={[math]::Round($_.Size/1GB,2)}}, HealthStatus</div>
+                    <div class="code-block">Get-Volume | Select-Object DriveLetter, FileSystem, @{n='TotalGB';e={[math]::Round($_.Size/1GB,2)}}, @{n='LibreGB';e={[math]::Round($_.SizeRemaining/1GB,2)}}</div>
+                    <div class="code-block">Get-Counter '\PhysicalDisk(_Total)\% Disk Time'</div>
+
+                    <h3>Paso 3: Administrador de tareas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de tareas</strong> (Ctrl+Shift+Esc).</li>
+                            <li>Ve a la pestana <strong>Rendimiento</strong> y selecciona <strong>Disco 0</strong>.</li>
+                            <li>Observa el tiempo de actividad, velocidad de lectura/escritura y capacidad.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Rellena la tabla con los datos obtenidos</h3>
+                    <table>
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Modelo del disco</td>
+                            <td><input type="text" placeholder="Ej: VBOX HARDDISK"></td>
+                        </tr>
+                        <tr>
+                            <td>Tamano total</td>
+                            <td><input type="text" placeholder="Ej: 50 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>Espacio libre</td>
+                            <td><input type="text" placeholder="Ej: 30 GB"></td>
+                        </tr>
+                        <tr>
+                            <td>% disco en uso (actividad)</td>
+                            <td><input type="text" placeholder="Ej: 5%"></td>
+                        </tr>
+                        <tr>
+                            <td>Estado SMART</td>
+                            <td><input type="text" placeholder="Ej: OK / Healthy"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 4: Metricas de disco</h3>
+                    <div class="foto-upload" data-foto-id="foto-4">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Administrador de tareas mostrando el rendimiento de disco o de la salida de los comandos</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Procesos y servicios -->
+            <div class="seccion">
+                <h2>Parte 5 — Procesos y servicios (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Ahora vas a analizar los procesos en ejecucion para identificar cuales consumen mas recursos del sistema.</p>
+
+                    <h3>Paso 1: Listar procesos desde CMD</h3>
+                    <p>Ejecuta los siguientes comandos en <strong>CMD</strong> (como Administrador):</p>
+                    <div class="code-block">tasklist /V</div>
+                    <div class="code-block">tasklist /SVC</div>
+
+                    <h3>Paso 2: Top 10 procesos por CPU desde PowerShell</h3>
+                    <p>Ejecuta en <strong>PowerShell</strong> (como Administrador):</p>
+                    <div class="code-block">Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name, Id, CPU, @{Name='Mem(MB)';Expression={[math]::Round($_.WorkingSet64/1MB,1)}}</div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> La columna <strong>CPU</strong> en PowerShell muestra el tiempo total de CPU en segundos que ha consumido cada proceso desde que se inicio, no el porcentaje actual. Para ver el porcentaje actual, consulta el Administrador de tareas.
+                    </div>
+
+                    <h3>Rellena la tabla con los 5 procesos que mas recursos consumen</h3>
+                    <table>
+                        <tr>
+                            <th>Nombre del proceso</th>
+                            <th>PID</th>
+                            <th>CPU (%)</th>
+                            <th>Memoria (MB)</th>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ej: svchost.exe"></td>
+                            <td><input type="text" placeholder="Ej: 1234"></td>
+                            <td><input type="text" placeholder="Ej: 5%"></td>
+                            <td><input type="text" placeholder="Ej: 120"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Proceso 2"></td>
+                            <td><input type="text" placeholder="PID"></td>
+                            <td><input type="text" placeholder="%"></td>
+                            <td><input type="text" placeholder="MB"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Proceso 3"></td>
+                            <td><input type="text" placeholder="PID"></td>
+                            <td><input type="text" placeholder="%"></td>
+                            <td><input type="text" placeholder="MB"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Proceso 4"></td>
+                            <td><input type="text" placeholder="PID"></td>
+                            <td><input type="text" placeholder="%"></td>
+                            <td><input type="text" placeholder="MB"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Proceso 5"></td>
+                            <td><input type="text" placeholder="PID"></td>
+                            <td><input type="text" placeholder="%"></td>
+                            <td><input type="text" placeholder="MB"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 5: Procesos en ejecucion</h3>
+                    <div class="foto-upload" data-foto-id="foto-5">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura de la salida de tasklist /V, del comando de PowerShell o del Administrador de tareas ordenado por CPU</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Prueba de estres y monitorizacion -->
+            <div class="seccion">
+                <h2>Parte 6 — Prueba de estres y monitorizacion (30 min)</h2>
+                <div class="seccion-body">
+                    <p>En esta parte vas a usar el Monitor de rendimiento (perfmon) para monitorizar el sistema y generar carga artificial para observar como reacciona.</p>
+
+                    <h3>Paso 1: Abrir el Monitor de rendimiento</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win+R</strong>, escribe <strong>perfmon</strong> y pulsa Enter.</li>
+                            <li>En el panel izquierdo, expande <strong>Herramientas de supervision</strong> y haz clic en <strong>Monitor de rendimiento</strong>.</li>
+                            <li>Haz clic en el boton <strong>+</strong> (verde) de la barra de herramientas para anadir contadores.</li>
+                            <li>Anade los siguientes contadores:
+                                <ul style="margin-left: 20px; margin-top: 4px; line-height: 1.8;">
+                                    <li><strong>Processor(_Total) > % Processor Time</strong> — Uso de CPU</li>
+                                    <li><strong>Memory > Available MBytes</strong> — RAM disponible</li>
+                                    <li><strong>PhysicalDisk(_Total) > % Disk Time</strong> — Actividad del disco</li>
+                                </ul>
+                            </li>
+                            <li>Observa los graficos durante 1 minuto en estado de reposo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Paso 2: Generar carga de CPU con PowerShell</h3>
+                    <p>Ejecuta el siguiente script en <strong>PowerShell</strong> para estresar la CPU durante 30 segundos:</p>
+                    <div class="code-block">$end = (Get-Date).AddSeconds(30)
+while ((Get-Date) -lt $end) {
+    [math]::Sqrt(12345.6789) | Out-Null
+}</div>
+                    <div class="nota">
+                        <strong>Nota:</strong> Este script realiza calculos matematicos continuos durante 30 segundos para generar carga en la CPU. Mientras se ejecuta, observa como cambian los graficos en el Monitor de rendimiento. Es completamente seguro y se detendra automaticamente.
+                    </div>
+
+                    <h3>Paso 3: Documentar metricas antes y despues</h3>
+                    <table>
+                        <tr>
+                            <th style="width:35%">Metrica</th>
+                            <th>Antes de la prueba (reposo)</th>
+                            <th>Durante la prueba (estres)</th>
+                        </tr>
+                        <tr>
+                            <td>Uso de CPU (%)</td>
+                            <td><input type="text" placeholder="Ej: 5%"></td>
+                            <td><input type="text" placeholder="Ej: 95%"></td>
+                        </tr>
+                        <tr>
+                            <td>RAM disponible (MB)</td>
+                            <td><input type="text" placeholder="Ej: 2048 MB"></td>
+                            <td><input type="text" placeholder="Ej: 1900 MB"></td>
+                        </tr>
+                        <tr>
+                            <td>Actividad del disco (%)</td>
+                            <td><input type="text" placeholder="Ej: 2%"></td>
+                            <td><input type="text" placeholder="Ej: 5%"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Captura 6: Grafico del Monitor de rendimiento durante la prueba de estres</h3>
+                    <div class="foto-upload" data-foto-id="foto-6">
+                        <button type="button" class="btn-remove" onclick="removePhoto(this)" title="Eliminar imagen">&times;</button>
+                        <div class="placeholder">
+                            <div class="icon">&#128247;</div>
+                            <p><strong>Pega</strong> una captura (Ctrl+V) o <strong>arrastra</strong> una imagen aqui</p>
+                            <p style="font-size:11px; color:#a0aec0; margin-top:4px;">Captura del Monitor de rendimiento (perfmon) mostrando los graficos durante o justo despues de la prueba de estres</p>
+                        </div>
+                        <img class="foto-preview" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 7: Preguntas de reflexion -->
+            <div class="seccion">
+                <h2>Parte 7 — Preguntas de reflexion (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Responde a las siguientes preguntas con tus propias palabras. Cada respuesta debe tener un <strong>minimo de 3 lineas</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>1. Que herramienta te ha parecido mas util para comprobar el rendimiento del sistema: el Administrador de tareas, el Monitor de rendimiento (perfmon) o los comandos de PowerShell? Justifica tu respuesta.</p>
+                        <textarea rows="4" placeholder="Compara las distintas herramientas que has utilizado, indica cual te ha resultado mas practica y explica por que..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. Si un usuario se queja de que su ordenador "va muy lento", que pasos seguirias para diagnosticar el problema? Que metricas comprobarias primero y por que?</p>
+                        <textarea rows="4" placeholder="Describe tu protocolo de diagnostico paso a paso, indicando que herramientas usarias y que valores buscarias..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. Observando los datos de tu maquina virtual, hay algun componente que sea un cuello de botella? Cual y por que? Si no lo hay, cual seria el primer componente que mejorarlas y por que?</p>
+                        <textarea rows="4" placeholder="Analiza los datos que has recogido durante la practica e identifica posibles cuellos de botella o puntos de mejora..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. En que situaciones recomendarias ampliar la RAM frente a cambiar el disco duro por un SSD? Pon ejemplos concretos de cada caso.</p>
+                        <textarea rows="4" placeholder="Explica escenarios reales donde cada mejora seria mas adecuada, con ejemplos de uso concretos..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Que diferencia hay entre monitorizar el rendimiento en tiempo real (como hace perfmon) y consultar informacion estatica del sistema (como hace systeminfo)? Cuando usarias cada una?</p>
+                        <textarea rows="4" placeholder="Explica las diferencias entre monitorizacion en tiempo real y consultas estaticas, y en que situaciones es mas util cada enfoque..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREGA -->
+            <div class="seccion">
+                <h2>Entrega de la practica</h2>
+                <div class="seccion-body">
+                    <h3>Capturas de pantalla requeridas</h3>
+                    <p>Comprueba que tienes todas las capturas necesarias:</p>
+                    <table>
+                        <tr>
+                            <th>Captura</th>
+                            <th>Descripcion</th>
+                            <th style="width:50px;">OK</th>
+                        </tr>
+                        <tr>
+                            <td>Captura 1</td>
+                            <td>Salida de systeminfo o ventana de msinfo32</td>
+                            <td><input type="checkbox" id="cap-1"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 2</td>
+                            <td>Metricas de CPU (Administrador de tareas o comandos)</td>
+                            <td><input type="checkbox" id="cap-2"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 3</td>
+                            <td>Metricas de RAM (Administrador de tareas o comandos)</td>
+                            <td><input type="checkbox" id="cap-3"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 4</td>
+                            <td>Metricas de disco (Administrador de tareas o comandos)</td>
+                            <td><input type="checkbox" id="cap-4"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 5</td>
+                            <td>Procesos en ejecucion (tasklist o PowerShell)</td>
+                            <td><input type="checkbox" id="cap-5"></td>
+                        </tr>
+                        <tr>
+                            <td>Captura 6</td>
+                            <td>Monitor de rendimiento durante la prueba de estres</td>
+                            <td><input type="checkbox" id="cap-6"></td>
+                        </tr>
+                    </table>
+
+                    <h3>Formato del mensaje en Discord</h3>
+                    <div class="nota">
+                        <strong>Nombre:</strong> [Tu nombre y apellidos]<br>
+                        <strong>Practica:</strong> Bloque 3, Practica 14 - Comprobacion del Rendimiento en Windows 10<br>
+                        [Adjuntar documento PDF y capturas de pantalla]
+                    </div>
+
+                    <!-- Evaluacion -->
+                    <div class="evaluacion">
+                        <h3>Criterios de evaluacion</h3>
+                        <table>
+                            <tr>
+                                <th>Criterio</th>
+                                <th style="width:120px">Puntuacion</th>
+                            </tr>
+                            <tr>
+                                <td>Informacion general del sistema (Parte 1)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de CPU (Parte 2)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de memoria RAM (Parte 3)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Rendimiento de disco (Parte 4)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Procesos y servicios (Parte 5)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Prueba de estres y monitorizacion (Parte 6)</td>
+                                <td>1.5 puntos</td>
+                            </tr>
+                            <tr>
+                                <td>Preguntas de reflexion (Parte 7)</td>
+                                <td>1.0 punto</td>
+                            </tr>
+                            <tr>
+                                <td>Capturas completas y claras (6 capturas)</td>
+                                <td>0.5 puntos</td>
+                            </tr>
+                            <tr style="font-weight:700; background:#c6f6d5">
+                                <td>Total</td>
+                                <td>10 puntos</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Penalizaciones</h3>
+                    <table>
+                        <tr>
+                            <th>Motivo</th>
+                            <th style="width:130px">Penalizacion</th>
+                        </tr>
+                        <tr>
+                            <td>Entrega fuera de plazo (sin justificacion)</td>
+                            <td>-2 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Capturas insuficientes (menos de 3 de las 6 requeridas)</td>
+                            <td>-1 punto</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas copiadas de Internet o de otro companero</td>
+                            <td>-3 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Tablas de datos incompletas (mas del 30% en blanco)</td>
+                            <td>-1.5 puntos</td>
+                        </tr>
+                        <tr>
+                            <td>Respuestas de una sola linea en preguntas que piden minimo 3 lineas</td>
+                            <td>-0.5 puntos por pregunta</td>
+                        </tr>
+                    </table>
+
+                    <div class="nota" style="margin-top: 14px;">
+                        <strong>Fecha limite:</strong> Indicada por el profesor en el canal de Discord.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de verificacion de entrega -->
+            <div class="seccion">
+                <h2>Lista de verificacion de entrega (firma del alumno)</h2>
+                <div class="seccion-body">
+                    <p>Antes de subir tu practica, confirma que has incluido todo:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin: 10px 0;">
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte1">
+                            <label for="verif-parte1">Parte 1: Informacion general del sistema documentada</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte2">
+                            <label for="verif-parte2">Parte 2: Rendimiento de CPU analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte3">
+                            <label for="verif-parte3">Parte 3: Rendimiento de memoria RAM analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte4">
+                            <label for="verif-parte4">Parte 4: Rendimiento de disco analizado y documentado</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte5">
+                            <label for="verif-parte5">Parte 5: Procesos y servicios analizados</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte6">
+                            <label for="verif-parte6">Parte 6: Prueba de estres realizada y documentada con perfmon</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-parte7">
+                            <label for="verif-parte7">Parte 7: 5 preguntas de reflexion respondidas (minimo 3 lineas cada una)</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-capturas">
+                            <label for="verif-capturas">6 capturas de pantalla incluidas</label>
+                        </div>
+                        <div class="check-group">
+                            <input type="checkbox" id="verif-pdf">
+                            <label for="verif-pdf">Documento en formato PDF</label>
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 16px;">
+                        <tr>
+                            <th style="width:40%">Dato</th>
+                            <th>Tu respuesta</th>
+                        </tr>
+                        <tr>
+                            <td>Nombre del alumno</td>
+                            <td><input type="text" id="firma-nombre" placeholder="Tu nombre y apellidos"></td>
+                        </tr>
+                        <tr>
+                            <td>Firma</td>
+                            <td><input type="text" id="firma-firma" placeholder="Escribe tu nombre como firma"></td>
+                        </tr>
+                        <tr>
+                            <td>Fecha de entrega</td>
+                            <td><input type="date" id="firma-fecha"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+
+        <!-- Botones de accion -->
+        <div class="botones no-print">
+            <button class="btn btn-secondary" onclick="guardarJSON()">Guardar borrador (.json)</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('cargar-json').click()">Cargar borrador (.json)</button>
+            <input type="file" id="cargar-json" accept=".json" style="display:none" onchange="cargarJSON(this)">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+
+        <div style="text-align:center; padding: 16px; font-size: 12px; color: #a0aec0;" class="no-print">
+            <p>Entrega esta practica en el canal <strong>#entrega-practicas</strong> del Discord del curso.</p>
+            <p>Formato del mensaje: <strong>Nombre:</strong> [tu nombre] | <strong>Practica:</strong> Bloque 3, Practica 14 - Comprobacion del Rendimiento en Windows 10</p>
+            <p style="margin-top:6px; font-style:italic;">Practica correspondiente al Bloque 3 - Diagnostico y Reparacion de Sistemas (Practica 14)</p>
+        </div>
+    </div>
+
+    <script>
+        const NOMBRE_PRACTICA = 'Practica 14: Rendimiento en Windows 10';
+        const PREFIJO_ARCHIVO = 'P14_Rendimiento_Windows';
+
+        // ====== FOTOS: pegar, arrastrar, redimensionar, eliminar ======
+
+        function resizeImage(dataUrl, maxSize, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = dataUrl;
+        }
+
+        function setPhoto(container, dataUrl) {
+            resizeImage(dataUrl, 800, function(resized) {
+                const preview = container.querySelector('.foto-preview');
+                preview.src = resized;
+                preview.style.display = 'block';
+                container.classList.add('has-image');
+            });
+        }
+
+        function removePhoto(btn) {
+            const container = btn.closest('.foto-upload');
+            const preview = container.querySelector('.foto-preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            container.classList.remove('has-image');
+        }
+
+        function getImageFromEvent(e) {
+            const items = e.clipboardData ? e.clipboardData.items : e.dataTransfer ? e.dataTransfer.items : [];
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) return item.getAsFile();
+            }
+            if (e.dataTransfer && e.dataTransfer.files) {
+                for (const file of e.dataTransfer.files) {
+                    if (file.type.indexOf('image') !== -1) return file;
+                }
+            }
+            return null;
+        }
+
+        function handleImageInput(container, file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) { setPhoto(container, ev.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        function initFotoUploads() {
+            document.querySelectorAll('.foto-upload').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.btn-remove')) return;
+                    if (container.classList.contains('has-image')) return;
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = 'image/*';
+                    input.onchange = function() { if (input.files[0]) handleImageInput(container, input.files[0]); };
+                    input.click();
+                });
+                container.addEventListener('dragover', function(e) { e.preventDefault(); container.classList.add('drag-over'); });
+                container.addEventListener('dragleave', function() { container.classList.remove('drag-over'); });
+                container.addEventListener('drop', function(e) {
+                    e.preventDefault(); container.classList.remove('drag-over');
+                    const file = getImageFromEvent(e);
+                    if (file) handleImageInput(container, file);
+                });
+            });
+            document.addEventListener('paste', function(e) {
+                const ae = document.activeElement;
+                if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
+                const file = getImageFromEvent(e);
+                if (!file) return;
+                e.preventDefault();
+                const empty = document.querySelector('.foto-upload:not(.has-image)');
+                if (empty) handleImageInput(empty, file);
+            });
+        }
+
+        // ====== NOTIFICACION ======
+
+        function mostrarMsg(texto, color) {
+            const msg = document.createElement('div');
+            msg.textContent = texto;
+            msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:' + color + ';color:white;padding:12px 24px;border-radius:6px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // ====== GUARDAR / CARGAR BORRADOR (archivo JSON) ======
+
+        function guardarJSON() {
+            const datos = {
+                practica: NOMBRE_PRACTICA,
+                fecha_guardado: new Date().toLocaleString('es-ES'),
+                alumno: document.getElementById('alumno-nombre')?.value || '',
+                campos: {},
+                checks: {},
+                fotos: {}
+            };
+            document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                datos.campos['campo_' + i] = el.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                datos.checks['check_' + i] = el.checked;
+            });
+            document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                const preview = el.querySelector('.foto-preview');
+                if (preview && preview.src && preview.style.display !== 'none' && preview.src.startsWith('data:')) {
+                    datos.fotos['foto_' + i] = preview.src;
+                }
+            });
+
+            const json = JSON.stringify(datos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            let nombre = datos.alumno.trim().replace(/\s+/g, '_') || 'sin_nombre';
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'Borrador_' + PREFIJO_ARCHIVO + '_' + nombre + '.json';
+            enlace.click();
+            URL.revokeObjectURL(url);
+            mostrarMsg('Borrador descargado como archivo JSON', '#276749');
+        }
+
+        function cargarJSON(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.campos) {
+                        mostrarMsg('El archivo no es un borrador valido', '#c53030');
+                        return;
+                    }
+                    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach((el, i) => {
+                        if (datos.campos['campo_' + i] !== undefined) el.value = datos.campos['campo_' + i];
+                    });
+                    document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+                        if (datos.checks && datos.checks['check_' + i] !== undefined) el.checked = datos.checks['check_' + i];
+                    });
+                    if (datos.fotos) {
+                        document.querySelectorAll('.foto-upload').forEach((el, i) => {
+                            if (datos.fotos['foto_' + i]) {
+                                const preview = el.querySelector('.foto-preview');
+                                preview.src = datos.fotos['foto_' + i];
+                                preview.style.display = 'block';
+                                el.classList.add('has-image');
+                            }
+                        });
+                    }
+                    mostrarMsg('Borrador cargado: ' + (datos.alumno || 'sin nombre') + ' (' + (datos.fecha_guardado || '') + ')', '#276749');
+                } catch (err) {
+                    mostrarMsg('Error al leer el archivo JSON', '#c53030');
+                }
+            };
+            reader.readAsText(input.files[0]);
+            input.value = '';
+        }
+
+        // ====== INICIO ======
+
+        window.addEventListener('load', function() {
+            initFotoUploads();
+            const fechaInput = document.getElementById('alumno-fecha');
+            if (fechaInput && !fechaInput.value) { fechaInput.valueAsDate = new Date(); }
+        });
+    </script>
+</body>
+</html>
