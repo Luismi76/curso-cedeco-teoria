@@ -1106,43 +1106,77 @@ ls -lt /mnt/backup/diario/</pre>
                 <div class="seccion-body">
                     <p><strong>Duplicati</strong> es una herramienta de backup de codigo abierto con interfaz web. Permite crear copias de seguridad incrementales con cifrado AES-256, programar backups y restaurar archivos facilmente desde un navegador.</p>
 
-                    <h3>5.1 Instalar Duplicati</h3>
+                    <h3>5.1 Instalar Duplicati (version estable actual)</h3>
+                    <p>Duplicati se distribuye como paquete <code>.deb</code> autocontenido (ya no requiere instalar Mono por separado). La version estable actual es la <strong>2.2.0.1</strong> (noviembre de 2025). Si cuando realices la practica existe una version mas reciente, sustituye el nombre del fichero por la que aparezca en <a href="https://duplicati.com/download" target="_blank" style="color: var(--azul-claro);">duplicati.com/download</a>.</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Descarga el paquete <code>.deb</code> desde la web oficial de Duplicati.</li>
-                            <li>Instala las dependencias necesarias.</li>
-                            <li>Instala el paquete descargado.</li>
+                            <li>Actualizar los indices de paquetes y herramientas basicas.</li>
+                            <li>Descargar el paquete <code>.deb</code> oficial.</li>
+                            <li>Instalar con <code>apt</code> (resuelve dependencias automaticamente).</li>
+                            <li>Arrancar Duplicati como servicio del sistema.</li>
                         </ol>
                     </div>
-                    <pre class="codigo-bloque"># Instalar dependencias necesarias
+                    <pre class="codigo-bloque"># Actualizar paquetes y herramientas basicas
 sudo apt update
-sudo apt install -y apt-transport-https nano wget
+sudo apt install -y wget
 
-# Descargar Duplicati (version mas reciente .deb)
-# Visita https://www.duplicati.com/download para obtener el enlace actualizado
-wget https://updates.duplicati.com/beta/duplicati.deb
+# Descargar Duplicati 2.2.0.1 estable (linux-x64-gui)
+cd /tmp
+wget https://updates.duplicati.com/stable/duplicati-2.2.0.1_stable_2025-11-09-linux-x64-gui.deb
 
-# Instalar el paquete
-sudo dpkg -i duplicati.deb
+# Instalar (apt resuelve dependencias por si solo)
+sudo apt install -y ./duplicati-2.2.0.1_stable_2025-11-09-linux-x64-gui.deb
 
-# Si hay errores de dependencias, ejecuta:
-sudo apt -f install -y
+# Activar el servicio para que arranque con el sistema
+sudo systemctl enable --now duplicati
 
-# Iniciar el servicio de Duplicati
-sudo systemctl enable duplicati
-sudo systemctl start duplicati</pre>
+# Comprobar que esta en marcha (debe decir "active (running)")
+sudo systemctl status duplicati</pre>
 
                     <div class="nota">
-                        <strong>Nota:</strong> Si la URL de descarga no funciona, visita <a href="https://www.duplicati.com/download" target="_blank" style="color: var(--azul-claro);">duplicati.com/download</a> y descarga la version <code>.deb</code> mas reciente para Ubuntu/Debian.
+                        <strong>Nota:</strong> si el enlace no responde, visita <a href="https://duplicati.com/download" target="_blank" style="color: var(--azul-claro);">duplicati.com/download</a>, copia la URL de la version Linux x64 (.deb) y sustituyela en el <code>wget</code>.
                     </div>
 
-                    <h3>5.2 Acceder a la interfaz web</h3>
+                    <h3>5.2 Primer acceso a la interfaz web (obtener el "signin link")</h3>
+                    <p>Desde la version 2.1, cuando Duplicati arranca por primera vez como servicio <strong>genera una contrasena aleatoria</strong> para proteger el panel de administracion. Como no la conoces, no puedes entrar con usuario y contrasena: hay que usar un <strong>enlace de inicio de sesion temporal (signin link)</strong> que el servicio imprime en sus logs.</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Abre el navegador web de la VM.</li>
-                            <li>Navega a <strong>http://localhost:8200</strong>.</li>
-                            <li>Deberia aparecer la interfaz de administracion de Duplicati.</li>
+                            <li>Abre el navegador de la VM y ve a <strong>http://localhost:8200</strong>. Veras una pantalla pidiendo contrasena.</li>
+                            <li>Abre una terminal y obten el signin link desde el log del servicio:</li>
                         </ol>
+                    </div>
+                    <pre class="codigo-bloque"># Ver el log de Duplicati y buscar el enlace de acceso
+sudo journalctl -u duplicati | grep -i "signin\|sign-in\|token" | tail -5
+
+# Si no ves nada, muestra el log completo desde el ultimo arranque
+sudo journalctl -u duplicati -b --no-pager | tail -40</pre>
+
+                    <div class="pasos">
+                        <ol start="3">
+                            <li>Localiza una linea con una URL del tipo <code>http://localhost:8200/signin.html?token=...</code>. <strong>Copiala entera</strong> (incluido el token, que es muy largo).</li>
+                            <li>Pegala en el navegador y pulsa Intro. Entraras directamente al panel sin que te pida contrasena.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> el signin link caduca en minutos y solo sirve una vez. Si expira, reinicia el servicio (<code>sudo systemctl restart duplicati</code>) y vuelve a consultar el log.
+                    </div>
+
+                    <h3>5.2 bis — Fijar la contrasena del panel web</h3>
+                    <p>Para no depender del signin link cada vez, establece una contrasena fija para la interfaz:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Una vez dentro del panel (tras usar el signin link), pulsa el icono de <strong>ajustes</strong> (arriba a la derecha) &rarr; <strong>Settings</strong> (Configuracion).</li>
+                            <li>Busca la seccion <strong>"Access to the user interface"</strong> (Acceso a la interfaz).</li>
+                            <li>Activa <strong>"Password protected"</strong> (Proteger con contrasena) y escribe una contrasena robusta. Confirmala.</li>
+                            <li>Pulsa <strong>"OK"</strong> para guardar. A partir de ahora, al entrar en <code>http://localhost:8200</code> te pedira esa contrasena.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> esta contrasena protege <strong>solo el acceso al panel de administracion</strong>. Es distinta de la <em>frase de contrasena</em> (passphrase) que cifra el contenido de cada backup — esa se configura en el paso 1 del asistente (seccion 5.3).
                     </div>
 
                     <h3>5.3 Crear un trabajo de backup</h3>
