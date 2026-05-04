@@ -866,6 +866,32 @@ sudo systemctl restart nmbd
 # Verificar que estan activos
 sudo systemctl status smbd</pre>
 
+                    <h3>2.X Creacion de usuario Samba (obligatorio)</h3>
+<pre class="codigo-bloque"># Crear usuario en Linux si no existe
+sudo adduser usuario
+
+# Crear usuario Samba
+sudo smbpasswd -a usuario
+sudo smbpasswd -e usuario</pre>
+
+                    <h3>2.X Diagnostico interno con smbclient</h3>
+<pre class="codigo-bloque"># Listar recursos
+smbclient -L localhost -U usuario
+
+# Acceso real
+smbclient //localhost/Compartida -U usuario
+ls</pre>
+
+                    <div class="aviso">
+<strong>Errores tipicos:</strong>
+<ul>
+<li>Access denied → usuario Samba no creado</li>
+<li>No conecta → smbd no iniciado</li>
+<li>No aparece recurso → error en smb.conf</li>
+<li>Funciona a veces → uso incorrecto de guest</li>
+</ul>
+</div>
+
                     <h3>2.5 Acceder desde Windows</h3>
                     <div class="pasos">
                         <ol>
