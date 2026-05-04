@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Guía de estudio - UF0853</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --ac: #2b6cb0;
+            --verde: #276749;
+            --naranja: #c05621;
+            --rojo: #c53030;
+            --morado: #553c9a;
+            --teal: #234e52;
+            --rosa: #b83280;
+            --ocre: #975a16;
+            --indigo: #434190;
+            --gb: #e2e8f0;
+            --tx: #2d3748;
+            --bg: #f7fafc;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+
+        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #63b3ed, #4299e1, #3182ce); z-index: 200; transition: width .1s; width: 0; }
+
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
+        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        #btn-idx:active { background: rgba(255,255,255,.15); }
+        .back-home { color: #fff; text-decoration: none; font-size: 18px; padding: 4px 8px; opacity: .85; }
+        .back-home:active { opacity: 1; }
+
+        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
+        .drawer-bg.show { display: block; opacity: 1; }
+        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 70vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
+        .drawer.show { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
+        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
+        .drawer a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--tx); text-decoration: none; font-size: 15px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+        .drawer a:active { background: #ebf8ff; }
+        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
+
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--verde) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 24px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero::before { content: ''; position: absolute; bottom: -40px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,.04); border-radius: 50%; }
+        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 14px; position: relative; }
+        .hero .meta { font-size: 13px; opacity: .8; line-height: 1.6; position: relative; }
+        .hero .meta strong { color: #fff; opacity: 1; }
+
+        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
+        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .topic-header:active { background: #f7fafc; }
+        .topic-num { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); }
+        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
+        .topic.open .topic-arrow { transform: rotate(180deg); }
+        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .topic.open .topic-body { max-height: none; }
+        .topic-content { padding: 0 18px 20px; }
+
+        .c1 { background: var(--rojo); }
+        .c2 { background: var(--naranja); }
+        .c3 { background: var(--ac); }
+        .c4 { background: var(--morado); }
+        .c5 { background: var(--verde); }
+        .c6 { background: var(--teal); }
+        .c7 { background: var(--rosa); }
+        .c8 { background: var(--ocre); }
+        .c9 { background: var(--indigo); }
+        .c10 { background: #718096; }
+
+        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
+        .topic-content h3:first-child { margin-top: 4px; }
+        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
+        .topic-content p { margin: 6px 0; font-size: 15px; }
+        .topic-content strong { color: #1a202c; }
+
+        .table-wrap { overflow-x: auto; margin: 12px -18px; padding: 0 18px; -webkit-overflow-scrolling: touch; }
+        .topic-content table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 400px; }
+        .topic-content th { background: #edf2f7; color: var(--azul); padding: 10px 10px; text-align: left; font-size: 12px; font-weight: 700; border: 1px solid var(--gb); white-space: nowrap; }
+        .topic-content td { padding: 8px 10px; border: 1px solid var(--gb); vertical-align: top; }
+        .topic-content tr:nth-child(even) { background: #f7fafc; }
+
+        .topic-content ul, .topic-content ol { margin: 8px 0 8px 20px; font-size: 15px; }
+        .topic-content li { margin: 6px 0; }
+        .topic-content li li { margin: 3px 0; font-size: 14px; }
+        .topic-content ul ul { margin: 4px 0 4px 16px; }
+
+        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+        .info p { margin: 3px 0; }
+        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
+        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
+        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
+        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
+        .info-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .info-blue .info-title { color: var(--ac); }
+        .info-yellow .info-title { color: #975a16; }
+        .info-red .info-title { color: var(--rojo); }
+        .info-green .info-title { color: var(--verde); }
+
+        code, .cmd { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+
+        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--verde); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
+        #bt:active { background: #22543d; }
+
+        @media (min-width: 768px) {
+            .container { padding: 24px 24px 80px; }
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 28px; }
+            .topic-content { padding: 0 24px 24px; }
+            .topic-header { padding: 18px 24px; }
+            .table-wrap { margin: 12px 0; padding: 0; }
+        }
+
+        @media print {
+            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
+            .topic-body { max-height: none !important; }
+            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <div class="topnav">
+        <a href="index.html" class="back-home" aria-label="Inicio">&#8592;</a>
+        <h1>UF0853 - Guía de estudio</h1>
+        <span class="badge">Examen final</span>
+        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
+    </div>
+
+    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-handle"></div>
+        <h2>Índice de temas</h2>
+        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Gestión de archivos</a>
+        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Estructura de directorios</a>
+        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. Permisos, cuotas y cifrado</a>
+        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. Accesibilidad y dispositivos</a>
+        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. Pantalla, energía y red</a>
+        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. Usuarios y grupos</a>
+        <a href="#s7" onclick="toggleDrawer()"><span class="dot c7"></span>7. Mantenimiento y procesos</a>
+        <a href="#s8" onclick="toggleDrawer()"><span class="dot c8"></span>8. Copias de seguridad</a>
+        <a href="#consejos" onclick="toggleDrawer()"><span class="dot c10"></span>Consejos para el examen</a>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Guía de estudio<br>Examen Final UF0853</h1>
+            <div class="meta">
+                <strong>Certificado:</strong> IFCT0309 - Montaje y Reparación<br>
+                <strong>Módulo:</strong> MF0219_2<br>
+                <strong>UF:</strong> UF0853 - Explotación de las funcionalidades del sistema<br>
+                <strong>Examen:</strong> Sesiones 1 a 9 | 20 preguntas tipo test
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 1 ==================== -->
+        <div class="topic open" id="s1">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">1</div>
+                <div class="topic-title">Gestión de archivos en Windows y Linux</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Conceptos básicos</h3>
+                    <ul>
+                        <li><strong>Archivo:</strong> contenedor de datos con un nombre y una extensión.</li>
+                        <li><strong>Carpeta o directorio:</strong> agrupa archivos y otras carpetas.</li>
+                        <li><strong>Ruta:</strong> la dirección completa del archivo en el disco.
+                            <ul>
+                                <li>Windows: <code>C:\Users\Juan\informe.docx</code></li>
+                                <li>Linux: <code>/home/juan/informe.txt</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>Extensión:</strong> las letras tras el último punto. Le dicen al SO con qué programa abrir el archivo (<code>.docx</code>, <code>.jpg</code>, <code>.mp3</code>...).</li>
+                    </ul>
+
+                    <h3>Tipos de ruta</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Definición</th><th>Ejemplo Windows</th><th>Ejemplo Linux</th></tr>
+                        <tr><td><strong>Absoluta</strong></td><td>Desde la raíz</td><td><code>C:\Users\Juan\foto.jpg</code></td><td><code>/home/juan/foto.jpg</code></td></tr>
+                        <tr><td><strong>Relativa</strong></td><td>Desde donde estás</td><td><code>..\foto.jpg</code></td><td><code>./foto.jpg</code></td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Operaciones básicas en CMD y en Bash</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Acción</th><th>Windows (CMD)</th><th>Linux (Bash)</th></tr>
+                        <tr><td>Listar (con detalles)</td><td><code>dir</code></td><td><code>ls -la</code></td></tr>
+                        <tr><td>Cambiar carpeta</td><td><code>cd carpeta</code></td><td><code>cd carpeta</code></td></tr>
+                        <tr><td>Subir un nivel</td><td><code>cd ..</code></td><td><code>cd ..</code></td></tr>
+                        <tr><td>Crear carpeta</td><td><code>mkdir test</code></td><td><code>mkdir test</code></td></tr>
+                        <tr><td>Copiar</td><td><code>copy a.txt b.txt</code></td><td><code>cp a.txt b.txt</code></td></tr>
+                        <tr><td>Mover / renombrar</td><td><code>move</code> / <code>ren</code></td><td><code>mv</code></td></tr>
+                        <tr><td>Borrar</td><td><code>del archivo</code></td><td><code>rm archivo</code></td></tr>
+                        <tr><td>Borrar carpeta vacía</td><td><code>rmdir carpeta</code></td><td><code>rmdir carpeta</code></td></tr>
+                        <tr><td>Borrar carpeta llena</td><td><code>rmdir /S</code></td><td><code>rm -r carpeta</code></td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Archivos ocultos</h3>
+                    <ul>
+                        <li><strong>Windows:</strong> atributo «Oculto» (clic derecho → Propiedades → Oculto).</li>
+                        <li><strong>Linux:</strong> el nombre empieza por <strong>punto</strong> (<code>.bashrc</code>, <code>.config</code>). Para verlos: <code>ls -a</code>.</li>
+                    </ul>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Para el examen</div>
+                        <p>«¿Qué hace que un archivo sea oculto en Linux?» → empezar por <strong>punto</strong>. «¿Cómo se listan los archivos ocultos?» → <code>ls -a</code> (o <code>ls -la</code> con detalles). Caen seguro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 2 ==================== -->
+        <div class="topic" id="s2">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c2">2</div>
+                <div class="topic-title">Estructura de directorios y sistemas de archivos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Estructura típica en Windows</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Carpeta</th><th>Para qué</th></tr>
+                        <tr><td><code>C:\Windows</code></td><td>Archivos del sistema operativo. <strong>No tocar.</strong></td></tr>
+                        <tr><td><code>C:\Program Files</code></td><td>Programas instalados (versión de 64 bits).</td></tr>
+                        <tr><td><code>C:\Program Files (x86)</code></td><td>Programas de 32 bits.</td></tr>
+                        <tr><td><code>C:\Users\&lt;usuario&gt;</code></td><td>Carpeta personal del usuario (Documentos, Escritorio, Descargas...).</td></tr>
+                        <tr><td><code>C:\ProgramData</code></td><td>Datos compartidos por aplicaciones.</td></tr>
+                        <tr><td><code>C:\Temp</code></td><td>Archivos temporales.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Estructura estándar en Linux (FHS)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Carpeta</th><th>Contenido</th></tr>
+                        <tr><td><code>/</code></td><td>La raíz: cuelga todo de aquí.</td></tr>
+                        <tr><td><code>/home</code></td><td>Carpetas personales (<code>/home/juan</code>).</td></tr>
+                        <tr><td><code>/etc</code></td><td>Archivos de configuración del sistema.</td></tr>
+                        <tr><td><code>/bin</code> y <code>/usr/bin</code></td><td>Ejecutables (comandos).</td></tr>
+                        <tr><td><code>/var</code></td><td>Datos variables: logs, colas de impresión...</td></tr>
+                        <tr><td><code>/tmp</code></td><td>Temporales (se borran al reiniciar).</td></tr>
+                        <tr><td><code>/dev</code></td><td>Dispositivos (cada hardware se ve como un archivo).</td></tr>
+                        <tr><td><code>/mnt</code> y <code>/media</code></td><td>Puntos de montaje (USB, particiones extra...).</td></tr>
+                        <tr><td><code>/root</code></td><td>Carpeta personal del usuario administrador (root).</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Sistemas de archivos típicos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>SF</th><th>Plataforma</th><th>Comentario</th></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Windows</td><td>Permisos, cifrado, journaling. C: por defecto.</td></tr>
+                        <tr><td><strong>FAT32</strong></td><td>USB / SD</td><td>Compatible con todo. Archivo máx. 4 GB.</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>USB grandes</td><td>FAT32 sin límite de 4 GB. Compatible Win/Mac.</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>El estándar en Ubuntu / Debian.</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Equivalencia clave</div>
+                        <p><code>C:\Users\&lt;nombre&gt;</code> en Windows ≈ <code>/home/&lt;nombre&gt;</code> en Linux. Es donde tienes tus datos personales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 3 ==================== -->
+        <div class="topic" id="s3">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">3</div>
+                <div class="topic-title">Permisos, cuotas y cifrado</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Permisos NTFS (Windows)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Permiso</th><th>Qué permite</th></tr>
+                        <tr><td>Lectura</td><td>Ver el contenido</td></tr>
+                        <tr><td>Escritura</td><td>Modificar contenido</td></tr>
+                        <tr><td>Lectura y ejecución</td><td>Leer y ejecutar archivos</td></tr>
+                        <tr><td>Modificar</td><td>Lectura + escritura + borrado</td></tr>
+                        <tr><td><strong>Control total</strong></td><td>Todo, incluido cambiar permisos</td></tr>
+                    </table>
+                    </div>
+                    <p>Se asignan a usuarios o grupos desde clic derecho → <strong>Propiedades → Seguridad</strong>.</p>
+
+                    <h3>Permisos en Linux</h3>
+                    <p>Cada archivo tiene 3 permisos para 3 niveles de usuario:</p>
+                    <div class="diagram">
+                        <svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg" style="max-width:340px">
+                            <rect x="0" y="0" width="360" height="130" rx="10" fill="#f0fff4" stroke="#9ae6b4" stroke-width="1"/>
+                            <text x="180" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#276749">EJEMPLO: -rwxr-xr--</text>
+                            <text x="40" y="55" font-size="22" font-family="monospace" fill="#1a202c">-</text>
+                            <text x="60" y="55" font-size="22" font-family="monospace" fill="#c53030">rwx</text>
+                            <text x="115" y="55" font-size="22" font-family="monospace" fill="#d69e2e">r-x</text>
+                            <text x="170" y="55" font-size="22" font-family="monospace" fill="#2b6cb0">r--</text>
+                            <text x="40" y="80" font-size="9" fill="#718096">tipo</text>
+                            <text x="78" y="80" text-anchor="middle" font-size="9" fill="#c53030" font-weight="600">propietario</text>
+                            <text x="133" y="80" text-anchor="middle" font-size="9" fill="#d69e2e" font-weight="600">grupo</text>
+                            <text x="188" y="80" text-anchor="middle" font-size="9" fill="#2b6cb0" font-weight="600">otros</text>
+                            <text x="40" y="105" font-size="9.5" fill="#4a5568">r=4 (lectura) &#160; w=2 (escritura) &#160; x=1 (ejecución)</text>
+                            <text x="40" y="120" font-size="9.5" fill="#4a5568">rwxr-xr-- = 754 (en notación octal)</text>
+                        </svg>
+                    </div>
+
+                    <ul>
+                        <li><strong>Comando para cambiar permisos:</strong> <code>chmod 755 archivo</code> o <code>chmod u+x archivo</code>.</li>
+                        <li><strong>Comando para cambiar propietario:</strong> <code>chown usuario:grupo archivo</code>.</li>
+                        <li><strong>El primer carácter</strong> indica el tipo: <code>-</code> archivo, <code>d</code> directorio, <code>l</code> enlace simbólico.</li>
+                    </ul>
+
+                    <h3>Cuotas de disco</h3>
+                    <p>Son <strong>límites de espacio</strong> que el SO asigna a cada usuario o grupo. Sirven para que un solo usuario no pueda ocupar todo el disco. Se gestionan en Windows desde <em>Propiedades del disco → Cuota</em>; en Linux con <code>quota</code>, <code>edquota</code>.</p>
+
+                    <h3>Cifrado de datos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Plataforma</th><th>Para qué</th></tr>
+                        <tr><td><strong>BitLocker</strong></td><td>Windows Pro/Enterprise</td><td>Cifra unidades completas (C:, USB...)</td></tr>
+                        <tr><td>EFS</td><td>Windows</td><td>Cifra archivos o carpetas concretas</td></tr>
+                        <tr><td><strong>LUKS</strong></td><td>Linux</td><td>Cifra particiones enteras</td></tr>
+                        <tr><td>VeraCrypt</td><td>Multiplataforma</td><td>Cifra contenedores de archivos</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-red">
+                        <div class="info-title">Pregunta típica</div>
+                        <p>«BitLocker sirve para...»: <strong>cifrar unidades completas</strong>, para proteger los datos si te roban el portátil. No es un antivirus ni una copia de seguridad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 4 ==================== -->
+        <div class="topic" id="s4">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c4">4</div>
+                <div class="topic-title">Accesibilidad y configuración de dispositivos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Accesibilidad en Windows</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Para qué</th></tr>
+                        <tr><td><strong>Narrador</strong></td><td>Lee en voz alta lo que aparece en pantalla.</td></tr>
+                        <tr><td><strong>Lupa</strong></td><td>Amplía partes de la pantalla.</td></tr>
+                        <tr><td>Alto contraste</td><td>Combinaciones de colores para baja visión.</td></tr>
+                        <tr><td>Teclado en pantalla</td><td>Para dificultades motoras o pantalla táctil.</td></tr>
+                        <tr><td>Reconocimiento de voz</td><td>Controlar el PC por voz.</td></tr>
+                        <tr><td>Subtítulos</td><td>Para personas con problemas de audición.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Accesibilidad en Ubuntu / GNOME</h3>
+                    <p>Configuración → Accesibilidad. Incluye lector de pantalla (Orca), tecla pegajosa, lupa, alto contraste...</p>
+
+                    <h3>Drivers (controladores) de dispositivo</h3>
+                    <ul>
+                        <li>Un <strong>driver</strong> es un programa que permite al SO comunicarse con un dispositivo concreto (impresora, GPU, webcam...).</li>
+                        <li>Sin driver, el SO no sabe «hablar» con el hardware.</li>
+                        <li>Windows lo gestiona desde el <strong>Administrador de dispositivos</strong> (<code>devmgmt.msc</code>).</li>
+                        <li>Linux suele incluirlos en el kernel o como módulos. Para drivers privativos (Nvidia): <em>Software y actualizaciones → Controladores adicionales</em>.</li>
+                    </ul>
+
+                    <h3>Plug and Play (PnP)</h3>
+                    <p>El PC detecta el dispositivo automáticamente al conectarlo y carga el driver adecuado si lo tiene. Casi todo lo USB es PnP.</p>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Recuerda</div>
+                        <p>El <strong>Administrador de dispositivos</strong> en Windows muestra todo el hardware del PC y avisa con un signo de admiración (⚠) si falta algún driver.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 5 ==================== -->
+        <div class="topic" id="s5">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">5</div>
+                <div class="topic-title">Pantalla, energía y red</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Pantalla</h3>
+                    <ul>
+                        <li><strong>Resolución:</strong> número de píxeles (1920×1080 = Full HD, 3840×2160 = 4K).</li>
+                        <li><strong>Frecuencia de actualización:</strong> Hz. 60 Hz para uso normal, 144 Hz+ para juegos.</li>
+                        <li><strong>Escalado:</strong> aumenta el tamaño de letras e iconos sin bajar la resolución (útil en pantallas pequeñas con resolución alta).</li>
+                        <li><strong>Modo nocturno / luz cálida:</strong> reduce la luz azul para descansar la vista.</li>
+                    </ul>
+
+                    <h3>Energía</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Plan / modo</th><th>Para qué</th></tr>
+                        <tr><td><strong>Equilibrado</strong></td><td>Lo normal. Rendimiento medio, ahorro medio.</td></tr>
+                        <tr><td><strong>Ahorro de energía</strong></td><td>Baja brillo, frena CPU. Ideal con batería.</td></tr>
+                        <tr><td><strong>Alto rendimiento</strong></td><td>CPU al máximo, ventiladores al máximo.</td></tr>
+                        <tr><td>Suspender</td><td>El PC se duerme: gasta poco, despierta rápido.</td></tr>
+                        <tr><td>Hibernar</td><td>Guarda la sesión en disco y se apaga del todo.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Red: lo básico</h3>
+                    <ul>
+                        <li><strong>Dirección IP:</strong> identifica al equipo en la red. Ejemplo: <code>192.168.1.45</code>.</li>
+                        <li><strong>Máscara de subred:</strong> divide la IP en parte de red y parte de host. Ejemplo: <code>255.255.255.0</code>.</li>
+                        <li><strong>Puerta de enlace (gateway):</strong> el router. Por dónde sale el tráfico hacia internet.</li>
+                        <li><strong>DNS:</strong> traduce nombres (<code>google.com</code>) a IPs.</li>
+                        <li><strong>DHCP:</strong> protocolo por el que el router asigna IP dinámica automáticamente al conectarte.</li>
+                        <li><strong>MAC:</strong> identificador físico de la tarjeta de red. No cambia con la red.</li>
+                    </ul>
+
+                    <h3>IP estática vs dinámica</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Cómo se asigna</th><th>Cuándo usarla</th></tr>
+                        <tr><td><strong>Dinámica</strong></td><td>Automática (DHCP)</td><td>Equipos normales en oficina o casa</td></tr>
+                        <tr><td><strong>Estática</strong></td><td>Manual</td><td>Servidores, impresoras de red, NAS</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Comandos útiles</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Acción</th><th>Windows</th><th>Linux</th></tr>
+                        <tr><td>Ver IP</td><td><code>ipconfig</code></td><td><code>ip a</code></td></tr>
+                        <tr><td>Probar conectividad</td><td><code>ping host</code></td><td><code>ping host</code></td></tr>
+                        <tr><td>Trazar ruta</td><td><code>tracert</code></td><td><code>traceroute</code></td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>DHCP</strong> = asignación <strong>automática</strong> de IP. <strong>DNS</strong> = traduce nombres a IPs. No los confundas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 6 ==================== -->
+        <div class="topic" id="s6">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c6">6</div>
+                <div class="topic-title">Usuarios y grupos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Tipos de cuenta en Windows</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Cuenta</th><th>Permisos</th></tr>
+                        <tr><td><strong>Administrador</strong></td><td>Total: instala programas, cambia configuración del sistema, crea usuarios.</td></tr>
+                        <tr><td><strong>Estándar</strong></td><td>Limitado: usa el sistema, pero no puede instalar nada que afecte a todos los usuarios.</td></tr>
+                        <tr><td>Invitado</td><td>Muy limitada (deshabilitada por defecto en Windows 10/11).</td></tr>
+                        <tr><td>Cuenta Microsoft</td><td>Cuenta online vinculada a OneDrive, Office, etc.</td></tr>
+                        <tr><td>Cuenta local</td><td>Solo en el equipo, sin nube.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Usuarios en Linux</h3>
+                    <ul>
+                        <li><strong>root:</strong> el administrador. UID = 0. Lo puede todo.</li>
+                        <li><strong>Usuarios normales:</strong> UID ≥ 1000.</li>
+                        <li><strong>Cuentas de sistema:</strong> para servicios (no se usan para login).</li>
+                        <li>Archivos clave: <code>/etc/passwd</code> (cuentas), <code>/etc/shadow</code> (contraseñas), <code>/etc/group</code> (grupos).</li>
+                    </ul>
+
+                    <h3>Comandos de Linux</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Comando</th><th>Para qué</th></tr>
+                        <tr><td><code>sudo</code></td><td>Ejecutar un comando con privilegios de root.</td></tr>
+                        <tr><td><code>adduser nombre</code></td><td>Crear un usuario.</td></tr>
+                        <tr><td><code>passwd nombre</code></td><td>Cambiar la contraseña.</td></tr>
+                        <tr><td><code>usermod -aG grupo usuario</code></td><td>Añadir un usuario a un grupo.</td></tr>
+                        <tr><td><code>id</code> / <code>whoami</code></td><td>Ver qué usuario eres y a qué grupos perteneces.</td></tr>
+                        <tr><td><code>groups</code></td><td>Listar los grupos del usuario actual.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Grupos</h3>
+                    <p>Un <strong>grupo</strong> es un conjunto de usuarios que comparten permisos. Es más fácil dar permisos a un grupo que a 50 usuarios uno por uno. Ejemplo en Linux: el grupo <code>sudo</code> permite usar <code>sudo</code>; el grupo <code>video</code> da acceso a la cámara.</p>
+
+                    <div class="info info-red">
+                        <div class="info-title">Concepto clave</div>
+                        <p>«Para instalar un programa en Windows, ¿qué cuenta hace falta?» → <strong>Administrador</strong>. Las cuentas estándar pueden usar el PC pero no pueden cambiar configuración que afecte a todos los usuarios.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 7 ==================== -->
+        <div class="topic" id="s7">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c7">7</div>
+                <div class="topic-title">Mantenimiento del sistema y procesos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Mantenimiento preventivo (lo que se hace cada cierto tiempo)</h3>
+                    <ul>
+                        <li><strong>Actualizar el sistema</strong> y las aplicaciones (Windows Update / <code>apt upgrade</code>).</li>
+                        <li><strong>Liberar espacio:</strong> archivos temporales, papelera, cachés del navegador.</li>
+                            <ul>
+                                <li>Windows: Liberador de espacio o Storage Sense.</li>
+                                <li>Linux: <code>sudo apt autoremove</code>, <code>sudo apt clean</code>.</li>
+                            </ul>
+                        <li><strong>Desfragmentar (HDD)</strong> en Windows. <strong>NO se desfragmentan los SSD</strong>: el SO ejecuta TRIM en su lugar.</li>
+                        <li><strong>Comprobar disco:</strong> Windows <code>chkdsk</code>; Linux <code>fsck</code>.</li>
+                        <li>Revisar el <strong>antivirus</strong> y los logs.</li>
+                    </ul>
+
+                    <h3>Procesos: el Administrador de tareas y top</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>Windows</th><th>Linux</th></tr>
+                        <tr><td>Abrir</td><td>Ctrl+Shift+Esc → Administrador de tareas</td><td><code>top</code> o <code>htop</code> en terminal</td></tr>
+                        <tr><td>Ver procesos</td><td>Pestaña <em>Procesos</em></td><td>Listado en pantalla, se autoactualiza</td></tr>
+                        <tr><td>Finalizar proceso</td><td>Botón derecho → Finalizar tarea</td><td><code>kill PID</code> o <code>killall nombre</code></td></tr>
+                        <tr><td>Ver uso de CPU/RAM</td><td>Pestaña <em>Rendimiento</em></td><td><code>top</code>, <code>free -h</code></td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Servicios y demonios</h3>
+                    <ul>
+                        <li><strong>Servicio (Windows):</strong> proceso que se ejecuta en segundo plano (Windows Update, Spooler, etc.). Se gestiona con <code>services.msc</code>.</li>
+                        <li><strong>Demonio (Linux):</strong> lo mismo, pero suelen acabar en <code>d</code> (<code>sshd</code>, <code>cupsd</code>). Se gestionan con <code>systemctl</code>.</li>
+                    </ul>
+
+                    <h3>Visor de eventos / logs</h3>
+                    <ul>
+                        <li><strong>Windows:</strong> <em>Visor de eventos</em> (<code>eventvwr</code>). Registra errores, avisos y actividad del sistema.</li>
+                        <li><strong>Linux:</strong> <code>/var/log/</code> (syslog, auth.log...) o <code>journalctl</code>.</li>
+                    </ul>
+
+                    <h3>Malware: tipos típicos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Qué hace</th></tr>
+                        <tr><td><strong>Virus</strong></td><td>Se replica infectando archivos.</td></tr>
+                        <tr><td><strong>Troyano</strong></td><td>Se hace pasar por un programa útil.</td></tr>
+                        <tr><td><strong>Ransomware</strong></td><td>Cifra tus archivos y pide rescate.</td></tr>
+                        <tr><td><strong>Spyware</strong></td><td>Espía lo que haces (contraseñas, navegación).</td></tr>
+                        <tr><td><strong>Rootkit</strong></td><td>Se oculta a nivel del kernel.</td></tr>
+                        <tr><td><strong>Adware</strong></td><td>Muestra publicidad.</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>Ransomware</strong>: cifra archivos y pide rescate (Wannacry, etc.). <strong>Spyware</strong>: espía. <strong>Troyano</strong>: se disfraza. No los confundas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 8 ==================== -->
+        <div class="topic" id="s8">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c8">8</div>
+                <div class="topic-title">Copias de seguridad y restauración</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Tipos de copia de seguridad</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Qué guarda</th><th>Velocidad</th><th>Espacio</th></tr>
+                        <tr><td><strong>Completa</strong></td><td>Todo, cada vez</td><td>Lenta</td><td>Mucho</td></tr>
+                        <tr><td><strong>Incremental</strong></td><td>Solo lo que cambió desde la última copia (de cualquier tipo)</td><td>Rápida</td><td>Poco</td></tr>
+                        <tr><td><strong>Diferencial</strong></td><td>Lo que cambió desde la última <em>completa</em></td><td>Media</td><td>Medio</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>La regla 3-2-1</h3>
+                    <div class="info info-green">
+                        <div class="info-title">Memorízala así</div>
+                        <p><strong>3</strong> copias de los datos &#8594; en <strong>2</strong> medios distintos &#8594; con <strong>1</strong> de ellas fuera de la ubicación principal (offsite o nube).</p>
+                    </div>
+                    <p>Por ejemplo: original en el portátil, copia en un disco externo, copia en la nube. Si se incendia tu casa, te queda la nube.</p>
+
+                    <h3>Herramientas de copia</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Plataforma</th><th>Notas</th></tr>
+                        <tr><td>Historial de archivos</td><td>Windows</td><td>Incluida. Copia tus carpetas personales a un disco externo.</td></tr>
+                        <tr><td>Copia de seguridad de Windows</td><td>Windows</td><td>Incluida. Imagen del sistema.</td></tr>
+                        <tr><td>OneDrive / Google Drive</td><td>Multiplat.</td><td>Sincronización en la nube. No es lo mismo que backup, pero ayuda.</td></tr>
+                        <tr><td><strong>Duplicati</strong></td><td>Multiplat.</td><td>Software libre, copias cifradas, programadas.</td></tr>
+                        <tr><td>rsync</td><td>Linux</td><td>Comando para sincronizar carpetas.</td></tr>
+                        <tr><td>Time Machine</td><td>macOS</td><td>El backup nativo de Mac.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Restauración de Windows</h3>
+                    <ul>
+                        <li><strong>Punto de restauración:</strong> guarda la configuración del sistema (registro, drivers...). Útil si una actualización rompe algo.</li>
+                        <li><strong>Restablecer este PC:</strong> reinstala Windows conservando o no tus archivos.</li>
+                        <li><strong>Imagen del sistema:</strong> copia exacta del disco; restaura el sistema entero.</li>
+                    </ul>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">No las confundas</div>
+                        <p><strong>Sincronización en la nube</strong> (OneDrive) no es lo mismo que <strong>copia de seguridad</strong>. Si borras un archivo, la sincronización lo borra también. Una copia de seguridad real guarda versiones anteriores.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CONSEJOS ==================== -->
+        <div class="topic" id="consejos">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">&#9733;</div>
+                <div class="topic-title">Consejos para el examen</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <div class="info info-green">
+                        <div class="info-title">Antes del examen</div>
+                        <p>Examen final. 20 preguntas tipo test, 4 opciones, 1 correcta. <strong>No restan los fallos.</strong> No dejes nada en blanco.</p>
+                    </div>
+                    <ol style="margin-left:16px">
+                        <li style="margin:12px 0"><strong>Rutas y carpetas:</strong> <code>C:\Users\&lt;tú&gt;</code> en Windows ↔ <code>/home/&lt;tú&gt;</code> en Linux. Datos de configuración del sistema en <code>/etc</code>.</li>
+                        <li style="margin:12px 0"><strong>Comandos básicos:</strong> <code>ls -la</code> (listar todo en Linux), <code>dir</code> (Windows). Punto al inicio = oculto en Linux.</li>
+                        <li style="margin:12px 0"><strong>Permisos Linux:</strong> <code>rwx</code> propietario / grupo / otros. <code>chmod</code> cambia permisos, <code>chown</code> cambia propietario.</li>
+                        <li style="margin:12px 0"><strong>BitLocker</strong> = cifrar unidades. <strong>EFS</strong> = cifrar archivos.</li>
+                        <li style="margin:12px 0"><strong>Cuentas Windows:</strong> Administrador (todo) vs Estándar (limitada). Para instalar programas hace falta administrador.</li>
+                        <li style="margin:12px 0"><strong>Red:</strong> DHCP asigna IP automática, DNS traduce nombres a IPs.</li>
+                        <li style="margin:12px 0"><strong>Mantenimiento:</strong> SSD → no desfragmentar (TRIM); HDD → sí desfragmentar.</li>
+                        <li style="margin:12px 0"><strong>Malware:</strong> ransomware = cifra y pide rescate. Spyware = espía. Troyano = se disfraza.</li>
+                        <li style="margin:12px 0"><strong>Backup:</strong> regla 3-2-1 (3 copias, 2 medios, 1 fuera). Diferencia completa / incremental / diferencial.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+    <script>
+    function toggle(header) {
+        header.closest('.topic').classList.toggle('open');
+    }
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('show');
+        document.getElementById('drawer-bg').classList.toggle('show');
+    }
+    window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    </script>
+</body>
+</html>

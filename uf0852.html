@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Guía de estudio - UF0852</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --ac: #2b6cb0;
+            --verde: #276749;
+            --naranja: #c05621;
+            --rojo: #c53030;
+            --morado: #553c9a;
+            --teal: #234e52;
+            --rosa: #b83280;
+            --ocre: #975a16;
+            --indigo: #434190;
+            --gb: #e2e8f0;
+            --tx: #2d3748;
+            --bg: #f7fafc;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+
+        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #63b3ed, #4299e1, #3182ce); z-index: 200; transition: width .1s; width: 0; }
+
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
+        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        #btn-idx:active { background: rgba(255,255,255,.15); }
+        .back-home { color: #fff; text-decoration: none; font-size: 18px; padding: 4px 8px; opacity: .85; }
+        .back-home:active { opacity: 1; }
+
+        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
+        .drawer-bg.show { display: block; opacity: 1; }
+        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 70vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
+        .drawer.show { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
+        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
+        .drawer a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--tx); text-decoration: none; font-size: 15px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+        .drawer a:active { background: #ebf8ff; }
+        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
+
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--ac) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 24px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero::before { content: ''; position: absolute; bottom: -40px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,.04); border-radius: 50%; }
+        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 14px; position: relative; }
+        .hero .meta { font-size: 13px; opacity: .8; line-height: 1.6; position: relative; }
+        .hero .meta strong { color: #fff; opacity: 1; }
+
+        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
+        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .topic-header:active { background: #f7fafc; }
+        .topic-num { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); }
+        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
+        .topic.open .topic-arrow { transform: rotate(180deg); }
+        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .topic.open .topic-body { max-height: none; }
+        .topic-content { padding: 0 18px 20px; }
+
+        .c1 { background: var(--rojo); }
+        .c2 { background: var(--naranja); }
+        .c3 { background: var(--ac); }
+        .c4 { background: var(--morado); }
+        .c5 { background: var(--verde); }
+        .c6 { background: var(--teal); }
+        .c7 { background: var(--rosa); }
+        .c8 { background: var(--ocre); }
+        .c9 { background: var(--indigo); }
+        .c10 { background: #718096; }
+
+        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
+        .topic-content h3:first-child { margin-top: 4px; }
+        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
+        .topic-content p { margin: 6px 0; font-size: 15px; }
+        .topic-content strong { color: #1a202c; }
+
+        .table-wrap { overflow-x: auto; margin: 12px -18px; padding: 0 18px; -webkit-overflow-scrolling: touch; }
+        .topic-content table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 400px; }
+        .topic-content th { background: #edf2f7; color: var(--azul); padding: 10px 10px; text-align: left; font-size: 12px; font-weight: 700; border: 1px solid var(--gb); white-space: nowrap; }
+        .topic-content td { padding: 8px 10px; border: 1px solid var(--gb); vertical-align: top; }
+        .topic-content tr:nth-child(even) { background: #f7fafc; }
+
+        .topic-content ul, .topic-content ol { margin: 8px 0 8px 20px; font-size: 15px; }
+        .topic-content li { margin: 6px 0; }
+        .topic-content li li { margin: 3px 0; font-size: 14px; }
+        .topic-content ul ul { margin: 4px 0 4px 16px; }
+
+        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+        .info p { margin: 3px 0; }
+        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
+        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
+        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
+        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
+        .info-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .info-blue .info-title { color: var(--ac); }
+        .info-yellow .info-title { color: #975a16; }
+        .info-red .info-title { color: var(--rojo); }
+        .info-green .info-title { color: var(--verde); }
+
+        .diagram { margin: 16px 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+
+        code, .cmd { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+
+        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--ac); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
+        #bt:active { background: var(--azul); }
+
+        @media (min-width: 768px) {
+            .container { padding: 24px 24px 80px; }
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 28px; }
+            .topic-content { padding: 0 24px 24px; }
+            .topic-header { padding: 18px 24px; }
+            .table-wrap { margin: 12px 0; padding: 0; }
+        }
+
+        @media print {
+            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
+            .topic-body { max-height: none !important; }
+            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <div class="topnav">
+        <a href="index.html" class="back-home" aria-label="Inicio">&#8592;</a>
+        <h1>UF0852 - Guía de estudio</h1>
+        <span class="badge">Examen parcial</span>
+        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
+    </div>
+
+    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-handle"></div>
+        <h2>Índice de temas</h2>
+        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Arquitectura del sistema y firmware</a>
+        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Funciones del sistema operativo</a>
+        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. CLI vs GUI</a>
+        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. Estructura del SO</a>
+        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. Memoria y procesos</a>
+        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. Windows: ediciones y requisitos</a>
+        <a href="#s7" onclick="toggleDrawer()"><span class="dot c7"></span>7. Linux: distribuciones</a>
+        <a href="#s8" onclick="toggleDrawer()"><span class="dot c8"></span>8. Particiones y sistemas de archivos</a>
+        <a href="#s9" onclick="toggleDrawer()"><span class="dot c9"></span>9. Instalación de Windows y Linux</a>
+        <a href="#s10" onclick="toggleDrawer()"><span class="dot c10"></span>10. Clonación y replicación</a>
+        <a href="#consejos" onclick="toggleDrawer()"><span class="dot c10"></span>Consejos para el examen</a>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Guía de estudio<br>Examen Parcial UF0852</h1>
+            <div class="meta">
+                <strong>Certificado:</strong> IFCT0309 - Montaje y Reparación<br>
+                <strong>Módulo:</strong> MF0219_2<br>
+                <strong>UF:</strong> UF0852 - Instalación y actualización de sistemas operativos<br>
+                <strong>Examen:</strong> Sesiones 1 a 15 | 20 preguntas tipo test
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 1 ==================== -->
+        <div class="topic open" id="s1">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">1</div>
+                <div class="topic-title">Arquitectura del sistema y firmware</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+
+                    <h3>Las capas del sistema</h3>
+                    <p>Un sistema microinformático funciona en capas. Cada capa habla con la de arriba y la de abajo, pero no se salta ninguna. Esto es lo que tienes que saber:</p>
+
+                    <div class="diagram">
+                        <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" style="max-width:340px">
+                            <rect x="0" y="0" width="360" height="220" rx="10" fill="#ebf8ff" stroke="#90cdf4" stroke-width="1"/>
+                            <text x="180" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#2b6cb0" letter-spacing=".5">CAPAS DEL SISTEMA</text>
+                            <rect x="40" y="35" width="280" height="32" rx="6" fill="#bee3f8" stroke="#4299e1"/>
+                            <text x="180" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#1a365d">APLICACIONES</text>
+                            <text x="180" y="62" text-anchor="middle" font-size="8" fill="#2b6cb0">Word, Chrome, Photoshop...</text>
+                            <rect x="40" y="75" width="280" height="32" rx="6" fill="#90cdf4" stroke="#2b6cb0"/>
+                            <text x="180" y="95" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">SISTEMA OPERATIVO</text>
+                            <text x="180" y="103" text-anchor="middle" font-size="8" fill="#fff">Windows 11, Ubuntu, macOS</text>
+                            <rect x="40" y="115" width="280" height="32" rx="6" fill="#fbd38d" stroke="#d69e2e"/>
+                            <text x="180" y="135" text-anchor="middle" font-size="11" font-weight="700" fill="#744210">FIRMWARE (BIOS / UEFI)</text>
+                            <text x="180" y="143" text-anchor="middle" font-size="8" fill="#975a16">Arranca el hardware</text>
+                            <rect x="40" y="155" width="280" height="32" rx="6" fill="#a0aec0" stroke="#4a5568"/>
+                            <text x="180" y="175" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">HARDWARE</text>
+                            <text x="180" y="183" text-anchor="middle" font-size="8" fill="#edf2f7">CPU, RAM, disco, placa base</text>
+                            <text x="180" y="208" text-anchor="middle" font-size="9" fill="#718096">Cada capa habla con la de arriba y la de abajo</text>
+                        </svg>
+                    </div>
+
+                    <ul>
+                        <li><strong>Hardware:</strong> los componentes físicos (CPU, RAM, disco, placa base...).</li>
+                        <li><strong>Firmware (BIOS/UEFI):</strong> el primer programa que se ejecuta al encender. Está «grabado» en un chip de la placa base.</li>
+                        <li><strong>Sistema operativo:</strong> Windows, Linux, macOS. Hace de intermediario entre el usuario y el hardware.</li>
+                        <li><strong>Aplicaciones:</strong> los programas que tú abres (navegador, ofimática...).</li>
+                    </ul>
+
+                    <h3>Hardware base vs software base</h3>
+                    <ul>
+                        <li><strong>Hardware base:</strong> lo mínimo para que el PC arranque (placa base, CPU, RAM, almacenamiento, fuente).</li>
+                        <li><strong>Software base:</strong> firmware + sistema operativo. Sin ellos, el hardware no hace nada.</li>
+                    </ul>
+
+                    <h3>BIOS vs UEFI</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>BIOS (antiguo)</th><th>UEFI (moderno)</th></tr>
+                        <tr><td><strong>Interfaz</strong></td><td>Texto, sin ratón</td><td>Gráfica, con ratón</td></tr>
+                        <tr><td><strong>Arranque</strong></td><td>Lento, limitado</td><td>Rápido (Secure Boot, Fast Boot)</td></tr>
+                        <tr><td><strong>Discos</strong></td><td>Hasta 2 TB (MBR)</td><td>Más de 2 TB (GPT)</td></tr>
+                        <tr><td><strong>Seguridad</strong></td><td>Básica</td><td>Secure Boot (impide arrancar SO no firmados)</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>UEFI</strong> es lo moderno: interfaz gráfica, arranque rápido, GPT (discos &gt; 2 TB), Secure Boot. La <strong>BIOS</strong> tradicional es texto, MBR, lenta. Esto cae siempre.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 2 ==================== -->
+        <div class="topic" id="s2">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c2">2</div>
+                <div class="topic-title">Funciones del sistema operativo</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <p>El SO es el «director de orquesta» del PC. Sus funciones principales:</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Función</th><th>Qué hace</th></tr>
+                        <tr><td><strong>Gestión de procesos</strong></td><td>Reparte el tiempo de CPU entre los programas abiertos. Decide qué se ejecuta y cuándo.</td></tr>
+                        <tr><td><strong>Gestión de memoria</strong></td><td>Asigna RAM a cada programa y se asegura de que no se «pisen». Si hace falta, usa memoria virtual (disco).</td></tr>
+                        <tr><td><strong>Gestión de archivos</strong></td><td>Organiza los datos del disco en carpetas y archivos. Usa un sistema de archivos (NTFS, ext4...).</td></tr>
+                        <tr><td><strong>Gestión de E/S</strong></td><td>Comunica el software con los periféricos a través de los <em>drivers</em>.</td></tr>
+                        <tr><td><strong>Interfaz de usuario</strong></td><td>Te da una forma de interactuar (escritorio gráfico o terminal).</td></tr>
+                        <tr><td><strong>Seguridad</strong></td><td>Usuarios, contraseñas, permisos: controla quién puede hacer qué.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Tipos de sistemas operativos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Ejemplos</th><th>Uso</th></tr>
+                        <tr><td>Escritorio</td><td>Windows, macOS, Ubuntu</td><td>PC, portátil</td></tr>
+                        <tr><td>Móvil</td><td>Android, iOS</td><td>Smartphone, tablet</td></tr>
+                        <tr><td>Servidor</td><td>Windows Server, Ubuntu Server</td><td>Servidores web, BBDD</td></tr>
+                        <tr><td>Embebido</td><td>SO de routers, smart TV</td><td>Dispositivos específicos</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 3 ==================== -->
+        <div class="topic" id="s3">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">3</div>
+                <div class="topic-title">CLI vs GUI</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <p>Hay dos formas de hablar con el ordenador. Los profesionales usan <strong>las dos</strong>.</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>CLI (línea de comandos)</th><th>GUI (interfaz gráfica)</th></tr>
+                        <tr><td><strong>Qué es</strong></td><td>Texto: escribes comandos</td><td>Ratón, ventanas, iconos</td></tr>
+                        <tr><td><strong>Ejemplos</strong></td><td>CMD, PowerShell, terminal Linux</td><td>Escritorio Windows / Ubuntu</td></tr>
+                        <tr><td><strong>Ventajas</strong></td><td>Rápida, automatizable, potente</td><td>Intuitiva, fácil para principiantes</td></tr>
+                        <tr><td><strong>Inconvenientes</strong></td><td>Hay que saber comandos</td><td>Más lenta para tareas repetitivas</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Comandos básicos que tienes que reconocer</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Acción</th><th>Windows (CMD)</th><th>Linux</th></tr>
+                        <tr><td>Listar contenido</td><td><code>dir</code></td><td><code>ls</code> o <code>ls -la</code></td></tr>
+                        <tr><td>Cambiar de directorio</td><td><code>cd carpeta</code></td><td><code>cd carpeta</code></td></tr>
+                        <tr><td>Crear carpeta</td><td><code>mkdir nombre</code></td><td><code>mkdir nombre</code></td></tr>
+                        <tr><td>Copiar archivo</td><td><code>copy a b</code></td><td><code>cp a b</code></td></tr>
+                        <tr><td>Mover / renombrar</td><td><code>move a b</code></td><td><code>mv a b</code></td></tr>
+                        <tr><td>Borrar archivo</td><td><code>del archivo</code></td><td><code>rm archivo</code></td></tr>
+                        <tr><td>Ver contenido</td><td><code>type archivo</code></td><td><code>cat archivo</code></td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Trampa típica</div>
+                        <p>En CMD se usa <code>dir</code>; en Linux se usa <code>ls</code>. <strong>No al revés.</strong> Es la pregunta más fácil del examen, no la falles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 4 ==================== -->
+        <div class="topic" id="s4">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c4">4</div>
+                <div class="topic-title">Estructura del sistema operativo</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>El kernel: el corazón del SO</h3>
+                    <p>El <strong>kernel</strong> (o «núcleo») es la parte más importante del SO. Está en contacto directo con el hardware y gestiona:</p>
+                    <ul>
+                        <li>El <strong>tiempo de CPU</strong> (qué proceso se ejecuta en cada instante).</li>
+                        <li>La <strong>memoria RAM</strong> (qué proceso usa qué zona).</li>
+                        <li>El acceso a los <strong>dispositivos</strong> (disco, tarjeta de red, USB...).</li>
+                        <li>La <strong>seguridad</strong>: separa los procesos para que no se interfieran.</li>
+                    </ul>
+
+                    <h3>Capas del SO (visión simplificada)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Nivel</th><th>Descripción</th></tr>
+                        <tr><td><strong>Kernel</strong></td><td>Núcleo. Habla con el hardware.</td></tr>
+                        <tr><td><strong>Servicios del sistema</strong></td><td>Procesos que arrancan con el SO (red, audio, impresión...).</td></tr>
+                        <tr><td><strong>Shell / interfaz</strong></td><td>El intérprete (CMD, Bash) o el escritorio gráfico.</td></tr>
+                        <tr><td><strong>Aplicaciones</strong></td><td>Lo que ejecuta el usuario.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Modos de ejecución</h3>
+                    <ul>
+                        <li><strong>Modo kernel (privilegiado):</strong> acceso total al hardware. Solo el SO entra aquí.</li>
+                        <li><strong>Modo usuario:</strong> con restricciones. Es donde se ejecutan tus aplicaciones.</li>
+                    </ul>
+                    <p>Esta separación evita que un programa pueda «cargarse» el sistema por error.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 5 ==================== -->
+        <div class="topic" id="s5">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">5</div>
+                <div class="topic-title">Gestión de memoria y procesos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Procesos e hilos</h3>
+                    <ul>
+                        <li><strong>Proceso:</strong> un programa en ejecución (Chrome abierto = un proceso).</li>
+                        <li><strong>Hilo (thread):</strong> una «línea de ejecución» dentro del proceso. Un proceso puede tener varios hilos a la vez.</li>
+                        <li><strong>Multitarea:</strong> el SO va alternando rapidísimo entre procesos para que parezca que todo va a la vez.</li>
+                    </ul>
+
+                    <h3>Estados de un proceso</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Estado</th><th>Significado</th></tr>
+                        <tr><td>En ejecución</td><td>Está usando CPU ahora mismo.</td></tr>
+                        <tr><td>Listo</td><td>Puede ejecutarse, pero la CPU está ocupada con otro.</td></tr>
+                        <tr><td>Bloqueado</td><td>Esperando algo (datos del disco, una pulsación de teclado...).</td></tr>
+                        <tr><td>Terminado</td><td>Ha finalizado.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Memoria virtual y archivo de paginación</h3>
+                    <div class="info info-blue">
+                        <div class="info-title">¿Qué es?</div>
+                        <p>Cuando la <strong>RAM se llena</strong>, el SO usa una zona del <strong>disco</strong> como si fuera RAM extra. En Windows se llama <em>archivo de paginación</em> (pagefile.sys); en Linux es la <em>partición swap</em>. Es mucho más lenta que la RAM real.</p>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Para el examen</div>
+                        <p>Si te preguntan qué pasa cuando la RAM se llena: el SO usa <strong>memoria virtual / swap</strong> en el disco. Por eso un PC con poca RAM y disco mecánico va lentísimo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 6 ==================== -->
+        <div class="topic" id="s6">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c6">6</div>
+                <div class="topic-title">Windows 10/11: ediciones y requisitos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Ediciones principales</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Edición</th><th>Para quién</th><th>Funciones extra</th></tr>
+                        <tr><td><strong>Home</strong></td><td>Uso doméstico</td><td>Lo básico. Sin BitLocker ni dominio</td></tr>
+                        <tr><td><strong>Pro</strong></td><td>Profesional / pyme</td><td>BitLocker, dominio Active Directory, Hyper-V, Escritorio Remoto</td></tr>
+                        <tr><td><strong>Enterprise</strong></td><td>Grandes empresas</td><td>Pro + gestión avanzada, AppLocker</td></tr>
+                        <tr><td><strong>Education</strong></td><td>Centros educativos</td><td>Similar a Enterprise, descuentos académicos</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Requisitos de Windows 11 (los que cambian respecto a Windows 10)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Requisito</th><th>Windows 10</th><th>Windows 11</th></tr>
+                        <tr><td>Procesador</td><td>1 GHz, 32 o 64 bits</td><td>1 GHz, <strong>solo 64 bits</strong>, 2 núcleos+</td></tr>
+                        <tr><td>RAM</td><td>1 GB (32b) / 2 GB (64b)</td><td><strong>4 GB</strong></td></tr>
+                        <tr><td>Almacenamiento</td><td>16 GB / 32 GB</td><td><strong>64 GB</strong></td></tr>
+                        <tr><td>Firmware</td><td>BIOS o UEFI</td><td><strong>UEFI con Secure Boot</strong></td></tr>
+                        <tr><td>TPM</td><td>No</td><td><strong>TPM 2.0</strong></td></tr>
+                        <tr><td>Gráficos</td><td>DirectX 9</td><td>DirectX 12, WDDM 2.0</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-red">
+                        <div class="info-title">Pregunta de oro</div>
+                        <p>Lo que <strong>Windows 11 exige y Windows 10 no</strong>: <strong>TPM 2.0</strong>, <strong>Secure Boot (UEFI)</strong>, procesador 64 bits. Cae casi seguro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 7 ==================== -->
+        <div class="topic" id="s7">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c7">7</div>
+                <div class="topic-title">Linux: distribuciones</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>¿Qué es una distro?</h3>
+                    <p>Una <strong>distribución de Linux</strong> es un SO completo formado por:</p>
+                    <ul>
+                        <li>El <strong>kernel Linux</strong> (común a casi todas).</li>
+                        <li>Utilidades del sistema (GNU coreutils, etc.).</li>
+                        <li>Un <strong>entorno de escritorio</strong> (GNOME, KDE, XFCE...).</li>
+                        <li>Un <strong>gestor de paquetes</strong> (apt, dnf, pacman...) para instalar software.</li>
+                        <li>Aplicaciones preinstaladas.</li>
+                    </ul>
+
+                    <h3>Familias y ejemplos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Familia</th><th>Distros conocidas</th><th>Gestor de paquetes</th></tr>
+                        <tr><td><strong>Debian</strong></td><td>Debian, <strong>Ubuntu</strong>, Linux Mint, Kali</td><td><code>apt</code> (.deb)</td></tr>
+                        <tr><td><strong>Red Hat</strong></td><td>Fedora, RHEL, CentOS, Rocky</td><td><code>dnf</code> / <code>yum</code> (.rpm)</td></tr>
+                        <tr><td><strong>Arch</strong></td><td>Arch, Manjaro</td><td><code>pacman</code></td></tr>
+                        <tr><td><strong>SUSE</strong></td><td>openSUSE, SLES</td><td><code>zypper</code> (.rpm)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Ubuntu: la distro recomendada para empezar</h3>
+                    <ul>
+                        <li>Basada en Debian.</li>
+                        <li>Versiones <strong>LTS</strong> (Long Term Support) cada 2 años, con soporte 5 años.</li>
+                        <li>Entorno gráfico GNOME por defecto.</li>
+                        <li>Gestor de paquetes: <code>apt</code>.</li>
+                        <li>Variantes: Kubuntu (KDE), Xubuntu (XFCE), Ubuntu Server (sin escritorio).</li>
+                    </ul>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Truco</div>
+                        <p>Si te dicen «Debian»: piensa en <code>apt</code> y archivos <code>.deb</code>. Si te dicen «Red Hat / Fedora»: <code>dnf</code> y <code>.rpm</code>. Esa correspondencia distro-gestor es típica de examen.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 8 ==================== -->
+        <div class="topic" id="s8">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c8">8</div>
+                <div class="topic-title">Particiones y sistemas de archivos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Esquemas de particionado: MBR vs GPT</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>MBR</th><th>GPT</th></tr>
+                        <tr><td><strong>Antigüedad</strong></td><td>Antiguo (~1983)</td><td>Moderno</td></tr>
+                        <tr><td><strong>Tamaño máximo de disco</strong></td><td>2 TB</td><td>&gt; 9 ZB (ilimitado en la práctica)</td></tr>
+                        <tr><td><strong>Particiones primarias</strong></td><td>Máx. 4</td><td>Hasta 128 (en Windows)</td></tr>
+                        <tr><td><strong>Firmware compatible</strong></td><td>BIOS</td><td>UEFI</td></tr>
+                        <tr><td><strong>Resistencia</strong></td><td>1 sola tabla</td><td>Tabla principal + copia</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Tipos de particiones (esquema MBR clásico)</h3>
+                    <ul>
+                        <li><strong>Primaria:</strong> arrancable. Máx. 4 por disco.</li>
+                        <li><strong>Extendida:</strong> sustituye a una primaria para poder crear más particiones (lógicas) dentro.</li>
+                        <li><strong>Lógica:</strong> dentro de la extendida. Sin límite práctico.</li>
+                    </ul>
+                    <p>Con <strong>GPT</strong> esta distinción ya no tiene sentido: todas son «iguales» y puedes tener muchísimas.</p>
+
+                    <h3>Sistemas de archivos</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>SF</th><th>SO típico</th><th>Comentarios</th></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Windows</td><td>Por defecto en C:. Permisos, cifrado, compresión.</td></tr>
+                        <tr><td><strong>FAT32</strong></td><td>Pendrives, SD</td><td>Compatible con todo. Archivo máx. 4 GB.</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>Pendrives grandes</td><td>Como FAT32 pero sin el límite de 4 GB.</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>Por defecto en Ubuntu y la mayoría de distros.</td></tr>
+                        <tr><td><strong>Btrfs / XFS</strong></td><td>Linux</td><td>Avanzados (instantáneas, gran tamaño).</td></tr>
+                        <tr><td><strong>swap</strong></td><td>Linux</td><td>No es para datos: es la memoria virtual de Linux.</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Trampas frecuentes</div>
+                        <ul style="margin-left:16px">
+                            <li><strong>FAT32</strong> no permite archivos &gt; 4 GB.</li>
+                            <li><strong>swap</strong> en Linux ≠ datos. Es solo memoria virtual.</li>
+                            <li>Si el firmware es <strong>UEFI</strong>, normalmente el disco es <strong>GPT</strong>. Si es BIOS, suele ser MBR.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 9 ==================== -->
+        <div class="topic" id="s9">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c9">9</div>
+                <div class="topic-title">Instalación de Windows y Linux</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Pasos comunes a cualquier instalación</h3>
+                    <ol>
+                        <li>Descargar la <strong>imagen ISO</strong> oficial.</li>
+                        <li>Crear un <strong>medio de instalación</strong> (USB con Rufus / balenaEtcher) o cargar la ISO en una <strong>máquina virtual</strong>.</li>
+                        <li>Configurar el <strong>orden de arranque</strong> en la UEFI para arrancar desde el USB / DVD / ISO.</li>
+                        <li>Seguir el asistente: idioma, teclado, particionado, usuario, contraseña.</li>
+                        <li>Reiniciar y entrar en el SO recién instalado.</li>
+                        <li><strong>Post-instalación:</strong> drivers, actualizaciones, programas básicos.</li>
+                    </ol>
+
+                    <h3>Instalación de Windows 11</h3>
+                    <ul>
+                        <li>Tipo de instalación: <strong>Personalizada (avanzada)</strong> para una instalación limpia.</li>
+                        <li>Windows crea solas las particiones del sistema (EFI, MSR, datos).</li>
+                        <li>Si no tienes clave de producto, selecciona <strong>«No tengo clave»</strong>: se instala igualmente.</li>
+                        <li>Tras instalar: <strong>Windows Update</strong>, instalar drivers oficiales, navegador, antivirus si procede.</li>
+                    </ul>
+
+                    <h3>Instalación de Ubuntu</h3>
+                    <ul>
+                        <li>Modo <strong>«Probar Ubuntu»</strong>: arranca sin instalar (live USB).</li>
+                        <li>Para instalar, opciones de particionado:
+                            <ul>
+                                <li><strong>Borrar disco e instalar Ubuntu</strong>: lo más sencillo.</li>
+                                <li><strong>Instalar junto a Windows</strong>: arranque dual.</li>
+                                <li><strong>Más opciones</strong>: particionado manual.</li>
+                            </ul>
+                        </li>
+                        <li>Crea usuario y contraseña.</li>
+                        <li>Tras instalar: <code>sudo apt update &amp;&amp; sudo apt upgrade</code>, drivers privativos si los necesitas, software extra desde <em>Software</em> de Ubuntu o con <code>apt install</code>.</li>
+                    </ul>
+
+                    <div class="info info-green">
+                        <div class="info-title">Recuerda</div>
+                        <p>En el examen suele preguntar el <strong>tipo de instalación</strong> (Personalizada en Windows; <em>Borrar disco</em> en Ubuntu) y el <strong>gestor de paquetes</strong> de Ubuntu (<code>apt</code>).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 10 ==================== -->
+        <div class="topic" id="s10">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">10</div>
+                <div class="topic-title">Clonación, replicación y actualizaciones</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Clonación de discos</h3>
+                    <p><strong>Clonar</strong> = hacer una copia <em>exacta</em> de un disco (o partición) en otro disco o en un archivo de imagen. Sirve para:</p>
+                    <ul>
+                        <li>Pasar de HDD a SSD sin reinstalar nada.</li>
+                        <li>Replicar el mismo SO en varios equipos del aula o la empresa.</li>
+                        <li>Hacer una copia de seguridad completa antes de tocar el sistema.</li>
+                    </ul>
+
+                    <h3>Herramientas habituales</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Herramienta</th><th>Plataforma</th><th>Notas</th></tr>
+                        <tr><td><strong>Clonezilla</strong></td><td>Live USB</td><td>Estándar libre, en modo texto.</td></tr>
+                        <tr><td><strong>Rescuezilla</strong></td><td>Live USB</td><td>Misma idea, con interfaz gráfica.</td></tr>
+                        <tr><td>Macrium Reflect</td><td>Windows</td><td>Comercial, fácil de usar.</td></tr>
+                        <tr><td><code>dd</code></td><td>Linux</td><td>Comando de bajo nivel, potente y peligroso.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Despliegue masivo: imagen maestra</h3>
+                    <div class="info info-blue">
+                        <div class="info-title">«Golden image»</div>
+                        <p>Es una <strong>imagen de disco preconfigurada</strong> (con SO, drivers y programas instalados) que se replica a varios equipos. Acelera mucho el despliegue de un parque de PCs en una empresa o aula.</p>
+                    </div>
+
+                    <h3>Sysprep (Windows)</h3>
+                    <p><code>sysprep /generalize</code> deja una instalación de Windows lista para clonar: borra identificadores únicos (SID, nombre del equipo) para que cada copia se considere un PC nuevo al arrancar. <strong>Imprescindible</strong> antes de clonar Windows a varios equipos.</p>
+
+                    <h3>Actualizaciones</h3>
+                    <ul>
+                        <li><strong>Windows Update</strong>: actualizaciones de seguridad y de funcionalidades. Se aplican automáticamente, suele requerir reinicio.</li>
+                        <li><strong>Linux:</strong> <code>sudo apt update</code> (refresca lista) + <code>sudo apt upgrade</code> (instala). Sin reinicio salvo si actualizas el kernel.</li>
+                        <li><strong>WSUS</strong> (Windows Server Update Services): centraliza actualizaciones en una empresa para no saturar la red.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CONSEJOS ==================== -->
+        <div class="topic" id="consejos">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">&#9733;</div>
+                <div class="topic-title">Consejos para el examen</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <div class="info info-green">
+                        <div class="info-title">Antes del examen</div>
+                        <p>El examen es tipo test, 20 preguntas, 4 opciones, una sola correcta. <strong>No restan los fallos.</strong> Por tanto: <strong>no dejes nada en blanco</strong>.</p>
+                    </div>
+                    <ol style="margin-left:16px">
+                        <li style="margin:12px 0"><strong>Diferencia siempre BIOS/MBR de UEFI/GPT.</strong> Esa pareja siempre cae.</li>
+                        <li style="margin:12px 0"><strong>Windows 11 ≠ Windows 10:</strong> exige TPM 2.0, Secure Boot y procesador 64 bits.</li>
+                        <li style="margin:12px 0"><strong>Comandos:</strong> <code>dir</code> (Windows) vs <code>ls</code> (Linux). Gestor de paquetes Ubuntu = <code>apt</code>.</li>
+                        <li style="margin:12px 0"><strong>FAT32</strong> no admite archivos &gt; 4 GB. <strong>NTFS</strong> es el de Windows. <strong>ext4</strong> el de Linux.</li>
+                        <li style="margin:12px 0"><strong>swap</strong> en Linux = memoria virtual, no datos.</li>
+                        <li style="margin:12px 0"><strong>Clonación:</strong> Clonezilla / Rescuezilla. <strong>Sysprep</strong> antes de clonar Windows.</li>
+                        <li style="margin:12px 0"><strong>Lee las opciones enteras antes de marcar.</strong> Suelen tener distractores muy parecidos.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+    <script>
+    function toggle(header) {
+        header.closest('.topic').classList.toggle('open');
+    }
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('show');
+        document.getElementById('drawer-bg').classList.toggle('show');
+    }
+    window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    </script>
+</body>
+</html>
