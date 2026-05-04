@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 30: Instalacion y mantenimiento de impresoras</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 30: Instalacion y mantenimiento de impresoras</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S4 (impresoras: tipos e instalacion) + S5 (mantenimiento)<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual o por parejas<br>
+                <strong>Herramientas:</strong> impresora del aula (laser o inyeccion), papel, cable USB o conexion red
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
+                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> Si solo hay una impresora en el aula, trabajareis por parejas o turnos. Lo importante es completar la instalacion, gestionar la cola y revisar los consumibles.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Identificar el tipo de impresora (inyeccion, laser, termica) y sus consumibles.</li>
+                        <li>Instalar una impresora local (USB) y/o en red.</li>
+                        <li>Gestionar la cola de impresion: pausar, cancelar, reanudar trabajos.</li>
+                        <li>Revisar el estado de los consumibles y simular el cambio.</li>
+                        <li>Resolver atascos de papel siguiendo el procedimiento correcto.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Identificar -->
+            <div class="seccion">
+                <h2>Parte 1 - Identificar la impresora (20 min)</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr><th>Dato</th><th>Valor</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
+                        <tr><td>Tipo (inyeccion / laser / termica)</td><td><input type="text"></td></tr>
+                        <tr><td>Color o monocromo</td><td><input type="text"></td></tr>
+                        <tr><td>Conexiones disponibles</td><td><input type="text" placeholder="USB, Ethernet, Wi-Fi..."></td></tr>
+                        <tr><td>&iquest;Tiene pantalla / panel de control?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>&iquest;Es multifuncion (escanea / fotocopia)?</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Instalacion local -->
+            <div class="seccion">
+                <h2>Parte 2 - Instalacion local por USB (60 min)</h2>
+                <div class="seccion-body">
+                    <h3>2.1 - Conectar e instalar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta la impresora al PC con el cable USB. Encendela.</li>
+                            <li>Espera. &iquest;Windows la detecta automaticamente? Anotalo.</li>
+                            <li>Ve a <strong>Configuracion &rarr; Bluetooth y dispositivos &rarr; Impresoras y escaneres</strong>.</li>
+                            <li>Si no aparece, pulsa <strong>Agregar dispositivo</strong> y espera a que la encuentre.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>&iquest;La detecto automaticamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Driver instalado por Windows</td><td><input type="text" placeholder="Generico / del fabricante"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Instalar driver del fabricante (si hace falta)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Busca el modelo exacto en la web del fabricante (HP, Brother, Canon, Epson...).</li>
+                            <li>Descarga el driver completo para Windows 10/11.</li>
+                            <li>Ejecuta el instalador y sigue los pasos.</li>
+                            <li>Reinicia si te lo pide.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - Pagina de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En <strong>Impresoras y escaneres</strong>, haz clic en la impresora &rarr; <strong>Administrar</strong>.</li>
+                            <li>Pulsa <strong>Imprimir una pagina de prueba</strong>.</li>
+                            <li>Revisa la pagina: &iquest;sale toda la informacion? &iquest;Algun fallo de impresion (lineas, manchas)?</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Calidad de la pagina de prueba</td><td><input type="text" placeholder="Buena / Regular / Mala"></td></tr>
+                        <tr><td>Si hay fallos, descripcion</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Instalacion en red -->
+            <div class="seccion">
+                <h2>Parte 3 - Instalacion en red (40 min, opcional)</h2>
+                <div class="seccion-body">
+                    <div class="nota">
+                        Solo si la impresora del aula tiene Ethernet o Wi-Fi. Si solo hay USB, salta a la Parte 4.
+                    </div>
+
+                    <h3>3.1 - Conectar a la red</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta la impresora a la red por cable Ethernet (al router/switch del aula) o configura el Wi-Fi desde el panel de la impresora.</li>
+                            <li>Imprime una <strong>pagina de configuracion de red</strong> (suele estar en el menu de la impresora). Anota su IP.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Direccion IP de la impresora</td><td><input type="text" placeholder="Ej: 192.168.1.50"></td></tr>
+                        <tr><td>Mascara de red</td><td><input type="text"></td></tr>
+                        <tr><td>Puerta de enlace</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.2 - Anadir como impresora de red</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el PC: <strong>Configuracion &rarr; Impresoras y escaneres &rarr; Agregar dispositivo</strong>.</li>
+                            <li>Si Windows la detecta en la red, anadela.</li>
+                            <li>Si no, pulsa <strong>Agregar manualmente</strong> &rarr; <strong>Agregar usando direccion IP</strong> y escribe la IP que anotaste.</li>
+                            <li>Imprime una pagina de prueba.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Cola -->
+            <div class="seccion">
+                <h2>Parte 4 - Gestionar la cola de impresion (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>4.1 - Enviar varios trabajos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre tres documentos distintos (Word, PDF, una imagen).</li>
+                            <li>Imprime los tres seguidos (Ctrl+P).</li>
+                            <li>Antes de que termine el primero, abre la <strong>cola de impresion</strong>: doble clic en la impresora desde el icono de la barra de tareas, o desde Configuracion &rarr; Impresoras &rarr; <strong>Abrir cola</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.2 - Pausar y cancelar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la cola, ve a <strong>Impresora &rarr; Pausar la impresion</strong>.</li>
+                            <li>Selecciona el segundo trabajo y elimina lo (Suprimir).</li>
+                            <li>Reanuda la cola: <strong>Impresora &rarr; Pausar</strong> de nuevo (se quita el tilde).</li>
+                            <li>Comprueba que se imprimen el primero y el tercero (no el segundo).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Trabajo</th><th>&iquest;Se imprimio?</th><th>Comentario</th></tr>
+                        <tr><td>1</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>2 (cancelado)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>3</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Si una impresora "no imprime", &iquest;que es lo primero que conviene revisar antes de tocar drivers o reinstalar?</p>
+                        <textarea rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Mantenimiento -->
+            <div class="seccion">
+                <h2>Parte 5 - Mantenimiento basico (50 min)</h2>
+                <div class="seccion-body">
+                    <h3>5.1 - Localizar consumibles</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre la tapa frontal o superior de la impresora (segun el modelo).</li>
+                            <li>Localiza los <strong>cartuchos de tinta</strong> (inyeccion) o el <strong>toner</strong> y el <strong>tambor</strong> (laser).</li>
+                            <li>Anota los modelos exactos: te haran falta para reponerlos.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Consumible</th><th>Modelo / referencia</th><th>Estado / nivel aproximado</th></tr>
+                        <tr><td>Cartucho 1</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cartucho 2</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Toner</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tambor / drum</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.2 - Simulacion de cambio</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Extrae con cuidado el cartucho o toner (NO lo abras ni vacies).</li>
+                            <li>Examina los contactos electricos y la salida de tinta/toner.</li>
+                            <li>Vuelve a colocarlo correctamente.</li>
+                            <li>Cierra la tapa y comprueba que la impresora vuelve a estar lista.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Aviso toner:</strong> si se derrama, NO lo soples. Usa pano humedo o aspiradora especifica para toner. El polvo es muy fino y nocivo si se inhala.
+                    </div>
+
+                    <h3>5.3 - Limpieza de cabezales (solo inyeccion de tinta)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde el software de la impresora (utilidades) busca <strong>Limpieza de cabezales</strong>.</li>
+                            <li>Ejecutala. Imprimira una pagina de patron.</li>
+                            <li>Si las lineas siguen rotas, repite la limpieza una vez mas (solo una; mas seca el cabezal).</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.4 - Atasco de papel (simulacion)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre la tapa de la impresora.</li>
+                            <li>Localiza el recorrido del papel (suele estar marcado con flechas).</li>
+                            <li>Si hubiese papel atascado, deberia retirarse <strong>en el sentido de avance del papel</strong>, sin tirar fuerte hacia atras.</li>
+                            <li>Cierra la tapa.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Aviso laser:</strong> el <strong>fusor</strong> (la zona donde se aplica calor) puede estar muy caliente. No lo toques inmediatamente despues de imprimir.
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Si tienes que retirar papel atascado y no quieres romper nada, &iquest;por donde tiras y por que?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>He instalado la impresora correctamente y he impreso una pagina de prueba</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>He gestionado la cola de impresion (pausar, cancelar, reanudar)</td><td><input type="text"></td></tr>
+                            <tr><td>He localizado los consumibles y se sus modelos exactos</td><td><input type="text"></td></tr>
+                            <tr><td>He realizado al menos una operacion de mantenimiento (simulacion de cambio o limpieza)</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco las precauciones con toner y con el fusor caliente</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
+</body>
+</html>

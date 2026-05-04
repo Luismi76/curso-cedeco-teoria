@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 28: Identificacion y conexion de perifericos de entrada</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --azul-claro: #2b6cb0;
+            --gris-fondo: #f7fafc;
+            --gris-borde: #cbd5e0;
+            --rojo: #c53030;
+            --verde: #276749;
+            --naranja: #c05621;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        td input[type="text"]:focus, td select:focus { border-color: var(--azul-claro); outline: none; background: white; box-shadow: 0 0 0 2px rgba(43,108,176,.15); }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        textarea:focus { border-color: var(--azul-claro); outline: none; background: white; box-shadow: 0 0 0 2px rgba(43,108,176,.15); }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-primary:hover { background: var(--azul); }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 28: Identificacion y conexion de perifericos de entrada</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S1 (clasificacion, teclados y ratones) + S2 (escaneres, webcams, micros)<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual y por parejas<br>
+                <strong>Herramientas:</strong> teclados y ratones del aula, escaner USB, webcam, micro
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica combina trabajo en mesa (desmontar teclado, comparar ratones) con trabajo en el PC (escanear, configurar webcam). Pide al profesor los perifericos disponibles en el aula.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Clasificar correctamente perifericos en entrada, salida, E/S, almacenamiento y comunicaciones.</li>
+                        <li>Distinguir teclados de membrana y mecanicos por su construccion.</li>
+                        <li>Comparar caracteristicas entre varios ratones (sensor, conexion, DPI).</li>
+                        <li>Escanear un documento y una foto a distintas resoluciones.</li>
+                        <li>Conectar y probar una webcam.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Clasificacion -->
+            <div class="seccion">
+                <h2>Parte 1 - Clasificar perifericos (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Para cada dispositivo, indica la categoria correcta:</p>
+                    <table>
+                        <tr><th>Dispositivo</th><th>Categoria (entrada / salida / E/S / almacenamiento / comunicaciones)</th></tr>
+                        <tr><td>Webcam</td><td><input type="text"></td></tr>
+                        <tr><td>Altavoces</td><td><input type="text"></td></tr>
+                        <tr><td>Pendrive USB</td><td><input type="text"></td></tr>
+                        <tr><td>Pantalla tactil</td><td><input type="text"></td></tr>
+                        <tr><td>Router Wi-Fi</td><td><input type="text"></td></tr>
+                        <tr><td>Escaner</td><td><input type="text"></td></tr>
+                        <tr><td>Auriculares con microfono</td><td><input type="text"></td></tr>
+                        <tr><td>Proyector</td><td><input type="text"></td></tr>
+                        <tr><td>Impresora multifuncion</td><td><input type="text"></td></tr>
+                        <tr><td>Adaptador Wi-Fi USB</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Razona por que la pantalla tactil y la impresora multifuncion son E/S y no solo de salida:</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Teclados -->
+            <div class="seccion">
+                <h2>Parte 2 - Desmontar y comparar teclados (60 min)</h2>
+                <div class="seccion-body">
+                    <h3>2.1 - Identificar el tipo</h3>
+                    <p>Con un teclado proporcionado por el profesor:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa varias teclas. &iquest;Que tacto tienen? &iquest;Hacen "clic" audible?</li>
+                            <li>Mira las teclas: las mecanicas suelen ser mas altas y se pueden quitar individualmente con un extractor.</li>
+                            <li>Apunta tu hipotesis (membrana o mecanico) antes de abrirlo.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td><strong>Hipotesis previa</strong></td><td><input type="text" placeholder="Membrana / Mecanico"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Abrir el teclado</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Si el teclado tiene cable, desconectalo del PC antes de abrir.</li>
+                            <li>Retira los tornillos de la parte inferior. Apunta cuantos hay y donde estaban.</li>
+                            <li>Separa con cuidado las dos mitades de la carcasa.</li>
+                            <li>Observa el interior y describe lo que ves.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Observacion</th><th>Respuesta</th></tr>
+                        <tr><td>&iquest;Hay capas de plastico flexible con pistas impresas?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>&iquest;Hay un switch independiente bajo cada tecla?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>&iquest;Conclusion: que tipo es realmente?</td><td><input type="text" placeholder="Membrana / Mecanico"></td></tr>
+                        <tr><td>&iquest;Coincide con tu hipotesis previa?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Si fuese mecanico: extrae un switch (tirando hacia arriba con cuidado o con un extractor de switches). &iquest;De que color es el cuerpo? &iquest;Sabrias decir si es lineal, tactil o clicky?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Dibuja un esquema de lo que ves en el interior del teclado (puede ser un boceto rapido, no hace falta artistico):</p>
+                        <textarea rows="6" placeholder="Describe el esquema con texto: capas, conexiones, controlador..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Ratones -->
+            <div class="seccion">
+                <h2>Parte 3 - Comparar ratones (40 min)</h2>
+                <div class="seccion-body">
+                    <p>Con dos o tres ratones del aula, completa la tabla:</p>
+                    <table>
+                        <tr><th>Caracteristica</th><th>Raton 1</th><th>Raton 2</th><th>Raton 3</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tipo de sensor (optico / laser)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Conexion (USB / Bluetooth / dongle)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Numero de botones</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Tiene rueda?</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Tiene boton para cambiar DPI?</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Probar el sensor</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Para cada raton, pruebalo sobre la mesa, una hoja de papel y una superficie pulida (cristal, espejo).</li>
+                            <li>Anota en cuales funciona bien.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Superficie</th><th>Raton 1</th><th>Raton 2</th><th>Raton 3</th></tr>
+                        <tr><td>Mesa</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Papel</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cristal</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Por que algunos ratones no funcionan en cristal? &iquest;Que tipo de sensor si funciona?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Escanear -->
+            <div class="seccion">
+                <h2>Parte 4 - Escanear documento y foto (60 min)</h2>
+                <div class="seccion-body">
+                    <h3>4.1 - Conectar e instalar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta el escaner al PC por USB.</li>
+                            <li>Espera unos segundos. &iquest;Lo detecta Windows automaticamente?</li>
+                            <li>Si no, instala el driver del fabricante (ver Practica 32).</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.2 - Escanear un documento de texto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Coloca el documento boca abajo en el cristal del escaner.</li>
+                            <li>Abre <strong>Escaner de Windows</strong> (o el software del fabricante).</li>
+                            <li>Configura: <strong>300 PPP</strong>, formato <strong>PDF</strong>, color blanco y negro.</li>
+                            <li>Escanea y guarda como <strong>doc_texto_300.pdf</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.3 - Escanear una foto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Coloca una foto en el escaner.</li>
+                            <li>Configura: <strong>600 PPP</strong>, formato <strong>JPEG</strong>, color completo.</li>
+                            <li>Escanea y guarda como <strong>foto_600.jpg</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.4 - Comparar resultados</h3>
+                    <table>
+                        <tr><th>Documento</th><th>Resolucion</th><th>Formato</th><th>Tamano archivo</th></tr>
+                        <tr><td>Documento de texto</td><td>300 PPP</td><td>PDF</td><td><input type="text" placeholder="Ej: 250 KB"></td></tr>
+                        <tr><td>Fotografia</td><td>600 PPP</td><td>JPEG</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Por que la foto a 600 PPP pesa mucho mas que el documento a 300 PPP? Razona la respuesta:</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Webcam y micro -->
+            <div class="seccion">
+                <h2>Parte 5 - Webcam y microfono (40 min)</h2>
+                <div class="seccion-body">
+                    <h3>5.1 - Conectar la webcam</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta la webcam al USB.</li>
+                            <li>Abre la app <strong>Camara</strong> de Windows.</li>
+                            <li>Comprueba que se ve la imagen.</li>
+                            <li>Si tiene boton de privacidad o tapa, prueba a abrirlo y cerrarlo.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Caracteristica de la webcam</th><th>Valor</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
+                        <tr><td>Resolucion maxima (720p / 1080p / 4K)</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Tiene microfono integrado?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Tipo de conexion</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.2 - Grabar video corto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la app Camara, cambia a modo <strong>Video</strong>.</li>
+                            <li>Graba 10 segundos de video diciendo tu nombre y la fecha.</li>
+                            <li>Reproducelo. &iquest;El audio se entiende?</li>
+                            <li>Mira el archivo guardado en <code>Videos\Album de la camara</code>. Anota su tamano.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Tamano del video de 10 s</td><td><input type="text"></td></tr>
+                        <tr><td>Calidad del audio</td><td><input type="text" placeholder="Buena / Regular / Mala"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Configurar microfono externo (si hay)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta un microfono externo (jack rosa o USB).</li>
+                            <li>Boton derecho en el icono de sonido (barra de tareas) &rarr; <strong>Configuracion de sonido</strong>.</li>
+                            <li>En <strong>Entrada</strong>, selecciona el microfono que has conectado.</li>
+                            <li>Habla y comprueba que la barra de nivel se mueve.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>Si tuvieras que recomendar a un companero un teclado para escribir mucho codigo y un raton para edicion grafica, &iquest;que tipos elegirias y por que?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>He clasificado correctamente los perifericos en sus categorias</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>He distinguido un teclado de membrana de uno mecanico al abrirlo</td><td><input type="text"></td></tr>
+                            <tr><td>He comparado al menos 2 ratones documentando sus diferencias</td><td><input type="text"></td></tr>
+                            <tr><td>He escaneado un documento a 300 PPP y una foto a 600 PPP</td><td><input type="text"></td></tr>
+                            <tr><td>He conectado una webcam y grabado video con audio</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
+</body>
+</html>

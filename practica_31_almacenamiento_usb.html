@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 31: Almacenamiento externo y conexiones USB</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 31: Almacenamiento externo y conexiones USB</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S6 (almacenamiento externo) + S7 (USB y comunicaciones)<br>
+                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> pendrive USB, disco duro externo (si hay), adaptador Ethernet/Wi-Fi USB
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
+                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> Necesitaras al menos un pendrive y un archivo de prueba grande (1 GB aprox). Si no tienes uno, copia varios archivos hasta sumar 1 GB. El profesor puede proporcionarte un disco externo si esta disponible.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Identificar los puertos USB del PC y su version (2.0 / 3.0 / 3.2).</li>
+                        <li>Medir y comparar velocidades de transferencia entre USB 2.0 y USB 3.0.</li>
+                        <li>Conectar y configurar un adaptador de red USB (Ethernet o Wi-Fi).</li>
+                        <li>Acceder a un NAS (si esta disponible) y compartir un archivo.</li>
+                        <li>Distinguir conectores USB Tipo A, B y C.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Identificar puertos -->
+            <div class="seccion">
+                <h2>Parte 1 - Identificar los puertos USB del PC (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>1.1 - Inventario fisico</h3>
+                    <p>Inspecciona los puertos USB del PC (frontal y trasero). Apunta cada uno y su color:</p>
+                    <table>
+                        <tr><th>Nº</th><th>Ubicacion (frontal / trasera)</th><th>Color</th><th>Version USB probable</th></tr>
+                        <tr><td>1</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>2</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>3</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>4</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>5</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>6</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Pista:</strong> negro = USB 2.0, azul = USB 3.0, rojo o amarillo = puerto siempre activo (carga incluso con el PC apagado).
+                    </div>
+
+                    <h3>1.2 - Comprobar version desde el sistema</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Administrador de dispositivos</strong> (clic derecho en Inicio).</li>
+                            <li>Despliega <strong>Controladoras de bus serie universal (USB)</strong>.</li>
+                            <li>Anota cuantos hubs y controladores xHCI / EHCI hay (xHCI = USB 3.x).</li>
+                        </ol>
+                    </div>
+                    <textarea rows="4" placeholder="Lista de controladores USB que aparecen"></textarea>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Medir velocidades -->
+            <div class="seccion">
+                <h2>Parte 2 - Medir velocidades de transferencia (60 min)</h2>
+                <div class="seccion-body">
+                    <h3>2.1 - Preparar archivo de 1 GB</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Localiza un archivo de aproximadamente 1 GB (un video, una ISO...). Si no tienes, copia varios archivos hasta sumar 1 GB.</li>
+                            <li>Anota la ruta y el tamano exacto.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Ruta del archivo de prueba</td><td><input type="text"></td></tr>
+                        <tr><td>Tamano exacto (MB)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Copiar a USB 2.0</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta el pendrive a un puerto <strong>USB 2.0 (negro)</strong>.</li>
+                            <li>Copia el archivo al pendrive. Cronometra cuanto tarda.</li>
+                            <li>Calcula velocidad media: tamano (MB) / tiempo (s) = velocidad MB/s.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - Copiar a USB 3.0</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Borra el archivo del pendrive (o usa otro).</li>
+                            <li>Conecta el pendrive a un puerto <strong>USB 3.0 (azul)</strong>.</li>
+                            <li>Copia de nuevo y cronometra.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.4 - Resultados</h3>
+                    <table>
+                        <tr><th>Dispositivo</th><th>Puerto</th><th>Tiempo (s)</th><th>Velocidad calculada (MB/s)</th></tr>
+                        <tr><td>Pendrive</td><td>USB 2.0</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Pendrive</td><td>USB 3.0</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Disco externo (si hay)</td><td>USB 3.0</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Compara las velocidades obtenidas con las teoricas (USB 2.0: 60 MB/s teorico, ~30 MB/s real; USB 3.0: 625 MB/s teorico, ~400 MB/s real). &iquest;Por que la real es siempre menor que la teorica?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Conectores -->
+            <div class="seccion">
+                <h2>Parte 3 - Reconocer tipos de conector USB (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Mira los cables y conectores disponibles en el aula. Anota lo que encuentres:</p>
+                    <table>
+                        <tr><th>Tipo de conector</th><th>&iquest;Lo encuentras en el aula?</th><th>Ejemplo de dispositivo</th></tr>
+                        <tr><td>USB Tipo A (clasico rectangular)</td><td><input type="text" placeholder="Si / No"></td><td><input type="text"></td></tr>
+                        <tr><td>USB Tipo B (cuadrado)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Mini-USB</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Micro-USB</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>USB Tipo C</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Cual es la principal ventaja del USB Tipo C frente al Tipo A?</p>
+                        <textarea rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Adaptador red -->
+            <div class="seccion">
+                <h2>Parte 4 - Adaptador de red USB (40 min)</h2>
+                <div class="seccion-body">
+                    <h3>4.1 - Conectar el adaptador</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta el adaptador (Ethernet o Wi-Fi) a un puerto USB.</li>
+                            <li>Espera a que Windows lo detecte. &iquest;Instala driver automaticamente?</li>
+                            <li>Si es Ethernet, conecta tambien el cable de red al adaptador.</li>
+                            <li>Si es Wi-Fi, abre la lista de redes y conecta a la red del aula.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Tipo de adaptador</td><td><input type="text" placeholder="Ethernet / Wi-Fi"></td></tr>
+                        <tr><td>&iquest;Driver instalado automaticamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Nombre del adaptador en Administrador de dispositivos</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.2 - Verificar conectividad</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre CMD y ejecuta <code>ipconfig</code>. Anota la IP que tiene el adaptador.</li>
+                            <li>Ejecuta <code>ping 8.8.8.8</code> para comprobar internet.</li>
+                            <li>Ejecuta <code>ping google.com</code> para comprobar resolucion DNS.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>IP asignada al adaptador</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Responde ping a 8.8.8.8?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>&iquest;Responde ping a google.com?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Si <code>ping 8.8.8.8</code> funciona pero <code>ping google.com</code> no, &iquest;cual es el problema?</p>
+                        <textarea rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: NAS -->
+            <div class="seccion">
+                <h2>Parte 5 - Acceder a un NAS (30 min, opcional)</h2>
+                <div class="seccion-body">
+                    <div class="nota">
+                        Solo si hay un NAS o una carpeta compartida disponibles en el aula. Tu profesor te dara la ruta o IP.
+                    </div>
+
+                    <h3>5.1 - Acceder por ruta UNC</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el Explorador de archivos, escribe en la barra de direcciones: <code>\\IP_DEL_NAS</code> (por ejemplo <code>\\192.168.1.100</code>).</li>
+                            <li>Si pide credenciales, introduce las que te de el profesor.</li>
+                            <li>Veras las carpetas compartidas. Entra en la asignada al curso.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 - Compartir un archivo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una carpeta con tu nombre dentro de la carpeta del curso.</li>
+                            <li>Copia un archivo cualquiera (no muy grande) en ella.</li>
+                            <li>Pidele a un companero que verifique desde su PC que ve tu archivo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.3 - Mapear como unidad de red</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en <strong>Este equipo</strong> &rarr; <strong>Conectar a unidad de red</strong>.</li>
+                            <li>Asigna letra (Z:) y escribe la ruta del NAS: <code>\\IP_DEL_NAS\carpeta</code>.</li>
+                            <li>Marca "Conectar de nuevo al iniciar sesion" si quieres que se conecte automaticamente.</li>
+                            <li>Comprueba que el NAS aparece como una unidad mas en Este equipo.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>En una empresa, &iquest;que ventajas tiene un NAS frente a varios discos externos repartidos por los puestos?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>He identificado correctamente los puertos USB del PC y su version</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>He medido y comparado las velocidades USB 2.0 y USB 3.0</td><td><input type="text"></td></tr>
+                            <tr><td>Reconozco visualmente los conectores USB Tipo A, B y C</td><td><input type="text"></td></tr>
+                            <tr><td>He configurado un adaptador de red USB y comprobado conectividad con ping</td><td><input type="text"></td></tr>
+                            <tr><td>(Si aplicaba) He accedido a un NAS y mapeado una unidad de red</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
+</body>
+</html>

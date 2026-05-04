@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 32: Drivers y diagnostico de perifericos</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 32: Drivers y diagnostico de perifericos</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S9 (drivers) + S11 (diagnostico)<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual y por parejas<br>
+                <strong>Herramientas:</strong> PC con Windows, perifericos varios, conexion a internet
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
+                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> En la parte de diagnostico, el profesor habra preparado varios puestos con problemas simulados. Trabajareis por parejas turnandoos como tecnico y como cliente.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Manejar el Administrador de dispositivos: identificar dispositivos con problemas, ver detalles del driver.</li>
+                        <li>Instalar y actualizar drivers desde la web del fabricante.</li>
+                        <li>Aplicar la metodologia de diagnostico paso a paso.</li>
+                        <li>Documentar incidencias en una ficha tecnica.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Administrador dispositivos -->
+            <div class="seccion">
+                <h2>Parte 1 - Explorar el Administrador de dispositivos (40 min)</h2>
+                <div class="seccion-body">
+                    <h3>1.1 - Abrir y recorrer</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en el boton de Inicio &rarr; <strong>Administrador de dispositivos</strong>.</li>
+                            <li>Despliega cada categoria y cuenta dispositivos en total.</li>
+                            <li>Apunta cuantos hay en cada categoria principal.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Categoria</th><th>Numero de dispositivos</th></tr>
+                        <tr><td>Adaptadores de pantalla</td><td><input type="text"></td></tr>
+                        <tr><td>Adaptadores de red</td><td><input type="text"></td></tr>
+                        <tr><td>Controladoras USB</td><td><input type="text"></td></tr>
+                        <tr><td>Dispositivos de sonido / video</td><td><input type="text"></td></tr>
+                        <tr><td>Procesadores</td><td><input type="text"></td></tr>
+                        <tr><td>Unidades de disco</td><td><input type="text"></td></tr>
+                        <tr><td><strong>Total estimado</strong></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Detectar problemas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Recorre todas las categorias.</li>
+                            <li>&iquest;Hay algun dispositivo con un <strong>triangulo amarillo &#9888;</strong>?</li>
+                            <li>&iquest;Hay algun "Dispositivo desconocido"?</li>
+                            <li>Si encuentras alguno, anota el nombre.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Dispositivos con triangulo amarillo</td><td><input type="text" placeholder="Lista o 'Ninguno'"></td></tr>
+                        <tr><td>Dispositivos desconocidos</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.3 - Examinar un driver</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en tu <strong>tarjeta de red</strong> (o adaptador inalambrico) &rarr; <strong>Propiedades</strong>.</li>
+                            <li>Pestana <strong>Controlador</strong>.</li>
+                            <li>Anota los datos.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Proveedor del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>Fecha del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>Version del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Esta firmado digitalmente?</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Instalar driver -->
+            <div class="seccion">
+                <h2>Parte 2 - Instalar un driver manualmente (50 min)</h2>
+                <div class="seccion-body">
+                    <h3>2.1 - Desinstalar un driver</h3>
+                    <div class="aviso">
+                        <strong>Aviso:</strong> elige un dispositivo que NO sea critico (no la tarjeta grafica ni el disco del sistema). Mejor un dispositivo USB que puedes desconectar y volver a conectar sin riesgo.
+                    </div>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en el dispositivo elegido &rarr; <strong>Desinstalar dispositivo</strong>.</li>
+                            <li>Si te pregunta si quieres tambien borrar el archivo del driver, mira las dos opciones (con o sin borrar archivos) y prueba <strong>sin borrar</strong>.</li>
+                            <li>Confirma. El dispositivo desaparecera o aparecera con triangulo amarillo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.2 - Reinstalar (Windows)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el menu del Administrador, elige <strong>Accion &rarr; Buscar cambios de hardware</strong>.</li>
+                            <li>Windows debe re-detectar el dispositivo y reinstalar el driver basico.</li>
+                            <li>Comprueba que el triangulo amarillo desaparece.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - Instalar el driver del fabricante</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Localiza el modelo exacto del dispositivo (etiqueta o web).</li>
+                            <li>En la web oficial del fabricante, descarga el driver para tu version de Windows.</li>
+                            <li>Ejecuta el instalador. Si es solo .inf, clic derecho &rarr; <strong>Instalar</strong>.</li>
+                            <li>Reinicia si te lo pide.</li>
+                            <li>Vuelve al Administrador de dispositivos y comprueba que el dispositivo ahora muestra el driver del fabricante (no el generico de Windows).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Dispositivo elegido</td><td><input type="text"></td></tr>
+                        <tr><td>URL del driver descargado</td><td><input type="text"></td></tr>
+                        <tr><td>Version del driver instalado</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Por que es preferible instalar el driver del fabricante en lugar del generico de Windows, especialmente en GPUs y impresoras?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Metodologia de diagnostico -->
+            <div class="seccion">
+                <h2>Parte 3 - Metodologia de diagnostico (15 min teoria)</h2>
+                <div class="seccion-body">
+                    <p>Cuando un periferico no funciona, sigue siempre estos pasos en orden:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>&iquest;Esta <strong>conectado</strong>? (parece broma, pero es la causa nº1).</li>
+                            <li>&iquest;Esta <strong>encendido</strong>? (interruptor, pilas, bateria, indicador LED).</li>
+                            <li>&iquest;Lo detecta Windows? (Administrador de dispositivos).</li>
+                            <li>&iquest;Tiene <strong>driver</strong>? &iquest;Triangulo amarillo? &iquest;Desconocido?</li>
+                            <li>Probar <strong>otro puerto</strong> / otro cable.</li>
+                            <li>Probar el periferico en <strong>otro PC</strong>.</li>
+                            <li>Probar otro periferico del mismo tipo en este PC.</li>
+                            <li>Si nada de lo anterior funciona &rarr; el periferico esta averiado.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Idea clave:</strong> ir de lo barato y rapido a lo caro y lento. Un cable nuevo cuesta 5 €; cambiar la impresora, varios cientos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Diagnostico practico -->
+            <div class="seccion">
+                <h2>Parte 4 - Diagnosticar fallos simulados (75 min)</h2>
+                <div class="seccion-body">
+                    <p>El profesor ha preparado varios puestos con problemas. En parejas, recorred al menos <strong>3 puestos</strong> y diagnosticadlos:</p>
+
+                    <h3>Puesto A</h3>
+                    <table>
+                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
+                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
+                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
+                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
+                        <tr><th>&iquest;Resuelto?</th><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
+
+                    <h3>Puesto B</h3>
+                    <table>
+                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
+                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
+                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
+                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
+                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Puesto C</h3>
+                    <table>
+                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
+                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
+                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
+                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
+                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Puesto D (opcional)</h3>
+                    <table>
+                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
+                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
+                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
+                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
+                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Ficha de incidencia -->
+            <div class="seccion">
+                <h2>Parte 5 - Ficha de incidencia profesional (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Elige uno de los puestos diagnosticados arriba y rellena una ficha como la que se usa en una empresa real:</p>
+
+                    <div class="ficha">
+                        <h4>FICHA DE INCIDENCIA Nº _______</h4>
+                        <label>Fecha</label>
+                        <input type="date">
+                        <label>Tecnico</label>
+                        <input type="text">
+                        <label>Cliente / departamento</label>
+                        <input type="text">
+                        <label>Equipo / periferico (marca y modelo)</label>
+                        <input type="text">
+                        <label>Numero de serie</label>
+                        <input type="text">
+                        <label>Descripcion del problema (lo que dice el usuario)</label>
+                        <textarea rows="3"></textarea>
+                        <label>Sintomas observados (lo que ves tu)</label>
+                        <textarea rows="3"></textarea>
+                        <label>Diagnostico realizado: pasos en orden</label>
+                        <textarea rows="5" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea>
+                        <label>Causa raiz identificada</label>
+                        <textarea rows="2"></textarea>
+                        <label>Solucion aplicada</label>
+                        <textarea rows="3"></textarea>
+                        <label>Tiempo total empleado (min)</label>
+                        <input type="text">
+                        <label>Materiales / consumibles usados</label>
+                        <input type="text">
+                        <label>&iquest;Resuelto?</label>
+                        <input type="text" placeholder="Si / No (motivo) / Pendiente">
+                        <label>Recomendaciones al usuario para que no vuelva a ocurrir</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="pregunta">
+                        <p>De todos los problemas que has visto en los puestos, &iquest;cual fue el mas dificil de diagnosticar y por que? &iquest;Que aprendiste de el?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>Manejo el Administrador de dispositivos y se identificar drivers problematicos</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>He instalado un driver desde la web del fabricante</td><td><input type="text"></td></tr>
+                            <tr><td>He aplicado la metodologia de diagnostico paso a paso en al menos 3 puestos</td><td><input type="text"></td></tr>
+                            <tr><td>He documentado al menos una incidencia con la ficha tecnica</td><td><input type="text"></td></tr>
+                            <tr><td>Distingo problemas de hardware (cable, puerto), de driver y de configuracion</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
+</body>
+</html>

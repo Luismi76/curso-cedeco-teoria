@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 29: Configuracion y calibracion de monitores</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 29: Configuracion y calibracion de monitores</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S3 (monitores) + S8 (vidieo) + S10 (calibracion)<br>
+                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> al menos un monitor externo, cables HDMI / DisplayPort / VGA si hay
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
+                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>Nota:</strong> Trabajaras con el monitor de tu puesto y, si hay disponibles, con un segundo monitor para comparar. Identificaras puertos, configuraras resolucion/frecuencia y calibraras el color.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Identificar los puertos de video del monitor y del PC.</li>
+                        <li>Conectar correctamente con el cable adecuado segun la situacion.</li>
+                        <li>Configurar resolucion nativa y frecuencia maxima en Windows.</li>
+                        <li>Comprender la diferencia entre IPS, VA y TN.</li>
+                        <li>Calibrar el color del monitor con el asistente de Windows.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PARTE 1: Identificar -->
+            <div class="seccion">
+                <h2>Parte 1 - Identificar el monitor (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>1.1 - Datos del monitor</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Mira la etiqueta trasera del monitor o el menu OSD (boton de menu del propio monitor) para sacar los datos.</li>
+                            <li>Si el OSD lo permite, anota la resolucion nativa y la frecuencia maxima.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Dato</th><th>Valor</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
+                        <tr><td>Tamano (pulgadas)</td><td><input type="text"></td></tr>
+                        <tr><td>Resolucion nativa</td><td><input type="text" placeholder="Ej: 1920 x 1080"></td></tr>
+                        <tr><td>Frecuencia maxima (Hz)</td><td><input type="text"></td></tr>
+                        <tr><td>Tecnologia de panel (IPS / VA / TN / OLED)</td><td><input type="text"></td></tr>
+                        <tr><td>Conectores disponibles</td><td><input type="text" placeholder="Ej: HDMI x1, DP x1, VGA x1"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Identificar el cable usado</h3>
+                    <table>
+                        <tr><th>Cable que conecta tu monitor al PC</th><th>Tipo (HDMI / DP / DVI / VGA / USB-C)</th><th>Comentario</th></tr>
+                        <tr><td>Cable actual</td><td><input type="text"></td><td><input type="text" placeholder="Estado, longitud..."></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 2: Resolucion y frecuencia -->
+            <div class="seccion">
+                <h2>Parte 2 - Configurar resolucion y frecuencia (45 min)</h2>
+                <div class="seccion-body">
+                    <h3>2.1 - Cambiar resolucion</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en el escritorio &rarr; <strong>Configuracion de pantalla</strong>.</li>
+                            <li>En <strong>Escala y disposicion</strong>, anota la resolucion actual.</li>
+                            <li>Cambia a una resolucion mas baja (por ejemplo 1280 x 720) y observa el efecto. &iquest;Que pasa?</li>
+                            <li>Vuelve a la resolucion nativa (la marcada como "(Recomendada)").</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Resolucion</th><th>Como se ve</th></tr>
+                        <tr><td>Nativa: <input type="text" placeholder="Ej: 1920 x 1080"></td><td><input type="text"></td></tr>
+                        <tr><td>Baja: 1280 x 720</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Cambiar frecuencia de refresco</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla &rarr; <strong>Configuracion avanzada de pantalla</strong>.</li>
+                            <li>En "Frecuencia de actualizacion", selecciona la maxima disponible.</li>
+                            <li>Aplica y confirma.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Frecuencia configurada (Hz)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.3 - Escalado</h3>
+                    <p>Si la resolucion nativa es muy alta y el texto se ve pequeno, ajusta el escalado.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla, busca <strong>Escala</strong>.</li>
+                            <li>Prueba con 100%, 125% y 150%. Anota cual te resulta mas comodo.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Escala mas comoda para ti</td><td><input type="text" placeholder="Ej: 125%"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 3: Comparativa -->
+            <div class="seccion">
+                <h2>Parte 3 - Comparativa de monitores (30 min)</h2>
+                <div class="seccion-body">
+                    <p>Si hay otro monitor disponible en el aula, completa la comparativa:</p>
+                    <table>
+                        <tr><th>Caracteristica</th><th>Monitor 1 (tu puesto)</th><th>Monitor 2 (otro puesto)</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tamano</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Resolucion nativa</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tecnologia de panel</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Frecuencia maxima</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Conectores disponibles</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Mira los dos monitores desde un angulo (de lado). &iquest;Cual conserva mejor los colores? &iquest;Que tecnologia de panel suele tener mejores angulos de vision?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 4: Calibracion -->
+            <div class="seccion">
+                <h2>Parte 4 - Calibrar el color del monitor (40 min)</h2>
+                <div class="seccion-body">
+                    <h3>4.1 - Asistente de calibracion de Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win+S</strong> y busca "Calibrar el color de la pantalla". Abrelo.</li>
+                            <li>Sigue el asistente paso a paso:
+                                <ul style="margin-left:18px">
+                                    <li>Ajuste de gamma.</li>
+                                    <li>Brillo y contraste (con los botones del monitor).</li>
+                                    <li>Balance de colores (rojo, verde, azul).</li>
+                                </ul>
+                            </li>
+                            <li>Al final, pulsa "Comparacion antes/despues".</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Ajuste</th><th>Valor antes</th><th>Valor despues</th></tr>
+                        <tr><td>Brillo del monitor (%)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Contraste del monitor (%)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Gamma (claro / oscuro / intermedio)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.2 - Ajustes desde el OSD del monitor</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa el boton de menu del monitor (OSD).</li>
+                            <li>Busca <strong>perfiles de imagen</strong> (sRGB, Cinema, Game, etc.) y prueba al menos 2.</li>
+                            <li>Anota cual te parece mas natural para uso normal.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Perfil OSD elegido</td><td><input type="text" placeholder="Ej: sRGB"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que perfil de color elegirias para retoque fotografico profesional y por que?</p>
+                        <textarea rows="3" placeholder="Pista: sRGB, Adobe RGB, DCI-P3..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Multimonitor -->
+            <div class="seccion">
+                <h2>Parte 5 - Configuracion multimonitor (opcional, si hay segundo monitor)</h2>
+                <div class="seccion-body">
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta un segundo monitor al PC con el cable disponible (HDMI o DP).</li>
+                            <li>Ve a <strong>Configuracion de pantalla</strong>. Veras los dos monitores.</li>
+                            <li>Prueba los modos: <strong>Duplicar</strong>, <strong>Extender</strong>, <strong>Solo segunda pantalla</strong>.</li>
+                            <li>Arrastra los monitores en el grafico para que coincidan con su posicion fisica.</li>
+                            <li>Mueve una ventana de un monitor a otro para comprobar que extiende bien.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Cuando usarias "Duplicar" en lugar de "Extender"?</p>
+                        <textarea rows="3" placeholder="Pista: presentaciones, proyectores..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>He identificado correctamente la resolucion nativa y conectores del monitor</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>He configurado resolucion y frecuencia correctamente en Windows</td><td><input type="text"></td></tr>
+                            <tr><td>He completado el asistente de calibracion de color</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo las diferencias entre IPS, VA, TN y OLED</td><td><input type="text"></td></tr>
+                            <tr><td>(Si aplicaba) He configurado correctamente un setup multimonitor</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
+</body>
+</html>
