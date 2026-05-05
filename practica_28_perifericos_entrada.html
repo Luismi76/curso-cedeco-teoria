@@ -1,211 +1,468 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Practica 28: Identificacion y conexion de perifericos de entrada (Entorno Virtual)</title>
-
-<style>
-:root {
-    --azul: #1a365d;
-    --azul-claro: #2b6cb0;
-    --gris-fondo: #f7fafc;
-    --gris-borde: #cbd5e0;
-    --verde: #276749;
-}
-
-body {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 14px;
-    background: #e2e8f0;
-    padding: 20px;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-header {
-    background: var(--azul);
-    color: white;
-    padding: 24px;
-}
-
-.content {
-    padding: 28px;
-}
-
-.seccion {
-    margin-bottom: 28px;
-}
-
-.seccion h2 {
-    background: var(--azul);
-    color: white;
-    padding: 10px;
-}
-
-.seccion-body {
-    border: 1px solid var(--gris-borde);
-    padding: 16px;
-}
-
-.pasos ol {
-    margin-left: 20px;
-}
-
-textarea, input {
-    width: 100%;
-    margin-top: 5px;
-}
-
-.nota {
-    background: #ebf8ff;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 28: Perifericos de entrada (entorno virtual)</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+        }
+    </style>
 </head>
-
 <body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <div class="container">
+        <header>
+            <h1>Practica 28: Perifericos de entrada (entorno virtual)</h1>
+            <div class="meta">
+                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Sesiones:</strong> S1 (clasificacion, teclados y ratones) + S2 (escaneres, webcams, micros)<br>
+                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
+                <strong>Modalidad:</strong> Trabajo individual en VM<br>
+                <strong>Herramientas:</strong> VM Windows 10/11, NAPS2 para simulacion de escaner, webcam pasada al VM o video de prueba
+            </div>
+        </header>
 
-<div class="container">
+        <div class="content">
 
-<header>
-<h1>Practica 28: Perifericos de entrada (Entorno Virtual)</h1>
-<p>Adaptada a laboratorio con maquinas virtuales</p>
-</header>
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date">
+                </div>
+            </div>
 
-<div class="content">
+            <div class="nota">
+                <strong>Nota:</strong> Esta practica esta adaptada al laboratorio virtual del curso. Donde no podemos manipular hardware fisico (desmontar teclados, escaneres reales) trabajamos con informacion tecnica online y simulaciones por software. Lo importante son los conceptos y la configuracion, no el hardware en si.
+            </div>
 
-<div class="nota">
-<strong>Nota:</strong> Esta practica se realiza en un laboratorio virtual. Los perifericos se simulan mediante software, replicando el comportamiento real del sistema.
-</div>
+            <div class="seccion">
+                <h2>Objetivos de la practica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Clasificar correctamente perifericos en entrada, salida, E/S, almacenamiento y comunicaciones.</li>
+                        <li>Distinguir teclados de membrana, mecanicos y por tipo de switch consultando especificaciones tecnicas.</li>
+                        <li>Configurar un raton en Windows: velocidad, botones primarios, rueda.</li>
+                        <li>Simular un escaneo con NAPS2 a distintas resoluciones (300 PPP documento, 600 PPP foto) y comparar tamanos.</li>
+                        <li>Comprobar y configurar webcam y microfono en la VM.</li>
+                    </ul>
+                </div>
+            </div>
 
-<!-- PARTE 1 -->
-<div class="seccion">
-<h2>Parte 1 - Clasificacion</h2>
-<div class="seccion-body">
-<p>Clasifica los siguientes dispositivos:</p>
-<textarea rows="4"></textarea>
-</div>
-</div>
+            <!-- PARTE 1: Clasificacion -->
+            <div class="seccion">
+                <h2>Parte 1 - Clasificar perifericos (20 min)</h2>
+                <div class="seccion-body">
+                    <p>Para cada dispositivo, indica la categoria correcta:</p>
+                    <table>
+                        <tr><th>Dispositivo</th><th>Categoria (entrada / salida / E/S / almacenamiento / comunicaciones)</th></tr>
+                        <tr><td>Webcam</td><td><input type="text"></td></tr>
+                        <tr><td>Altavoces</td><td><input type="text"></td></tr>
+                        <tr><td>Pendrive USB</td><td><input type="text"></td></tr>
+                        <tr><td>Pantalla tactil</td><td><input type="text"></td></tr>
+                        <tr><td>Router Wi-Fi</td><td><input type="text"></td></tr>
+                        <tr><td>Escaner</td><td><input type="text"></td></tr>
+                        <tr><td>Auriculares con microfono</td><td><input type="text"></td></tr>
+                        <tr><td>Proyector</td><td><input type="text"></td></tr>
+                        <tr><td>Impresora multifuncion</td><td><input type="text"></td></tr>
+                        <tr><td>Adaptador Wi-Fi USB</td><td><input type="text"></td></tr>
+                        <tr><td>Disco duro externo</td><td><input type="text"></td></tr>
+                        <tr><td>Lector de huella dactilar</td><td><input type="text"></td></tr>
+                    </table>
 
-<!-- PARTE 2 -->
-<div class="seccion">
-<h2>Parte 2 - Teclados</h2>
-<div class="seccion-body">
+                    <div class="pregunta">
+                        <p>Razona por que la pantalla tactil y la impresora multifuncion son E/S y no solo de salida:</p>
+                        <textarea rows="3"></textarea>
+                    </div>
 
-<p>Analiza un teclado mediante informacion tecnica:</p>
+                    <div class="pregunta">
+                        <p>Una webcam con microfono integrado, &iquest;es solo de entrada o de E/S? Explica por que.</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
 
-<div class="pasos">
-<ol>
-<li>Busca el modelo en internet</li>
-<li>Determina si es mecanico o membrana</li>
-<li>Describe sus caracteristicas</li>
-</ol>
-</div>
+            <!-- PARTE 2: Teclados -->
+            <div class="seccion">
+                <h2>Parte 2 - Analisis tecnico de teclados (50 min)</h2>
+                <div class="seccion-body">
+                    <p>Como no podemos desmontar teclados fisicos en la VM, vamos a analizarlos usando sus <strong>fichas tecnicas online</strong>.</p>
 
-<textarea rows="4"></textarea>
+                    <h3>2.1 - Buscar tres modelos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM, abre el navegador.</li>
+                            <li>Busca tres teclados de gamas y tipos diferentes:
+                                <ul style="margin-left:18px">
+                                    <li>Uno <strong>de membrana barato</strong> (ej. Logitech K120, HP Wired 320).</li>
+                                    <li>Uno <strong>mecanico de oficina</strong> (ej. Keychron K2, Logitech MX Mechanical).</li>
+                                    <li>Uno <strong>mecanico gaming</strong> (ej. Razer BlackWidow, Corsair K70).</li>
+                                </ul>
+                            </li>
+                            <li>Apunta los datos clave de cada uno consultando la web del fabricante o tiendas como PCComponentes/Amazon.</li>
+                        </ol>
+                    </div>
 
-</div>
-</div>
+                    <table>
+                        <tr><th>Caracteristica</th><th>Teclado 1 (membrana)</th><th>Teclado 2 (mecanico oficina)</th><th>Teclado 3 (gaming)</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tipo (membrana / mecanico)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tipo de switch (si es mecanico)</td><td>-</td><td><input type="text" placeholder="Ej: Cherry MX Brown"></td><td><input type="text"></td></tr>
+                        <tr><td>Conexion (USB cable / inalambrico / Bluetooth)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Iluminacion (no / single / RGB)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Distribucion (full / TKL / 60%)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Precio aproximado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
 
-<!-- PARTE 3 -->
-<div class="seccion">
-<h2>Parte 3 - Ratones</h2>
-<div class="seccion-body">
+                    <h3>2.2 - Switches mecanicos Cherry MX</h3>
+                    <p>Completa la tabla con la caracteristica principal de cada color:</p>
+                    <table>
+                        <tr><th>Color</th><th>Lineal / Tactil / Clicky</th><th>Uso recomendado</th></tr>
+                        <tr><td>Cherry MX Red</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cherry MX Blue</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cherry MX Brown</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
 
-<p>Configura el raton en Windows:</p>
+                    <h3>2.3 - Probar el teclado de la VM</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM, abre <strong>Bloc de notas</strong>.</li>
+                            <li>Escribe la frase: "El veloz murcielago hindu comia feliz cardillo y kiwi".</li>
+                            <li>Verifica que se escriben correctamente las tildes, la &ntilde; y los caracteres especiales (@, #, &euro;).</li>
+                            <li>Si algo no funciona, comprueba la <strong>distribucion</strong> del teclado en Configuracion &rarr; Hora e idioma &rarr; Idioma y region.</li>
+                        </ol>
+                    </div>
 
-<div class="pasos">
-<ol>
-<li>Configuracion → Dispositivos → Raton</li>
-<li>Cambia velocidad del puntero</li>
-<li>Prueba comportamiento</li>
-</ol>
-</div>
+                    <table>
+                        <tr><td>Distribucion configurada</td><td><input type="text" placeholder="Espanol (Espana) / US / ..."></td></tr>
+                        <tr><td>&iquest;Las tildes y la &ntilde; funcionan correctamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
 
-<textarea rows="4"></textarea>
+                    <div class="pregunta">
+                        <p>Si tuvieras que recomendar un teclado a un programador que escribe codigo todo el dia y trabaja en una oficina compartida, &iquest;que tipo elegirias y por que?</p>
+                        <textarea rows="3" placeholder="Pista: tacto + ruido"></textarea>
+                    </div>
+                </div>
+            </div>
 
-</div>
-</div>
+            <!-- PARTE 3: Ratones -->
+            <div class="seccion">
+                <h2>Parte 3 - Configurar y comparar ratones (45 min)</h2>
+                <div class="seccion-body">
+                    <h3>3.1 - Configuracion del raton en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM, abre <strong>Configuracion &rarr; Bluetooth y dispositivos &rarr; Raton</strong>.</li>
+                            <li>Apunta los valores actuales y prueba a cambiarlos.</li>
+                        </ol>
+                    </div>
 
-<!-- PARTE 4 ESCANER -->
-<div class="seccion">
-<h2>Parte 4 - Simulacion de escaner</h2>
-<div class="seccion-body">
+                    <table>
+                        <tr><th>Ajuste</th><th>Valor antes</th><th>Valor despues</th><th>Que cambia al modificarlo</th></tr>
+                        <tr><td>Velocidad del puntero</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Boton primario (izquierdo / derecho)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Lineas a desplazar con la rueda</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
 
-<p>Usaremos NAPS2 para simular escaneo.</p>
+                    <h3>3.2 - Configuracion avanzada</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa en <strong>Configuracion adicional del raton</strong> (panel clasico).</li>
+                            <li>Pestana <strong>Punteros</strong>: cambia el esquema. Aplica.</li>
+                            <li>Pestana <strong>Opciones del puntero</strong>: activa "Mostrar la ubicacion del puntero al pulsar Ctrl".</li>
+                            <li>Pruebalo: deja la pantalla quieta y pulsa Ctrl. &iquest;Aparece un circulo?</li>
+                        </ol>
+                    </div>
 
-<div class="pasos">
-<ol>
-<li>Abrir NAPS2</li>
-<li>Importar archivo desde C:\Escaner_Entrada</li>
-</ol>
-</div>
+                    <table>
+                        <tr><td>Esquema de punteros elegido</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Funciona el indicador con Ctrl?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
 
-<h3>Documento</h3>
-<ul>
-<li>300 PPP</li>
-<li>Blanco y negro</li>
-<li>Exportar PDF</li>
-</ul>
+                    <h3>3.3 - Comparar ratones por especificaciones online</h3>
+                    <p>Busca en la web tres ratones distintos y completa la tabla:</p>
+                    <table>
+                        <tr><th>Caracteristica</th><th>Raton 1 (oficina basico)</th><th>Raton 2 (gaming)</th><th>Raton 3 (productividad MX)</th></tr>
+                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Sensor (optico / laser)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>DPI maximos</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Polling rate (Hz)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Numero de botones</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Conexion</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Precio aproximado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
 
-<h3>Foto</h3>
-<ul>
-<li>600 PPP</li>
-<li>Color</li>
-<li>Exportar JPG</li>
-</ul>
+                    <div class="pregunta">
+                        <p>&iquest;Para que sirve tener un boton dedicado a cambiar el DPI sobre la marcha en un raton gaming?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
 
-<div class="pregunta">
-<p>¿Por que cambia el tamaño del archivo?</p>
-<textarea rows="3"></textarea>
-</div>
+            <!-- PARTE 4: Escaner con NAPS2 -->
+            <div class="seccion">
+                <h2>Parte 4 - Simulacion de escaner con NAPS2 (60 min)</h2>
+                <div class="seccion-body">
+                    <p><strong>NAPS2</strong> es una herramienta libre que permite escanear documentos. Aunque no tengamos un escaner fisico, NAPS2 puede importar imagenes existentes y aplicarles ajustes como si las hubiera escaneado, lo que nos sirve para entender el flujo de escaneo (resolucion, formato, OCR).</p>
 
-<div class="pregunta">
-<p>¿Que partes son simuladas?</p>
-<textarea rows="3"></textarea>
-</div>
+                    <h3>4.1 - Instalar NAPS2</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM, abre el navegador y visita <code>https://www.naps2.com</code>.</li>
+                            <li>Descarga el instalador para Windows.</li>
+                            <li>Ejecutalo y completa la instalacion con valores por defecto.</li>
+                            <li>Abre NAPS2 desde el menu Inicio.</li>
+                        </ol>
+                    </div>
 
-</div>
-</div>
+                    <h3>4.2 - Importar y "escanear" un documento</h3>
+                    <p>El profesor habra dejado en <code>C:\Escaner_Entrada\</code> un par de archivos: un documento de texto en imagen y una foto.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En NAPS2 pulsa <strong>Importar</strong>.</li>
+                            <li>Selecciona el archivo de <strong>documento</strong> (texto / formulario).</li>
+                            <li>En las propiedades, configura:
+                                <ul style="margin-left:18px">
+                                    <li>Resolucion: <strong>300 PPP</strong></li>
+                                    <li>Color: <strong>blanco y negro</strong> o <strong>escala de grises</strong></li>
+                                </ul>
+                            </li>
+                            <li>Pulsa <strong>Guardar como PDF</strong> y nombralo <code>doc_300.pdf</code>.</li>
+                        </ol>
+                    </div>
 
-<!-- PARTE 5 -->
-<div class="seccion">
-<h2>Parte 5 - Webcam</h2>
-<div class="seccion-body">
+                    <h3>4.3 - Importar y "escanear" una foto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Importa la <strong>foto</strong> en NAPS2.</li>
+                            <li>Configura: <strong>600 PPP</strong>, color completo.</li>
+                            <li>Guarda como <strong>JPEG</strong> con nombre <code>foto_600.jpg</code>.</li>
+                        </ol>
+                    </div>
 
-<div class="nota">
-Si la VM no detecta webcam, usar video de prueba.
-</div>
+                    <h3>4.4 - Comparar resultados</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Localiza los dos archivos en el Explorador.</li>
+                            <li>Apunta el tamano de cada uno (clic derecho &rarr; Propiedades).</li>
+                        </ol>
+                    </div>
 
-<textarea rows="3"></textarea>
+                    <table>
+                        <tr><th>Archivo</th><th>Resolucion</th><th>Formato</th><th>Tamano</th></tr>
+                        <tr><td>doc_300.pdf</td><td>300 PPP</td><td>PDF</td><td><input type="text"></td></tr>
+                        <tr><td>foto_600.jpg</td><td>600 PPP</td><td>JPEG</td><td><input type="text"></td></tr>
+                    </table>
 
-</div>
-</div>
+                    <div class="pregunta">
+                        <p>&iquest;Por que la foto a 600 PPP pesa mas que el documento a 300 PPP, aunque las dos sean del mismo tamano fisico?</p>
+                        <textarea rows="3" placeholder="Pista: pixeles + profundidad de color"></textarea>
+                    </div>
 
-<!-- ENTREGA -->
-<div class="seccion">
-<h2>Entrega</h2>
-<div class="seccion-body">
-<ul>
-<li>PDF generado</li>
-<li>Imagen generada</li>
-<li>Respuestas completadas</li>
-<li>Captura del proceso</li>
-</ul>
-</div>
-</div>
+                    <div class="pregunta">
+                        <p>Identifica que partes del flujo son <strong>simuladas</strong> y cuales serian iguales con un escaner real:</p>
+                        <textarea rows="3"></textarea>
+                    </div>
 
-</div>
-</div>
+                    <h3>4.5 - OCR (extra)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>NAPS2 incluye OCR (reconocimiento de texto) en varios idiomas.</li>
+                            <li>Importa el documento de texto y aplica OCR en espanol antes de guardar como PDF.</li>
+                            <li>Abre el PDF resultante en cualquier visor: ahora deberia poderse <strong>seleccionar y copiar el texto</strong>, no solo verlo como imagen.</li>
+                        </ol>
+                    </div>
 
+                    <table>
+                        <tr><td>&iquest;Has podido seleccionar texto del PDF con OCR?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PARTE 5: Webcam -->
+            <div class="seccion">
+                <h2>Parte 5 - Webcam en la VM (40 min)</h2>
+                <div class="seccion-body">
+                    <div class="nota">
+                        Si tu VM tiene una webcam pasada por VirtualBox/VMware (USB passthrough), usaras esa. Si no, trabajaras con un <strong>video de prueba</strong> que el profesor habra dejado en <code>C:\Recursos\webcam_test.mp4</code>.
+                    </div>
+
+                    <h3>5.1 - Comprobar si la VM detecta camara</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM, abre la app <strong>Camara</strong> (Win+S, escribe "Camara").</li>
+                            <li>Si aparece imagen, anota los datos de la camara.</li>
+                            <li>Si dice "No se encuentra ninguna camara", marca esa opcion abajo y pasa al ejercicio 5.3.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>&iquest;La VM detecta camara?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Marca y modelo (si la detecta)</td><td><input type="text"></td></tr>
+                        <tr><td>Resolucion maxima ofrecida</td><td><input type="text" placeholder="Ej: 720p / 1080p"></td></tr>
+                    </table>
+
+                    <h3>5.2 - Grabar vídeo (si hay camara)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la app Camara, cambia a modo <strong>Video</strong>.</li>
+                            <li>Graba 10 segundos diciendo tu nombre y la fecha.</li>
+                            <li>Reproducelo. Apunta el tamano del archivo (Videos / Camera Roll).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Tamano del video de 10 s</td><td><input type="text"></td></tr>
+                        <tr><td>Calidad del audio</td><td><input type="text" placeholder="Buena / Regular / Mala"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Alternativa con video de prueba</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Localiza <code>C:\Recursos\webcam_test.mp4</code>.</li>
+                            <li>Abrelo con el reproductor por defecto. Apunta su resolucion y duracion (clic derecho &rarr; Propiedades &rarr; Detalles).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Resolucion del video</td><td><input type="text"></td></tr>
+                        <tr><td>Duracion</td><td><input type="text"></td></tr>
+                        <tr><td>Codec / formato</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Para una videollamada profesional, &iquest;que resolucion minima recomendarias y por que?</p>
+                        <textarea rows="3" placeholder="Pista: 720p, 1080p, ancho de banda..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTE 6: Microfono -->
+            <div class="seccion">
+                <h2>Parte 6 - Microfono y entrada de audio (30 min)</h2>
+                <div class="seccion-body">
+                    <h3>6.1 - Configurar entrada de audio</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en el icono de sonido de la barra de tareas &rarr; <strong>Configuracion de sonido</strong>.</li>
+                            <li>En la seccion <strong>Entrada</strong>, mira los dispositivos disponibles. Apuntalos.</li>
+                            <li>Habla. &iquest;Se mueve la barra de nivel?</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Dispositivos de entrada disponibles</td><td><input type="text"></td></tr>
+                        <tr><td>Dispositivo predeterminado</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Se mueve la barra al hablar?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.2 - Grabadora de voz</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Grabadora de sonido</strong> de Windows.</li>
+                            <li>Graba 10 segundos diciendo tu nombre y nombre de la VM.</li>
+                            <li>Reproducelo. Apunta el tamano del archivo y donde se guarda.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Tamano del audio de 10 s</td><td><input type="text"></td></tr>
+                        <tr><td>Carpeta de guardado</td><td><input type="text"></td></tr>
+                        <tr><td>Formato del archivo</td><td><input type="text" placeholder="Ej: .m4a"></td></tr>
+                    </table>
+
+                    <h3>6.3 - Tipos de microfono (teoria)</h3>
+                    <p>Asocia cada tipo con su uso recomendado:</p>
+                    <table>
+                        <tr><th>Tipo</th><th>Caracteristica principal</th><th>Uso recomendado</th></tr>
+                        <tr><td>Condensador</td><td><input type="text" placeholder="Tu definicion"></td><td><input type="text"></td></tr>
+                        <tr><td>Dinamico</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Lavalier (solapa)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EVALUACION -->
+            <div class="seccion">
+                <h2>Conclusiones y evaluacion</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>Reflexion final: trabajar con perifericos en un entorno virtual tiene limitaciones (no podemos desmontar hardware, ni medir tactos reales). &iquest;Que aspectos del temario crees que se entienden bien igualmente y cuales necesitarian hardware fisico para aprenderse a fondo?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluacion</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>He clasificado correctamente los perifericos en sus categorias</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>Distingo membrana / mecanico y los principales switches Cherry MX</td><td><input type="text"></td></tr>
+                            <tr><td>He configurado velocidad, botones y rueda del raton en Windows</td><td><input type="text"></td></tr>
+                            <tr><td>He simulado un escaneo con NAPS2 a 300 PPP y a 600 PPP, y entiendo por que cambia el tamano</td><td><input type="text"></td></tr>
+                            <tr><td>He probado el OCR de NAPS2 y obtenido un PDF con texto seleccionable</td><td><input type="text"></td></tr>
+                            <tr><td>He comprobado camara/microfono en la VM o trabajado con video de prueba</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+        </div>
+    </div>
 </body>
 </html>
