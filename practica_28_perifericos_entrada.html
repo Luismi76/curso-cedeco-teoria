@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practica 28: Perifericos de entrada (entorno virtual)</title>
+    <title>Practica 28: USB en maquinas virtuales (Windows y Linux)</title>
     <style>
-        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
         header { background: var(--azul); color: white; padding: 24px 32px; }
         header h1 { font-size: 22px; margin-bottom: 8px; }
         header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
@@ -22,6 +22,7 @@
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
         td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
@@ -31,9 +32,13 @@
         .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
         .pasos strong { color: var(--azul); }
         .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .pregunta { margin: 14px 0; }
         .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
         code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
         .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
         .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
         .evaluacion th { background: #c6f6d5; color: var(--verde); }
@@ -41,6 +46,8 @@
         .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
         .btn-primary { background: var(--azul-claro); color: white; }
         .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        .duracion-bar { display: flex; gap: 0; margin: 14px 0; border-radius: 6px; overflow: hidden; font-size: 11px; font-weight: 600; }
+        .duracion-bar div { padding: 6px 8px; color: white; text-align: center; }
         @media print {
             body { background: white; padding: 0; font-size: 12px; }
             .container { box-shadow: none; border-radius: 0; }
@@ -50,6 +57,7 @@
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -57,14 +65,14 @@
     <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
     <div class="container">
         <header>
-            <h1>Practica 28: Perifericos de entrada (entorno virtual)</h1>
+            <h1>Practica 28: USB en maquinas virtuales (Windows y Linux)</h1>
             <div class="meta">
                 <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
                 <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
-                <strong>Sesiones:</strong> S1 (clasificacion, teclados y ratones) + S2 (escaneres, webcams, micros)<br>
-                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
-                <strong>Modalidad:</strong> Trabajo individual en VM<br>
-                <strong>Herramientas:</strong> VM Windows 10/11, NAPS2 para simulacion de escaner, webcam pasada al VM o video de prueba
+                <strong>Sesiones:</strong> S1 (clasificacion de perifericos) + S7 (interfaces USB)<br>
+                <strong>Duracion estimada:</strong> 5-6 horas (1 sesion completa)<br>
+                <strong>Modalidad:</strong> Trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox + Extension Pack, VM Windows 10/11, VM Ubuntu, 1 pendrive USB fisico (proporcionado por el aula)
             </div>
         </header>
 
@@ -82,378 +90,762 @@
             </div>
 
             <div class="nota">
-                <strong>Nota:</strong> Esta practica esta adaptada al laboratorio virtual del curso. Donde no podemos manipular hardware fisico (desmontar teclados, escaneres reales) trabajamos con informacion tecnica online y simulaciones por software. Lo importante son los conceptos y la configuracion, no el hardware en si.
+                <strong>De que va esta practica:</strong> el bus USB es la columna vertebral de los perifericos modernos. En esta sesion vas a trabajar con USB en profundidad: como el host (tu PC fisico) cede dispositivos USB a la VM, como Windows y Linux los detectan, montan y usan, y como diagnosticar problemas. Es una practica larga y guiada. Sigue cada paso en orden y rellena las tablas conforme avanzas.
+            </div>
+
+            <div class="seccion">
+                <h2>Reparto de tiempo orientativo</h2>
+                <div class="seccion-body">
+                    <div class="duracion-bar">
+                        <div style="background:#553c9a;width:8%">P0 25</div>
+                        <div style="background:#1a365d;width:10%">P1 30</div>
+                        <div style="background:#2b6cb0;width:18%">P2 60</div>
+                        <div style="background:#276749;width:22%">P3 75</div>
+                        <div style="background:#c05621;width:14%">P4 45</div>
+                        <div style="background:#975a16;width:14%">P5 45</div>
+                        <div style="background:#c53030;width:14%">P6 45</div>
+                    </div>
+                    <table>
+                        <tr><th>Parte</th><th>Tema</th><th>Min</th></tr>
+                        <tr><td>Parte 0</td><td>Conceptos previos: USB passthrough, versiones, filtros</td><td>25</td></tr>
+                        <tr><td>Parte 1</td><td>Preparar host y VirtualBox (Extension Pack, controlador USB)</td><td>30</td></tr>
+                        <tr><td>Parte 2</td><td>Pendrive en Windows guest: deteccion, formato, transferencia</td><td>60</td></tr>
+                        <tr><td>Parte 3</td><td>Pendrive en Linux guest: lsusb, mount, dmesg, permisos</td><td>75</td></tr>
+                        <tr><td>Parte 4</td><td>Filtros USB y captura automatica</td><td>45</td></tr>
+                        <tr><td>Parte 5</td><td>Compatibilidad cross-OS de sistemas de archivos</td><td>45</td></tr>
+                        <tr><td>Parte 6</td><td>Diagnostico y casos avanzados</td><td>45</td></tr>
+                        <tr><td>Total</td><td></td><td><strong>325 min &#8776; 5 h 25</strong></td></tr>
+                    </table>
+                </div>
             </div>
 
             <div class="seccion">
                 <h2>Objetivos de la practica</h2>
                 <div class="seccion-body">
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Clasificar correctamente perifericos en entrada, salida, E/S, almacenamiento y comunicaciones.</li>
-                        <li>Distinguir teclados de membrana, mecanicos y por tipo de switch consultando especificaciones tecnicas.</li>
-                        <li>Configurar un raton en Windows: velocidad, botones primarios, rueda.</li>
-                        <li>Simular un escaneo con NAPS2 a distintas resoluciones (300 PPP documento, 600 PPP foto) y comparar tamanos.</li>
-                        <li>Comprobar y configurar webcam y microfono en la VM.</li>
+                        <li>Comprender el concepto de <strong>USB passthrough</strong> entre host e invitado y por que VirtualBox necesita el Extension Pack para USB 2.0/3.0.</li>
+                        <li>Configurar el controlador USB de una VM y elegir entre OHCI (1.1), EHCI (2.0) y xHCI (3.0).</li>
+                        <li>Capturar manualmente y mediante <strong>filtros USB</strong> un dispositivo desde la VM.</li>
+                        <li>Detectar, identificar y montar un pendrive en una VM Windows: Administrador de dispositivos, Diskpart, transferencia y rendimiento.</li>
+                        <li>Detectar, identificar y montar un pendrive en una VM Linux desde la terminal con <code>lsusb</code>, <code>lsblk</code>, <code>dmesg</code>, <code>mount</code> y <code>umount</code>.</li>
+                        <li>Comparar la compatibilidad cross-OS de FAT32, exFAT, NTFS y ext4.</li>
+                        <li>Diagnosticar problemas tipicos: dispositivo no aparece, capturado por otra VM, permisos en host, conflicto de versiones.</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- PARTE 1: Clasificacion -->
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Clasificar perifericos (20 min)</h2>
+                <h2>Parte 0 - Conceptos previos (25 min)</h2>
                 <div class="seccion-body">
-                    <p>Para cada dispositivo, indica la categoria correcta:</p>
+
+                    <h3>0.1 - El problema del USB en virtualizacion</h3>
+                    <p>Cuando enchufas un pendrive en el USB del PC, lo recibe el <strong>host</strong> (Windows / Linux real, el que esta corriendo VirtualBox). La VM no lo ve por si sola: hay que <strong>cederselo</strong>. A esto se le llama <strong>USB passthrough</strong>.</p>
+
+                    <p>VirtualBox ofrece tres modos de controlador USB:</p>
                     <table>
-                        <tr><th>Dispositivo</th><th>Categoria (entrada / salida / E/S / almacenamiento / comunicaciones)</th></tr>
-                        <tr><td>Webcam</td><td><input type="text"></td></tr>
-                        <tr><td>Altavoces</td><td><input type="text"></td></tr>
-                        <tr><td>Pendrive USB</td><td><input type="text"></td></tr>
-                        <tr><td>Pantalla tactil</td><td><input type="text"></td></tr>
-                        <tr><td>Router Wi-Fi</td><td><input type="text"></td></tr>
-                        <tr><td>Escaner</td><td><input type="text"></td></tr>
-                        <tr><td>Auriculares con microfono</td><td><input type="text"></td></tr>
-                        <tr><td>Proyector</td><td><input type="text"></td></tr>
-                        <tr><td>Impresora multifuncion</td><td><input type="text"></td></tr>
-                        <tr><td>Adaptador Wi-Fi USB</td><td><input type="text"></td></tr>
-                        <tr><td>Disco duro externo</td><td><input type="text"></td></tr>
-                        <tr><td>Lector de huella dactilar</td><td><input type="text"></td></tr>
+                        <tr><th>Controlador</th><th>Standard</th><th>Velocidad nominal</th><th>Cuando usarlo</th></tr>
+                        <tr><td><strong>OHCI</strong></td><td>USB 1.1</td><td>12 Mbps</td><td>Solo USB 1.1 muy antiguos. Casi obsoleto.</td></tr>
+                        <tr><td><strong>EHCI</strong></td><td>USB 2.0</td><td>480 Mbps</td><td>Pendrives, ratones, teclados, webcams 720p.</td></tr>
+                        <tr><td><strong>xHCI</strong></td><td>USB 3.0/3.1/3.2</td><td>5-10 Gbps</td><td>Discos externos rapidos, webcams 1080p+, transferencias grandes.</td></tr>
                     </table>
 
-                    <div class="pregunta">
-                        <p>Razona por que la pantalla tactil y la impresora multifuncion son E/S y no solo de salida:</p>
-                        <textarea rows="3"></textarea>
+                    <div class="aviso">
+                        <strong>Importante:</strong> EHCI y xHCI requieren tener instalado el <strong>VirtualBox Extension Pack</strong>. Sin el, solo dispondras de USB 1.1 (OHCI) y un pendrive USB 3.0 conectado se vera a velocidad ridicula o no se vera.
                     </div>
 
-                    <div class="pregunta">
-                        <p>Una webcam con microfono integrado, &iquest;es solo de entrada o de E/S? Explica por que.</p>
-                        <textarea rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
+                    <h3>0.2 - Captura manual vs filtros</h3>
+                    <p>Para que un dispositivo USB pase del host a la VM hay dos vias:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Captura manual:</strong> con la VM en marcha, en el menu <em>Dispositivos &rarr; USB</em> seleccionas el dispositivo. El host pierde el acceso y la VM lo gana.</li>
+                        <li><strong>Filtro USB:</strong> defines en la configuracion de la VM una "regla" (por nombre, vendor ID, product ID, numero de serie...) y cada vez que ese USB se conecte al host, VirtualBox lo redirigira <strong>automaticamente</strong> a la VM. Util para perifericos de uso permanente (lector de DNI, dongle, etc.).</li>
+                    </ul>
 
-            <!-- PARTE 2: Teclados -->
-            <div class="seccion">
-                <h2>Parte 2 - Analisis tecnico de teclados (50 min)</h2>
-                <div class="seccion-body">
-                    <p>Como no podemos desmontar teclados fisicos en la VM, vamos a analizarlos usando sus <strong>fichas tecnicas online</strong>.</p>
+                    <h3>0.3 - VID y PID</h3>
+                    <p>Cada dispositivo USB tiene dos identificadores en hexadecimal:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>VID (Vendor ID):</strong> 4 caracteres hex. Identifica al fabricante. Ejemplos: <code>0x0781</code> SanDisk, <code>0x1d6b</code> Linux Foundation, <code>0x046d</code> Logitech.</li>
+                        <li><strong>PID (Product ID):</strong> 4 caracteres hex. Identifica el modelo dentro del fabricante.</li>
+                    </ul>
+                    <p>La pareja <strong>VID:PID</strong> identifica univocamente un modelo de dispositivo.</p>
 
-                    <h3>2.1 - Buscar tres modelos</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En la VM, abre el navegador.</li>
-                            <li>Busca tres teclados de gamas y tipos diferentes:
-                                <ul style="margin-left:18px">
-                                    <li>Uno <strong>de membrana barato</strong> (ej. Logitech K120, HP Wired 320).</li>
-                                    <li>Uno <strong>mecanico de oficina</strong> (ej. Keychron K2, Logitech MX Mechanical).</li>
-                                    <li>Uno <strong>mecanico gaming</strong> (ej. Razer BlackWidow, Corsair K70).</li>
-                                </ul>
-                            </li>
-                            <li>Apunta los datos clave de cada uno consultando la web del fabricante o tiendas como PCComponentes/Amazon.</li>
-                        </ol>
-                    </div>
-
+                    <h3>0.4 - Cuestionario de entrada (sin mirar nada)</h3>
+                    <p>Antes de empezar, contesta lo que sepas. Al final compararemos:</p>
                     <table>
-                        <tr><th>Caracteristica</th><th>Teclado 1 (membrana)</th><th>Teclado 2 (mecanico oficina)</th><th>Teclado 3 (gaming)</th></tr>
-                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Tipo (membrana / mecanico)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Tipo de switch (si es mecanico)</td><td>-</td><td><input type="text" placeholder="Ej: Cherry MX Brown"></td><td><input type="text"></td></tr>
-                        <tr><td>Conexion (USB cable / inalambrico / Bluetooth)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Iluminacion (no / single / RGB)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Distribucion (full / TKL / 60%)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Precio aproximado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>2.2 - Switches mecanicos Cherry MX</h3>
-                    <p>Completa la tabla con la caracteristica principal de cada color:</p>
-                    <table>
-                        <tr><th>Color</th><th>Lineal / Tactil / Clicky</th><th>Uso recomendado</th></tr>
-                        <tr><td>Cherry MX Red</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Cherry MX Blue</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Cherry MX Brown</td><td><input type="text"></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>2.3 - Probar el teclado de la VM</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En la VM, abre <strong>Bloc de notas</strong>.</li>
-                            <li>Escribe la frase: "El veloz murcielago hindu comia feliz cardillo y kiwi".</li>
-                            <li>Verifica que se escriben correctamente las tildes, la &ntilde; y los caracteres especiales (@, #, &euro;).</li>
-                            <li>Si algo no funciona, comprueba la <strong>distribucion</strong> del teclado en Configuracion &rarr; Hora e idioma &rarr; Idioma y region.</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><td>Distribucion configurada</td><td><input type="text" placeholder="Espanol (Espana) / US / ..."></td></tr>
-                        <tr><td>&iquest;Las tildes y la &ntilde; funcionan correctamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                    </table>
-
-                    <div class="pregunta">
-                        <p>Si tuvieras que recomendar un teclado a un programador que escribe codigo todo el dia y trabaja en una oficina compartida, &iquest;que tipo elegirias y por que?</p>
-                        <textarea rows="3" placeholder="Pista: tacto + ruido"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PARTE 3: Ratones -->
-            <div class="seccion">
-                <h2>Parte 3 - Configurar y comparar ratones (45 min)</h2>
-                <div class="seccion-body">
-                    <h3>3.1 - Configuracion del raton en Windows</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En la VM, abre <strong>Configuracion &rarr; Bluetooth y dispositivos &rarr; Raton</strong>.</li>
-                            <li>Apunta los valores actuales y prueba a cambiarlos.</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><th>Ajuste</th><th>Valor antes</th><th>Valor despues</th><th>Que cambia al modificarlo</th></tr>
-                        <tr><td>Velocidad del puntero</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Boton primario (izquierdo / derecho)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Lineas a desplazar con la rueda</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>3.2 - Configuracion avanzada</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Pulsa en <strong>Configuracion adicional del raton</strong> (panel clasico).</li>
-                            <li>Pestana <strong>Punteros</strong>: cambia el esquema. Aplica.</li>
-                            <li>Pestana <strong>Opciones del puntero</strong>: activa "Mostrar la ubicacion del puntero al pulsar Ctrl".</li>
-                            <li>Pruebalo: deja la pantalla quieta y pulsa Ctrl. &iquest;Aparece un circulo?</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><td>Esquema de punteros elegido</td><td><input type="text"></td></tr>
-                        <tr><td>&iquest;Funciona el indicador con Ctrl?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                    </table>
-
-                    <h3>3.3 - Comparar ratones por especificaciones online</h3>
-                    <p>Busca en la web tres ratones distintos y completa la tabla:</p>
-                    <table>
-                        <tr><th>Caracteristica</th><th>Raton 1 (oficina basico)</th><th>Raton 2 (gaming)</th><th>Raton 3 (productividad MX)</th></tr>
-                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Sensor (optico / laser)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>DPI maximos</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Polling rate (Hz)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Numero de botones</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Conexion</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Precio aproximado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <div class="pregunta">
-                        <p>&iquest;Para que sirve tener un boton dedicado a cambiar el DPI sobre la marcha en un raton gaming?</p>
-                        <textarea rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PARTE 4: Escaner con NAPS2 -->
-            <div class="seccion">
-                <h2>Parte 4 - Simulacion de escaner con NAPS2 (60 min)</h2>
-                <div class="seccion-body">
-                    <p><strong>NAPS2</strong> es una herramienta libre que permite escanear documentos. Aunque no tengamos un escaner fisico, NAPS2 puede importar imagenes existentes y aplicarles ajustes como si las hubiera escaneado, lo que nos sirve para entender el flujo de escaneo (resolucion, formato, OCR).</p>
-
-                    <h3>4.1 - Instalar NAPS2</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En la VM, abre el navegador y visita <code>https://www.naps2.com</code>.</li>
-                            <li>Descarga el instalador para Windows.</li>
-                            <li>Ejecutalo y completa la instalacion con valores por defecto.</li>
-                            <li>Abre NAPS2 desde el menu Inicio.</li>
-                        </ol>
-                    </div>
-
-                    <h3>4.2 - Importar y "escanear" un documento</h3>
-                    <p>El profesor habra dejado en <code>C:\Escaner_Entrada\</code> un par de archivos: un documento de texto en imagen y una foto.</p>
-                    <div class="pasos">
-                        <ol>
-                            <li>En NAPS2 pulsa <strong>Importar</strong>.</li>
-                            <li>Selecciona el archivo de <strong>documento</strong> (texto / formulario).</li>
-                            <li>En las propiedades, configura:
-                                <ul style="margin-left:18px">
-                                    <li>Resolucion: <strong>300 PPP</strong></li>
-                                    <li>Color: <strong>blanco y negro</strong> o <strong>escala de grises</strong></li>
-                                </ul>
-                            </li>
-                            <li>Pulsa <strong>Guardar como PDF</strong> y nombralo <code>doc_300.pdf</code>.</li>
-                        </ol>
-                    </div>
-
-                    <h3>4.3 - Importar y "escanear" una foto</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Importa la <strong>foto</strong> en NAPS2.</li>
-                            <li>Configura: <strong>600 PPP</strong>, color completo.</li>
-                            <li>Guarda como <strong>JPEG</strong> con nombre <code>foto_600.jpg</code>.</li>
-                        </ol>
-                    </div>
-
-                    <h3>4.4 - Comparar resultados</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Localiza los dos archivos en el Explorador.</li>
-                            <li>Apunta el tamano de cada uno (clic derecho &rarr; Propiedades).</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><th>Archivo</th><th>Resolucion</th><th>Formato</th><th>Tamano</th></tr>
-                        <tr><td>doc_300.pdf</td><td>300 PPP</td><td>PDF</td><td><input type="text"></td></tr>
-                        <tr><td>foto_600.jpg</td><td>600 PPP</td><td>JPEG</td><td><input type="text"></td></tr>
-                    </table>
-
-                    <div class="pregunta">
-                        <p>&iquest;Por que la foto a 600 PPP pesa mas que el documento a 300 PPP, aunque las dos sean del mismo tamano fisico?</p>
-                        <textarea rows="3" placeholder="Pista: pixeles + profundidad de color"></textarea>
-                    </div>
-
-                    <div class="pregunta">
-                        <p>Identifica que partes del flujo son <strong>simuladas</strong> y cuales serian iguales con un escaner real:</p>
-                        <textarea rows="3"></textarea>
-                    </div>
-
-                    <h3>4.5 - OCR (extra)</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>NAPS2 incluye OCR (reconocimiento de texto) en varios idiomas.</li>
-                            <li>Importa el documento de texto y aplica OCR en espanol antes de guardar como PDF.</li>
-                            <li>Abre el PDF resultante en cualquier visor: ahora deberia poderse <strong>seleccionar y copiar el texto</strong>, no solo verlo como imagen.</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><td>&iquest;Has podido seleccionar texto del PDF con OCR?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><th>Pregunta</th><th>Tu respuesta</th></tr>
+                        <tr><td>Si conecto un pendrive al PC con la VM en marcha, &iquest;la VM lo ve automaticamente?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Que diferencia hay entre OHCI, EHCI y xHCI?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Para que sirve el VirtualBox Extension Pack?</td><td><input type="text"></td></tr>
+                        <tr><td>En Linux, &iquest;que comando muestra los dispositivos USB conectados?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Que es VID:PID?</td><td><input type="text"></td></tr>
                     </table>
                 </div>
             </div>
 
-            <!-- PARTE 5: Webcam -->
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - PREPARAR HOST Y VIRTUALBOX                           -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 5 - Webcam en la VM (40 min)</h2>
+                <h2>Parte 1 - Preparar host y VirtualBox (30 min)</h2>
                 <div class="seccion-body">
+
+                    <h3>1.1 - Comprobar la version de VirtualBox</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre VirtualBox.</li>
+                            <li>Menu <strong>Ayuda &rarr; Acerca de VirtualBox</strong>.</li>
+                            <li>Apunta la version exacta.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Version de VirtualBox</td><td><input type="text" placeholder="Ej: 7.0.18"></td></tr>
+                        <tr><td>Sistema operativo del host</td><td><input type="text" placeholder="Ej: Windows 11"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Comprobar si esta instalado el Extension Pack</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En VirtualBox: <strong>Archivo &rarr; Herramientas &rarr; Administrador de paquetes de extension</strong> (o <em>Preferencias &rarr; Extensiones</em>).</li>
+                            <li>Mira si aparece <em>Oracle VM VirtualBox Extension Pack</em>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Esta instalado el Extension Pack?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Si esta, version</td><td><input type="text"></td></tr>
+                    </table>
+
                     <div class="nota">
-                        Si tu VM tiene una webcam pasada por VirtualBox/VMware (USB passthrough), usaras esa. Si no, trabajaras con un <strong>video de prueba</strong> que el profesor habra dejado en <code>C:\Recursos\webcam_test.mp4</code>.
+                        Si NO esta instalado: descargalo de <code>https://www.virtualbox.org/wiki/Downloads</code> (la version debe coincidir con la de VirtualBox), haz doble clic en el .vbox-extpack y acepta la instalacion. Hace falta admin/sudo en el host.
                     </div>
 
-                    <h3>5.1 - Comprobar si la VM detecta camara</h3>
+                    <h3>1.3 - Permisos del usuario host (solo Linux host)</h3>
+                    <p>Si tu host es Linux, el usuario debe pertenecer al grupo <code>vboxusers</code> para acceder a USB. Si tu host es Windows, salta este paso.</p>
                     <div class="pasos">
                         <ol>
-                            <li>En la VM, abre la app <strong>Camara</strong> (Win+S, escribe "Camara").</li>
-                            <li>Si aparece imagen, anota los datos de la camara.</li>
-                            <li>Si dice "No se encuentra ninguna camara", marca esa opcion abajo y pasa al ejercicio 5.3.</li>
+                            <li>En el host, terminal: <code>groups</code>. &iquest;Aparece <code>vboxusers</code>?</li>
+                            <li>Si no: <code>sudo usermod -aG vboxusers $USER</code> y cierra sesion para que se aplique.</li>
+                        </ol>
+                    </div>
+
+                    <h3>1.4 - Activar controlador USB en una VM (Windows guest)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Apaga</strong> la VM Windows si esta encendida (configuracion USB requiere VM apagada).</li>
+                            <li>Selecciona la VM &rarr; <strong>Configuracion &rarr; USB</strong>.</li>
+                            <li>Comprueba que <strong>Habilitar controlador USB</strong> esta marcado.</li>
+                            <li>Selecciona <strong>Controlador USB 3.0 (xHCI)</strong>.</li>
+                            <li>Acepta y arranca la VM.</li>
                         </ol>
                     </div>
 
                     <table>
-                        <tr><td>&iquest;La VM detecta camara?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                        <tr><td>Marca y modelo (si la detecta)</td><td><input type="text"></td></tr>
-                        <tr><td>Resolucion maxima ofrecida</td><td><input type="text" placeholder="Ej: 720p / 1080p"></td></tr>
+                        <tr><td>Controlador USB elegido</td><td><input type="text" placeholder="OHCI / EHCI / xHCI"></td></tr>
+                        <tr><td>&iquest;La VM arranca sin errores?</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>5.2 - Grabar vídeo (si hay camara)</h3>
+                    <h3>1.5 - Repetir para la VM Linux (Ubuntu)</h3>
                     <div class="pasos">
                         <ol>
-                            <li>En la app Camara, cambia a modo <strong>Video</strong>.</li>
-                            <li>Graba 10 segundos diciendo tu nombre y la fecha.</li>
-                            <li>Reproducelo. Apunta el tamano del archivo (Videos / Camera Roll).</li>
+                            <li>Apaga la VM Ubuntu.</li>
+                            <li>Configuracion &rarr; USB &rarr; controlador <strong>xHCI</strong>.</li>
+                            <li>Acepta y arranca.</li>
                         </ol>
                     </div>
 
+                    <div class="reto">
+                        <strong>Reto extra:</strong> compara que pasa si en una VM dejas el controlador en EHCI (2.0) y conectas un pendrive USB 3.0. Mas adelante mediremos si influye en la velocidad.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - PENDRIVE EN WINDOWS GUEST                            -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 - Pendrive en Windows guest (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 - Identificar el pendrive en el host</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta el pendrive a un puerto USB del PC fisico (host).</li>
+                            <li>Espera a que el host lo monte.</li>
+                            <li>Si tu host es Windows, abre el Explorador y mira que letra le ha dado.</li>
+                            <li>Si tu host es Linux, terminal: <code>lsusb</code> y <code>lsblk</code>.</li>
+                        </ol>
+                    </div>
                     <table>
-                        <tr><td>Tamano del video de 10 s</td><td><input type="text"></td></tr>
-                        <tr><td>Calidad del audio</td><td><input type="text" placeholder="Buena / Regular / Mala"></td></tr>
+                        <tr><td>Letra/punto de montaje en host</td><td><input type="text"></td></tr>
+                        <tr><td>Capacidad del pendrive</td><td><input type="text"></td></tr>
+                        <tr><td>Sistema de archivos visto por el host</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>5.3 - Alternativa con video de prueba</h3>
+                    <h3>2.2 - Pasar el pendrive a la VM Windows (captura manual)</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Localiza <code>C:\Recursos\webcam_test.mp4</code>.</li>
-                            <li>Abrelo con el reproductor por defecto. Apunta su resolucion y duracion (clic derecho &rarr; Propiedades &rarr; Detalles).</li>
+                            <li>Arranca la VM Windows.</li>
+                            <li>En la barra de la ventana de la VM: <strong>Dispositivos &rarr; USB</strong>.</li>
+                            <li>Veras la lista de USB del host. Localiza tu pendrive (suele tener el nombre o el modelo).</li>
+                            <li>Haz clic en el. Aparecera un tilde &#10003; al lado.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Atencion:</strong> en cuanto lo selecciones, <strong>desaparecera del host</strong>. La VM Windows lo recibira como si lo acabaras de enchufar fisicamente.
+                    </div>
+
+                    <table>
+                        <tr><td>Nombre del dispositivo en el menu USB</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Aparece sonido de "dispositivo conectado" en la VM Windows?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.3 - Comprobar en el Administrador de dispositivos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, clic derecho en Inicio &rarr; <strong>Administrador de dispositivos</strong>.</li>
+                            <li>Despliega <strong>Controladoras de bus serie universal</strong>.</li>
+                            <li>Apunta los controladores que aparecen.</li>
+                            <li>Despliega <strong>Unidades de disco</strong>. Deberias ver el pendrive.</li>
                         </ol>
                     </div>
 
                     <table>
-                        <tr><td>Resolucion del video</td><td><input type="text"></td></tr>
-                        <tr><td>Duracion</td><td><input type="text"></td></tr>
-                        <tr><td>Codec / formato</td><td><input type="text"></td></tr>
+                        <tr><td>Controladores USB que ve la VM</td><td><input type="text" placeholder="Ej: USB 3.0 xHCI..."></td></tr>
+                        <tr><td>Nombre del pendrive en Unidades de disco</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.4 - VID y PID del dispositivo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En el Administrador de dispositivos &rarr; <strong>Controladoras USB</strong>, busca un dispositivo con el nombre del pendrive (suele ser <em>USB Mass Storage</em>).</li>
+                            <li>Clic derecho &rarr; Propiedades &rarr; pestana <strong>Detalles</strong>.</li>
+                            <li>En <strong>Propiedad</strong>, elige <em>Identificadores de hardware</em>.</li>
+                            <li>Veras lineas como <code>USB\VID_0781&amp;PID_5567</code>. Apunta los valores.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>VID</td><td><input type="text" placeholder="Ej: 0781"></td></tr>
+                        <tr><td>PID</td><td><input type="text" placeholder="Ej: 5567"></td></tr>
+                        <tr><td>Fabricante deducido (busca el VID en internet)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.5 - Sistema de archivos y diskpart</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el <strong>Explorador</strong>. Anota la letra de unidad asignada al pendrive.</li>
+                            <li>Abre <strong>CMD como administrador</strong>.</li>
+                            <li>Ejecuta <code>diskpart</code>.</li>
+                            <li>Dentro: <code>list disk</code>, anota el numero del pendrive.</li>
+                            <li><code>select disk N</code> (sustituye N).</li>
+                            <li><code>detail disk</code>. Apunta el resultado.</li>
+                            <li><code>list partition</code>.</li>
+                            <li>Escribe <code>exit</code> para salir de diskpart.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Aviso muy serio:</strong> NO ejecutes <code>clean</code> en diskpart si estas con tu disco principal seleccionado por error. <code>clean</code> borra la tabla de particiones. Verifica con <code>list disk</code> que has seleccionado el pendrive (suele ser el de menos GB y de tipo "Removible").
+                    </div>
+
+                    <table>
+                        <tr><td>Letra asignada en VM</td><td><input type="text"></td></tr>
+                        <tr><td>Sistema de archivos actual</td><td><input type="text" placeholder="FAT32 / exFAT / NTFS"></td></tr>
+                        <tr><td>Numero de particiones</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.6 - Transferencia de prueba</h3>
+                    <p>Vamos a medir cuanto tarda el pendrive desde la VM:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, crea un archivo grande para la prueba. Abre PowerShell:
+                                <pre class="codigo">$f = "C:\test_500MB.bin"
+fsutil file createnew $f 524288000
+Get-Item $f | Select-Object Length, FullName</pre>
+                            </li>
+                            <li>Copia ese archivo al pendrive con el Explorador. Cronometra el tiempo.</li>
+                            <li>Calcula la velocidad media: 500 MB / tiempo (s).</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Controlador USB en VirtualBox</th><th>Tiempo (s)</th><th>Velocidad calculada (MB/s)</th></tr>
+                        <tr><td>xHCI (USB 3.0)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.7 - Devolver el USB al host</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Antes de quitarlo, en el Explorador clica el icono <strong>Quitar hardware con seguridad</strong> y expulsa el pendrive.</li>
+                            <li>Menu <strong>Dispositivos &rarr; USB</strong> en VirtualBox: vuelve a desmarcar el pendrive.</li>
+                            <li>Comprueba en el host que el pendrive aparece de nuevo.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Por que es importante usar "Quitar hardware con seguridad" antes de retirar el pendrive de la VM (o del host)?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - PENDRIVE EN LINUX GUEST                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Pendrive en Linux guest (75 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>3.1 - Pasar el pendrive a la VM Ubuntu</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Asegurate de que el pendrive este conectado al host.</li>
+                            <li>Arranca la VM Ubuntu.</li>
+                            <li>Menu <strong>Dispositivos &rarr; USB</strong> y selecciona el pendrive.</li>
+                            <li>Si Ubuntu tiene escritorio grafico, deberia aparecer una notificacion y montarse automaticamente.</li>
+                        </ol>
+                    </div>
+
+                    <h3>3.2 - lsusb: ver dispositivos USB</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre la terminal en Ubuntu (Ctrl+Alt+T).</li>
+                            <li>Ejecuta <code>lsusb</code>. Pega abajo la salida:</li>
+                        </ol>
+                    </div>
+                    <textarea rows="6" placeholder="Salida de lsusb"></textarea>
+
+                    <table>
+                        <tr><td>Linea correspondiente al pendrive</td><td><input type="text" placeholder="Bus 003 Device 002: ID 0781:5567 ..."></td></tr>
+                        <tr><td>VID:PID que ves</td><td><input type="text" placeholder="Ej: 0781:5567"></td></tr>
+                        <tr><td>&iquest;Coincide con lo que viste en Windows?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Truco:</strong> <code>lsusb -v -d 0781:5567</code> muestra info detallada del dispositivo (descriptores, velocidad, etc.). Pruebalo con tu VID:PID. Es <em>verbose</em>, asi que la salida es larga.
+                    </div>
+
+                    <h3>3.3 - Identificar el dispositivo de bloque</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><code>lsblk</code>. Anota la salida.</li>
+                            <li>El pendrive suele aparecer como <code>sdb</code> o <code>sdc</code>. Tiene su propia particion: <code>sdb1</code>.</li>
+                            <li>Para ver mas detalles: <code>sudo fdisk -l /dev/sdb</code> (sustituye sdb por el tuyo).</li>
+                        </ol>
+                    </div>
+                    <textarea rows="5" placeholder="Salida de lsblk"></textarea>
+
+                    <table>
+                        <tr><td>Dispositivo de bloque del pendrive</td><td><input type="text" placeholder="Ej: /dev/sdb"></td></tr>
+                        <tr><td>Particion del pendrive</td><td><input type="text" placeholder="Ej: /dev/sdb1"></td></tr>
+                        <tr><td>Tamano</td><td><input type="text"></td></tr>
+                        <tr><td>Sistema de archivos detectado</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.4 - dmesg: que paso al conectarlo</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta <code>sudo dmesg | tail -30</code>.</li>
+                            <li>Localiza las lineas que se imprimieron al pasar el pendrive a la VM.</li>
+                        </ol>
+                    </div>
+                    <textarea rows="6" placeholder="Lineas de dmesg relacionadas con el USB (corta lo relevante)"></textarea>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que informacion da dmesg que NO da lsusb?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <h3>3.5 - Punto de montaje automatico</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li><code>findmnt /dev/sdb1</code> (sustituye por tu particion).</li>
+                            <li>Anota el punto de montaje (suele ser <code>/media/$USER/NOMBRE_USB</code>).</li>
+                            <li><code>ls -la /media/$USER/</code>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Punto de montaje automatico</td><td><input type="text"></td></tr>
+                        <tr><td>Permisos de la carpeta</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.6 - Desmontaje y montaje manual</h3>
+                    <p>El sistema lo monto automaticamente. Vamos a hacerlo a mano para entender el proceso.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desmontalo: <code>sudo umount /dev/sdb1</code>.</li>
+                            <li>Crea un punto de montaje propio: <code>sudo mkdir -p /mnt/usb_practica</code>.</li>
+                            <li>Montalo ahi: <code>sudo mount /dev/sdb1 /mnt/usb_practica</code>.</li>
+                            <li>Comprueba: <code>ls -la /mnt/usb_practica</code> y <code>df -h /mnt/usb_practica</code>.</li>
+                            <li>Desmontalo de nuevo: <code>sudo umount /mnt/usb_practica</code>.</li>
+                            <li>Borra el punto de montaje: <code>sudo rmdir /mnt/usb_practica</code>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>&iquest;Pudiste montarlo manualmente?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Espacio libre en el pendrive (df -h)</td><td><input type="text"></td></tr>
                     </table>
 
                     <div class="pregunta">
-                        <p>Para una videollamada profesional, &iquest;que resolucion minima recomendarias y por que?</p>
-                        <textarea rows="3" placeholder="Pista: 720p, 1080p, ancho de banda..."></textarea>
+                        <p>&iquest;Por que para hacer mount/umount hace falta <code>sudo</code> pero el sistema lo monta solo cuando llega el USB sin pedirte contrasena?</p>
+                        <textarea rows="3" placeholder="Pista: udisks2, polkit"></textarea>
+                    </div>
+
+                    <h3>3.7 - udevadm monitor (extra)</h3>
+                    <p>Para ver los eventos USB en tiempo real:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Termina cualquier captura activa del pendrive en la VM Linux: menu Dispositivos &rarr; USB &rarr; quitar tilde.</li>
+                            <li>En la terminal de Ubuntu, lanza: <code>udevadm monitor --kernel --udev --subsystem-match=usb</code>.</li>
+                            <li>Sin cerrar el comando, vuelve a pasar el pendrive a la VM (Dispositivos &rarr; USB).</li>
+                            <li>Mira los eventos que se imprimen en la terminal.</li>
+                            <li>Pulsa Ctrl+C para detener el monitor.</li>
+                        </ol>
+                    </div>
+
+                    <textarea rows="5" placeholder="Pega 5-10 lineas representativas del udevadm monitor"></textarea>
+
+                    <h3>3.8 - Transferencia de prueba en Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Genera 500 MB en el home: <code>dd if=/dev/zero of=~/test_500MB.bin bs=1M count=500 status=progress</code>.</li>
+                            <li>Copia al pendrive: <code>time cp ~/test_500MB.bin /media/$USER/.../</code>.</li>
+                            <li>Apunta el tiempo real (real:).</li>
+                            <li>Calcula MB/s.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Controlador USB en VBox</th><th>Tiempo (s)</th><th>MB/s calculados</th></tr>
+                        <tr><td>xHCI (USB 3.0)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Compara la velocidad obtenida en Linux con la que mediste en Windows (Parte 2.6). &iquest;Hay diferencia? &iquest;De que orden?</p>
+                        <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 6: Microfono -->
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - FILTROS USB Y CAPTURA AUTOMATICA                     -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 6 - Microfono y entrada de audio (30 min)</h2>
+                <h2>Parte 4 - Filtros USB y captura automatica (45 min)</h2>
                 <div class="seccion-body">
-                    <h3>6.1 - Configurar entrada de audio</h3>
+
+                    <h3>4.1 - Crear un filtro por nombre</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Clic derecho en el icono de sonido de la barra de tareas &rarr; <strong>Configuracion de sonido</strong>.</li>
-                            <li>En la seccion <strong>Entrada</strong>, mira los dispositivos disponibles. Apuntalos.</li>
-                            <li>Habla. &iquest;Se mueve la barra de nivel?</li>
+                            <li><strong>Apaga</strong> la VM Windows (los filtros pueden modificarse en caliente, pero arrancamos limpio).</li>
+                            <li>Selecciona la VM &rarr; Configuracion &rarr; <strong>USB</strong>.</li>
+                            <li>En el panel derecho, pulsa el icono "+" con un USB y un asterisco. Elige el pendrive de la lista del host.</li>
+                            <li>VirtualBox crea un filtro con el nombre del dispositivo.</li>
+                            <li>Acepta y arranca la VM.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.2 - Probar el filtro</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Con la VM Windows arrancada y el pendrive desconectado del host, conectalo de nuevo.</li>
+                            <li>Comprueba: &iquest;aparece automaticamente en la VM Windows? &iquest;O sigue en el host?</li>
                         </ol>
                     </div>
 
                     <table>
-                        <tr><td>Dispositivos de entrada disponibles</td><td><input type="text"></td></tr>
-                        <tr><td>Dispositivo predeterminado</td><td><input type="text"></td></tr>
-                        <tr><td>&iquest;Se mueve la barra al hablar?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Funciona la captura automatica con el filtro?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Cuanto tarda en aparecer en la VM (segundos)?</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>6.2 - Grabadora de voz</h3>
+                    <h3>4.3 - Editar el filtro: hacerlo mas estricto</h3>
+                    <p>Un filtro por <strong>solo el nombre</strong> es muy permisivo. Vamos a ajustarlo:</p>
                     <div class="pasos">
                         <ol>
-                            <li>Abre <strong>Grabadora de sonido</strong> de Windows.</li>
-                            <li>Graba 10 segundos diciendo tu nombre y nombre de la VM.</li>
-                            <li>Reproducelo. Apunta el tamano del archivo y donde se guarda.</li>
+                            <li>Apaga la VM. Configuracion &rarr; USB &rarr; doble clic en el filtro.</li>
+                            <li>Borra el campo <strong>Producto</strong>.</li>
+                            <li>Rellena solo VID y PID con los valores que apuntaste antes.</li>
+                            <li>Aplica y arranca la VM. Conecta el pendrive.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que ventaja tiene filtrar por VID:PID en lugar de por nombre?</p>
+                        <textarea rows="3" placeholder="Pista: el nombre del fabricante puede repetirse, los IDs no"></textarea>
+                    </div>
+
+                    <h3>4.4 - Conflicto entre dos VMs</h3>
+                    <p>El mismo dispositivo no puede estar capturado por dos VMs a la vez. Vamos a comprobarlo:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un filtro identico (VID:PID) tambien en la VM Ubuntu (con la VM apagada).</li>
+                            <li>Arranca primero la VM Ubuntu. Conecta el pendrive. &iquest;Donde aparece?</li>
+                            <li>Ahora arranca tambien la VM Windows con el pendrive ya conectado a Ubuntu.</li>
+                            <li>Apaga la VM Ubuntu. Apunta donde queda el pendrive.</li>
+                            <li>Reconectalo (desconecta del host y vuelve a conectar). &iquest;Va a Ubuntu o Windows?</li>
                         </ol>
                     </div>
 
                     <table>
-                        <tr><td>Tamano del audio de 10 s</td><td><input type="text"></td></tr>
-                        <tr><td>Carpeta de guardado</td><td><input type="text"></td></tr>
-                        <tr><td>Formato del archivo</td><td><input type="text" placeholder="Ej: .m4a"></td></tr>
+                        <tr><td>Tras arrancar Ubuntu primero, &iquest;donde se monta?</td><td><input type="text"></td></tr>
+                        <tr><td>Con las dos VMs encendidas, &iquest;que VM gana cuando reconectas?</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>6.3 - Tipos de microfono (teoria)</h3>
-                    <p>Asocia cada tipo con su uso recomendado:</p>
+                    <div class="pregunta">
+                        <p>Conclusion: cuando dos VMs tienen el mismo filtro y las dos estan encendidas, &iquest;como decide VirtualBox a quien dar el dispositivo?</p>
+                        <textarea rows="3" placeholder="Pista: orden de arranque, prioridad..."></textarea>
+                    </div>
+
+                    <h3>4.5 - Eliminar los filtros</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga las dos VMs.</li>
+                            <li>En cada una: Configuracion &rarr; USB &rarr; selecciona el filtro &rarr; pulsa el "-" para borrarlo.</li>
+                            <li>Arranca y comprueba que ya no captura automaticamente.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - CROSS-OS FILE SYSTEMS                                -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Compatibilidad cross-OS de sistemas de archivos (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Ahora vamos a ver que pasa si formateas el pendrive con distintos sistemas de archivos y lo metes en cada VM.</p>
+
+                    <div class="aviso">
+                        <strong>Aviso:</strong> formatear borra TODO el contenido del pendrive. Asegurate de que esta vacio o que su contenido es desechable. Hazlo siempre sobre el pendrive, NUNCA sobre el disco del sistema.
+                    </div>
+
+                    <h3>5.1 - Formatear como FAT32 desde Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows con el pendrive capturado, abre Explorador.</li>
+                            <li>Clic derecho en el pendrive &rarr; <strong>Formatear</strong>.</li>
+                            <li>Sistema de archivos: <strong>FAT32</strong>. Formato rapido.</li>
+                            <li>Crea un archivo de prueba: <code>test_win.txt</code> con texto dentro.</li>
+                            <li>Quita el pendrive con seguridad.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 - Leer el FAT32 desde Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pasa el pendrive a la VM Ubuntu.</li>
+                            <li>Comprueba que se monta y que ves <code>test_win.txt</code>.</li>
+                            <li>Crea un archivo desde Linux: <code>echo "Hola desde Linux" &gt; /media/$USER/.../test_linux.txt</code>.</li>
+                            <li>Desmonta y devuelve a Windows. &iquest;Ves los dos archivos?</li>
+                        </ol>
+                    </div>
                     <table>
-                        <tr><th>Tipo</th><th>Caracteristica principal</th><th>Uso recomendado</th></tr>
-                        <tr><td>Condensador</td><td><input type="text" placeholder="Tu definicion"></td><td><input type="text"></td></tr>
-                        <tr><td>Dinamico</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Lavalier (solapa)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Linux lee el FAT32 sin problemas?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Windows ve el archivo creado en Linux?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Probar el limite de FAT32: 4 GB</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Linux con el pendrive en FAT32, intenta crear un archivo de 5 GB:
+                                <pre class="codigo">dd if=/dev/zero of=/media/$USER/.../big.bin bs=1M count=5000 status=progress</pre>
+                            </li>
+                            <li>Mira el error que da.</li>
+                        </ol>
+                    </div>
+                    <textarea rows="3" placeholder="Mensaje de error que recibes"></textarea>
+
+                    <h3>5.4 - Formatear como exFAT y repetir</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Borra el archivo de 5 GB (si quedo a medias).</li>
+                            <li>En Windows VM, formatea el pendrive a <strong>exFAT</strong>.</li>
+                            <li>En Ubuntu VM (puede que necesites <code>sudo apt install exfat-fuse exfatprogs</code>), monta y comprueba.</li>
+                            <li>Repite la prueba de 5 GB.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;exFAT acepta el archivo de 5 GB?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Ubuntu monta exFAT sin problemas?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.5 - Formatear como NTFS y probar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Formatea como <strong>NTFS</strong> desde Windows.</li>
+                            <li>Pasa a Ubuntu. Comprueba si lo monta automaticamente.</li>
+                            <li>Crea, modifica y borra archivos.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Ubuntu lee NTFS?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Ubuntu escribe NTFS?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.6 - Formatear como ext4 desde Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Ubuntu VM con el pendrive (desmontado): <code>sudo mkfs.ext4 /dev/sdb1</code>.</li>
+                            <li>Vuelvelo a montar (desconecta y reconecta para que se monte automatico).</li>
+                            <li>Crea un archivo de prueba.</li>
+                            <li>Pasalo a la VM Windows. &iquest;Que ocurre?</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Windows lee ext4 nativamente?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Que mensaje muestra el Explorador?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.7 - Tabla resumen</h3>
+                    <table>
+                        <tr><th>Sistema</th><th>Lee Win</th><th>Escribe Win</th><th>Lee Ubuntu</th><th>Escribe Ubuntu</th><th>Limite archivo</th></tr>
+                        <tr><td>FAT32</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>exFAT</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>NTFS</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>ext4</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Si tuvieras un pendrive que vas a usar en Windows, Mac y Ubuntu indistintamente, &iquest;que sistema de archivos elegirias y por que?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - DIAGNOSTICO Y CASOS AVANZADOS                        -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Diagnostico y casos avanzados (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>6.1 - Caso A: el USB no aparece en el menu Dispositivos &rarr; USB</h3>
+                    <p>El profesor habra creado este escenario en una VM. Sintoma: conectas un pendrive al host y no aparece en <strong>Dispositivos &rarr; USB</strong> de la VM.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba que el host SI ve el dispositivo (Explorador de Windows host o <code>lsusb</code> en host Linux).</li>
+                            <li>En la VM, mira la configuracion: &iquest;esta marcado "Habilitar controlador USB"? &iquest;Que controlador esta seleccionado?</li>
+                            <li>Si el dispositivo es USB 3.0 y el controlador es OHCI (1.1), no podra pasarlo. Cambia a xHCI.</li>
+                            <li>Si la VM usa EHCI/xHCI pero NO tienes Extension Pack instalado, falla. Comprueba.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Causa identificada en el caso A</td><td><input type="text"></td></tr>
+                        <tr><td>Solucion aplicada</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.2 - Caso B: el USB aparece pero la VM no lo puede capturar</h3>
+                    <p>Sintoma: pulsas en el dispositivo en el menu USB pero al instante "se libera" o sale un error.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba si el host esta usando el dispositivo en ese momento (lo tiene montado, hay una transferencia, etc.).</li>
+                            <li>En el host, "Quitar hardware con seguridad" o <code>umount</code> antes de capturarlo.</li>
+                            <li>Si tu host es Linux y aparece error "No tiene permisos", verifica que tu usuario esta en <code>vboxusers</code>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Causa identificada en el caso B</td><td><input type="text"></td></tr>
+                        <tr><td>Solucion aplicada</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.3 - Caso C: el rendimiento es ridiculamente bajo</h3>
+                    <p>Sintoma: copias 100 MB y tarda mucho.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba en VirtualBox que el controlador es xHCI (USB 3.0).</li>
+                            <li>Comprueba que el puerto fisico del host es USB 3.0 (azul).</li>
+                            <li>Comprueba en la VM, en Administrador de dispositivos, que el dispositivo se conecta como USB 3.0 y no como USB 2.0.</li>
+                            <li>Mide la velocidad otra vez con el cambio.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Configuracion</th><th>Velocidad</th></tr>
+                        <tr><td>Antes del cambio</td><td><input type="text" placeholder="MB/s"></td></tr>
+                        <tr><td>Despues</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.4 - Caso D: la VM no detecta una webcam USB</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Conecta una webcam (real o simulada) y pasala a la VM via USB.</li>
+                            <li>En la VM Windows, abre la app Camara. &iquest;La detecta?</li>
+                            <li>Si no, mira el Administrador de dispositivos: &iquest;hay un signo amarillo en algun dispositivo?</li>
+                            <li>En la VM Linux, prueba <code>lsusb</code> y <code>v4l2-ctl --list-devices</code> (puede requerir <code>sudo apt install v4l-utils</code>).</li>
+                        </ol>
+                    </div>
+                    <textarea rows="4" placeholder="Resultado del diagnostico de la webcam"></textarea>
+
+                    <h3>6.5 - Caso E: el host pierde el USB tras desconectarlo de la VM</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pasa el pendrive a una VM y luego quitalo del menu USB de VirtualBox.</li>
+                            <li>Si el host no lo recupera (no aparece en el Explorador del host ni en <code>lsusb</code>), reconecta fisicamente el pendrive.</li>
+                            <li>Apunta cuanto tarda en aparecer.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Volvio el USB al host inmediatamente?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Hizo falta reconectarlo fisicamente?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.6 - Sintesis: tabla de problemas y soluciones</h3>
+                    <table>
+                        <tr><th>Sintoma</th><th>Causa probable</th><th>Solucion</th></tr>
+                        <tr><td>USB no aparece en el menu de la VM</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>USB aparece pero no se captura</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Velocidad de transferencia muy baja</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Dos VMs se "pelean" por el mismo USB</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Linux no monta el pendrive automaticamente</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Windows no monta un pendrive en ext4</td><td><input type="text"></td><td><input type="text"></td></tr>
                     </table>
                 </div>
             </div>
 
-            <!-- EVALUACION -->
+            <!-- ============================================================ -->
+            <!-- EVALUACION                                                     -->
+            <!-- ============================================================ -->
             <div class="seccion">
                 <h2>Conclusiones y evaluacion</h2>
                 <div class="seccion-body">
 
+                    <h3>Cuestionario de salida</h3>
+                    <p>Vuelve al cuestionario de la parte 0.4 y responde de nuevo, ahora con todo lo que has aprendido. Compara con tus respuestas iniciales.</p>
+                    <table>
+                        <tr><th>Pregunta</th><th>Respuesta inicial</th><th>Respuesta final</th></tr>
+                        <tr><td>&iquest;La VM ve sola un USB conectado al host?</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>OHCI vs EHCI vs xHCI</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Para que sirve el Extension Pack</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Comando Linux para listar USB</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Que es VID:PID</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Reflexion final</h3>
                     <div class="pregunta">
-                        <p>Reflexion final: trabajar con perifericos en un entorno virtual tiene limitaciones (no podemos desmontar hardware, ni medir tactos reales). &iquest;Que aspectos del temario crees que se entienden bien igualmente y cuales necesitarian hardware fisico para aprenderse a fondo?</p>
-                        <textarea rows="4"></textarea>
+                        <p>Imagina que en una empresa virtualizan los puestos con VirtualBox y los empleados llevan pendrives propios. &iquest;Que politicas de USB recomendarias para evitar problemas de seguridad y compatibilidad?</p>
+                        <textarea rows="5" placeholder="Pista: filtros restrictivos, formatos prohibidos, captura solo manual..."></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que parte de la practica te ha resultado mas dificil? &iquest;Por que?</p>
+                        <textarea rows="3"></textarea>
                     </div>
 
                     <div class="evaluacion">
                         <h3>Autoevaluacion</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>He clasificado correctamente los perifericos en sus categorias</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
-                            <tr><td>Distingo membrana / mecanico y los principales switches Cherry MX</td><td><input type="text"></td></tr>
-                            <tr><td>He configurado velocidad, botones y rueda del raton en Windows</td><td><input type="text"></td></tr>
-                            <tr><td>He simulado un escaneo con NAPS2 a 300 PPP y a 600 PPP, y entiendo por que cambia el tamano</td><td><input type="text"></td></tr>
-                            <tr><td>He probado el OCR de NAPS2 y obtenido un PDF con texto seleccionable</td><td><input type="text"></td></tr>
-                            <tr><td>He comprobado camara/microfono en la VM o trabajado con video de prueba</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo USB passthrough y la diferencia OHCI/EHCI/xHCI</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>Capturo y libero un USB manualmente desde el menu Dispositivos</td><td><input type="text"></td></tr>
+                            <tr><td>Configuro filtros USB por VID:PID</td><td><input type="text"></td></tr>
+                            <tr><td>En Windows: detecto USB en Administrador de dispositivos, Diskpart, transfiero archivos</td><td><input type="text"></td></tr>
+                            <tr><td>En Linux: uso lsusb, lsblk, dmesg, mount/umount manuales y udevadm</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco compatibilidades cross-OS de FAT32, exFAT, NTFS y ext4</td><td><input type="text"></td></tr>
+                            <tr><td>Diagnostico problemas USB tipicos (Extension Pack, controlador, permisos, conflictos)</td><td><input type="text"></td></tr>
                         </table>
                     </div>
-
                 </div>
             </div>
 
