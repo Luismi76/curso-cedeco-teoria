@@ -181,8 +181,9 @@
                     <h3>1.2 - Comprobar si esta instalado el Extension Pack</h3>
                     <div class="pasos">
                         <ol>
-                            <li>En VirtualBox: <strong>Archivo &rarr; Herramientas &rarr; Administrador de paquetes de extension</strong> (o <em>Preferencias &rarr; Extensiones</em>).</li>
-                            <li>Mira si aparece <em>Oracle VM VirtualBox Extension Pack</em>.</li>
+                            <li>En VirtualBox 7.x: <strong>Archivo &rarr; Herramientas &rarr; Administrador de extensiones</strong>.</li>
+                            <li>Si no encuentras ese menu, prueba <strong>Archivo &rarr; Preferencias &rarr; Extensiones</strong> (versiones antiguas).</li>
+                            <li>Mira si aparece <em>Oracle VM VirtualBox Extension Pack</em> (en VirtualBox 7.1+ se llama <em>Oracle VirtualBox Extension Pack</em> sin "VM").</li>
                         </ol>
                     </div>
                     <table>
@@ -482,12 +483,18 @@ Get-Item $f | Select-Object Length, FullName</pre>
                     <textarea rows="5" placeholder="Pega 5-10 lineas representativas del udevadm monitor"></textarea>
 
                     <h3>3.8 - Transferencia de prueba en Linux</h3>
+
+                    <div class="nota">
+                        <strong>Cuidado con la cache:</strong> Linux usa cache de pagina al escribir, asi que <code>cp</code> termina antes de que los datos esten realmente en el pendrive. Para medir el tiempo real de transferencia, anadimos <code>sync</code>, que fuerza a vaciar la cache.
+                    </div>
+
                     <div class="pasos">
                         <ol>
                             <li>Genera 500 MB en el home: <code>dd if=/dev/zero of=~/test_500MB.bin bs=1M count=500 status=progress</code>.</li>
-                            <li>Copia al pendrive: <code>time cp ~/test_500MB.bin /media/$USER/.../</code>.</li>
-                            <li>Apunta el tiempo real (real:).</li>
-                            <li>Calcula MB/s.</li>
+                            <li>Copia al pendrive con sync incluido: <code>time (cp ~/test_500MB.bin /media/$USER/.../ &amp;&amp; sync)</code> (incluye los parentesis).</li>
+                            <li>Apunta el tiempo <strong>real</strong> (linea "real").</li>
+                            <li>Calcula MB/s: 500 / segundos.</li>
+                            <li>Borra el archivo del pendrive cuando termines.</li>
                         </ol>
                     </div>
 
@@ -597,15 +604,26 @@ Get-Item $f | Select-Object Length, FullName</pre>
                     </div>
 
                     <h3>5.1 - Formatear como FAT32 desde Windows</h3>
+
+                    <div class="aviso">
+                        <strong>Limite de Windows:</strong> el cuadro de Formatear del Explorador <strong>no ofrece FAT32 si el pendrive tiene mas de 32 GB</strong> (limitacion artificial de Microsoft, no del propio FAT32). Si tu pendrive es de 64 GB o mas, no veras la opcion FAT32 en el desplegable. En ese caso, formatealo desde PowerShell admin con: <code>format X: /FS:FAT32 /Q</code> (sustituye X por la letra del pendrive). El proceso es lento en pendrives grandes.
+                    </div>
+
                     <div class="pasos">
                         <ol>
                             <li>En la VM Windows con el pendrive capturado, abre Explorador.</li>
                             <li>Clic derecho en el pendrive &rarr; <strong>Formatear</strong>.</li>
                             <li>Sistema de archivos: <strong>FAT32</strong>. Formato rapido.</li>
+                            <li>Si FAT32 NO aparece (pendrive &gt; 32 GB), usa la alternativa: PowerShell admin &rarr; <code>format X: /FS:FAT32 /Q /Y</code>.</li>
                             <li>Crea un archivo de prueba: <code>test_win.txt</code> con texto dentro.</li>
                             <li>Quita el pendrive con seguridad.</li>
                         </ol>
                     </div>
+
+                    <table>
+                        <tr><td>&iquest;Aparecio FAT32 en el desplegable del Explorador?</td><td><input type="text" placeholder="Si / No (capacidad del pendrive)"></td></tr>
+                        <tr><td>Metodo usado finalmente</td><td><input type="text" placeholder="Explorador / PowerShell"></td></tr>
+                    </table>
 
                     <h3>5.2 - Leer el FAT32 desde Linux</h3>
                     <div class="pasos">
@@ -633,12 +651,18 @@ Get-Item $f | Select-Object Length, FullName</pre>
                     <textarea rows="3" placeholder="Mensaje de error que recibes"></textarea>
 
                     <h3>5.4 - Formatear como exFAT y repetir</h3>
+
+                    <div class="nota">
+                        <strong>Nota actual:</strong> en Ubuntu 22.04 y posteriores, exFAT esta en el kernel desde la version 5.4 (el driver se llama <code>exfat</code>) y se monta automaticamente. Solo necesitas las utilidades para formatear y comprobar: <code>sudo apt install exfatprogs</code>. El paquete antiguo <code>exfat-fuse</code> ya no es necesario.
+                    </div>
+
                     <div class="pasos">
                         <ol>
                             <li>Borra el archivo de 5 GB (si quedo a medias).</li>
                             <li>En Windows VM, formatea el pendrive a <strong>exFAT</strong>.</li>
-                            <li>En Ubuntu VM (puede que necesites <code>sudo apt install exfat-fuse exfatprogs</code>), monta y comprueba.</li>
-                            <li>Repite la prueba de 5 GB.</li>
+                            <li>En Ubuntu VM, asegurate de tener las utilidades: <code>sudo apt install exfatprogs</code>.</li>
+                            <li>Pasa el pendrive a Ubuntu y monta. Comprueba que se ve.</li>
+                            <li>Repite la prueba de los 5 GB con dd.</li>
                         </ol>
                     </div>
                     <table>
@@ -647,30 +671,47 @@ Get-Item $f | Select-Object Length, FullName</pre>
                     </table>
 
                     <h3>5.5 - Formatear como NTFS y probar</h3>
+
+                    <div class="nota">
+                        <strong>Aclaracion importante:</strong> hasta hace pocos anos en Linux solo se podia leer NTFS (con <code>ntfs-3g</code> habia escritura, pero limitada). Desde el kernel 5.15 (Ubuntu 22.04 LTS y posteriores) existe el driver <strong>NTFS3</strong> de Paragon en el kernel, que permite <strong>lectura y escritura nativas</strong>. Lo veras en accion abajo.
+                    </div>
+
                     <div class="pasos">
                         <ol>
                             <li>Formatea como <strong>NTFS</strong> desde Windows.</li>
+                            <li>Crea un archivo <code>desde_windows.txt</code> dentro.</li>
                             <li>Pasa a Ubuntu. Comprueba si lo monta automaticamente.</li>
-                            <li>Crea, modifica y borra archivos.</li>
+                            <li>Mira que driver se uso: <code>findmnt /dev/sdb1</code> o <code>mount | grep sdb1</code>. &iquest;Pone "ntfs3" o "fuseblk/ntfs"?</li>
+                            <li>Crea desde Linux: <code>echo "Hola desde Linux" &gt; /media/$USER/.../desde_linux.txt</code>.</li>
+                            <li>Modifica el archivo creado en Windows: <code>echo "Editado" &gt;&gt; /media/$USER/.../desde_windows.txt</code>.</li>
+                            <li>Pasalo a Windows y comprueba que ve los cambios.</li>
                         </ol>
                     </div>
+
                     <table>
                         <tr><td>&iquest;Ubuntu lee NTFS?</td><td><input type="text"></td></tr>
                         <tr><td>&iquest;Ubuntu escribe NTFS?</td><td><input type="text"></td></tr>
+                        <tr><td>Driver usado (ntfs3 / fuseblk)</td><td><input type="text"></td></tr>
                     </table>
 
                     <h3>5.6 - Formatear como ext4 desde Linux</h3>
+
+                    <div class="nota">
+                        <strong>Caso opuesto:</strong> Windows 10/11 NO lee ext4 nativamente desde el Explorador (a fecha de hoy sigue sin haber driver). Existe la opcion <code>wsl --mount</code> en Windows 11 con WSL2 que permite acceder al pendrive ext4 desde la consola WSL, pero el Explorador no lo monta como una unidad. Para el alumno medio, la respuesta sigue siendo: <strong>Windows no lee ext4</strong>.
+                    </div>
+
                     <div class="pasos">
                         <ol>
                             <li>En Ubuntu VM con el pendrive (desmontado): <code>sudo mkfs.ext4 /dev/sdb1</code>.</li>
                             <li>Vuelvelo a montar (desconecta y reconecta para que se monte automatico).</li>
                             <li>Crea un archivo de prueba.</li>
-                            <li>Pasalo a la VM Windows. &iquest;Que ocurre?</li>
+                            <li>Pasalo a la VM Windows. &iquest;Que ocurre? &iquest;Aparece la unidad? &iquest;Pide formatear?</li>
                         </ol>
                     </div>
+
                     <table>
-                        <tr><td>&iquest;Windows lee ext4 nativamente?</td><td><input type="text"></td></tr>
-                        <tr><td>&iquest;Que mensaje muestra el Explorador?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Windows lee ext4 nativamente desde el Explorador?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Que mensaje muestra Windows? (formatear / ignorar / vacio)</td><td><input type="text"></td></tr>
                     </table>
 
                     <h3>5.7 - Tabla resumen</h3>
