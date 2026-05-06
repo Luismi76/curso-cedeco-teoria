@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practica 29: Configuracion y calibracion de monitores</title>
     <style>
-        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
         header { background: var(--azul); color: white; padding: 24px 32px; }
         header h1 { font-size: 22px; margin-bottom: 8px; }
         header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
@@ -22,6 +22,7 @@
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
         td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
@@ -31,9 +32,13 @@
         .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
         .pasos strong { color: var(--azul); }
         .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .pregunta { margin: 14px 0; }
         .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
         code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
         .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
         .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
         .evaluacion th { background: #c6f6d5; color: var(--verde); }
@@ -50,6 +55,7 @@
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -61,215 +67,748 @@
             <div class="meta">
                 <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
                 <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
-                <strong>Sesiones:</strong> S3 (monitores) + S8 (vidieo) + S10 (calibracion)<br>
-                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
-                <strong>Modalidad:</strong> Trabajo individual<br>
-                <strong>Herramientas:</strong> al menos un monitor externo, cables HDMI / DisplayPort / VGA si hay
+                <strong>Sesiones:</strong> S3 (monitores) + S8 (video) + S10 (calibracion)<br>
+                <strong>Duracion estimada:</strong> 5-6 horas (1 sesion completa)<br>
+                <strong>Modalidad:</strong> Trabajo individual con puesta en comun<br>
+                <strong>Herramientas:</strong> monitor del puesto + (si hay) un segundo monitor del aula, cables HDMI / DisplayPort / VGA disponibles, regla o cinta metrica, telefono movil para fotos
             </div>
         </header>
 
         <div class="content">
+
             <div class="alumno-box">
-                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
-                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realizacion</label>
+                    <input type="date">
+                </div>
             </div>
 
             <div class="nota">
-                <strong>Nota:</strong> Trabajaras con el monitor de tu puesto y, si hay disponibles, con un segundo monitor para comparar. Identificaras puertos, configuraras resolucion/frecuencia y calibraras el color.
+                <strong>De que va esta practica:</strong> el monitor es la "ventana" del usuario. Da igual lo potente que sea el PC: si el monitor esta mal configurado o calibrado, la experiencia es mala. En esta sesion vas a aprender a identificar las caracteristicas reales de tu monitor (panel, resolucion nativa, frecuencia, conectores), elegir el cable adecuado, configurar resolucion / frecuencia / escalado en Windows, calibrar el color con el asistente del sistema y con el OSD del propio monitor, y diagnosticar los problemas mas tipicos (sin senal, escalado borroso, parpadeo, pixeles muertos). La practica es larga: ve rellenando las tablas conforme avanzas.
             </div>
 
             <div class="seccion">
-                <h2>Objetivos</h2>
+                <h2>Objetivos de la practica</h2>
                 <div class="seccion-body">
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Identificar los puertos de video del monitor y del PC.</li>
-                        <li>Conectar correctamente con el cable adecuado segun la situacion.</li>
-                        <li>Configurar resolucion nativa y frecuencia maxima en Windows.</li>
-                        <li>Comprender la diferencia entre IPS, VA y TN.</li>
-                        <li>Calibrar el color del monitor con el asistente de Windows.</li>
+                        <li>Distinguir las tecnologias de panel <strong>IPS, VA, TN y OLED</strong> y saber para que aplicacion conviene cada una.</li>
+                        <li>Identificar los conectores de video (<strong>HDMI, DisplayPort, USB-C/Thunderbolt, DVI, VGA</strong>) y sus versiones.</li>
+                        <li>Elegir el cable adecuado segun resolucion y frecuencia objetivo.</li>
+                        <li>Configurar <strong>resolucion nativa</strong> y <strong>frecuencia maxima</strong> en Windows, y entender por que NO debe usarse una resolucion no nativa.</li>
+                        <li>Ajustar el <strong>escalado (DPI)</strong> del sistema para una lectura comoda.</li>
+                        <li>Calibrar el monitor con el asistente de Windows (gamma, brillo, contraste, balance RGB) y con los <strong>perfiles del OSD</strong>.</li>
+                        <li>Configurar un setup <strong>multimonitor</strong> (extender, duplicar, orientacion, posicion).</li>
+                        <li>Diagnosticar problemas frecuentes: sin senal, escalado borroso, parpadeo, pixeles muertos, ghosting, backlight bleed.</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- PARTE 1: Identificar -->
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Identificar el monitor (30 min)</h2>
+                <h2>Parte 0 - Conceptos previos (40 min)</h2>
                 <div class="seccion-body">
-                    <h3>1.1 - Datos del monitor</h3>
+
+                    <h3>0.1 - Tecnologias de panel</h3>
+                    <p>El "panel" es el corazon del monitor: la matriz de cristal liquido (o de pixeles OLED) que forma la imagen. La tecnologia del panel decide los colores, los angulos de vision, el contraste y la velocidad de respuesta. Tienes cuatro tecnologias importantes:</p>
+                    <table>
+                        <tr><th>Tecnologia</th><th>Colores</th><th>Angulos</th><th>Contraste</th><th>Velocidad</th><th>Para que se usa</th></tr>
+                        <tr><td><strong>IPS</strong> (In-Plane Switching)</td><td>Muy buenos, fieles</td><td>Excelentes (178&deg;)</td><td>Medio (1000:1)</td><td>Buena (1-5 ms)</td><td>Oficina, retoque, programacion. El "todoterreno".</td></tr>
+                        <tr><td><strong>VA</strong> (Vertical Alignment)</td><td>Buenos</td><td>Medios</td><td>Alto (3000:1+, negros profundos)</td><td>Media (4-8 ms)</td><td>Multimedia, peliculas en habitacion oscura.</td></tr>
+                        <tr><td><strong>TN</strong> (Twisted Nematic)</td><td>Pobres, lavados</td><td>Malos</td><td>Medio</td><td>Muy alta (&lt;1 ms)</td><td>Gaming competitivo barato. En desuso.</td></tr>
+                        <tr><td><strong>OLED</strong></td><td>Espectaculares</td><td>Excelentes</td><td>Infinito (negro real)</td><td>Muy alta (&lt;0,1 ms)</td><td>Gama alta, video profesional. Riesgo de burn-in.</td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Regla rapida:</strong> si dudas y el monitor es para oficina o trabajo general, escoge <strong>IPS</strong>. Si es para ver peliculas en una habitacion a oscuras, <strong>VA</strong>. Si es OLED y vas a tenerlo encendido 10 horas con la barra de tareas siempre visible, ten cuidado con el burn-in.
+                    </div>
+
+                    <h3>0.2 - Resolucion y resolucion nativa</h3>
+                    <p>La <strong>resolucion</strong> es el numero de pixeles del panel (ancho x alto). La <strong>resolucion nativa</strong> es la real del panel; cualquier otra obliga al monitor a "estirar" la imagen y se ve borrosa.</p>
+                    <table>
+                        <tr><th>Nombre</th><th>Pixeles</th><th>Tamano tipico</th><th>Uso</th></tr>
+                        <tr><td>HD</td><td>1280 x 720</td><td>Pantallas pequenas</td><td>Casi obsoleto en monitores</td></tr>
+                        <tr><td>Full HD (1080p)</td><td>1920 x 1080</td><td>22"-24"</td><td>Oficina general</td></tr>
+                        <tr><td>QHD / 1440p</td><td>2560 x 1440</td><td>27"</td><td>Trabajo + multimedia</td></tr>
+                        <tr><td>4K UHD</td><td>3840 x 2160</td><td>27"-32"</td><td>Diseno, video, ofimatica de gama alta</td></tr>
+                        <tr><td>Ultrawide</td><td>2560 x 1080 / 3440 x 1440</td><td>29"-34"</td><td>Productividad y cine</td></tr>
+                    </table>
+
+                    <h3>0.3 - Frecuencia de refresco y tiempo de respuesta</h3>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Frecuencia de refresco (Hz):</strong> cuantas veces por segundo se actualiza la imagen. 60 Hz es el estandar de oficina. 120/144/165/240 Hz se usan en gaming. Notaras claramente la diferencia al mover el raton entre 60 y 144 Hz.</li>
+                        <li><strong>Tiempo de respuesta (ms):</strong> cuanto tarda un pixel en cambiar de un color a otro. A menor tiempo, menos rastro / ghosting. 5 ms es normal en IPS de oficina; 1 ms en TN o VA gaming.</li>
+                        <li><strong>VRR (Variable Refresh Rate):</strong> tecnologia que sincroniza la frecuencia del monitor con los FPS de la GPU. Marcas: <strong>FreeSync</strong> (AMD, abierto), <strong>G-Sync</strong> (NVIDIA), <strong>Adaptive Sync</strong> (estandar VESA). Evita el "tearing" (la imagen partida) sin penalizar latencia.</li>
+                    </ul>
+
+                    <h3>0.4 - Conectores de video y sus versiones</h3>
+                    <p>No basta con saber que es HDMI o DisplayPort: la <strong>version</strong> del estandar limita resolucion y frecuencia maximas. Esta es la situacion actual:</p>
+                    <table>
+                        <tr><th>Conector</th><th>Version</th><th>Maximo aprox.</th><th>Notas</th></tr>
+                        <tr><td>HDMI 1.4</td><td>2009</td><td>4K @ 30 Hz / 1080p @ 120 Hz</td><td>Lo que llevan TVs antiguas</td></tr>
+                        <tr><td>HDMI 2.0</td><td>2013</td><td>4K @ 60 Hz / 1440p @ 144 Hz</td><td>Estandar habitual hoy</td></tr>
+                        <tr><td>HDMI 2.1</td><td>2017+</td><td>4K @ 120 Hz / 8K @ 60 Hz, VRR, eARC</td><td>Necesario para gaming 4K reciente</td></tr>
+                        <tr><td>DisplayPort 1.2</td><td>2010</td><td>4K @ 60 Hz / 1440p @ 144 Hz</td><td>Lo minimo aceptable</td></tr>
+                        <tr><td>DisplayPort 1.4</td><td>2016</td><td>4K @ 144 Hz (con DSC), 8K @ 60 Hz</td><td>Estandar en monitores actuales</td></tr>
+                        <tr><td>DisplayPort 2.1 / UHBR</td><td>2022+</td><td>4K @ 240 Hz, 8K @ 120 Hz</td><td>Aun poco extendido</td></tr>
+                        <tr><td>USB-C / Thunderbolt</td><td>DP Alt Mode</td><td>Hasta 4K @ 60 Hz (TB3) o 8K (TB4/USB4)</td><td>1 cable: video + datos + carga</td></tr>
+                        <tr><td>DVI-D Dual Link</td><td>1999</td><td>1440p @ 60 Hz</td><td>Solo digital, sin audio</td></tr>
+                        <tr><td>VGA</td><td>1987</td><td>1080p @ 60 Hz (con calidad regular)</td><td>Analogico, evitar si hay alternativa</td></tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Trampa muy frecuente:</strong> tienes un monitor 4K @ 144 Hz pero usas un cable HDMI viejo y solo te deja 4K @ 60 Hz. El problema NO es ni la GPU ni el monitor: es <strong>el cable</strong>. Por eso esta practica empieza siempre identificando el cable.
+                    </div>
+
+                    <h3>0.5 - Calibracion: que es y para que sirve</h3>
+                    <p>Calibrar un monitor es <strong>ajustar sus parametros</strong> (brillo, contraste, gamma, temperatura de color, balance RGB) para que muestre los colores de forma fiel. Hay dos niveles:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Calibracion software (la de hoy):</strong> usar el asistente de Windows o un perfil ICC del fabricante. Es subjetiva (depende de tu vista) pero gratis y suficiente para uso general.</li>
+                        <li><strong>Calibracion hardware con colorimetro:</strong> un dispositivo (Spyder, ColorMunki, i1Display) mide el color real que emite el monitor y genera un perfil ICC objetivo. Necesario en retoque profesional o video. No lo haremos en esta practica.</li>
+                    </ul>
+
+                    <p>Conceptos clave de la calibracion:</p>
+                    <table>
+                        <tr><th>Termino</th><th>Que significa</th><th>Valor de referencia</th></tr>
+                        <tr><td><strong>Brillo</strong></td><td>Intensidad de la retroiluminacion</td><td>Ajustar para que el blanco no canse la vista (~120 cd/m&sup2; en oficina)</td></tr>
+                        <tr><td><strong>Contraste</strong></td><td>Diferencia entre el blanco mas blanco y el negro mas negro</td><td>El maximo del monitor sin perder detalle</td></tr>
+                        <tr><td><strong>Gamma</strong></td><td>Curva de respuesta de luminancia</td><td>2.2 (estandar para Windows y web)</td></tr>
+                        <tr><td><strong>Temperatura de color</strong></td><td>Tono general (calido / frio)</td><td>6500 K (D65, "luz dia")</td></tr>
+                        <tr><td><strong>Espacio de color</strong></td><td>Gama de colores que reproduce</td><td>sRGB para uso general; AdobeRGB / DCI-P3 para retoque o video</td></tr>
+                        <tr><td><strong>Perfil ICC</strong></td><td>Fichero que describe el color real del monitor</td><td>Lo asocia el SO al monitor para que las apps lo usen</td></tr>
+                    </table>
+
+                    <h3>0.6 - HDR: high dynamic range</h3>
+                    <p><strong>HDR</strong> es una tecnologia que amplia el rango de luminancia (negros mas negros y blancos mas brillantes) y el espacio de color. No basta con que Windows tenga "modo HDR" activado: hace falta que el <strong>monitor tenga certificacion</strong> (DisplayHDR 400, 600, 1000...) y que el contenido sea HDR.</p>
+                    <div class="nota">
+                        Activar HDR en un monitor que NO es HDR real (DisplayHDR &lt; 400 o sin certificacion) suele dejar la imagen mas apagada. Es una de las quejas tipicas de soporte. La solucion casi siempre es desactivar HDR.
+                    </div>
+
+                    <h3>0.7 - Cuestionario de entrada (sin mirar nada)</h3>
+                    <p>Antes de empezar, contesta lo que sepas. Al final compararemos:</p>
+                    <table>
+                        <tr><th>Pregunta</th><th>Tu respuesta</th></tr>
+                        <tr><td>&iquest;Que pasa si configuras una resolucion distinta a la nativa?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Cual es la diferencia entre IPS y VA?</td><td><input type="text"></td></tr>
+                        <tr><td>Para 4K @ 144 Hz, &iquest;que cable necesitas como minimo?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Que es el escalado al 125% de Windows?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Para que sirve el "perfil ICC" de un monitor?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Cuando elegirias "Duplicar" pantalla en lugar de "Extender"?</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - IDENTIFICAR EL MONITOR                               -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 1 - Identificar el monitor (40 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>1.1 - Datos fisicos del monitor</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Mira la etiqueta trasera del monitor o el menu OSD (boton de menu del propio monitor) para sacar los datos.</li>
-                            <li>Si el OSD lo permite, anota la resolucion nativa y la frecuencia maxima.</li>
+                            <li>Mira la <strong>etiqueta trasera</strong> del monitor. Anota marca, modelo y numero de serie.</li>
+                            <li>Si no lees la etiqueta, prueba el menu OSD del monitor: pulsa el boton de menu y busca el apartado "Informacion" o "About".</li>
+                            <li>Mide la diagonal aproximada con cinta metrica (de esquina a esquina del area visible) y pasala a pulgadas: <code>cm / 2,54</code>.</li>
+                            <li>Toma una foto de la etiqueta trasera para tu informe (opcional).</li>
                         </ol>
                     </div>
                     <table>
-                        <tr><th>Dato</th><th>Valor</th></tr>
                         <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
-                        <tr><td>Tamano (pulgadas)</td><td><input type="text"></td></tr>
-                        <tr><td>Resolucion nativa</td><td><input type="text" placeholder="Ej: 1920 x 1080"></td></tr>
-                        <tr><td>Frecuencia maxima (Hz)</td><td><input type="text"></td></tr>
-                        <tr><td>Tecnologia de panel (IPS / VA / TN / OLED)</td><td><input type="text"></td></tr>
-                        <tr><td>Conectores disponibles</td><td><input type="text" placeholder="Ej: HDMI x1, DP x1, VGA x1"></td></tr>
+                        <tr><td>Numero de serie (S/N)</td><td><input type="text"></td></tr>
+                        <tr><td>Diagonal medida (cm)</td><td><input type="text"></td></tr>
+                        <tr><td>Diagonal en pulgadas</td><td><input type="text"></td></tr>
+                        <tr><td>Ano de fabricacion (etiqueta)</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>1.2 - Identificar el cable usado</h3>
+                    <h3>1.2 - Buscar la ficha tecnica oficial</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador y busca: <em>"[marca] [modelo] specifications"</em>.</li>
+                            <li>Entra en la web del fabricante (no en una tienda).</li>
+                            <li>Localiza y anota: resolucion nativa, frecuencia maxima, tecnologia de panel, brillo (cd/m&sup2;), contraste y conectores.</li>
+                        </ol>
+                    </div>
                     <table>
-                        <tr><th>Cable que conecta tu monitor al PC</th><th>Tipo (HDMI / DP / DVI / VGA / USB-C)</th><th>Comentario</th></tr>
-                        <tr><td>Cable actual</td><td><input type="text"></td><td><input type="text" placeholder="Estado, longitud..."></td></tr>
+                        <tr><td>Resolucion nativa (segun fabricante)</td><td><input type="text" placeholder="Ej: 1920 x 1080"></td></tr>
+                        <tr><td>Frecuencia maxima</td><td><input type="text" placeholder="Ej: 75 Hz"></td></tr>
+                        <tr><td>Tecnologia de panel</td><td><input type="text" placeholder="IPS / VA / TN / OLED"></td></tr>
+                        <tr><td>Tiempo de respuesta</td><td><input type="text" placeholder="Ej: 5 ms"></td></tr>
+                        <tr><td>Brillo (cd/m&sup2;)</td><td><input type="text"></td></tr>
+                        <tr><td>Contraste</td><td><input type="text" placeholder="Ej: 1000:1"></td></tr>
+                        <tr><td>Cobertura sRGB (%)</td><td><input type="text"></td></tr>
+                        <tr><td>Soporta VRR / FreeSync / G-Sync</td><td><input type="text"></td></tr>
                     </table>
+
+                    <h3>1.3 - Mirar el OSD: lo que dice el propio monitor</h3>
+                    <p>El menu OSD es el menu interno del monitor; lo abre el boton fisico (no Windows). Sirve para ver el estado real del monitor.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa el boton de menu del monitor (suele estar en el lateral o detras).</li>
+                            <li>Busca un apartado tipo <strong>Informacion / Status / About</strong>.</li>
+                            <li>Anota lo que el monitor dice que esta recibiendo: resolucion y frecuencia <em>actuales</em>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Resolucion que dice el OSD</td><td><input type="text"></td></tr>
+                        <tr><td>Frecuencia que dice el OSD</td><td><input type="text"></td></tr>
+                        <tr><td>Entrada activa segun el OSD</td><td><input type="text" placeholder="HDMI 1 / DP / VGA..."></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Truco diagnostico:</strong> si el OSD dice "1280 x 720 @ 60 Hz" pero el panel es Full HD nativo, ya sabes que algo esta mal antes de tocar Windows: o lo configuro asi un usuario, o el cable / GPU no soporta mas. El OSD no miente.
+                    </div>
                 </div>
             </div>
 
-            <!-- PARTE 2: Resolucion y frecuencia -->
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - CONECTORES Y CABLES                                  -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 2 - Configurar resolucion y frecuencia (45 min)</h2>
+                <h2>Parte 2 - Conectores, cables y eleccion del enlace (45 min)</h2>
                 <div class="seccion-body">
-                    <h3>2.1 - Cambiar resolucion</h3>
+
+                    <h3>2.1 - Inventario de puertos</h3>
+                    <p>Vamos a hacer un inventario de los puertos de video disponibles en tu monitor y en tu PC. Recuerda: el numero de puertos de la <strong>GPU dedicada</strong> (si la hay) puede ser distinto al de la placa base.</p>
                     <div class="pasos">
                         <ol>
-                            <li>Clic derecho en el escritorio &rarr; <strong>Configuracion de pantalla</strong>.</li>
-                            <li>En <strong>Escala y disposicion</strong>, anota la resolucion actual.</li>
-                            <li>Cambia a una resolucion mas baja (por ejemplo 1280 x 720) y observa el efecto. &iquest;Que pasa?</li>
-                            <li>Vuelve a la resolucion nativa (la marcada como "(Recomendada)").</li>
+                            <li>Mira la trasera de <strong>tu monitor</strong>. Cuenta los conectores de video.</li>
+                            <li>Mira la trasera de <strong>tu PC</strong>. Si tiene GPU dedicada (los puertos estan en una "tarjeta" en horizontal), usa esos. Si no, los de la placa.</li>
+                            <li>Apunta tipo y cantidad de cada uno.</li>
                         </ol>
                     </div>
                     <table>
-                        <tr><th>Resolucion</th><th>Como se ve</th></tr>
-                        <tr><td>Nativa: <input type="text" placeholder="Ej: 1920 x 1080"></td><td><input type="text"></td></tr>
-                        <tr><td>Baja: 1280 x 720</td><td><input type="text"></td></tr>
+                        <tr><th>Tipo de conector</th><th>En el monitor</th><th>En el PC</th></tr>
+                        <tr><td>HDMI</td><td><input type="text" placeholder="Cantidad"></td><td><input type="text"></td></tr>
+                        <tr><td>DisplayPort</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>USB-C / Thunderbolt</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>DVI</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>VGA</td><td><input type="text"></td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>2.2 - Cambiar frecuencia de refresco</h3>
+                    <h3>2.2 - El cable que estas usando ahora</h3>
                     <div class="pasos">
                         <ol>
-                            <li>En Configuracion de pantalla &rarr; <strong>Configuracion avanzada de pantalla</strong>.</li>
-                            <li>En "Frecuencia de actualizacion", selecciona la maxima disponible.</li>
-                            <li>Aplica y confirma.</li>
+                            <li>Mira el cable que conecta tu monitor con el PC. Apaga el PC si tienes que mirar las dos puntas.</li>
+                            <li>Identifica el conector en cada extremo. Pueden ser distintos (cable HDMI &rarr; DP, USB-C &rarr; HDMI, etc.).</li>
+                            <li>Si el cable lleva impresa una version (HDMI 2.0, DP 1.4...), apuntala.</li>
+                            <li>Mide la longitud aproximada y observa si esta forrado, doblado o pisado.</li>
                         </ol>
                     </div>
                     <table>
-                        <tr><td>Frecuencia configurada (Hz)</td><td><input type="text"></td></tr>
+                        <tr><td>Tipo de cable</td><td><input type="text" placeholder="Ej: HDMI - HDMI"></td></tr>
+                        <tr><td>Version impresa (si la hay)</td><td><input type="text"></td></tr>
+                        <tr><td>Longitud aproximada</td><td><input type="text" placeholder="Ej: 1,8 m"></td></tr>
+                        <tr><td>Estado (recto / doblado / pelado)</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>2.3 - Escalado</h3>
-                    <p>Si la resolucion nativa es muy alta y el texto se ve pequeno, ajusta el escalado.</p>
-                    <div class="pasos">
-                        <ol>
-                            <li>En Configuracion de pantalla, busca <strong>Escala</strong>.</li>
-                            <li>Prueba con 100%, 125% y 150%. Anota cual te resulta mas comodo.</li>
-                        </ol>
-                    </div>
+                    <h3>2.3 - Eleccion teorica del cable adecuado</h3>
+                    <p>Sin probar todavia, decide que cable seria el mejor para tu monitor segun esta tabla:</p>
                     <table>
-                        <tr><td>Escala mas comoda para ti</td><td><input type="text" placeholder="Ej: 125%"></td></tr>
-                    </table>
-                </div>
-            </div>
-
-            <!-- PARTE 3: Comparativa -->
-            <div class="seccion">
-                <h2>Parte 3 - Comparativa de monitores (30 min)</h2>
-                <div class="seccion-body">
-                    <p>Si hay otro monitor disponible en el aula, completa la comparativa:</p>
-                    <table>
-                        <tr><th>Caracteristica</th><th>Monitor 1 (tu puesto)</th><th>Monitor 2 (otro puesto)</th></tr>
-                        <tr><td>Marca y modelo</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Tamano</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Resolucion nativa</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Tecnologia de panel</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Frecuencia maxima</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Conectores disponibles</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><th>Caso</th><th>Cable recomendado</th></tr>
+                        <tr><td>Oficina, Full HD @ 60 Hz</td><td>HDMI 1.4+ o DisplayPort 1.2+ (cualquiera vale)</td></tr>
+                        <tr><td>Gaming 1440p @ 144 Hz</td><td>DisplayPort 1.2+ (HDMI 2.0 al limite)</td></tr>
+                        <tr><td>Monitor 4K @ 60 Hz</td><td>HDMI 2.0+ o DisplayPort 1.2+</td></tr>
+                        <tr><td>4K @ 120/144 Hz</td><td>DisplayPort 1.4 o HDMI 2.1</td></tr>
+                        <tr><td>Portatil moderno + monitor</td><td>USB-C &rarr; DisplayPort (un solo cable)</td></tr>
+                        <tr><td>Monitor antiguo solo VGA</td><td>HDMI &rarr; VGA con conversor activo</td></tr>
                     </table>
 
                     <div class="pregunta">
-                        <p>Mira los dos monitores desde un angulo (de lado). &iquest;Cual conserva mejor los colores? &iquest;Que tecnologia de panel suele tener mejores angulos de vision?</p>
+                        <p>Para tu monitor concreto (resolucion nativa + frecuencia maxima vistas en la parte 1), &iquest;que cable es el adecuado y por que? &iquest;El que tienes ahora es el correcto?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <h3>2.4 - Cambio de cable (si hay material disponible)</h3>
+                    <p>Si en el aula hay cables alternativos, prueba a cambiarlos para comprobar que el sistema sigue funcionando:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga el monitor (no es obligatorio para HDMI/DP, pero evita ruidos).</li>
+                            <li>Desconecta el cable actual y conecta uno alternativo (por ejemplo, si tenias HDMI prueba DP, o viceversa).</li>
+                            <li>Si la entrada del monitor tiene varias (HDMI 1 / HDMI 2 / DP), asegurate de seleccionar la entrada correcta en el OSD: <strong>Source / Input</strong>.</li>
+                            <li>Vuelve a mirar la resolucion y frecuencia que reporta el OSD. &iquest;Cambia algo?</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Cable probado</th><th>Resolucion lograda</th><th>Frecuencia lograda</th></tr>
+                        <tr><td><input type="text" placeholder="Cable 1"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text" placeholder="Cable 2"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Aviso muy comun:</strong> en PCs con GPU dedicada, hay alumnos que conectan el monitor a la <strong>placa</strong> (puertos cerca de los USB y la red) en vez de a la <strong>tarjeta grafica</strong> (los puertos de abajo, en horizontal). Resultado: la GPU buena no se usa, hay tirones y la resolucion / frecuencia se quedan a medias. Comprueba siempre que el monitor esta conectado a la GPU si la hay.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - RESOLUCION, FRECUENCIA Y ESCALADO                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Resolucion, frecuencia y escalado en Windows (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>3.1 - Abrir Configuracion de pantalla</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Clic derecho en el escritorio &rarr; <strong>Configuracion de pantalla</strong>.</li>
+                            <li>Anota la resolucion actual y si lleva la etiqueta <em>(Recomendada)</em>: esa es la <strong>nativa</strong>.</li>
+                            <li>Anota tambien el escalado (porcentaje) que muestra Windows.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Resolucion actual</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Aparece "(Recomendada)"?</td><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><td>Escalado actual</td><td><input type="text" placeholder="100% / 125% / 150%..."></td></tr>
+                    </table>
+
+                    <h3>3.2 - Probar una resolucion no nativa</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Cambia la resolucion a <strong>1280 x 720</strong> (o la mas baja disponible).</li>
+                            <li>Aplica y mira la imagen: el texto se ve mas grande pero <em>borroso</em>.</li>
+                            <li>Acerca la cara a la pantalla y observa los bordes: veras pixeles "estirados" (interpolacion).</li>
+                            <li>Apunta tus observaciones.</li>
+                            <li>Vuelve a la resolucion nativa <em>(Recomendada)</em>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Resolucion</th><th>Como se ve la imagen</th></tr>
+                        <tr><td>Nativa: <input type="text"></td><td><input type="text" placeholder="Nitida / borrosa / estirada..."></td></tr>
+                        <tr><td>Baja: 1280 x 720</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>&iquest;Por que una resolucion no nativa se ve borrosa? Pista: pensa en los pixeles fisicos del panel y en como rellena el monitor lo que falta.</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <h3>3.3 - Configurar la frecuencia maxima</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla &rarr; baja hasta <strong>Configuracion avanzada de pantalla</strong>.</li>
+                            <li>Busca <strong>Elegir una frecuencia de actualizacion</strong>.</li>
+                            <li>Selecciona la maxima del desplegable.</li>
+                            <li>Si la pantalla parpadea unos segundos, es normal. Confirma cuando aparezca el cuadro.</li>
+                            <li>Comprueba en el OSD del monitor que ahora esta a la frecuencia correcta.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Frecuencia anterior</td><td><input type="text"></td></tr>
+                        <tr><td>Frecuencia maxima del desplegable</td><td><input type="text"></td></tr>
+                        <tr><td>Frecuencia que confirma el OSD</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Sintoma tipico:</strong> el monitor es 144 Hz pero el desplegable de Windows solo te ofrece 60 Hz. Causas habituales: cable insuficiente (HDMI 1.4), conexion al puerto de la placa en lugar de la GPU, o el OSD del monitor tiene un modo "Overdrive" / "OC" que hay que activar. Anota lo que veas.
+                    </div>
+
+                    <h3>3.4 - Escalado (DPI) del sistema</h3>
+                    <p>El escalado decide el tamano de los textos e iconos. En 4K en una 27" sin escalado, el texto se ve diminuto. Windows lo ajusta con el porcentaje de Escala.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla, localiza <strong>Escala</strong>.</li>
+                            <li>Prueba 100%, 125%, 150% (o el que tengas disponible). Aplica cada uno y abre una ventana del Explorador para comparar.</li>
+                            <li>Decide el que mas comodo te resulta.</li>
+                            <li>Si despues de cambiar el escalado alguna app se ve borrosa, abre <strong>Configuracion avanzada de escalado</strong> y activa <em>"Permitir que Windows intente corregir el escalado"</em>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Escalado</th><th>Como se ve en general</th></tr>
+                        <tr><td>100%</td><td><input type="text"></td></tr>
+                        <tr><td>125%</td><td><input type="text"></td></tr>
+                        <tr><td>150%</td><td><input type="text"></td></tr>
+                        <tr><td>Escalado mas comodo para ti</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.5 - Test de pixeles muertos / atascados</h3>
+                    <p>Vamos a usar un test online para detectar pixeles defectuosos. Es importante hacerlo a resolucion <strong>nativa</strong>.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador y entra en una pagina de test (busca "online dead pixel test").</li>
+                            <li>Pon la pagina a pantalla completa con <code>F11</code>.</li>
+                            <li>Recorre las pantallas en color rojo, verde, azul, blanco y negro.</li>
+                            <li>Observa de cerca por si ves puntos siempre encendidos o siempre apagados (pixeles atascados / muertos).</li>
+                            <li>Sal con <code>F11</code> de nuevo.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Has detectado algun pixel defectuoso?</td><td><input type="text"></td></tr>
+                        <tr><td>Si si: zona aproximada</td><td><input type="text" placeholder="Ej: arriba-derecha"></td></tr>
+                        <tr><td>Color en el que era visible</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Truco para pixeles "atascados" (no muertos):</strong> hay programas que parpadean colores muy rapido en la zona afectada (JScreenFix, UDPixel) y a veces lo "desbloquean". No funciona con pixeles totalmente muertos, pero si con los que se quedan en un solo color.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - CALIBRACION DE COLOR                                 -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - Calibracion de color (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>4.1 - Anotar valores ANTES de calibrar</h3>
+                    <p>Antes de tocar nada, abre el OSD del monitor y anota los valores actuales. Asi podras volver atras si algo sale mal.</p>
+                    <table>
+                        <tr><th>Parametro del OSD</th><th>Valor antes</th></tr>
+                        <tr><td>Brillo</td><td><input type="text"></td></tr>
+                        <tr><td>Contraste</td><td><input type="text"></td></tr>
+                        <tr><td>Modo de imagen / preset</td><td><input type="text" placeholder="Standard / sRGB / Cinema..."></td></tr>
+                        <tr><td>Temperatura de color</td><td><input type="text" placeholder="Calida / Neutra / Fria / 6500K"></td></tr>
+                        <tr><td>Modo Eco / Low Blue</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.2 - Asistente de calibracion de color de Windows (DCCW)</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win+S</strong> y escribe: "Calibrar el color de la pantalla". Abrelo (es el clasico DCCW).</li>
+                            <li>Sigue el asistente paso a paso. Te ira ensenando imagenes de referencia y tendras que ajustar:
+                                <ul style="margin-left:18px">
+                                    <li><strong>Gamma:</strong> deslizador hasta que los puntos del centro de los circulos casi desaparezcan.</li>
+                                    <li><strong>Brillo:</strong> hay que ajustarlo en el OSD del MONITOR (no en Windows). Que el traje del hombre se distinga del fondo, pero la X del pecho siga apenas visible.</li>
+                                    <li><strong>Contraste:</strong> tambien en el OSD del monitor. Las arrugas de la camisa blanca tienen que verse.</li>
+                                    <li><strong>Balance de color:</strong> deslizadores rojo / verde / azul hasta que las barras grises no tengan tinte de color.</li>
+                                </ul>
+                            </li>
+                            <li>Al final, pulsa <strong>Comparacion antes/despues</strong>. Decide si te quedas con la nueva calibracion.</li>
+                            <li>Marca tambien <em>"Iniciar ClearType"</em> al final para optimizar el suavizado de fuentes.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Parametro</th><th>Valor antes</th><th>Valor despues</th></tr>
+                        <tr><td>Brillo del monitor (OSD, %)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Contraste del monitor (OSD, %)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Gamma (subjetivo: claro / oscuro / centrado)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Balance final R / G / B</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.3 - Mirar el perfil ICC asociado</h3>
+                    <p>El asistente DCCW deja un perfil ICC asociado al monitor. Vamos a comprobarlo.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <strong>Win+S</strong> y busca "Administracion de color". Abrela.</li>
+                            <li>En el desplegable <strong>Dispositivo</strong>, asegurate de que esta seleccionado tu monitor.</li>
+                            <li>Marca <strong>Usar mi configuracion para este dispositivo</strong>.</li>
+                            <li>Comprueba que aparece tu perfil (suele llamarse <em>CalibratedDisplayProfile-X.icc</em>).</li>
+                            <li>Selecciona el perfil y pulsa <strong>Establecer como perfil predeterminado</strong>.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Nombre del perfil ICC creado</td><td><input type="text"></td></tr>
+                        <tr><td>Esta marcado como predeterminado</td><td><input type="text" placeholder="Si / No"></td></tr>
+                    </table>
+
+                    <h3>4.4 - Probar perfiles del OSD del monitor</h3>
+                    <p>El monitor suele tener varios "modos de imagen" predefinidos en el OSD. Vamos a verlos por dentro:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el OSD &rarr; <strong>Picture / Imagen / Modo de imagen</strong>.</li>
+                            <li>Prueba al menos 3 modos diferentes (por ejemplo: Standard, sRGB, Cinema/Movie, Game, Eco, Reading).</li>
+                            <li>Para cada modo, abre una foto con colores variados (un fondo de escritorio, una pagina con texto y otra con imagen).</li>
+                            <li>Anota la sensacion: tonos calidos / frios, mas o menos saturado, brillo aparente, fatiga visual.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><th>Modo OSD</th><th>Sensacion general</th><th>Para que lo usarias</th></tr>
+                        <tr><td><input type="text" placeholder="Ej: sRGB"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.5 - Filtros de luz azul / Modo nocturno</h3>
+                    <p>La luz azul reduce la melatonina y dificulta dormir si trabajas hasta tarde. Tienes dos formas de filtrarla:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>OSD del monitor:</strong> busca un modo "Low Blue Light" o "Reading". Pruebalo y observa el cambio.</li>
+                            <li><strong>Windows:</strong> Configuracion &rarr; Pantalla &rarr; <strong>Luz nocturna</strong>. Activala y prueba a programar un horario (por ejemplo, 21:00 - 07:00).</li>
+                            <li>Compara los dos: la luz nocturna de Windows actua software (modifica el color via GPU); la del OSD actua sobre el panel directamente.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Tu monitor tiene modo Low Blue Light en OSD?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Has activado la Luz nocturna de Windows?</td><td><input type="text"></td></tr>
+                        <tr><td>Cual te parece menos agresiva</td><td><input type="text" placeholder="Windows / OSD"></td></tr>
+                    </table>
+
+                    <div class="reto">
+                        <strong>Reto extra:</strong> haz una foto del monitor con tu telefono (sin flash) antes y despues de la calibracion. La camara no esta calibrada igual que el ojo, pero veras diferencias de blanco/temperatura. No es ciencia, es para que aprecies el cambio.
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que perfil de color elegirias para retoque fotografico profesional y por que? Pista: gama del espacio (sRGB, AdobeRGB, DCI-P3) y necesidades del flujo de trabajo.</p>
                         <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 4: Calibracion -->
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - MULTIMONITOR                                         -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 4 - Calibrar el color del monitor (40 min)</h2>
+                <h2>Parte 5 - Configuracion multimonitor (45 min)</h2>
                 <div class="seccion-body">
-                    <h3>4.1 - Asistente de calibracion de Windows</h3>
+
+                    <p>Si en el aula hay un segundo monitor disponible, conectalo y completa esta parte. Si no, leela e intenta razonar las respuestas a partir de lo aprendido.</p>
+
+                    <h3>5.1 - Conectar el segundo monitor</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Pulsa <strong>Win+S</strong> y busca "Calibrar el color de la pantalla". Abrelo.</li>
-                            <li>Sigue el asistente paso a paso:
-                                <ul style="margin-left:18px">
-                                    <li>Ajuste de gamma.</li>
-                                    <li>Brillo y contraste (con los botones del monitor).</li>
-                                    <li>Balance de colores (rojo, verde, azul).</li>
-                                </ul>
-                            </li>
-                            <li>Al final, pulsa "Comparacion antes/despues".</li>
+                            <li>Conecta el segundo monitor a un puerto libre del PC (preferentemente DisplayPort o HDMI).</li>
+                            <li>Encendelo y selecciona la entrada correcta en su OSD si no aparece imagen.</li>
+                            <li>Vuelve a Configuracion de pantalla. Veras dos rectangulos numerados (1 y 2).</li>
+                            <li>Pulsa <strong>Identificar</strong>: en cada monitor aparecera un numerito grande para que sepas cual es cual.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 - Modos: Duplicar, Extender, Solo X</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla, baja al desplegable <em>Varias pantallas</em>.</li>
+                            <li>Prueba <strong>Duplicar estas pantallas</strong>: misma imagen en los dos monitores. Util para presentaciones / proyector.</li>
+                            <li>Prueba <strong>Extender estas pantallas</strong>: el escritorio se reparte. Mueve una ventana de uno a otro.</li>
+                            <li>Prueba <strong>Mostrar solo en 1 / Solo en 2</strong>: el otro monitor queda apagado.</li>
                         </ol>
                     </div>
 
                     <table>
-                        <tr><th>Ajuste</th><th>Valor antes</th><th>Valor despues</th></tr>
-                        <tr><td>Brillo del monitor (%)</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Contraste del monitor (%)</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Gamma (claro / oscuro / intermedio)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><th>Modo</th><th>Cuando lo usarias</th></tr>
+                        <tr><td>Duplicar</td><td><input type="text"></td></tr>
+                        <tr><td>Extender</td><td><input type="text"></td></tr>
+                        <tr><td>Solo en 1 / Solo en 2</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>4.2 - Ajustes desde el OSD del monitor</h3>
+                    <div class="truco">
+                        <strong>Truco rapido:</strong> el atajo <code>Win+P</code> abre el selector de proyeccion en una franja lateral. En portatiles con proyector es <em>el</em> atajo a recordar.
+                    </div>
+
+                    <h3>5.3 - Posicion fisica vs logica</h3>
+                    <p>Si en el escritorio mueves el raton del monitor 1 al 2 hacia la derecha pero fisicamente el segundo monitor esta a tu izquierda, te volveras loco. Hay que ordenarlos.</p>
                     <div class="pasos">
                         <ol>
-                            <li>Pulsa el boton de menu del monitor (OSD).</li>
-                            <li>Busca <strong>perfiles de imagen</strong> (sRGB, Cinema, Game, etc.) y prueba al menos 2.</li>
-                            <li>Anota cual te parece mas natural para uso normal.</li>
+                            <li>En Configuracion de pantalla, arrastra el rectangulo del monitor 2 al lado del monitor 1, en la misma posicion fisica que tienes en el escritorio.</li>
+                            <li>Ajusta tambien la <strong>altura relativa</strong>: si el monitor 2 es mas bajo, baja el rectangulo.</li>
+                            <li>Aplica y comprueba moviendo el raton. Tiene que "salir" por el lado correcto.</li>
+                            <li>Decide cual es el <strong>monitor principal</strong> (donde aparecen el menu Inicio, las notificaciones y se abre la mayoria de programas): seleccionalo y marca <em>Convertir en pantalla principal</em>.</li>
                         </ol>
                     </div>
                     <table>
-                        <tr><td>Perfil OSD elegido</td><td><input type="text" placeholder="Ej: sRGB"></td></tr>
+                        <tr><td>Posicion fisica del monitor 2</td><td><input type="text" placeholder="Izquierda / derecha / encima"></td></tr>
+                        <tr><td>Cual es ahora el principal</td><td><input type="text"></td></tr>
                     </table>
 
-                    <div class="pregunta">
-                        <p>&iquest;Que perfil de color elegirias para retoque fotografico profesional y por que?</p>
-                        <textarea rows="3" placeholder="Pista: sRGB, Adobe RGB, DCI-P3..."></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PARTE 5: Multimonitor -->
-            <div class="seccion">
-                <h2>Parte 5 - Configuracion multimonitor (opcional, si hay segundo monitor)</h2>
-                <div class="seccion-body">
+                    <h3>5.4 - Resoluciones y escalados mixtos</h3>
+                    <p>Si un monitor es Full HD y el otro 4K, lo facil es que cada uno necesite un escalado distinto.</p>
                     <div class="pasos">
                         <ol>
-                            <li>Conecta un segundo monitor al PC con el cable disponible (HDMI o DP).</li>
-                            <li>Ve a <strong>Configuracion de pantalla</strong>. Veras los dos monitores.</li>
-                            <li>Prueba los modos: <strong>Duplicar</strong>, <strong>Extender</strong>, <strong>Solo segunda pantalla</strong>.</li>
-                            <li>Arrastra los monitores en el grafico para que coincidan con su posicion fisica.</li>
-                            <li>Mueve una ventana de un monitor a otro para comprobar que extiende bien.</li>
+                            <li>Selecciona el monitor 1 en Configuracion de pantalla. Ajusta su resolucion nativa y un escalado comodo.</li>
+                            <li>Selecciona el monitor 2. Ajusta de igual manera. Veras que cada uno tiene su propio escalado.</li>
+                            <li>Mueve una ventana del monitor 1 al 2 y observa: el texto deberia mantener tamano coherente entre ambas pantallas.</li>
                         </ol>
                     </div>
+                    <table>
+                        <tr><th></th><th>Resolucion</th><th>Escalado</th></tr>
+                        <tr><td>Monitor 1</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Monitor 2</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
 
-                    <div class="pregunta">
-                        <p>&iquest;Cuando usarias "Duplicar" en lugar de "Extender"?</p>
-                        <textarea rows="3" placeholder="Pista: presentaciones, proyectores..."></textarea>
+                    <h3>5.5 - Orientacion vertical</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Configuracion de pantalla, en el monitor secundario, busca <strong>Orientacion de la pantalla</strong>.</li>
+                            <li>Prueba <em>Vertical</em>. Si el monitor lo permite fisicamente, gira el monitor 90&deg; en su pie.</li>
+                            <li>Anota cuando seria util.</li>
+                            <li>Vuelve a horizontal.</li>
+                        </ol>
                     </div>
+                    <table>
+                        <tr><td>&iquest;Para que tareas usarias un monitor vertical?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.6 - Daisy chain (encadenado por DisplayPort) - opcional</h3>
+                    <p>DisplayPort permite conectar un monitor a otro en cascada (DP-Out del primero al DP-In del segundo) y asi usar un solo cable desde el PC. Necesita que los monitores soporten <strong>MST (Multi-Stream Transport)</strong>.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Mira si tus monitores tienen un puerto <strong>DP-OUT</strong> ademas del DP-IN.</li>
+                            <li>Si lo tienen y hay otro monitor compatible, prueba a encadenarlos.</li>
+                            <li>Activa MST en el OSD del primer monitor (<em>DisplayPort 1.2 / MST: ON</em>).</li>
+                            <li>Anota si Windows ve los dos monitores con un solo cable saliendo del PC.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Tus monitores soportan MST?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Has podido encadenar?</td><td><input type="text"></td></tr>
+                    </table>
                 </div>
             </div>
 
-            <!-- EVALUACION -->
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - DIAGNOSTICO                                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Diagnostico de problemas (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>El profesor habra preparado algunos de estos escenarios en los puestos. Si no, son problemas frecuentes en soporte que conviene saber resolver.</p>
+
+                    <h3>6.1 - Caso A: monitor con "Sin senal"</h3>
+                    <p>Sintoma: enciendes el PC, el monitor se enciende pero pone "No signal" o "Sin senal".</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba que el monitor tiene seleccionada la <strong>entrada correcta</strong> en el OSD (HDMI 1, DP, VGA...). Es el error mas comun.</li>
+                            <li>Comprueba que el cable esta enchufado en los dos extremos.</li>
+                            <li>Si el PC tiene GPU dedicada, verifica que el cable va a la GPU (puertos en horizontal abajo) y NO a la placa.</li>
+                            <li>Cambia el cable si tienes otro a mano.</li>
+                            <li>Prueba el monitor con otro PC para descartar fallo del monitor.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Causa identificada</td><td><input type="text"></td></tr>
+                        <tr><td>Solucion aplicada</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.2 - Caso B: la imagen se ve borrosa o con bandas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Comprueba que la resolucion configurada en Windows es la <strong>nativa</strong> (con etiqueta "(Recomendada)").</li>
+                            <li>Comprueba el escalado: si esta a 100% y el panel es 4K en una 27", el texto se ve muy pequeno; si esta al 175% pero el monitor es Full HD, todo se ve sobreescalado.</li>
+                            <li>Si la imagen tiene bandas verticales o "ruido" parpadeando, el cable VGA esta funcionando: cambia a HDMI o DP. VGA es analogico y suele dar esos problemas.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>&iquest;Era resolucion no nativa, escalado o cable VGA?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.3 - Caso C: parpadeo / flickering</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Asegurate de que la frecuencia de refresco coincide con la nominal del monitor (en el OSD lo veras).</li>
+                            <li>Si tu monitor es 60 Hz, no fuerces 75 Hz a menos que el OSD lo ofrezca explicitamente.</li>
+                            <li>Comprueba el cable: un HDMI muy largo o pelado pierde senal. Cambialo.</li>
+                            <li>Mira si hay alguna fuente de interferencias cerca: regletas, cargadores baratos, transformadores.</li>
+                            <li>Si nada cambia, prueba el monitor en otro puerto del PC o en otro PC.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Causa probable del parpadeo</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.4 - Caso D: ghosting / motion blur al mover ventanas</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Mueve rapidamente una ventana por el escritorio. Si ves "rastros" del color anterior, hay ghosting.</li>
+                            <li>En el OSD del monitor, busca <strong>Overdrive / Response Time / Trace Free</strong>. Suele ir de Off / Low / Medium / High.</li>
+                            <li>Sube un escalon (de Off a Low, por ejemplo) y vuelve a probar. Si subes demasiado, aparece el efecto contrario: <em>inverse ghosting</em> (halo claro detras del objeto).</li>
+                            <li>Encuentra el punto medio.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Nivel de Overdrive antes</td><td><input type="text"></td></tr>
+                        <tr><td>Nivel de Overdrive optimo</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.5 - Caso E: tinte de color o pixeles defectuosos</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Si toda la pantalla tiene un tinte rojizo / verdoso / azulado, mira primero el balance de color del OSD: pudo quedarse mal.</li>
+                            <li>Restaura los valores de fabrica del OSD: <strong>Reset / Factory reset</strong>.</li>
+                            <li>Si el tinte solo afecta a una zona, podria ser el panel (presion fisica, defecto). Anotalo: el monitor tendra que ir a garantia.</li>
+                            <li>Repite el test de pixeles muertos del paso 3.5.</li>
+                        </ol>
+                    </div>
+                    <table>
+                        <tr><td>Causa identificada</td><td><input type="text"></td></tr>
+                        <tr><td>Solucion (reset / RMA / nada)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.6 - Caso F: backlight bleed y glow</h3>
+                    <p>Pon una imagen completamente <strong>negra</strong> en el monitor (a oscuras y a pantalla completa). Observa las esquinas:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Backlight bleed:</strong> manchas claras en los bordes (la retroiluminacion se "escapa"). Es defecto.</li>
+                        <li><strong>IPS glow:</strong> resplandor blanquecino al mirar las esquinas desde un angulo. Es propio de los IPS, no es defecto.</li>
+                    </ul>
+                    <table>
+                        <tr><td>&iquest;Tu monitor presenta backlight bleed?</td><td><input type="text"></td></tr>
+                        <tr><td>&iquest;Tu monitor presenta IPS glow?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.7 - Sintesis: tabla de problemas y soluciones</h3>
+                    <table>
+                        <tr><th>Sintoma</th><th>Causa probable</th><th>Solucion</th></tr>
+                        <tr><td>"Sin senal" en el monitor</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Texto borroso</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Pantalla parpadea</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Solo me ofrece 60 Hz en un monitor 144 Hz</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Ghosting al mover el raton</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Tinte de color general</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Pixel siempre rojo</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- EVALUACION                                                     -->
+            <!-- ============================================================ -->
             <div class="seccion">
                 <h2>Conclusiones y evaluacion</h2>
                 <div class="seccion-body">
+
+                    <h3>Cuestionario de salida</h3>
+                    <p>Vuelve al cuestionario de la parte 0.7 y responde de nuevo, ahora con todo lo que has aprendido. Compara con tus respuestas iniciales:</p>
+                    <table>
+                        <tr><th>Pregunta</th><th>Respuesta inicial</th><th>Respuesta final</th></tr>
+                        <tr><td>Resolucion no nativa: &iquest;que pasa?</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>IPS vs VA</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cable para 4K @ 144 Hz</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Que es el escalado al 125%</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Para que sirve un perfil ICC</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Cuando usar "Duplicar"</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>Reflexion final</h3>
+                    <div class="pregunta">
+                        <p>Imagina que tienes que comprar un monitor para un puesto de oficina con tareas de retoque ligero (correos, Office, retoque ocasional de fotos). Presupuesto medio. Define las especificaciones que pedirias: tamano, resolucion, panel, frecuencia, conectores y cobertura sRGB. Justifica cada eleccion.</p>
+                        <textarea rows="6"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Que parte de la practica te ha resultado mas dificil? &iquest;Por que?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>&iquest;Hay algo que no haya quedado claro? Anotalo aqui para preguntarlo en la puesta en comun.</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
                     <div class="evaluacion">
                         <h3>Autoevaluacion</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>He identificado correctamente la resolucion nativa y conectores del monitor</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
-                            <tr><td>He configurado resolucion y frecuencia correctamente en Windows</td><td><input type="text"></td></tr>
-                            <tr><td>He completado el asistente de calibracion de color</td><td><input type="text"></td></tr>
-                            <tr><td>Entiendo las diferencias entre IPS, VA, TN y OLED</td><td><input type="text"></td></tr>
-                            <tr><td>(Si aplicaba) He configurado correctamente un setup multimonitor</td><td><input type="text"></td></tr>
+                            <tr><td>Identifico marca, modelo, resolucion nativa y conectores de un monitor</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
+                            <tr><td>Distingo IPS, VA, TN y OLED y se cuando elegir cada uno</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco los conectores HDMI, DP, USB-C, DVI, VGA y sus versiones</td><td><input type="text"></td></tr>
+                            <tr><td>Configuro resolucion nativa y frecuencia maxima en Windows</td><td><input type="text"></td></tr>
+                            <tr><td>Ajusto el escalado del sistema para una lectura comoda</td><td><input type="text"></td></tr>
+                            <tr><td>He completado la calibracion con DCCW y entiendo gamma / brillo / contraste / RGB</td><td><input type="text"></td></tr>
+                            <tr><td>Se que es un perfil ICC y donde aplicarlo</td><td><input type="text"></td></tr>
+                            <tr><td>Configuro multimonitor (extender, posicion, principal, escalados mixtos)</td><td><input type="text"></td></tr>
+                            <tr><td>Diagnostico problemas tipicos: sin senal, parpadeo, ghosting, pixeles, escalado</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="botones">
