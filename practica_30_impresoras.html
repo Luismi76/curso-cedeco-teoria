@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practica 30: Instalacion y mantenimiento de impresoras</title>
+    <title>Práctica 30: Impresoras en máquinas virtuales (Windows y Linux)</title>
     <style>
-        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
         header { background: var(--azul); color: white; padding: 24px 32px; }
         header h1 { font-size: 22px; margin-bottom: 8px; }
         header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
@@ -22,6 +22,7 @@
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
         td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
@@ -32,9 +33,12 @@
         .pasos strong { color: var(--azul); }
         .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .pregunta { margin: 14px 0; }
         .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
         code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
         .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
         .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
         .evaluacion th { background: #c6f6d5; color: var(--verde); }
@@ -51,266 +55,548 @@
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
     <div class="container">
         <header>
-            <h1>Practica 30: Instalacion y mantenimiento de impresoras</h1>
+            <h1>Práctica 30: Impresoras en máquinas virtuales (Windows y Linux)</h1>
             <div class="meta">
-                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
-                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
-                <strong>Sesiones:</strong> S4 (impresoras: tipos e instalacion) + S5 (mantenimiento)<br>
-                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
-                <strong>Modalidad:</strong> Trabajo individual o por parejas<br>
-                <strong>Herramientas:</strong> impresora del aula (laser o inyeccion), papel, cable USB o conexion red
+                <strong>Módulo:</strong> MF0953_2 - Reparación y ampliación de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalación y configuración de periféricos<br>
+                <strong>Sesiones:</strong> S4 (impresoras: tipos e instalación) + S5 (gestión de cola y diagnóstico)<br>
+                <strong>Duración estimada:</strong> 4-5 horas (1 sesión)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox, VM Windows 10/11, VM Ubuntu, conexión a internet en la VM Windows para descargar drivers
             </div>
         </header>
 
         <div class="content">
+
             <div class="alumno-box">
-                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
-                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
             </div>
 
             <div class="nota">
-                <strong>Nota:</strong> Si solo hay una impresora en el aula, trabajareis por parejas o turnos. Lo importante es completar la instalacion, gestionar la cola y revisar los consumibles.
+                <strong>De qué va esta práctica:</strong> en el aula no tenemos una impresora física por puesto, así que vamos a montar todo el flujo de una impresora <em>sin impresora</em>. Lo bueno es que el sistema operativo no distingue: una impresora virtual usa el mismo subsistema de impresión, los mismos drivers, la misma cola y los mismos protocolos de red que una real. Vas a instalar impresoras virtuales en Windows, montar un servidor <strong>CUPS</strong> en Linux, compartirlo por red entre las dos VM, gestionar la cola y diagnosticar fallos típicos.
             </div>
 
             <div class="seccion">
-                <h2>Objetivos</h2>
+                <h2>Objetivos de la práctica</h2>
                 <div class="seccion-body">
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Identificar el tipo de impresora (inyeccion, laser, termica) y sus consumibles.</li>
-                        <li>Instalar una impresora local (USB) y/o en red.</li>
-                        <li>Gestionar la cola de impresion: pausar, cancelar, reanudar trabajos.</li>
-                        <li>Revisar el estado de los consumibles y simular el cambio.</li>
-                        <li>Resolver atascos de papel siguiendo el procedimiento correcto.</li>
+                        <li>Identificar los <strong>tipos de impresora</strong> (inyección, láser, térmica, matricial, 3D) y sus consumibles.</li>
+                        <li>Distinguir los <strong>lenguajes de impresión</strong> (PCL, PostScript, raw) y los <strong>protocolos de red</strong> (IPP, LPD, RAW 9100).</li>
+                        <li>Instalar una <strong>impresora local virtual</strong> en Windows (Microsoft Print to PDF) y otra <strong>desde el driver del fabricante sin tener el equipo</strong>.</li>
+                        <li>Montar un servidor <strong>CUPS</strong> en una VM Linux y añadir una impresora con <strong>cups-pdf</strong>.</li>
+                        <li>Compartir la impresora del servidor CUPS por red y conectarse a ella desde la VM Windows usando <strong>IPP</strong>.</li>
+                        <li>Gestionar la <strong>cola de impresión</strong> en Windows (GUI) y en Linux (<code>lpq</code>, <code>lp</code>, <code>cancel</code>).</li>
+                        <li>Diagnosticar problemas frecuentes: trabajos atascados en cola, driver incorrecto, impresora "fuera de línea", spooler parado.</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- PARTE 1: Identificar -->
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Identificar la impresora (20 min)</h2>
+                <h2>Parte 0 - Conceptos previos (40 min)</h2>
                 <div class="seccion-body">
-                    <table>
-                        <tr><th>Dato</th><th>Valor</th></tr>
-                        <tr><td>Marca y modelo</td><td><input type="text"></td></tr>
-                        <tr><td>Tipo (inyeccion / laser / termica)</td><td><input type="text"></td></tr>
-                        <tr><td>Color o monocromo</td><td><input type="text"></td></tr>
-                        <tr><td>Conexiones disponibles</td><td><input type="text" placeholder="USB, Ethernet, Wi-Fi..."></td></tr>
-                        <tr><td>&iquest;Tiene pantalla / panel de control?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                        <tr><td>&iquest;Es multifuncion (escanea / fotocopia)?</td><td><input type="text"></td></tr>
-                    </table>
-                </div>
-            </div>
 
-            <!-- PARTE 2: Instalacion local -->
-            <div class="seccion">
-                <h2>Parte 2 - Instalacion local por USB (60 min)</h2>
-                <div class="seccion-body">
-                    <h3>2.1 - Conectar e instalar</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Conecta la impresora al PC con el cable USB. Encendela.</li>
-                            <li>Espera. &iquest;Windows la detecta automaticamente? Anotalo.</li>
-                            <li>Ve a <strong>Configuracion &rarr; Bluetooth y dispositivos &rarr; Impresoras y escaneres</strong>.</li>
-                            <li>Si no aparece, pulsa <strong>Agregar dispositivo</strong> y espera a que la encuentre.</li>
-                        </ol>
-                    </div>
-
+                    <h3>0.1 - Tipos de impresora</h3>
                     <table>
-                        <tr><td>&iquest;La detecto automaticamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                        <tr><td>Driver instalado por Windows</td><td><input type="text" placeholder="Generico / del fabricante"></td></tr>
+                        <tr><th>Tipo</th><th>Cómo imprime</th><th>Consumibles</th><th>Para qué se usa</th></tr>
+                        <tr><td><strong>Inyección de tinta</strong></td><td>Lanza gotitas de tinta líquida sobre el papel</td><td>Cartuchos de tinta (CMYK) y a veces cabezal</td><td>Hogar, fotos, bajo volumen</td></tr>
+                        <tr><td><strong>Láser</strong></td><td>Funde tóner (polvo) sobre el papel mediante calor</td><td>Tóner, tambor (drum), fusor</td><td>Oficina, alto volumen, blanco y negro o color</td></tr>
+                        <tr><td><strong>Térmica</strong></td><td>Calienta zonas de un papel especial que se oscurece</td><td>Solo papel térmico (no hay tinta)</td><td>Tickets, etiquetas, balanzas, TPV</td></tr>
+                        <tr><td><strong>Matricial</strong></td><td>Una matriz de agujas golpea una cinta entintada contra el papel</td><td>Cinta de tela entintada</td><td>Documentos con copia (autocopiativos), industrial, talleres</td></tr>
+                        <tr><td><strong>3D</strong></td><td>Deposita material capa a capa (FDM) o solidifica resina con luz (SLA)</td><td>Filamento (PLA, PETG, ABS) o resina</td><td>Prototipado, piezas a medida</td></tr>
                     </table>
 
-                    <h3>2.2 - Instalar driver del fabricante (si hace falta)</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Busca el modelo exacto en la web del fabricante (HP, Brother, Canon, Epson...).</li>
-                            <li>Descarga el driver completo para Windows 10/11.</li>
-                            <li>Ejecuta el instalador y sigue los pasos.</li>
-                            <li>Reinicia si te lo pide.</li>
-                        </ol>
-                    </div>
-
-                    <h3>2.3 - Pagina de prueba</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En <strong>Impresoras y escaneres</strong>, haz clic en la impresora &rarr; <strong>Administrar</strong>.</li>
-                            <li>Pulsa <strong>Imprimir una pagina de prueba</strong>.</li>
-                            <li>Revisa la pagina: &iquest;sale toda la informacion? &iquest;Algun fallo de impresion (lineas, manchas)?</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><td>Calidad de la pagina de prueba</td><td><input type="text" placeholder="Buena / Regular / Mala"></td></tr>
-                        <tr><td>Si hay fallos, descripcion</td><td><input type="text"></td></tr>
-                    </table>
-                </div>
-            </div>
-
-            <!-- PARTE 3: Instalacion en red -->
-            <div class="seccion">
-                <h2>Parte 3 - Instalacion en red (40 min, opcional)</h2>
-                <div class="seccion-body">
                     <div class="nota">
-                        Solo si la impresora del aula tiene Ethernet o Wi-Fi. Si solo hay USB, salta a la Parte 4.
+                        <strong>Regla rápida:</strong> si imprimes pocas páginas y a veces fotos, inyección. Si imprimes muchas páginas de texto y quieres bajo coste por página, láser. Si haces tickets de caja, térmica.
                     </div>
 
-                    <h3>3.1 - Conectar a la red</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Conecta la impresora a la red por cable Ethernet (al router/switch del aula) o configura el Wi-Fi desde el panel de la impresora.</li>
-                            <li>Imprime una <strong>pagina de configuracion de red</strong> (suele estar en el menu de la impresora). Anota su IP.</li>
-                        </ol>
-                    </div>
+                    <h3>0.2 - Lenguajes de impresión y drivers</h3>
+                    <p>Cuando pulsas <em>Imprimir</em>, el sistema operativo no envía un PDF tal cual: el <strong>driver</strong> traduce el documento a un lenguaje que la impresora entiende. Los más habituales son:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>PCL</strong> (Printer Command Language, HP): muy extendido en láser de oficina. Eficiente.</li>
+                        <li><strong>PostScript (PS)</strong>: lenguaje de descripción de página. Imprescindible en artes gráficas.</li>
+                        <li><strong>PDF directo</strong>: muchas impresoras modernas aceptan PDF como entrada nativa.</li>
+                        <li><strong>RAW</strong>: el sistema envía datos sin procesar a la impresora (lo decide el driver).</li>
+                        <li><strong>GDI / Host-based</strong>: impresoras "tontas" que dependen totalmente del PC para componer la página. Más baratas, pero peor compatibilidad con Linux.</li>
+                    </ul>
 
+                    <h3>0.3 - Protocolos de impresión en red</h3>
                     <table>
-                        <tr><td>Direccion IP de la impresora</td><td><input type="text" placeholder="Ej: 192.168.1.50"></td></tr>
-                        <tr><td>Mascara de red</td><td><input type="text"></td></tr>
-                        <tr><td>Puerta de enlace</td><td><input type="text"></td></tr>
+                        <tr><th>Protocolo</th><th>Puerto</th><th>Cuándo se usa</th></tr>
+                        <tr><td><strong>IPP</strong> (Internet Printing Protocol)</td><td>631 / TCP</td><td>Estándar moderno. Es el que usa CUPS y AirPrint. Soporta cifrado (IPPS).</td></tr>
+                        <tr><td><strong>LPD/LPR</strong></td><td>515 / TCP</td><td>Protocolo clásico de Unix. Aún se usa por compatibilidad.</td></tr>
+                        <tr><td><strong>RAW socket / JetDirect</strong></td><td>9100 / TCP</td><td>HP. Conexión directa al puerto 9100 sin protocolo encima. Muy común en redes pequeñas.</td></tr>
+                        <tr><td><strong>SMB</strong> (compartido Windows)</td><td>445 / TCP</td><td>Cuando un Windows comparte la impresora.</td></tr>
                     </table>
 
-                    <h3>3.2 - Anadir como impresora de red</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En el PC: <strong>Configuracion &rarr; Impresoras y escaneres &rarr; Agregar dispositivo</strong>.</li>
-                            <li>Si Windows la detecta en la red, anadela.</li>
-                            <li>Si no, pulsa <strong>Agregar manualmente</strong> &rarr; <strong>Agregar usando direccion IP</strong> y escribe la IP que anotaste.</li>
-                            <li>Imprime una pagina de prueba.</li>
-                        </ol>
-                    </div>
+                    <h3>0.4 - ¿Por qué hacemos esto en VMs y sin impresora física?</h3>
+                    <p>El sistema operativo no distingue entre una impresora real y una virtual: usa el mismo <strong>spooler</strong> (servicio que gestiona la cola), el mismo driver y los mismos protocolos. Por eso:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Podemos instalar drivers reales del fabricante (HP, Brother, Canon...) <strong>sin tener la impresora delante</strong>.</li>
+                        <li>Podemos imprimir, gestionar la cola, pausar y cancelar trabajos exactamente igual.</li>
+                        <li>Podemos compartir por red entre VMs y simular un escenario de oficina con servidor de impresión.</li>
+                        <li>Lo único que no podemos hacer es tocar el hardware (cambiar tóner, retirar atascos). Eso lo cubrimos con preguntas guiadas al final.</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- PARTE 4: Cola -->
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - IDENTIFICACIÓN                                       -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 4 - Gestionar la cola de impresion (30 min)</h2>
+                <h2>Parte 1 - Identificación de impresoras de catálogo (20 min)</h2>
                 <div class="seccion-body">
-                    <h3>4.1 - Enviar varios trabajos</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Abre tres documentos distintos (Word, PDF, una imagen).</li>
-                            <li>Imprime los tres seguidos (Ctrl+P).</li>
-                            <li>Antes de que termine el primero, abre la <strong>cola de impresion</strong>: doble clic en la impresora desde el icono de la barra de tareas, o desde Configuracion &rarr; Impresoras &rarr; <strong>Abrir cola</strong>.</li>
-                        </ol>
-                    </div>
-
-                    <h3>4.2 - Pausar y cancelar</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>En la cola, ve a <strong>Impresora &rarr; Pausar la impresion</strong>.</li>
-                            <li>Selecciona el segundo trabajo y elimina lo (Suprimir).</li>
-                            <li>Reanuda la cola: <strong>Impresora &rarr; Pausar</strong> de nuevo (se quita el tilde).</li>
-                            <li>Comprueba que se imprimen el primero y el tercero (no el segundo).</li>
-                        </ol>
-                    </div>
+                    <p>Busca en el catálogo online de un fabricante (HP, Brother, Canon, Epson) <strong>tres modelos diferentes</strong>: una de inyección, una láser y una multifunción láser. Rellena la tabla con datos reales del fabricante.</p>
 
                     <table>
-                        <tr><th>Trabajo</th><th>&iquest;Se imprimio?</th><th>Comentario</th></tr>
-                        <tr><td>1</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>2 (cancelado)</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>3</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><th>Aspecto</th><th>Modelo 1 (inyección)</th><th>Modelo 2 (láser)</th><th>Modelo 3 (multifunción láser)</th></tr>
+                        <tr><td>Marca y modelo exacto</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Color o monocromo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Velocidad (ppm)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Conexiones (USB / Ethernet / Wi-Fi)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Lenguaje (PCL / PostScript / GDI)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Consumibles (referencia)</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Coste por página estimado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
                     </table>
 
                     <div class="pregunta">
-                        <p>Si una impresora "no imprime", &iquest;que es lo primero que conviene revisar antes de tocar drivers o reinstalar?</p>
-                        <textarea rows="2"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PARTE 5: Mantenimiento -->
-            <div class="seccion">
-                <h2>Parte 5 - Mantenimiento basico (50 min)</h2>
-                <div class="seccion-body">
-                    <h3>5.1 - Localizar consumibles</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Abre la tapa frontal o superior de la impresora (segun el modelo).</li>
-                            <li>Localiza los <strong>cartuchos de tinta</strong> (inyeccion) o el <strong>toner</strong> y el <strong>tambor</strong> (laser).</li>
-                            <li>Anota los modelos exactos: te haran falta para reponerlos.</li>
-                        </ol>
-                    </div>
-
-                    <table>
-                        <tr><th>Consumible</th><th>Modelo / referencia</th><th>Estado / nivel aproximado</th></tr>
-                        <tr><td>Cartucho 1</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Cartucho 2</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Toner</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Tambor / drum</td><td><input type="text"></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>5.2 - Simulacion de cambio</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Extrae con cuidado el cartucho o toner (NO lo abras ni vacies).</li>
-                            <li>Examina los contactos electricos y la salida de tinta/toner.</li>
-                            <li>Vuelve a colocarlo correctamente.</li>
-                            <li>Cierra la tapa y comprueba que la impresora vuelve a estar lista.</li>
-                        </ol>
-                    </div>
-
-                    <div class="aviso">
-                        <strong>Aviso toner:</strong> si se derrama, NO lo soples. Usa pano humedo o aspiradora especifica para toner. El polvo es muy fino y nocivo si se inhala.
-                    </div>
-
-                    <h3>5.3 - Limpieza de cabezales (solo inyeccion de tinta)</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Desde el software de la impresora (utilidades) busca <strong>Limpieza de cabezales</strong>.</li>
-                            <li>Ejecutala. Imprimira una pagina de patron.</li>
-                            <li>Si las lineas siguen rotas, repite la limpieza una vez mas (solo una; mas seca el cabezal).</li>
-                        </ol>
-                    </div>
-
-                    <h3>5.4 - Atasco de papel (simulacion)</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Abre la tapa de la impresora.</li>
-                            <li>Localiza el recorrido del papel (suele estar marcado con flechas).</li>
-                            <li>Si hubiese papel atascado, deberia retirarse <strong>en el sentido de avance del papel</strong>, sin tirar fuerte hacia atras.</li>
-                            <li>Cierra la tapa.</li>
-                        </ol>
-                    </div>
-
-                    <div class="aviso">
-                        <strong>Aviso laser:</strong> el <strong>fusor</strong> (la zona donde se aplica calor) puede estar muy caliente. No lo toques inmediatamente despues de imprimir.
-                    </div>
-
-                    <div class="pregunta">
-                        <p>Si tienes que retirar papel atascado y no quieres romper nada, &iquest;por donde tiras y por que?</p>
+                        <p>¿Cuál de los tres elegirías para una oficina pequeña que imprime 200 páginas de texto al día y por qué?</p>
                         <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- EVALUACION -->
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - WINDOWS: IMPRESORA VIRTUAL                           -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Conclusiones y evaluacion</h2>
+                <h2>Parte 2 - Impresora virtual local en Windows (40 min)</h2>
                 <div class="seccion-body">
+
+                    <p>Arranca tu <strong>VM Windows 10/11</strong>. Vamos a usar y a configurar la impresora virtual que ya trae Windows: <strong>Microsoft Print to PDF</strong>. Es una impresora real desde el punto de vista del sistema (driver, cola, propiedades), pero en lugar de papel produce un PDF.</p>
+
+                    <h3>2.1 - Comprobar que la impresora virtual existe</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Ve a <strong>Configuración → Bluetooth y dispositivos → Impresoras y escáneres</strong>.</li>
+                            <li>Comprueba que aparece <strong>Microsoft Print to PDF</strong>. Si no está, ve a <em>Características opcionales</em> y actívala (o desde <em>Activar o desactivar características de Windows → Impresión en PDF de Microsoft</em>).</li>
+                            <li>Haz clic en ella y pulsa <strong>Propiedades de la impresora</strong>. Mira las pestañas <em>General, Compartir, Puertos, Opciones avanzadas</em>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>¿Qué puerto usa Microsoft Print to PDF?</td><td><input type="text" placeholder="Pestaña Puertos"></td></tr>
+                        <tr><td>¿Qué driver aparece en Opciones avanzadas?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Está compartida por defecto?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Imprimir contra la impresora virtual</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el Bloc de notas, escribe un texto cualquiera y pulsa <strong>Ctrl+P</strong>.</li>
+                            <li>Selecciona <strong>Microsoft Print to PDF</strong> y pulsa <em>Imprimir</em>.</li>
+                            <li>Te pedirá la ruta y el nombre del archivo de salida. Guárdalo en el escritorio como <code>prueba1.pdf</code>.</li>
+                            <li>Ábrelo y comprueba el resultado.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Truco:</strong> esto es exactamente lo que hace una impresora real, sólo que el destino final es un archivo en lugar de papel. Toda la cadena (aplicación → spooler → driver → puerto) está intacta.
+                    </div>
+
+                    <h3>2.3 - Añadir una segunda impresora "manual" con driver del fabricante</h3>
+                    <p>Vamos a añadir una segunda impresora simulando una HP LaserJet, <strong>sin tener el equipo</strong>. Windows admite añadir impresoras manuales con cualquier driver disponible.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En <strong>Impresoras y escáneres</strong> pulsa <strong>Agregar dispositivo</strong>.</li>
+                            <li>Espera unos segundos y pulsa <strong>Agregar manualmente</strong>.</li>
+                            <li>Elige <strong>Agregar una impresora local o de red con configuración manual</strong> y siguiente.</li>
+                            <li>En <strong>Usar un puerto existente</strong> selecciona <code>FILE:</code> (imprimir a archivo). Siguiente.</li>
+                            <li>En la lista de fabricantes elige <strong>HP</strong> (o <em>Generic</em> si no carga la lista) y un modelo cualquiera, por ejemplo <strong>HP LaserJet Pro M404</strong> o el genérico <em>Generic / Text Only</em>.</li>
+                            <li>Si te pregunta, deja <strong>Usar el controlador instalado actualmente</strong>.</li>
+                            <li>Dale un nombre que reconozcas, por ejemplo <code>Laser-Aula-Virtual</code>. Siguiente.</li>
+                            <li>Cuando termine, marca <strong>NO compartir</strong> de momento. Finalizar.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.4 - Imprimir contra la impresora "manual"</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el Bloc de notas, escribe algo y pulsa <strong>Ctrl+P</strong>.</li>
+                            <li>Elige <strong>Laser-Aula-Virtual</strong> e imprime.</li>
+                            <li>Como su puerto es <code>FILE:</code>, te pedirá una ruta. Pon <code>C:\Users\&lt;tu_usuario&gt;\Desktop\salida.prn</code>.</li>
+                            <li>El archivo <code>.prn</code> contiene el flujo de datos <strong>tal cual</strong> lo recibiría la impresora real (PCL o PostScript según el driver).</li>
+                        </ol>
+                    </div>
+
+                    <div class="reto">
+                        <strong>Reto:</strong> abre <code>salida.prn</code> con el Bloc de notas y mira las primeras líneas. ¿Ves comandos extraños tipo <code>%-12345X@PJL</code> o <code>%!PS-Adobe</code>? Pega aquí el principio del archivo y di si es PCL o PostScript:
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <table>
+                        <tr><td>Nombre exacto que diste a la impresora "manual"</td><td><input type="text"></td></tr>
+                        <tr><td>Driver elegido</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño aproximado del archivo .prn generado</td><td><input type="text"></td></tr>
+                        <tr><td>¿El contenido del .prn es legible? ¿Qué lenguaje usa?</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - LINUX: SERVIDOR CUPS                                 -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Servidor CUPS en la VM Linux (60 min)</h2>
+                <div class="seccion-body">
+                    <p>Arranca tu <strong>VM Ubuntu</strong>. <strong>CUPS</strong> (Common Unix Printing System) es el subsistema de impresión que usan Linux y macOS. Vamos a instalarlo, añadir una impresora virtual con <code>cups-pdf</code> (que imprime a PDF en una carpeta) y prepararla para compartir por red.</p>
+
+                    <h3>3.1 - Instalar CUPS y cups-pdf</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre una terminal en Ubuntu.</li>
+                            <li>Actualiza el índice e instala los paquetes:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">sudo apt update
+sudo apt install -y cups cups-pdf printer-driver-all
+sudo systemctl enable --now cups
+systemctl status cups --no-pager</pre>
+
+                    <table>
+                        <tr><td>¿Está <code>cups</code> activo (active running)?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                        <tr><td>Puerto en el que escucha CUPS por defecto</td><td><input type="text" placeholder="Pista: 631"></td></tr>
+                    </table>
+
+                    <h3>3.2 - Añadir tu usuario al grupo de administración</h3>
+<pre class="codigo">sudo usermod -aG lpadmin $USER
+# cierra sesión y vuelve a entrar para que tome efecto, o:
+newgrp lpadmin</pre>
+
+                    <h3>3.3 - Acceder a la interfaz web de CUPS</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre Firefox dentro de la VM Ubuntu y ve a <code>http://localhost:631</code>.</li>
+                            <li>Verás el panel de administración de CUPS. Pestañas: <em>Home, Administration, Classes, Help, Jobs, Printers</em>.</li>
+                            <li>Ve a <strong>Printers</strong>: deberías ver ya una entrada llamada <strong>PDF</strong> (cups-pdf).</li>
+                        </ol>
+                    </div>
+
+                    <h3>3.4 - Imprimir a PDF desde Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre cualquier documento (por ejemplo <em>Archivos → Documentos</em>, o crea uno con <code>nano prueba.txt</code> y escribe varias líneas).</li>
+                            <li>Imprime desde la línea de comandos eligiendo la impresora PDF:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">echo "Hola desde CUPS" > prueba.txt
+lp -d PDF prueba.txt
+lpstat -o          # ver trabajos en cola
+lpstat -p -d       # ver impresoras y la predeterminada</pre>
+
+                    <p>El PDF resultante aparecerá en <code>~/PDF/</code> (carpeta home del usuario). Compruébalo:</p>
+
+<pre class="codigo">ls -la ~/PDF/</pre>
+
+                    <table>
+                        <tr><td>Comando que usaste para imprimir</td><td><input type="text"></td></tr>
+                        <tr><td>Ruta donde aparece el PDF generado</td><td><input type="text"></td></tr>
+                        <tr><td>Salida de <code>lpstat -p</code></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.5 - Añadir una segunda impresora "genérica" (sin hardware)</h3>
+                    <p>Igual que en Windows, en Linux también podemos añadir una impresora con un driver del fabricante sin tenerla físicamente.</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En <code>http://localhost:631</code> ve a <strong>Administration → Add Printer</strong>.</li>
+                            <li>Te pedirá usuario y contraseña: usa los del usuario Linux que está en <code>lpadmin</code>.</li>
+                            <li>En <em>Other Network Printers</em> elige <strong>AppSocket/HP JetDirect</strong>.</li>
+                            <li>Pon una URL falsa: <code>socket://192.0.2.10:9100</code> (es una IP reservada que no existe; sirve para crear la entrada).</li>
+                            <li>Nombre: <code>HP-Generic</code>. Marca <strong>Share This Printer</strong>.</li>
+                            <li>Marca <strong>HP</strong> y elige un modelo, por ejemplo <em>HP LaserJet Series PCL 6</em>.</li>
+                            <li>Continúa hasta el final.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> esta impresora no podrá imprimir realmente porque la IP no responde, pero los trabajos que envíes se quedarán en cola. Es perfecta para practicar la <em>gestión de cola</em> de la Parte 5.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - COMPARTIR POR RED ENTRE VMs                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - Compartir CUPS por red y conectarse desde Windows (40 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>4.1 - Configurar la red entre las dos VM</h3>
+                    <p>Las dos VM tienen que verse. La forma más cómoda en VirtualBox es <strong>Red interna</strong> o <strong>Adaptador puente</strong>. Para esta práctica usaremos <strong>Adaptador puente</strong> para que las dos cojan IP del router del aula y puedan verse:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga las dos VM.</li>
+                            <li>En cada VM: <strong>Configuración → Red → Adaptador 1</strong> = <em>Adaptador puente</em> sobre la tarjeta del host.</li>
+                            <li>Arranca las dos VM.</li>
+                            <li>Anota la IP de cada una:
+                                <ul style="margin-left:20px;line-height:1.6">
+                                    <li>Linux: <code>ip a</code> o <code>hostname -I</code></li>
+                                    <li>Windows: <code>ipconfig</code> en CMD</li>
+                                </ul>
+                            </li>
+                            <li>Comprueba la conectividad: desde la VM Windows haz <code>ping IP-Linux</code> y al revés.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>IP de la VM Linux (servidor de impresión)</td><td><input type="text"></td></tr>
+                        <tr><td>IP de la VM Windows (cliente)</td><td><input type="text"></td></tr>
+                        <tr><td>¿Hace ping en ambos sentidos?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.2 - Habilitar compartir CUPS en la VM Linux</h3>
+                    <p>Por defecto CUPS sólo escucha en <code>localhost</code>. Hay que abrirlo a la red:</p>
+
+<pre class="codigo">sudo cupsctl --share-printers --remote-any
+sudo systemctl restart cups
+# permitir el puerto si tienes UFW activo
+sudo ufw allow 631/tcp || true</pre>
+
+                    <p>Comprueba que escucha en todas las interfaces:</p>
+
+<pre class="codigo">sudo ss -tlnp | grep 631</pre>
+
+                    <h3>4.3 - Acceder a la web de CUPS desde la VM Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows abre el navegador y ve a <code>http://IP-Linux:631</code>.</li>
+                            <li>Si te lo pide, acepta avisos de certificado.</li>
+                            <li>Pestaña <strong>Printers</strong>: deberías ver <em>PDF</em> y <em>HP-Generic</em>.</li>
+                            <li>Haz clic en <em>PDF</em>: copia la URL <code>ipp://...</code> que aparece (la usaremos en el siguiente paso).</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.4 - Añadir la impresora IPP en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Windows: <strong>Configuración → Impresoras y escáneres → Agregar dispositivo → Agregar manualmente</strong>.</li>
+                            <li>Marca <strong>Seleccionar una impresora compartida por nombre</strong>.</li>
+                            <li>Escribe la URL: <code>http://IP-Linux:631/printers/PDF</code>.</li>
+                            <li>Cuando te pida driver, elige <strong>Generic / MS Publisher Color Printer</strong> o un genérico PostScript.</li>
+                            <li>Termina y dale un nombre: <code>PDF-Servidor-Linux</code>.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.5 - Imprimir desde Windows contra el servidor Linux</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde el Bloc de notas en Windows imprime usando <code>PDF-Servidor-Linux</code>.</li>
+                            <li>Vete a la VM Linux y mira la carpeta <code>~/PDF/</code>: debe aparecer un nuevo PDF generado.</li>
+                            <li>Comprueba también la cola en la web de CUPS: pestaña <strong>Jobs</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>¿Por qué es importante esto?</strong> Acabas de montar el escenario más típico de oficina: un <em>servidor de impresión</em> (Linux/CUPS) compartiendo una impresora a clientes Windows por <em>IPP</em>. Cambiar el destino "PDF" por una impresora HP/Brother real sería literalmente cambiar la URL del paso 3.5: el resto es idéntico.
+                    </div>
+
+                    <table>
+                        <tr><td>URL IPP completa que usaste</td><td><input type="text"></td></tr>
+                        <tr><td>¿Apareció el PDF en la VM Linux tras imprimir desde Windows?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Qué driver elegiste en Windows para la cola compartida?</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - GESTIÓN DE COLA                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Gestión de la cola de impresión (40 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>5.1 - Llenar la cola en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, pausa primero la impresora <code>Laser-Aula-Virtual</code>: <em>Impresoras y escáneres → Laser-Aula-Virtual → Cola → Impresora → Pausar la impresión</em>.</li>
+                            <li>Envía tres trabajos seguidos: un Bloc de notas, un PDF y una imagen abierta con la app Fotos.</li>
+                            <li>Vuelve a la <strong>cola de impresión</strong>: deberías ver los tres trabajos esperando.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 - Pausar, cancelar y reordenar</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciona el segundo trabajo y pulsa <em>Suprimir</em>.</li>
+                            <li>Sobre el tercer trabajo, botón derecho → <strong>Propiedades → Avanzadas</strong>: cambia la prioridad a 99 (alta).</li>
+                            <li>Reanuda la impresora (<em>Impresora → Pausar la impresión</em> de nuevo, se desmarca).</li>
+                            <li>Comprueba que se imprime el primero y el tercero, y que el segundo no aparece.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Trabajo</th><th>¿Se "imprimió"?</th><th>Comentario</th></tr>
+                        <tr><td>1 (.txt)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>2 (PDF, cancelado)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>3 (imagen, prioridad alta)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Forzar un atasco de cola y resolverlo</h3>
+                    <p>La impresora <code>HP-Generic</code> de CUPS apunta a una IP que no existe, así que cualquier trabajo se quedará atascado. Lo aprovechamos:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Linux: <code>echo "test" | lp -d HP-Generic</code></li>
+                            <li>Comprueba la cola: <code>lpstat -o</code> o <code>lpq -P HP-Generic</code></li>
+                            <li>El trabajo se queda atascado o entra en estado de error. Mira el panel web de CUPS.</li>
+                            <li>Cancela el trabajo: <code>cancel -a HP-Generic</code></li>
+                            <li>Reanuda la cola si quedó pausada: <code>cupsenable HP-Generic</code> y <code>cupsaccept HP-Generic</code></li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">lpstat -o                       # ver trabajos pendientes
+lpq -P HP-Generic               # cola en formato BSD
+cancel -a HP-Generic            # cancelar todos los trabajos
+cupsenable HP-Generic           # reanudar la impresora
+cupsaccept HP-Generic           # aceptar nuevos trabajos
+lpadmin -d PDF                  # poner PDF como predeterminada</pre>
+
+                    <table>
+                        <tr><td>Salida de <code>lpstat -o</code> con trabajos atascados</td><td><input type="text"></td></tr>
+                        <tr><td>Comando que usaste para cancelarlos</td><td><input type="text"></td></tr>
+                        <tr><td>¿Cómo cambia <code>lpstat -o</code> después?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.4 - Reiniciar el spooler en Windows</h3>
+                    <p>En Windows, cuando la cola "se vuelve loca" y los trabajos no salen ni se borran, se reinicia el servicio del <em>spooler</em>:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>Servicios</strong> (<code>services.msc</code>).</li>
+                            <li>Busca <strong>Cola de impresión</strong> (Print Spooler).</li>
+                            <li>Botón derecho → <strong>Reiniciar</strong>.</li>
+                            <li>Equivalente por consola (administrador):</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">net stop spooler
+net start spooler</pre>
+
+                    <div class="aviso">
+                        <strong>Aviso:</strong> reiniciar el spooler tira <em>todos</em> los trabajos en cola, no sólo el atascado. Avisa al resto de usuarios si trabajas en un servidor compartido.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - DIAGNÓSTICO                                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Diagnóstico de problemas frecuentes (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Ya tienes el entorno montado. Vamos a provocar y resolver los fallos más típicos.</p>
+
+                    <h3>6.1 - Impresora "fuera de línea"</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Windows, sobre <code>Laser-Aula-Virtual</code>: <em>Cola → Impresora → Usar la impresora sin conexión</em>.</li>
+                            <li>Envía un trabajo: se queda en cola con la impresora marcada en gris.</li>
+                            <li>Desactiva el modo sin conexión y comprueba que el trabajo se procesa.</li>
+                        </ol>
+                    </div>
+                    <div class="pregunta">
+                        <p>¿En qué casos reales una impresora aparece "fuera de línea" sin que el usuario la haya puesto así?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <h3>6.2 - Driver incorrecto</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En Windows, propiedades de <code>Laser-Aula-Virtual → Opciones avanzadas → Controlador</code>: cámbialo a uno claramente incompatible (por ejemplo un driver matricial muy antiguo si está en la lista, o <em>Generic / Text Only</em>).</li>
+                            <li>Imprime un PDF con imágenes: comprueba el resultado del archivo <code>.prn</code>.</li>
+                            <li>Vuelve a poner el driver correcto.</li>
+                        </ol>
+                    </div>
+                    <div class="pregunta">
+                        <p>¿Qué síntomas en el papel te harían sospechar de un driver incorrecto en una impresora real?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <h3>6.3 - Problema de red</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la VM Linux dejando una impresión pendiente desde Windows contra <code>PDF-Servidor-Linux</code>.</li>
+                            <li>Mira el estado del trabajo en la cola Windows: irá a "error" o "intentando conectar".</li>
+                            <li>Vuelve a arrancar la VM Linux: el trabajo debería salir solo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>6.4 - Checklist "no imprime"</h3>
+                    <p>Cuando un usuario te diga "la impresora no imprime", repasa por orden:</p>
+                    <ol style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>¿Está encendida y con papel? (en una real)</li>
+                        <li>¿La cola tiene trabajos atascados? Vacíala.</li>
+                        <li>¿Está marcada como "sin conexión" o "pausada"? Quítaselo.</li>
+                        <li>¿Es la impresora <strong>predeterminada</strong> y la app está usando esa? Comprueba con un Bloc de notas.</li>
+                        <li>¿Hay conectividad si es de red? <code>ping</code> a la IP, navegador a la URL IPP.</li>
+                        <li>¿El driver es el correcto? Reinstálalo si dudas.</li>
+                        <li>¿El servicio <em>Print Spooler</em> (Windows) o <em>cups</em> (Linux) está corriendo? Reinícialo.</li>
+                        <li>Sólo al final: drivers más recientes / firmware de la impresora.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- EVALUACIÓN                                                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Conclusiones y autoevaluación</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>De todo lo que has hecho, ¿qué te llevarías a una situación real de trabajo en una oficina pequeña que necesita instalar y compartir una impresora?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
                     <div class="evaluacion">
-                        <h3>Autoevaluacion</h3>
+                        <h3>Autoevaluación</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>He instalado la impresora correctamente y he impreso una pagina de prueba</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
-                            <tr><td>He gestionado la cola de impresion (pausar, cancelar, reanudar)</td><td><input type="text"></td></tr>
-                            <tr><td>He localizado los consumibles y se sus modelos exactos</td><td><input type="text"></td></tr>
-                            <tr><td>He realizado al menos una operacion de mantenimiento (simulacion de cambio o limpieza)</td><td><input type="text"></td></tr>
-                            <tr><td>Conozco las precauciones con toner y con el fusor caliente</td><td><input type="text"></td></tr>
+                            <tr><td>He usado Microsoft Print to PDF y entiendo que es una impresora "real" para Windows</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>He añadido una impresora manualmente con el driver del fabricante sin tener el equipo</td><td><input type="text"></td></tr>
+                            <tr><td>He instalado y configurado CUPS en la VM Linux</td><td><input type="text"></td></tr>
+                            <tr><td>He compartido la impresora del servidor Linux y la he usado desde la VM Windows por IPP</td><td><input type="text"></td></tr>
+                            <tr><td>Sé gestionar la cola en Windows (GUI) y en Linux (lp, lpstat, cancel)</td><td><input type="text"></td></tr>
+                            <tr><td>Sé reiniciar el spooler en Windows y CUPS en Linux</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco los protocolos IPP, LPD y RAW 9100 y para qué se usan</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="botones">
             <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
-            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
         </div>
     </div>
 </body>
