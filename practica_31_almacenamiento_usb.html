@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practica 31: Almacenamiento externo y conexiones USB</title>
+    <title>Práctica 31: Almacenamiento externo en máquinas virtuales (Windows y Linux)</title>
     <style>
-        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
         header { background: var(--azul); color: white; padding: 24px 32px; }
         header h1 { font-size: 22px; margin-bottom: 8px; }
         header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
@@ -22,6 +22,7 @@
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
         td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
@@ -31,9 +32,13 @@
         .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
         .pasos strong { color: var(--azul); }
         .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .pregunta { margin: 14px 0; }
         .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
         code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
         .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
         .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
         .evaluacion th { background: #c6f6d5; color: var(--verde); }
@@ -50,256 +55,582 @@
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
     <div class="container">
         <header>
-            <h1>Practica 31: Almacenamiento externo y conexiones USB</h1>
+            <h1>Práctica 31: Almacenamiento externo en máquinas virtuales (Windows y Linux)</h1>
             <div class="meta">
-                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
-                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
+                <strong>Módulo:</strong> MF0953_2 - Reparación y ampliación de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalación y configuración de periféricos<br>
                 <strong>Sesiones:</strong> S6 (almacenamiento externo) + S7 (USB y comunicaciones)<br>
-                <strong>Duracion estimada:</strong> 4 horas (1 sesion)<br>
-                <strong>Modalidad:</strong> Trabajo individual<br>
-                <strong>Herramientas:</strong> pendrive USB, disco duro externo (si hay), adaptador Ethernet/Wi-Fi USB
+                <strong>Duración estimada:</strong> 5-6 horas (1 sesión completa)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox, VM Windows 10/11, VM Ubuntu, espacio libre suficiente en el host (al menos 10-15 GB) para crear discos virtuales adicionales
             </div>
         </header>
 
         <div class="content">
+
             <div class="alumno-box">
-                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
-                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
             </div>
 
             <div class="nota">
-                <strong>Nota:</strong> Necesitaras al menos un pendrive y un archivo de prueba grande (1 GB aprox). Si no tienes uno, copia varios archivos hasta sumar 1 GB. El profesor puede proporcionarte un disco externo si esta disponible.
+                <strong>De qué va esta práctica:</strong> en el aula no tenemos pendrives, discos externos ni NAS por puesto, así que vas a montar todo el escenario con discos virtuales y carpetas compartidas. El sistema operativo no distingue: un disco virtual VDI conectado a una VM aparece como cualquier disco externo, con su panel de discos, su asistente de formato y sus letras de unidad. Vas a crear discos virtuales que actúan como "pendrive" o "disco externo", probarás los sistemas de archivos NTFS / exFAT / FAT32 / ext4, configurarás carpetas compartidas entre el equipo anfitrión y la VM, y montarás un pequeño NAS casero con Samba en la VM Linux para conectarte desde la VM Windows. Para terminar, cifrarás un disco con BitLocker To Go y otro con LUKS.
+            </div>
+
+            <div class="nota">
+                <strong>USB físico:</strong> los pasos de USB passthrough (cómo VirtualBox cede un pendrive real a la VM, versiones USB 2.0/3.0, conectores Tipo A/B/C) ya los hiciste en la <strong>Práctica 28</strong>. Aquí nos centramos en almacenamiento sin necesidad de hardware físico.
             </div>
 
             <div class="seccion">
-                <h2>Objetivos</h2>
+                <h2>Objetivos de la práctica</h2>
                 <div class="seccion-body">
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Identificar los puertos USB del PC y su version (2.0 / 3.0 / 3.2).</li>
-                        <li>Medir y comparar velocidades de transferencia entre USB 2.0 y USB 3.0.</li>
-                        <li>Conectar y configurar un adaptador de red USB (Ethernet o Wi-Fi).</li>
-                        <li>Acceder a un NAS (si esta disponible) y compartir un archivo.</li>
-                        <li>Distinguir conectores USB Tipo A, B y C.</li>
+                        <li>Distinguir los <strong>tipos de almacenamiento externo</strong> (pendrive, HDD, SSD, NVMe en caja, NAS, almacenamiento en la nube) y elegir el adecuado para cada caso.</li>
+                        <li>Conocer las <strong>interfaces</strong> habituales: USB, USB-C, Thunderbolt, eSATA y M.2 en caja externa.</li>
+                        <li>Crear <strong>discos virtuales adicionales</strong> en VirtualBox y conectarlos a las VM Windows y Linux como si fuesen unidades externas.</li>
+                        <li>Particionar y formatear con <strong>NTFS, exFAT, FAT32 y ext4</strong>; saber elegir el sistema de archivos adecuado.</li>
+                        <li>Configurar <strong>carpetas compartidas host-guest</strong> mediante Guest Additions de VirtualBox.</li>
+                        <li>Montar un pequeño <strong>NAS casero con Samba</strong> en la VM Linux y conectarse desde la VM Windows.</li>
+                        <li>Mapear unidades de red en Windows y montarlas automáticamente en Linux con <code>fstab</code>.</li>
+                        <li>Cifrar almacenamiento externo con <strong>BitLocker To Go</strong> (Windows) y <strong>LUKS</strong> (Linux).</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- PARTE 1: Identificar puertos -->
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Identificar los puertos USB del PC (30 min)</h2>
+                <h2>Parte 0 - Conceptos previos (40 min)</h2>
                 <div class="seccion-body">
-                    <h3>1.1 - Inventario fisico</h3>
-                    <p>Inspecciona los puertos USB del PC (frontal y trasero). Apunta cada uno y su color:</p>
+
+                    <h3>0.1 - Tipos de almacenamiento externo</h3>
                     <table>
-                        <tr><th>Nº</th><th>Ubicacion (frontal / trasera)</th><th>Color</th><th>Version USB probable</th></tr>
-                        <tr><td>1</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>2</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>3</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>4</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>5</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>6</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><th>Dispositivo</th><th>Capacidad típica</th><th>Velocidad real</th><th>Para qué se usa</th></tr>
+                        <tr><td><strong>Pendrive USB</strong></td><td>16 GB - 1 TB</td><td>20-400 MB/s según modelo</td><td>Transporte ocasional, instaladores, copias rápidas</td></tr>
+                        <tr><td><strong>HDD externo (2,5")</strong></td><td>1-5 TB</td><td>80-130 MB/s</td><td>Copia de seguridad de gran volumen, archivado</td></tr>
+                        <tr><td><strong>SSD externo SATA</strong></td><td>250 GB - 4 TB</td><td>400-550 MB/s</td><td>Trabajo diario, edición, transporte de proyectos</td></tr>
+                        <tr><td><strong>NVMe en caja USB-C / Thunderbolt</strong></td><td>500 GB - 8 TB</td><td>700-3000 MB/s</td><td>Vídeo 4K/8K, máquinas virtuales portables</td></tr>
+                        <tr><td><strong>NAS</strong></td><td>2-100 TB</td><td>Limitada por la red (100-1000 MB/s)</td><td>Almacenamiento centralizado de oficina</td></tr>
+                        <tr><td><strong>Cloud</strong></td><td>"infinita"</td><td>Limitada por internet</td><td>Sincronización, copia fuera del local, colaboración</td></tr>
+                    </table>
+
+                    <h3>0.2 - Interfaces habituales</h3>
+                    <table>
+                        <tr><th>Interfaz</th><th>Velocidad máxima</th><th>Notas</th></tr>
+                        <tr><td>USB 2.0</td><td>60 MB/s teórico (~30 MB/s real)</td><td>Hoy sólo en accesorios baratos.</td></tr>
+                        <tr><td>USB 3.2 Gen 1 (5 Gbps)</td><td>625 MB/s teórico</td><td>El "azul" clásico. Estándar actual en pendrives.</td></tr>
+                        <tr><td>USB 3.2 Gen 2 (10 Gbps)</td><td>1,25 GB/s teórico</td><td>SSDs externos buenos.</td></tr>
+                        <tr><td>USB 3.2 Gen 2x2 (20 Gbps)</td><td>2,5 GB/s teórico</td><td>Sólo en USB-C.</td></tr>
+                        <tr><td>USB4 / Thunderbolt 3-4</td><td>5 GB/s teórico (40 Gbps)</td><td>Mismo conector USB-C. NVMe externo a tope.</td></tr>
+                        <tr><td>eSATA</td><td>600 MB/s</td><td>En desuso. Sólo en equipos antiguos.</td></tr>
+                    </table>
+
+                    <h3>0.3 - Sistemas de archivos</h3>
+                    <table>
+                        <tr><th>FS</th><th>Tamaño máx. archivo</th><th>Compatibilidad</th><th>Cuándo usarlo</th></tr>
+                        <tr><td><strong>FAT32</strong></td><td>4 GB</td><td>Todo lo que existe (Win, Linux, macOS, TVs, cámaras...)</td><td>Pendrives muy compatibles, BIOS UEFI, dispositivos antiguos</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>Sin límite práctico</td><td>Windows, macOS, Linux moderno, cámaras 4K</td><td>Pendrives y SSD externos para mover archivos grandes entre Windows y macOS</td></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Sin límite práctico</td><td>Windows nativo, Linux con <code>ntfs-3g</code>, macOS sólo lectura</td><td>Discos externos usados sobre todo en Windows</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Sin límite práctico</td><td>Linux nativo, Windows necesita drivers de terceros</td><td>Discos que sólo se van a usar en Linux</td></tr>
+                        <tr><td><strong>APFS</strong></td><td>Sin límite práctico</td><td>macOS</td><td>Discos para Mac</td></tr>
                     </table>
 
                     <div class="nota">
-                        <strong>Pista:</strong> negro = USB 2.0, azul = USB 3.0, rojo o amarillo = puerto siempre activo (carga incluso con el PC apagado).
+                        <strong>Regla rápida:</strong> si vas a llevar el pendrive entre un Windows y un Mac, formatea en <strong>exFAT</strong>. Si es un disco externo grande para Windows, <strong>NTFS</strong>. Si es un USB para arrancar un instalador o configurar una BIOS, <strong>FAT32</strong>. Si va a vivir conectado a un Linux, <strong>ext4</strong>.
                     </div>
 
-                    <h3>1.2 - Comprobar version desde el sistema</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Abre el <strong>Administrador de dispositivos</strong> (clic derecho en Inicio).</li>
-                            <li>Despliega <strong>Controladoras de bus serie universal (USB)</strong>.</li>
-                            <li>Anota cuantos hubs y controladores xHCI / EHCI hay (xHCI = USB 3.x).</li>
-                        </ol>
-                    </div>
-                    <textarea rows="4" placeholder="Lista de controladores USB que aparecen"></textarea>
+                    <h3>0.4 - ¿Por qué con discos virtuales?</h3>
+                    <p>Un <strong>disco virtual</strong> (VDI, VMDK o VHD) es un archivo en el host que VirtualBox presenta a la VM como si fuese un disco real. La VM no distingue: lo ve por su controladora SATA o NVMe, le aplica su asistente de discos, lo particiona y lo formatea exactamente igual. Esto te permite:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Crear discos "externos" del tamaño que quieras y desecharlos cuando termines.</li>
+                        <li>Probar varios sistemas de archivos sin riesgo de borrar nada importante.</li>
+                        <li>Mover el VDI entre VMs como si fuese un pendrive (es un archivo, lo copias y se acabó).</li>
+                        <li>Hacer pruebas destructivas sin miedo: si rompes el disco virtual, lo borras y creas otro.</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- PARTE 2: Medir velocidades -->
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - DISCO EXTERNO VIRTUAL EN WINDOWS                     -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 2 - Medir velocidades de transferencia (60 min)</h2>
+                <h2>Parte 1 - "Disco externo" virtual en la VM Windows (50 min)</h2>
                 <div class="seccion-body">
-                    <h3>2.1 - Preparar archivo de 1 GB</h3>
+
+                    <h3>1.1 - Crear un VDI nuevo y conectarlo a la VM</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Localiza un archivo de aproximadamente 1 GB (un video, una ISO...). Si no tienes, copia varios archivos hasta sumar 1 GB.</li>
-                            <li>Anota la ruta y el tamano exacto.</li>
+                            <li>Apaga la VM Windows.</li>
+                            <li>En VirtualBox, selecciona la VM y pulsa <strong>Configuración → Almacenamiento</strong>.</li>
+                            <li>Sobre la controladora <em>SATA</em> pulsa el icono <strong>+ disco duro</strong>.</li>
+                            <li><strong>Crear nuevo disco</strong>: tipo <em>VDI</em>, <em>asignado dinámicamente</em>, tamaño 4 GB. Llámalo <code>pendrive-virtual.vdi</code>.</li>
+                            <li>Acepta y arranca la VM.</li>
                         </ol>
                     </div>
+
+                    <h3>1.2 - Inicializar el disco en Windows</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Pulsa <code>Win+X</code> y abre <strong>Administración de discos</strong>.</li>
+                            <li>Verás un cuadro <em>Inicializar disco</em>: elige <strong>GPT</strong> y acepta.</li>
+                            <li>El disco aparece como "No asignado". Botón derecho → <strong>Nuevo volumen simple</strong>.</li>
+                            <li>Sigue el asistente: tamaño completo, letra <code>E:</code>, sistema de archivos <strong>NTFS</strong>, etiqueta <code>PRUEBA-NTFS</code>.</li>
+                            <li>Comprueba que el "pendrive virtual" aparece en <em>Este equipo</em>.</li>
+                        </ol>
+                    </div>
+
                     <table>
-                        <tr><td>Ruta del archivo de prueba</td><td><input type="text"></td></tr>
-                        <tr><td>Tamano exacto (MB)</td><td><input type="text"></td></tr>
+                        <tr><td>Nombre del VDI creado</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño asignado</td><td><input type="text"></td></tr>
+                        <tr><td>Tabla de particiones (GPT / MBR)</td><td><input type="text"></td></tr>
+                        <tr><td>Letra y sistema de archivos del volumen</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>2.2 - Copiar a USB 2.0</h3>
+                    <h3>1.3 - Probar los tres sistemas de archivos de Windows</h3>
+                    <p>Vamos a formatear el mismo disco en NTFS, exFAT y FAT32 y comprobar qué cambia.</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Conecta el pendrive a un puerto <strong>USB 2.0 (negro)</strong>.</li>
-                            <li>Copia el archivo al pendrive. Cronometra cuanto tarda.</li>
-                            <li>Calcula velocidad media: tamano (MB) / tiempo (s) = velocidad MB/s.</li>
+                            <li>Copia un archivo cualquiera dentro de <code>E:</code>. Comprueba que se ve.</li>
+                            <li>En <strong>Administración de discos</strong>, botón derecho sobre el volumen → <strong>Formatear</strong>. Elige <strong>exFAT</strong>. Etiqueta <code>PRUEBA-EXFAT</code>. Acepta el aviso de borrado.</li>
+                            <li>Vuelve a copiar un archivo y trata de copiar uno mayor de 4 GB (puedes generarlo con: <code>fsutil file createnew C:\test5gb.bin 5368709120</code> en CMD como administrador).</li>
+                            <li>Repite el formateo, esta vez en <strong>FAT32</strong>. Ojo: Windows sólo deja FAT32 hasta 32 GB desde el asistente, suficiente para 4 GB.</li>
+                            <li>Intenta copiar el archivo de 5 GB a FAT32. ¿Qué pasa? Anota el mensaje.</li>
                         </ol>
                     </div>
 
-                    <h3>2.3 - Copiar a USB 3.0</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Borra el archivo del pendrive (o usa otro).</li>
-                            <li>Conecta el pendrive a un puerto <strong>USB 3.0 (azul)</strong>.</li>
-                            <li>Copia de nuevo y cronometra.</li>
-                        </ol>
+                    <div class="aviso">
+                        <strong>Aviso:</strong> formatear borra el contenido del volumen entero. En la práctica esto da igual (es un disco virtual de pruebas), pero es lo más típico que destroza datos en una situación real. Lee siempre los avisos antes de aceptar.
                     </div>
 
-                    <h3>2.4 - Resultados</h3>
                     <table>
-                        <tr><th>Dispositivo</th><th>Puerto</th><th>Tiempo (s)</th><th>Velocidad calculada (MB/s)</th></tr>
-                        <tr><td>Pendrive</td><td>USB 2.0</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Pendrive</td><td>USB 3.0</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Disco externo (si hay)</td><td>USB 3.0</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><th>Sistema de archivos</th><th>¿Acepta el archivo de 5 GB?</th><th>Mensaje de error</th></tr>
+                        <tr><td>NTFS</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>exFAT</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>FAT32</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.4 - Medir velocidad de transferencia</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Genera un archivo de 1 GB: <code>fsutil file createnew C:\test1gb.bin 1073741824</code></li>
+                            <li>Copia el archivo de <code>C:</code> a <code>E:</code> (disco virtual). Cronométralo.</li>
+                            <li>Calcula la velocidad: <em>tamaño en MB / segundos = MB/s</em>.</li>
+                            <li>Repite copiando ahora de <code>E:</code> a <code>C:</code>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Sentido</th><th>Tiempo (s)</th><th>Velocidad (MB/s)</th></tr>
+                        <tr><td>C: → E: (escritura en disco virtual)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>E: → C: (lectura del disco virtual)</td><td><input type="text"></td><td><input type="text"></td></tr>
                     </table>
 
                     <div class="pregunta">
-                        <p>Compara las velocidades obtenidas con las teoricas (USB 2.0: 60 MB/s teorico, ~30 MB/s real; USB 3.0: 625 MB/s teorico, ~400 MB/s real). &iquest;Por que la real es siempre menor que la teorica?</p>
+                        <p>La velocidad sale altísima (cientos de MB/s, incluso GB/s). ¿Por qué un "disco virtual" es tan rápido si en el host está en un disco normal? ¿Qué efecto tiene la caché del SO?</p>
                         <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 3: Conectores -->
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - DISCO EXTERNO VIRTUAL EN LINUX                       -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 3 - Reconocer tipos de conector USB (20 min)</h2>
+                <h2>Parte 2 - "Disco externo" virtual en la VM Linux (40 min)</h2>
                 <div class="seccion-body">
-                    <p>Mira los cables y conectores disponibles en el aula. Anota lo que encuentres:</p>
+
+                    <h3>2.1 - Añadir el VDI</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la VM Ubuntu.</li>
+                            <li>Configuración → Almacenamiento → +disco duro → crear nuevo VDI de 4 GB. Llámalo <code>disco-linux.vdi</code>.</li>
+                            <li>Arranca la VM Ubuntu.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.2 - Detectar el disco</h3>
+
+<pre class="codigo">lsblk                # listado de bloques
+sudo fdisk -l        # detalle de discos y particiones</pre>
+
+                    <p>Identifica el disco nuevo. Suele aparecer como <code>/dev/sdb</code> (el sistema está en <code>/dev/sda</code>). Anota su nombre exacto.</p>
+
                     <table>
-                        <tr><th>Tipo de conector</th><th>&iquest;Lo encuentras en el aula?</th><th>Ejemplo de dispositivo</th></tr>
-                        <tr><td>USB Tipo A (clasico rectangular)</td><td><input type="text" placeholder="Si / No"></td><td><input type="text"></td></tr>
-                        <tr><td>USB Tipo B (cuadrado)</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Mini-USB</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>Micro-USB</td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>USB Tipo C</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Identificador del disco nuevo en Linux</td><td><input type="text" placeholder="/dev/sdb"></td></tr>
+                        <tr><td>Tamaño detectado</td><td><input type="text"></td></tr>
+                        <tr><td>¿Tiene tabla de particiones?</td><td><input type="text"></td></tr>
                     </table>
 
+                    <h3>2.3 - Particionar y formatear</h3>
+
+<pre class="codigo"># SUSTITUYE /dev/sdb por el tuyo. ¡Cuidado, esto BORRA el disco!
+sudo parted /dev/sdb -- mklabel gpt
+sudo parted /dev/sdb -- mkpart primary ext4 1MiB 100%
+sudo mkfs.ext4 -L DATOS-LINUX /dev/sdb1
+lsblk -f             # ver UUID y tipo de FS</pre>
+
+                    <h3>2.4 - Montar manualmente</h3>
+
+<pre class="codigo">sudo mkdir -p /mnt/datos
+sudo mount /dev/sdb1 /mnt/datos
+df -h | grep datos
+echo "hola desde linux" | sudo tee /mnt/datos/prueba.txt
+ls -la /mnt/datos
+sudo umount /mnt/datos</pre>
+
+                    <h3>2.5 - Montaje automático en /etc/fstab</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Mira el UUID del disco: <code>lsblk -f</code> o <code>sudo blkid /dev/sdb1</code>.</li>
+                            <li>Edita <code>sudo nano /etc/fstab</code> y añade una línea similar a:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">UUID=&lt;tu-uuid&gt;  /mnt/datos  ext4  defaults,nofail  0 2</pre>
+
+                    <p>Guarda el archivo y prueba:</p>
+
+<pre class="codigo">sudo systemctl daemon-reload
+sudo mount -a
+df -h | grep datos</pre>
+
+                    <div class="aviso">
+                        <strong>Aviso:</strong> una línea mal escrita en <code>/etc/fstab</code> puede impedir que arranque el sistema. Por eso añadimos <code>nofail</code>: si el disco no aparece, Linux sigue arrancando. Comprueba siempre con <code>sudo mount -a</code> antes de reiniciar.
+                    </div>
+
+                    <h3>2.6 - Comparar con NTFS</h3>
+                    <p>Linux puede leer y escribir NTFS gracias al driver <code>ntfs-3g</code> (incluido por defecto en Ubuntu). Para comprobarlo:</p>
+
+<pre class="codigo"># Apaga la VM, lleva el VDI E:/PRUEBA-NTFS de la práctica anterior
+# (o crea uno nuevo y formatéalo desde Windows). Conéctalo a la VM Linux.
+sudo apt install -y ntfs-3g  # ya viene normalmente
+lsblk -f                      # debería mostrar tipo "ntfs"
+sudo mkdir -p /mnt/ntfs
+sudo mount -t ntfs-3g /dev/sdc1 /mnt/ntfs
+ls -la /mnt/ntfs</pre>
+
                     <div class="pregunta">
-                        <p>&iquest;Cual es la principal ventaja del USB Tipo C frente al Tipo A?</p>
-                        <textarea rows="2"></textarea>
+                        <p>¿Qué ventaja tiene NTFS si tu equipo principal es Windows pero usas Linux como secundario? ¿Y qué inconveniente tiene si el equipo principal es Linux?</p>
+                        <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 4: Adaptador red -->
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - CARPETAS COMPARTIDAS HOST-GUEST                      -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 4 - Adaptador de red USB (40 min)</h2>
+                <h2>Parte 3 - Carpetas compartidas host-guest (40 min)</h2>
                 <div class="seccion-body">
-                    <h3>4.1 - Conectar el adaptador</h3>
+
+                    <p>VirtualBox permite "compartir" una carpeta del equipo anfitrión con la VM. Es muy útil para mover archivos sin tener que copiarlos: la carpeta se ve a la vez desde el host y desde la VM, en tiempo real. Necesita las <strong>Guest Additions</strong> instaladas en la VM.</p>
+
+                    <h3>3.1 - Comprobar / instalar Guest Additions en Windows</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Conecta el adaptador (Ethernet o Wi-Fi) a un puerto USB.</li>
-                            <li>Espera a que Windows lo detecte. &iquest;Instala driver automaticamente?</li>
-                            <li>Si es Ethernet, conecta tambien el cable de red al adaptador.</li>
-                            <li>Si es Wi-Fi, abre la lista de redes y conecta a la red del aula.</li>
+                            <li>Con la VM Windows arrancada, en el menú de VirtualBox: <strong>Dispositivos → Insertar imagen de Guest Additions CD</strong>.</li>
+                            <li>Dentro de Windows aparece una unidad CD nueva. Ejecuta <code>VBoxWindowsAdditions.exe</code> como administrador.</li>
+                            <li>Acepta todo y reinicia.</li>
                         </ol>
                     </div>
 
-                    <table>
-                        <tr><td>Tipo de adaptador</td><td><input type="text" placeholder="Ethernet / Wi-Fi"></td></tr>
-                        <tr><td>&iquest;Driver instalado automaticamente?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                        <tr><td>Nombre del adaptador en Administrador de dispositivos</td><td><input type="text"></td></tr>
-                    </table>
+                    <h3>3.2 - Comprobar / instalar Guest Additions en Linux</h3>
 
-                    <h3>4.2 - Verificar conectividad</h3>
+<pre class="codigo">sudo apt update
+sudo apt install -y virtualbox-guest-utils virtualbox-guest-x11
+sudo usermod -aG vboxsf $USER
+# cierra sesión y vuelve a entrar para que tome efecto el grupo</pre>
+
+                    <h3>3.3 - Crear la carpeta compartida</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Abre CMD y ejecuta <code>ipconfig</code>. Anota la IP que tiene el adaptador.</li>
-                            <li>Ejecuta <code>ping 8.8.8.8</code> para comprobar internet.</li>
-                            <li>Ejecuta <code>ping google.com</code> para comprobar resolucion DNS.</li>
+                            <li>En el host (tu PC físico) crea una carpeta nueva, por ejemplo <code>C:\compartida</code> en Windows o <code>/home/&lt;tu_usuario&gt;/compartida</code> en Linux.</li>
+                            <li>Pon dentro un par de archivos de prueba.</li>
+                            <li>Con la VM apagada, en VirtualBox: <strong>Configuración → Carpetas compartidas → +</strong>.</li>
+                            <li>Ruta: la carpeta del host. Nombre: <code>compartida</code>.</li>
+                            <li>Marca <em>Automontar</em> y <em>Hacer permanente</em>. Acepta.</li>
+                            <li>Arranca la VM.</li>
                         </ol>
                     </div>
 
+                    <h3>3.4 - Acceder desde la VM Windows</h3>
+                    <p>Aparece como una unidad de red automática (por ejemplo <code>Z:</code> o <code>\\VBOXSVR\compartida</code>). Compruébalo en <em>Este equipo</em>.</p>
+
                     <table>
-                        <tr><td>IP asignada al adaptador</td><td><input type="text"></td></tr>
-                        <tr><td>&iquest;Responde ping a 8.8.8.8?</td><td><input type="text" placeholder="Si / No"></td></tr>
-                        <tr><td>&iquest;Responde ping a google.com?</td><td><input type="text"></td></tr>
+                        <tr><td>Letra de unidad asignada (Windows)</td><td><input type="text"></td></tr>
+                        <tr><td>Ruta UNC alternativa</td><td><input type="text" placeholder="\\VBOXSVR\compartida"></td></tr>
                     </table>
 
-                    <div class="pregunta">
-                        <p>Si <code>ping 8.8.8.8</code> funciona pero <code>ping google.com</code> no, &iquest;cual es el problema?</p>
-                        <textarea rows="2"></textarea>
+                    <h3>3.5 - Acceder desde la VM Linux</h3>
+                    <p>Con automontaje aparece en <code>/media/sf_compartida</code>. Si no aparece, monta a mano:</p>
+
+<pre class="codigo">ls /media/sf_compartida
+# si no existe:
+sudo mkdir -p /mnt/compartida
+sudo mount -t vboxsf compartida /mnt/compartida
+ls /mnt/compartida</pre>
+
+                    <h3>3.6 - Prueba bidireccional</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un archivo <code>desde-host.txt</code> en la carpeta del host.</li>
+                            <li>Compruébalo desde dentro de las VMs (Windows y Linux).</li>
+                            <li>Crea ahora <code>desde-vm.txt</code> desde una de las VMs.</li>
+                            <li>Compruébalo desde el host.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Cuándo usar carpetas compartidas vs disco virtual:</strong> la carpeta compartida es ideal para mover archivos entre el host y la VM (es bidireccional y en tiempo real). El disco virtual es mejor cuando quieres que la VM "tenga" un disco propio (puedes formatearlo, particionarlo, simular que es un pendrive externo). Si lo que necesitas es trasladar archivos del host a la VM una vez, carpeta compartida; si lo que necesitas es que la VM trate algo como un disco real, VDI.
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 5: NAS -->
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - NAS CASERO CON SAMBA                                 -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 5 - Acceder a un NAS (30 min, opcional)</h2>
+                <h2>Parte 4 - NAS casero con Samba en la VM Linux (50 min)</h2>
                 <div class="seccion-body">
+
+                    <p>Vamos a convertir la VM Linux en un pequeño NAS y a conectarnos desde la VM Windows. Es el mismo principio que un Synology o un QNAP de oficina pero en miniatura.</p>
+
                     <div class="nota">
-                        Solo si hay un NAS o una carpeta compartida disponibles en el aula. Tu profesor te dara la ruta o IP.
+                        Si ya hiciste la <strong>Práctica 25 - Compartición de recursos</strong>, gran parte de esto te resultará familiar. Aquí lo enfocamos como almacenamiento, no tanto como permisos.
                     </div>
 
-                    <h3>5.1 - Acceder por ruta UNC</h3>
+                    <h3>4.1 - Red entre VMs</h3>
                     <div class="pasos">
                         <ol>
-                            <li>En el Explorador de archivos, escribe en la barra de direcciones: <code>\\IP_DEL_NAS</code> (por ejemplo <code>\\192.168.1.100</code>).</li>
-                            <li>Si pide credenciales, introduce las que te de el profesor.</li>
-                            <li>Veras las carpetas compartidas. Entra en la asignada al curso.</li>
+                            <li>Configura las dos VMs con <strong>Adaptador puente</strong> (igual que en la práctica 30) o con <em>Red interna</em>.</li>
+                            <li>Anota las IPs:
+                                <ul style="margin-left:20px;line-height:1.6">
+                                    <li>Linux: <code>hostname -I</code></li>
+                                    <li>Windows: <code>ipconfig</code></li>
+                                </ul>
+                            </li>
+                            <li>Ping bidireccional para confirmar.</li>
                         </ol>
                     </div>
 
-                    <h3>5.2 - Compartir un archivo</h3>
+                    <table>
+                        <tr><td>IP de la VM Linux (servidor NAS)</td><td><input type="text"></td></tr>
+                        <tr><td>IP de la VM Windows (cliente)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.2 - Instalar Samba y crear un share</h3>
+
+<pre class="codigo">sudo apt install -y samba
+sudo mkdir -p /srv/nas
+sudo chown $USER:$USER /srv/nas
+sudo chmod 770 /srv/nas
+echo "hola desde el NAS" > /srv/nas/bienvenida.txt</pre>
+
+                    <p>Edita <code>sudo nano /etc/samba/smb.conf</code> y añade al final:</p>
+
+<pre class="codigo">[NAS]
+   path = /srv/nas
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = @sambashare</pre>
+
+                    <p>Crea grupo y usuario Samba:</p>
+
+<pre class="codigo">sudo groupadd -f sambashare
+sudo usermod -aG sambashare $USER
+sudo smbpasswd -a $USER       # te pedirá una contraseña Samba (puede ser distinta a la del sistema)
+sudo systemctl restart smbd</pre>
+
+                    <h3>4.3 - Conectar desde la VM Windows</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Crea una carpeta con tu nombre dentro de la carpeta del curso.</li>
-                            <li>Copia un archivo cualquiera (no muy grande) en ella.</li>
-                            <li>Pidele a un companero que verifique desde su PC que ve tu archivo.</li>
+                            <li>Desde Windows, abre el explorador y escribe en la barra: <code>\\IP-LINUX\NAS</code>.</li>
+                            <li>Te pedirá usuario y contraseña: usa el usuario y la contraseña Samba que creaste.</li>
+                            <li>Verás <code>bienvenida.txt</code>.</li>
                         </ol>
                     </div>
 
-                    <h3>5.3 - Mapear como unidad de red</h3>
+                    <h3>4.4 - Mapear como unidad de red en Windows</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Clic derecho en <strong>Este equipo</strong> &rarr; <strong>Conectar a unidad de red</strong>.</li>
-                            <li>Asigna letra (Z:) y escribe la ruta del NAS: <code>\\IP_DEL_NAS\carpeta</code>.</li>
-                            <li>Marca "Conectar de nuevo al iniciar sesion" si quieres que se conecte automaticamente.</li>
-                            <li>Comprueba que el NAS aparece como una unidad mas en Este equipo.</li>
+                            <li>En <em>Este equipo</em>, botón derecho → <strong>Conectar a unidad de red</strong>.</li>
+                            <li>Letra: <code>N:</code> (de NAS).</li>
+                            <li>Ruta: <code>\\IP-LINUX\NAS</code>.</li>
+                            <li>Marca <em>Conectar de nuevo al iniciar sesión</em>.</li>
+                            <li>Te pedirá credenciales otra vez.</li>
                         </ol>
+                    </div>
+
+                    <h3>4.5 - Probar la velocidad del NAS</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Desde Windows, copia el archivo de 1 GB a <code>N:</code>. Cronométralo.</li>
+                            <li>Cópialo de vuelta a <code>C:</code>.</li>
+                            <li>Compáralo con la velocidad del disco virtual local de la Parte 1.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><th>Operación</th><th>Tiempo (s)</th><th>Velocidad (MB/s)</th></tr>
+                        <tr><td>Subida al NAS (C: → N:)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>Bajada del NAS (N: → C:)</td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>¿Por qué la velocidad por SMB suele ser bastante menor que la del disco virtual local de la VM, aunque el "disco" físico subyacente sea el mismo?</p>
+                        <textarea rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- EVALUACION -->
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - CIFRADO DE ALMACENAMIENTO EXTERNO                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Conclusiones y evaluacion</h2>
+                <h2>Parte 5 - Cifrado de almacenamiento externo (40 min)</h2>
                 <div class="seccion-body">
+
+                    <p>Si pierdes un disco externo o un pendrive, cualquiera puede ver lo que hay dentro. Por eso, lo que es sensible se cifra. Vamos a probar las dos soluciones más usadas: <strong>BitLocker To Go</strong> en Windows y <strong>LUKS</strong> en Linux.</p>
+
+                    <h3>5.1 - BitLocker To Go en la VM Windows</h3>
+                    <div class="aviso">
+                        <strong>Requiere edición Pro o Enterprise.</strong> Si tu VM es Windows 10/11 Home, salta a la sección 5.2 o usa una alternativa como VeraCrypt.
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, formatea de nuevo el disco virtual <code>E:</code> en NTFS o exFAT.</li>
+                            <li>Botón derecho sobre <code>E:</code> → <strong>Activar BitLocker</strong>.</li>
+                            <li>Elige cifrar con contraseña. Anota la contraseña que pongas (con todos sus carcteres especiales si los hay).</li>
+                            <li><strong>Guarda la clave de recuperación</strong>: en archivo, en cuenta Microsoft o impresa. Esto es crítico: si pierdes la contraseña y no tienes la clave, los datos se pierden.</li>
+                            <li>Elige <em>cifrar sólo el espacio usado</em> (es más rápido para discos vacíos).</li>
+                            <li>Modo de compatibilidad: elige <em>compatible</em> si te interesa que funcione en Windows 7/8.</li>
+                            <li>Empezar el cifrado. Espera a que termine.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pasos">
+                        <ol start="8">
+                            <li>Apaga la VM Windows. Lleva el VDI a la VM Ubuntu (Configuración → Almacenamiento → +disco duro → Existente → seleccionar el VDI cifrado).</li>
+                            <li>Arranca Ubuntu y haz <code>lsblk -f</code>. ¿Qué tipo de FS detecta? ¿Puedes montarlo?</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>¿Linux ve el contenido del disco BitLocker?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Qué tipo de filesystem reporta <code>lsblk -f</code>?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Truco:</strong> Linux <em>sí</em> puede leer BitLocker, pero hay que instalar <code>dislocker</code>. Por defecto, sólo verá una partición ilegible. Es muy útil saber esto si recibes un disco BitLocker y necesitas rescatar datos desde Linux.
+                    </div>
+
+                    <h3>5.2 - LUKS en la VM Linux</h3>
+                    <p>LUKS (Linux Unified Key Setup) es el estándar de cifrado de discos en Linux. Vamos a cifrar un disco virtual nuevo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la VM Ubuntu. Añade un disco virtual nuevo <code>luks.vdi</code> de 2 GB. Arranca.</li>
+                            <li>Identifica el disco con <code>lsblk</code>. Suele ser <code>/dev/sdc</code> o similar.</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">sudo apt install -y cryptsetup
+# CIFRAR (¡borra el disco!)
+sudo cryptsetup luksFormat /dev/sdc        # te pedirá YES en mayúsculas y una passphrase
+# ABRIR el contenedor cifrado con un alias
+sudo cryptsetup luksOpen /dev/sdc cifrado
+# crear un FS dentro
+sudo mkfs.ext4 -L SECRETO /dev/mapper/cifrado
+sudo mkdir -p /mnt/cifrado
+sudo mount /dev/mapper/cifrado /mnt/cifrado
+echo "esto es secreto" | sudo tee /mnt/cifrado/secreto.txt
+# CERRAR
+sudo umount /mnt/cifrado
+sudo cryptsetup luksClose cifrado</pre>
+
+                    <p>Comprueba que sin abrir el contenedor el disco es ilegible:</p>
+
+<pre class="codigo">sudo blkid /dev/sdc      # debería decir TYPE="crypto_LUKS"
+sudo mount /dev/sdc /mnt/cifrado    # debería fallar</pre>
+
+                    <div class="reto">
+                        <strong>Reto:</strong> apaga la VM Ubuntu, mueve el VDI cifrado con LUKS a la VM Windows. ¿Qué ve Windows? ¿Le pide formatearlo? ¡Cuidado, NO lo formatees! Sólo apunta lo que ve, apaga la VM y devuelve el disco a Linux.
+                    </div>
+
+                    <table>
+                        <tr><td>¿Qué tipo de FS detecta Linux con <code>blkid</code>?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Qué hace Windows al ver el disco LUKS?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Comparativa</h3>
+                    <table>
+                        <tr><th>Aspecto</th><th>BitLocker To Go</th><th>LUKS</th></tr>
+                        <tr><td>Plataforma nativa</td><td>Windows Pro/Enterprise</td><td>Linux</td></tr>
+                        <tr><td>Compatibilidad cruzada</td><td>Linux con dislocker</td><td>Windows necesita herramientas externas</td></tr>
+                        <tr><td>Algoritmo por defecto</td><td>AES-128 / AES-256 XTS</td><td>AES-256 XTS</td></tr>
+                        <tr><td>Recuperación si pierdes contraseña</td><td>Clave de recuperación de 48 dígitos</td><td>Hasta 8 keyslots con passphrases distintas</td></tr>
+                        <tr><td>Uso típico</td><td>Pendrives y discos externos en oficina Windows</td><td>Portátiles Linux, servidores</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- EVALUACIÓN                                                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Conclusiones y autoevaluación</h2>
+                <div class="seccion-body">
+
                     <div class="pregunta">
-                        <p>En una empresa, &iquest;que ventajas tiene un NAS frente a varios discos externos repartidos por los puestos?</p>
+                        <p>Imagina que en una empresa pequeña tienen 5 puestos de trabajo y cada usuario lleva su pendrive con sus archivos. ¿Qué le propondrías y por qué? Razónalo con lo aprendido en esta práctica (NAS, sistemas de archivos, cifrado, copias).</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Te dan un disco externo de un usuario que dice "no me funciona en Windows, sólo en Linux". ¿Cuál es la causa más probable y qué dos opciones tienes para arreglarlo?</p>
                         <textarea rows="3"></textarea>
                     </div>
 
                     <div class="evaluacion">
-                        <h3>Autoevaluacion</h3>
+                        <h3>Autoevaluación</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>He identificado correctamente los puertos USB del PC y su version</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
-                            <tr><td>He medido y comparado las velocidades USB 2.0 y USB 3.0</td><td><input type="text"></td></tr>
-                            <tr><td>Reconozco visualmente los conectores USB Tipo A, B y C</td><td><input type="text"></td></tr>
-                            <tr><td>He configurado un adaptador de red USB y comprobado conectividad con ping</td><td><input type="text"></td></tr>
-                            <tr><td>(Si aplicaba) He accedido a un NAS y mapeado una unidad de red</td><td><input type="text"></td></tr>
+                            <tr><td>He creado discos virtuales adicionales en VirtualBox y los he conectado como "discos externos" a las VMs</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>He particionado y formateado discos en NTFS, exFAT, FAT32 y ext4 según el caso</td><td><input type="text"></td></tr>
+                            <tr><td>Sé elegir el sistema de archivos adecuado según el destino (Windows / mixto / Linux)</td><td><input type="text"></td></tr>
+                            <tr><td>He configurado carpetas compartidas host-guest con Guest Additions</td><td><input type="text"></td></tr>
+                            <tr><td>He montado un NAS con Samba en la VM Linux y conectado desde la VM Windows</td><td><input type="text"></td></tr>
+                            <tr><td>Sé mapear unidades de red en Windows y montar discos en Linux con <code>fstab</code></td><td><input type="text"></td></tr>
+                            <tr><td>He cifrado almacenamiento externo con BitLocker To Go y/o LUKS</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo por qué la clave de recuperación de BitLocker es crítica</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="botones">
             <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
-            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
         </div>
     </div>
 </body>
