@@ -418,7 +418,7 @@ ls /mnt/compartida</pre>
                     <h3>4.1 - Red entre VMs</h3>
                     <div class="pasos">
                         <ol>
-                            <li>Configura las dos VMs con <strong>Adaptador sólo-anfitrión</strong> (host-only) en el mismo segmento, igual que hiciste en la práctica 30. Es autosuficiente: no depende de la red real, lleva DHCP integrado de VirtualBox.</li>
+                            <li>Configura las dos VMs con <strong>Adaptador puente</strong> sobre la tarjeta activa del host, igual que hiciste en la práctica 30. Cada VM coge IP del router de la red real.</li>
                             <li>Anota las IPs:
                                 <ul style="margin-left:20px;line-height:1.6">
                                     <li>Linux: <code>hostname -I</code></li>

@@ -351,13 +351,11 @@ lpstat -p -d       # ver impresoras y la predeterminada</pre>
                 <div class="seccion-body">
 
                     <h3>4.1 - Configurar la red entre las dos VM</h3>
-                    <p>Las dos VM tienen que verse entre sí. Vamos a usar <strong>Red sólo-anfitrión</strong> (host-only): es una red interna que crea VirtualBox entre el host y las VMs, con su propio DHCP, sin depender de la red real. Funciona aunque no haya router ni internet.</p>
+                    <p>Las dos VM tienen que verse entre sí y tener salida a internet (para descargar paquetes y drivers). Vamos a usar <strong>Adaptador puente</strong>: cada VM coge IP del router de la red real igual que si fuese un PC más. Es la forma más sencilla y con menos configuración.</p>
                     <div class="pasos">
                         <ol>
                             <li>Apaga las dos VM.</li>
-                            <li>En VirtualBox, menú <strong>Archivo → Herramientas → Administrador de red</strong>. Si no existe, crea una <em>Red sólo-anfitrión</em> nueva (por defecto se llama <code>VirtualBox Host-Only Ethernet Adapter</code> o similar). Marca <em>Habilitar servidor DHCP</em>.</li>
-                            <li>En cada VM: <strong>Configuración → Red → Adaptador 1</strong> = <em>Adaptador sólo-anfitrión</em> y selecciona la red recién creada.</li>
-                            <li>(Opcional) Si quieres que las VMs también tengan internet para descargar paquetes, deja un <strong>Adaptador 2</strong> en modo <em>NAT</em> en cada VM.</li>
+                            <li>En cada VM: <strong>Configuración → Red → Adaptador 1</strong> = <em>Adaptador puente</em> sobre la tarjeta de red activa del host (Wi-Fi o Ethernet, la que esté conectada).</li>
                             <li>Arranca las dos VM.</li>
                             <li>Anota la IP de cada una:
                                 <ul style="margin-left:20px;line-height:1.6">
@@ -367,6 +365,10 @@ lpstat -p -d       # ver impresoras y la predeterminada</pre>
                             </li>
                             <li>Comprueba la conectividad: desde la VM Windows haz <code>ping IP-Linux</code> y al revés.</li>
                         </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Si el firewall del host bloquea el ping</strong> entre VMs (típico en Windows con redes "Públicas"): cambia el perfil de red del host a "Privada" o añade una regla que permita ICMP entrante. También puedes seguir adelante: el ping puede fallar pero los servicios (puerto 631 de CUPS) sí responden.
                     </div>
 
                     <table>
