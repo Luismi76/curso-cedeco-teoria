@@ -68,9 +68,9 @@
                 <strong>Módulo:</strong> MF0953_2 - Reparación y ampliación de equipos<br>
                 <strong>Unidad Formativa:</strong> UF0862 - Instalación y configuración de periféricos<br>
                 <strong>Sesiones:</strong> S6 (almacenamiento externo) + S7 (USB y comunicaciones)<br>
-                <strong>Duración estimada:</strong> 5-6 horas (1 sesión completa)<br>
+                <strong>Duración estimada:</strong> 7-8 horas (puede partirse en dos sesiones)<br>
                 <strong>Modalidad:</strong> trabajo individual<br>
-                <strong>Herramientas:</strong> VirtualBox, VM Windows 10/11, VM Ubuntu, espacio libre suficiente en el host (al menos 10-15 GB) para crear discos virtuales adicionales
+                <strong>Herramientas:</strong> VirtualBox, VM Windows 10/11, VM Ubuntu, espacio libre suficiente en el host (al menos 15-20 GB) para crear discos virtuales adicionales
             </div>
         </header>
 
@@ -107,6 +107,11 @@
                         <li>Montar un pequeño <strong>NAS casero con Samba</strong> en la VM Linux y conectarse desde la VM Windows.</li>
                         <li>Mapear unidades de red en Windows y montarlas automáticamente en Linux con <code>fstab</code>.</li>
                         <li>Cifrar almacenamiento externo con <strong>BitLocker To Go</strong> (Windows) y <strong>LUKS</strong> (Linux).</li>
+                        <li>Distinguir las tablas de particiones <strong>MBR</strong> y <strong>GPT</strong> y saber cuándo se usa cada una.</li>
+                        <li>Comprobar la <strong>integridad</strong> de un sistema de archivos con <code>chkdsk</code> y <code>fsck</code>.</li>
+                        <li>Consultar el <strong>estado de salud</strong> de un disco con SMART (atributos clave, valores de alerta).</li>
+                        <li>Hacer copias y sincronización con <strong>robocopy</strong> (Windows) y <strong>rsync</strong> (Linux), y programarlas.</li>
+                        <li>Diagnosticar y resolver problemas frecuentes: <em>disco lleno</em>, <em>extracción no segura</em>, <em>FS corrupto</em>.</li>
                     </ul>
                 </div>
             </div>
@@ -115,7 +120,7 @@
             <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
             <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 0 - Conceptos previos (40 min)</h2>
+                <h2>Parte 0 - Conceptos previos (60 min)</h2>
                 <div class="seccion-body">
 
                     <h3>0.1 - Tipos de almacenamiento externo</h3>
@@ -129,7 +134,50 @@
                         <tr><td><strong>Cloud</strong></td><td>"infinita"</td><td>Limitada por internet</td><td>Sincronización, copia fuera del local, colaboración</td></tr>
                     </table>
 
-                    <h3>0.2 - Interfaces habituales</h3>
+                    <h3>0.2 - Anatomía: HDD vs SSD vs NVMe</h3>
+                    <p>Detrás de "disco" hay tres tecnologías muy distintas. Conocer la diferencia te ayuda a entender por qué un dispositivo es rápido o lento, frágil o duradero, y por qué algunos comandos (como TRIM) sólo aplican a unos.</p>
+
+                    <h4>HDD (disco duro mecánico)</h4>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Platos magnéticos girando a 5400 o 7200 rpm con un cabezal lector que se mueve sobre ellos.</li>
+                        <li>El acceso aleatorio es lento porque el cabezal tiene que <em>buscar</em> (~10 ms de seek time).</li>
+                        <li>Sensible a golpes en funcionamiento: el cabezal puede tocar el plato y rayarlo.</li>
+                        <li>Barato por GB. Sigue siendo el rey para archivado en grandes volúmenes.</li>
+                    </ul>
+
+                    <h4>SSD (disco de estado sólido)</h4>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Memoria flash <strong>NAND</strong>: celdas que retienen carga eléctrica. Sin partes móviles.</li>
+                        <li>Acceso aleatorio rapidísimo (~0,1 ms). Resistente a golpes en funcionamiento.</li>
+                        <li>Las celdas tienen un número limitado de ciclos de escritura. Por eso existe el <strong>wear leveling</strong>: el controlador del SSD reparte las escrituras por toda la memoria para que ninguna celda se gaste antes que las demás.</li>
+                        <li>Necesitan el comando <strong>TRIM</strong>: cuando borras un archivo, el SO le dice al SSD qué celdas ya no se usan. Sin TRIM, el rendimiento se degrada con el tiempo.</li>
+                        <li>Tipos de NAND por densidad: SLC (1 bit/celda, rápido y caro), MLC (2 bits), TLC (3 bits, mainstream), QLC (4 bits, barato pero menos durable).</li>
+                    </ul>
+
+                    <h4>NVMe (NAND con interfaz PCIe)</h4>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Mismo tipo de memoria flash que un SSD SATA, pero conectada directamente al bus PCIe en lugar de pasar por SATA.</li>
+                        <li>Usa el protocolo <strong>NVMe</strong>, diseñado para flash (admite miles de colas en paralelo). SATA se diseñó para HDDs y es un cuello de botella.</li>
+                        <li>Velocidades de 3-14 GB/s en formato M.2 interno. En caja externa por USB4/Thunderbolt llega a ~3 GB/s reales.</li>
+                        <li>Genera más calor que un SSD SATA: las cajas externas buenas llevan disipador.</li>
+                    </ul>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>HDD</th><th>SSD SATA</th><th>NVMe</th></tr>
+                        <tr><td>Velocidad secuencial</td><td>80-200 MB/s</td><td>400-550 MB/s</td><td>3000-14000 MB/s</td></tr>
+                        <tr><td>Acceso aleatorio</td><td>Muy malo</td><td>Bueno</td><td>Excelente</td></tr>
+                        <tr><td>Resistencia a golpes</td><td>Mala</td><td>Excelente</td><td>Excelente</td></tr>
+                        <tr><td>Ciclos de escritura</td><td>Ilimitados</td><td>Limitados (TBW)</td><td>Limitados (TBW)</td></tr>
+                        <tr><td>Necesita TRIM</td><td>No</td><td>Sí</td><td>Sí</td></tr>
+                        <tr><td>Calor</td><td>Bajo</td><td>Bajo</td><td>Alto bajo carga</td></tr>
+                        <tr><td>€/GB (orientativo)</td><td>~0,02 €</td><td>~0,07 €</td><td>~0,08 €</td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>TBW (Total Bytes Written):</strong> el fabricante de un SSD garantiza una cantidad concreta de datos escritos antes de que las celdas se agoten. Un SSD doméstico de 1 TB suele tener 600 TBW: equivale a escribir el disco entero unas 600 veces. Para uso normal, son muchos años.
+                    </div>
+
+                    <h3>0.3 - Interfaces habituales</h3>
                     <table>
                         <tr><th>Interfaz</th><th>Velocidad máxima</th><th>Notas</th></tr>
                         <tr><td>USB 2.0</td><td>60 MB/s teórico (~30 MB/s real)</td><td>Hoy sólo en accesorios baratos.</td></tr>
@@ -140,7 +188,7 @@
                         <tr><td>eSATA</td><td>600 MB/s</td><td>En desuso. Sólo en equipos antiguos.</td></tr>
                     </table>
 
-                    <h3>0.3 - Sistemas de archivos</h3>
+                    <h3>0.4 - Sistemas de archivos</h3>
                     <table>
                         <tr><th>FS</th><th>Tamaño máx. archivo</th><th>Compatibilidad</th><th>Cuándo usarlo</th></tr>
                         <tr><td><strong>FAT32</strong></td><td>4 GB</td><td>Todo lo que existe (Win, Linux, macOS, TVs, cámaras...)</td><td>Pendrives muy compatibles, BIOS UEFI, dispositivos antiguos</td></tr>
@@ -154,7 +202,51 @@
                         <strong>Regla rápida:</strong> si vas a llevar el pendrive entre un Windows y un Mac, formatea en <strong>exFAT</strong>. Si es un disco externo grande para Windows, <strong>NTFS</strong>. Si es un USB para arrancar un instalador o configurar una BIOS, <strong>FAT32</strong>. Si va a vivir conectado a un Linux, <strong>ext4</strong>.
                     </div>
 
-                    <h3>0.4 - ¿Por qué con discos virtuales?</h3>
+                    <h4>Journaling y por qué importa</h4>
+                    <p>NTFS y ext4 son sistemas de archivos con <strong>journal</strong>: antes de cada escritura, anotan en un registro qué cambios van a hacer. Si el equipo se apaga de golpe a mitad de una escritura, al volver a arrancar el sistema lee el journal y termina o deshace la operación. Resultado: el FS no queda corrupto. FAT32 y exFAT <em>no</em> tienen journal, por eso un corte de luz en mitad de una copia los deja inconsistentes y necesitan un <code>chkdsk</code>.</p>
+
+                    <h4>Tamaño de unidad de asignación (cluster)</h4>
+                    <p>Un FS no escribe byte a byte: agrupa los datos en bloques llamados <em>clusters</em>. El tamaño del cluster lo decides al formatear. Cluster grande (64 KB) = mejor rendimiento secuencial pero más espacio desperdiciado en archivos pequeños. Cluster pequeño (4 KB) = mejor para muchos archivos pequeños pero peor rendimiento secuencial. Para uso general, deja el valor por defecto (4 KB en NTFS, 4 KB en ext4).</p>
+
+                    <h3>0.5 - Tablas de particiones: MBR vs GPT</h3>
+                    <p>Antes de poder formatear un disco, hay que escribirle una <strong>tabla de particiones</strong>. Existen dos:</p>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>MBR (Master Boot Record)</th><th>GPT (GUID Partition Table)</th></tr>
+                        <tr><td>Año</td><td>1983 (PC/AT de IBM)</td><td>1999 (parte del estándar UEFI)</td></tr>
+                        <tr><td>Tamaño máximo de disco</td><td>2 TB</td><td>9,4 ZB (prácticamente ilimitado)</td></tr>
+                        <tr><td>Particiones primarias</td><td>4 (con extendida + lógicas para más)</td><td>128 sin tipos especiales</td></tr>
+                        <tr><td>Tabla replicada</td><td>No (un único MBR)</td><td>Sí (tabla principal + copia al final del disco)</td></tr>
+                        <tr><td>Suma de comprobación (CRC32)</td><td>No</td><td>Sí (detecta corrupción)</td></tr>
+                        <tr><td>Identificadores</td><td>Letras + números (1 byte de tipo)</td><td>GUID únicos por partición</td></tr>
+                        <tr><td>Compatible con BIOS legacy</td><td>Sí</td><td>Sólo si el firmware tiene CSM</td></tr>
+                        <tr><td>Compatible con UEFI</td><td>Sólo en modo legacy / CSM</td><td>Sí, nativo</td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Regla rápida:</strong> en cualquier disco moderno (mayor de 2 TB, instalación nueva, equipo UEFI), usa <strong>GPT</strong>. Sólo necesitas MBR si el disco va a arrancarse en un equipo muy antiguo con BIOS legacy o en algunos sistemas embebidos.
+                    </div>
+
+                    <h3>0.6 - SMART: salud del disco</h3>
+                    <p><strong>SMART</strong> (Self-Monitoring, Analysis and Reporting Technology) es un sistema integrado en HDDs y SSDs que monitoriza atributos del disco y avisa antes de un fallo inminente. Cualquier disco interno que compres lleva SMART; los pendrives baratos no, los SSDs externos buenos sí.</p>
+
+                    <h4>Atributos clave que mira un técnico</h4>
+                    <table>
+                        <tr><th>Atributo</th><th>Qué significa</th><th>Cuándo preocuparse</th></tr>
+                        <tr><td><strong>Reallocated Sectors Count</strong> (HDD)</td><td>Sectores defectuosos que el disco ha sustituido por otros de reserva</td><td>Si crece, el disco se está deteriorando</td></tr>
+                        <tr><td><strong>Current Pending Sector</strong></td><td>Sectores que dieron error y están a la espera de reasignarse</td><td>Cualquier valor &gt; 0 es alerta</td></tr>
+                        <tr><td><strong>Power-On Hours</strong></td><td>Horas que lleva encendido</td><td>Vida típica: 30-50.000 h</td></tr>
+                        <tr><td><strong>Temperature</strong></td><td>Temperatura</td><td>HDD: &lt;50 &deg;C. NVMe: &lt;70 &deg;C</td></tr>
+                        <tr><td><strong>Wear Leveling Count / Percent Used</strong> (SSD)</td><td>Cuánta vida útil de NAND has consumido</td><td>&gt;80% indica disco al final de su vida</td></tr>
+                        <tr><td><strong>Total LBAs Written</strong> (SSD)</td><td>Cuántos datos has escrito en total. Compáralo con el TBW del fabricante</td><td>Si te acercas al TBW, replantea reemplazo</td></tr>
+                        <tr><td><strong>Reported Uncorrectable Errors</strong></td><td>Errores que ni el ECC ha podido corregir</td><td>Cualquier valor distinto de 0 es muy mala señal</td></tr>
+                    </table>
+
+                    <div class="aviso">
+                        <strong>Aviso:</strong> SMART avisa, pero no detecta todos los fallos. Hay discos que mueren sin previo aviso. La regla de oro sigue siendo <em>tener copia de seguridad</em>; SMART es un complemento, no un sustituto.
+                    </div>
+
+                    <h3>0.7 - ¿Por qué con discos virtuales?</h3>
                     <p>Un <strong>disco virtual</strong> (VDI, VMDK o VHD) es un archivo en el host que VirtualBox presenta a la VM como si fuese un disco real. La VM no distingue: lo ve por su controladora SATA o NVMe, le aplica su asistente de discos, lo particiona y lo formatea exactamente igual. Esto te permite:</p>
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
                         <li>Crear discos "externos" del tamaño que quieras y desecharlos cuando termines.</li>
@@ -245,6 +337,42 @@
                         <p>La velocidad sale altísima (cientos de MB/s, incluso GB/s). ¿Por qué un "disco virtual" es tan rápido si en el host está en un disco normal? ¿Qué efecto tiene la caché del SO?</p>
                         <textarea rows="3"></textarea>
                     </div>
+
+                    <h3>1.5 - Comprobar integridad con chkdsk</h3>
+                    <p><code>chkdsk</code> es la herramienta de Windows para revisar y reparar la estructura de un sistema de archivos NTFS, FAT32 o exFAT. La equivalente en Linux es <code>fsck</code>. La verás en cualquier soporte real cuando un disco haya sufrido un apagón en mitad de una escritura o haya empezado a dar errores.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Asegúrate de que <code>E:</code> está formateada en NTFS (o vuelve a formatearla si la dejaste en FAT32).</li>
+                            <li>Abre CMD como <strong>administrador</strong>.</li>
+                            <li>Ejecuta una comprobación rápida (sólo lectura):</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">chkdsk E:</pre>
+
+                    <p>Anota la salida: tipo de FS detectado, número de archivos, espacio asignado, espacio libre, sectores defectuosos.</p>
+
+                    <table>
+                        <tr><td>Tipo de FS reportado por chkdsk</td><td><input type="text"></td></tr>
+                        <tr><td>Número de archivos en la unidad</td><td><input type="text"></td></tr>
+                        <tr><td>¿Reporta sectores defectuosos?</td><td><input type="text" placeholder="0 KB en sectores defectuosos"></td></tr>
+                    </table>
+
+                    <p>Para una comprobación con reparación se añaden modificadores:</p>
+
+<pre class="codigo">chkdsk E: /F          :: repara errores de FS
+chkdsk E: /R          :: localiza sectores dañados y recupera lo legible (incluye /F)
+chkdsk E: /F /X       :: fuerza desmontar antes de reparar (necesario si está en uso)</pre>
+
+                    <div class="aviso">
+                        <strong>Aviso:</strong> <code>chkdsk /R</code> en un disco grande tarda <em>horas</em>. No lo ejecutes si no lo necesitas. Sólo está justificado si sospechas sectores físicamente defectuosos.
+                    </div>
+
+                    <div class="pregunta">
+                        <p>¿Por qué <code>chkdsk C: /F</code> sobre la unidad del sistema te pide reiniciar para ejecutarse?</p>
+                        <textarea rows="2"></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -329,6 +457,42 @@ ls -la /mnt/ntfs</pre>
                         <p>¿Qué ventaja tiene NTFS si tu equipo principal es Windows pero usas Linux como secundario? ¿Y qué inconveniente tiene si el equipo principal es Linux?</p>
                         <textarea rows="3"></textarea>
                     </div>
+
+                    <h3>2.7 - Comprobar integridad con fsck</h3>
+                    <p><code>fsck</code> es el equivalente Linux de <code>chkdsk</code>. Cada FS tiene su versión: <code>fsck.ext4</code>, <code>fsck.vfat</code>, <code>fsck.exfat</code>... y <code>fsck</code> a secas elige la apropiada según el tipo detectado.</p>
+
+                    <div class="aviso">
+                        <strong>Importante:</strong> <code>fsck</code> exige que el sistema de archivos esté <strong>desmontado</strong>. Pasarlo sobre un FS montado puede corromperlo seriamente. Por eso el FS raíz (/) sólo se chequea durante el arranque.
+                    </div>
+
+<pre class="codigo">sudo umount /mnt/datos                  # asegúrate de desmontar
+sudo fsck.ext4 -f /dev/sdb1             # -f fuerza incluso si está "limpio"
+# salida típica:
+# Pass 1: Checking inodes, blocks, and sizes
+# Pass 2: Checking directory structure
+# Pass 3: Checking directory connectivity
+# Pass 4: Checking reference counts
+# Pass 5: Checking group summary information
+# /dev/sdb1: 11/65536 files (0.0% non-contiguous), 8843/262144 blocks</pre>
+
+                    <p>Para arreglar errores automáticamente sin pedir confirmación:</p>
+
+<pre class="codigo">sudo fsck.ext4 -y /dev/sdb1             # contesta YES a cualquier pregunta</pre>
+
+                    <h3>2.8 - tune2fs: ver y ajustar parámetros del FS</h3>
+                    <p>En ext2/3/4 puedes consultar (y modificar) parámetros del FS sin reformatear con <code>tune2fs</code>:</p>
+
+<pre class="codigo">sudo tune2fs -l /dev/sdb1               # listado completo de parámetros
+sudo tune2fs -L MIDISCO /dev/sdb1       # cambia la etiqueta
+sudo tune2fs -m 1 /dev/sdb1             # reduce el "reserved blocks" del 5% al 1%</pre>
+
+                    <p>Mira los campos: <code>Filesystem state</code> (clean / not clean), <code>Mount count</code>, <code>Maximum mount count</code>, <code>Last checked</code>. Linux fuerza un <code>fsck</code> automático cada cierto número de montajes para detectar corrupciones a tiempo.</p>
+
+                    <table>
+                        <tr><td>Estado del FS según <code>tune2fs -l</code></td><td><input type="text"></td></tr>
+                        <tr><td>Número de montajes acumulados</td><td><input type="text"></td></tr>
+                        <tr><td>Última revisión (Last checked)</td><td><input type="text"></td></tr>
+                    </table>
                 </div>
             </div>
 
@@ -593,6 +757,316 @@ sudo mount /dev/sdc /mnt/cifrado    # debería fallar</pre>
             </div>
 
             <!-- ============================================================ -->
+            <!-- PARTE 6 - SMART Y SALUD DEL DISCO                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - SMART y monitorización del disco (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Vamos a leer los datos SMART del disco virtual desde Linux y desde Windows. La VM no tiene SMART real (porque el VDI es un archivo, no un disco), pero VirtualBox emula la interfaz: SMART devolverá valores ficticios pero el procedimiento de consulta es <em>idéntico</em> al de un disco físico. En tu día a día como técnico, los comandos serán los mismos.</p>
+
+                    <h3>6.1 - SMART en Linux con smartmontools</h3>
+
+<pre class="codigo">sudo apt install -y smartmontools
+sudo smartctl --scan                   # lista los discos detectados
+sudo smartctl -i /dev/sda              # información básica del disco
+sudo smartctl -H /dev/sda              # estado de salud (PASSED / FAILED)
+sudo smartctl -A /dev/sda              # tabla de atributos SMART
+sudo smartctl -a /dev/sda              # todo lo anterior junto</pre>
+
+                    <p>Mira la salida de <code>-A</code>. Cada fila es un atributo: ID, nombre, valor actual, peor valor, umbral. Un atributo con <code>VALUE &lt;= THRESH</code> indica fallo inminente.</p>
+
+                    <table>
+                        <tr><td>Resultado de <code>smartctl -H /dev/sda</code></td><td><input type="text" placeholder="PASSED / FAILED / no soportado"></td></tr>
+                        <tr><td>Power-On Hours reportadas</td><td><input type="text"></td></tr>
+                        <tr><td>Reallocated Sectors Count</td><td><input type="text"></td></tr>
+                        <tr><td>Temperatura</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.2 - Tests SMART (cortos y largos)</h3>
+                    <p>SMART permite ejecutar autotests dentro del propio firmware del disco:</p>
+
+<pre class="codigo">sudo smartctl -t short /dev/sda        # test corto (~2 min)
+sudo smartctl -t long /dev/sda         # test largo (horas en HDD grande)
+sudo smartctl -l selftest /dev/sda     # ver historial de tests</pre>
+
+                    <div class="nota">
+                        <strong>Nota:</strong> en un disco virtual estos tests probablemente no produzcan resultados útiles, pero el comando es el que usarás con un disco real. Apúntalo.
+                    </div>
+
+                    <h3>6.3 - SMART en Windows con PowerShell y wmic</h3>
+                    <p>Windows expone una versión simplificada de SMART. La forma rápida de ver el estado:</p>
+
+<pre class="codigo">:: en CMD como administrador
+wmic diskdrive get model,size,status
+
+:: en PowerShell como administrador
+Get-PhysicalDisk | Format-Table FriendlyName, MediaType, HealthStatus, OperationalStatus, Size
+Get-PhysicalDisk | Get-StorageReliabilityCounter</pre>
+
+                    <p>El campo <code>HealthStatus</code> resume el estado: <em>Healthy</em>, <em>Warning</em> o <em>Unhealthy</em>. <code>Get-StorageReliabilityCounter</code> da datos parecidos a SMART (temperatura, errores, horas encendidas) cuando el driver lo soporta.</p>
+
+                    <table>
+                        <tr><td>Status reportado por <code>wmic diskdrive</code></td><td><input type="text"></td></tr>
+                        <tr><td>HealthStatus en PowerShell</td><td><input type="text"></td></tr>
+                        <tr><td>Temperatura reportada (si la hay)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>6.4 - Programar revisiones periódicas</h3>
+                    <p>En servidores y equipos importantes se programa <code>smartd</code> (Linux) para que vigile los discos en segundo plano y mande email si un atributo cruza un umbral. Configuración mínima en Linux:</p>
+
+<pre class="codigo">sudo systemctl enable --now smartd
+sudo systemctl status smartd</pre>
+
+                    <p>El archivo <code>/etc/smartd.conf</code> define qué discos vigilar y a qué dirección enviar avisos. En Windows hay equivalentes de pago (CrystalDiskInfo en modo "residente", Hard Disk Sentinel...).</p>
+
+                    <div class="pregunta">
+                        <p>Un usuario te trae un portátil que se ralentiza muchísimo cada poco rato. ¿Qué tres atributos SMART mirarías primero y por qué?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - SINCRONIZACIÓN Y BACKUP                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 7 - Sincronización y backup incremental (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Una "copia de seguridad" hecha arrastrando carpetas con el ratón funciona la primera vez. La segunda, copias todo otra vez. La tercera, ya no sabes qué cambió. Para algo serio hace falta una herramienta de <strong>sincronización incremental</strong>: que copie sólo lo que ha cambiado y deje la copia idéntica al origen. En Windows es <code>robocopy</code>; en Linux, <code>rsync</code>.</p>
+
+                    <h3>7.1 - robocopy en Windows</h3>
+                    <p><code>robocopy</code> (Robust File Copy) está incluido en cualquier Windows desde Vista. Es muy potente y soporta reintentos, sincronización idéntica, multihilo y registro detallado.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea en <code>C:\</code> una carpeta <code>origen</code> con varios archivos y subcarpetas.</li>
+                            <li>Asegúrate de que el disco virtual <code>E:</code> está montado y formateado en NTFS.</li>
+                            <li>En CMD ejecuta:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">:: copia inicial (toda la carpeta, incluidas subcarpetas, conservando estructura)
+robocopy C:\origen E:\backup /E /COPY:DAT /R:2 /W:5 /LOG:E:\robocopy.log /TEE</pre>
+
+                    <p>Modificadores clave:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>/E</code> — incluye subcarpetas, también las vacías.</li>
+                        <li><code>/MIR</code> — modo espejo: borra en destino lo que ya no está en origen. Cuidado con éste.</li>
+                        <li><code>/COPY:DAT</code> — qué copiar (Datos, Atributos, Timestamps).</li>
+                        <li><code>/R:2 /W:5</code> — reintentar 2 veces, esperar 5 s entre reintentos.</li>
+                        <li><code>/MT:8</code> — usar 8 hilos en paralelo (acelera con muchos archivos pequeños).</li>
+                        <li><code>/Z</code> — modo "reanudable" (si se interrumpe, retoma).</li>
+                        <li><code>/LOG:archivo</code> — guarda log; con <code>/TEE</code> también lo muestra en pantalla.</li>
+                    </ul>
+
+                    <div class="pasos">
+                        <ol start="4">
+                            <li>Modifica algún archivo en <code>C:\origen</code> y borra otro.</li>
+                            <li>Vuelve a ejecutar el mismo comando con <code>/MIR</code> en lugar de <code>/E</code>:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">robocopy C:\origen E:\backup /MIR /R:2 /W:5</pre>
+
+                    <p>Comprueba en el log: sólo se han copiado los archivos modificados y se ha eliminado el borrado.</p>
+
+                    <table>
+                        <tr><td>Tamaño total copiado en la primera ejecución</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño copiado en la segunda (modificado/borrado)</td><td><input type="text"></td></tr>
+                        <tr><td>¿En la segunda se eliminó el archivo borrado del destino?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>7.2 - rsync en Linux</h3>
+                    <p>El equivalente Linux es <code>rsync</code>. Más versátil aún que robocopy y especialmente eficaz por red (sólo envía diferencias byte a byte mediante un algoritmo propio).</p>
+
+<pre class="codigo">sudo apt install -y rsync           # ya viene en Ubuntu
+mkdir -p ~/origen ~/destino
+echo "v1" > ~/origen/archivo.txt
+mkdir -p ~/origen/sub
+echo "hola" > ~/origen/sub/otro.txt
+
+rsync -av ~/origen/ ~/destino/      # copia inicial
+ls -la ~/destino/</pre>
+
+                    <p>Modificadores clave:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>-a</code> — modo "archivo": copia recursiva preservando permisos, timestamps, enlaces simbólicos, owner/group.</li>
+                        <li><code>-v</code> — verboso. <code>-vv</code>, <code>-vvv</code> aún más detalle.</li>
+                        <li><code>--delete</code> — modo espejo (equivalente a <code>/MIR</code>).</li>
+                        <li><code>--dry-run</code> o <code>-n</code> — simulación, no copia nada. <strong>Úsalo siempre antes</strong> con <code>--delete</code>.</li>
+                        <li><code>-z</code> — comprime en tránsito (útil sólo por red).</li>
+                        <li><code>-P</code> — equivalente a <code>--partial --progress</code>; muestra progreso y permite reanudar.</li>
+                    </ul>
+
+                    <div class="aviso">
+                        <strong>Cuidado con la barra final:</strong> <code>rsync ~/origen/ ~/destino/</code> copia el <em>contenido</em> de origen dentro de destino. <code>rsync ~/origen ~/destino/</code> (sin barra) copia la <em>carpeta</em> origen dentro de destino. Es la fuente de errores más típica.
+                    </div>
+
+                    <p>Prueba el modo espejo:</p>
+
+<pre class="codigo">echo "v2" > ~/origen/archivo.txt
+rm ~/origen/sub/otro.txt
+rsync -av --dry-run --delete ~/origen/ ~/destino/    # simula
+rsync -av --delete ~/origen/ ~/destino/              # ahora sí
+ls -la ~/destino/ ~/destino/sub/</pre>
+
+                    <h3>7.3 - Programar la copia</h3>
+                    <h4>Windows: Programador de tareas</h4>
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un fichero <code>C:\backup.bat</code> con:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">@echo off
+robocopy C:\origen E:\backup /MIR /R:2 /W:5 /LOG+:E:\robocopy.log /NP</pre>
+
+                    <div class="pasos">
+                        <ol start="2">
+                            <li>Abre <strong>Programador de tareas</strong> → <em>Crear tarea básica</em>.</li>
+                            <li>Frecuencia: diaria, hora 22:00.</li>
+                            <li>Acción: iniciar programa → <code>C:\backup.bat</code>.</li>
+                            <li>Marca <em>Ejecutar con privilegios elevados</em> y <em>Ejecutar tanto si se inicia sesión como si no</em>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Linux: cron</h4>
+
+<pre class="codigo">crontab -e
+# añade esta línea para ejecutar la copia cada día a las 22:00
+0 22 * * *  rsync -a --delete /home/usuario/origen/ /mnt/datos/backup/ &gt;&gt; /var/log/backup.log 2&gt;&amp;1
+
+# para ver las tareas programadas
+crontab -l</pre>
+
+                    <div class="truco">
+                        <strong>Truco profesional:</strong> mantén siempre <strong>3 copias en 2 medios distintos, 1 fuera</strong> (regla 3-2-1). Una copia local rápida (disco externo o NAS), una en otro medio (cinta, otro disco), y una off-site (la nube, una sede distinta). Una sola copia en un disco externo enchufado al PC se pierde si se rompe la fuente, hay un ransomware o se incendia la oficina.
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Te encargas del backup de un servidor de archivos con 500 GB de datos. ¿Por qué <code>robocopy /MIR</code> sin más es una mala estrategia? ¿Qué le faltaría?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 8 - DIAGNÓSTICO DE PROBLEMAS FRECUENTES                  -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 8 - Diagnóstico de problemas frecuentes (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Los discos externos generan llamadas a soporte por las mismas tres o cuatro razones. Vamos a provocar cada problema en el disco virtual y ver cómo se diagnostica.</p>
+
+                    <h3>8.1 - "El disco está lleno"</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Windows, abre CMD como administrador y rellena <code>E:</code> hasta agotarlo:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">fsutil file createnew E:\relleno.bin 4000000000   :: 4 GB de relleno</pre>
+
+                    <p>Intenta copiar otro archivo. Anota el mensaje de error de Windows. Después libera espacio:</p>
+
+<pre class="codigo">del E:\relleno.bin</pre>
+
+                    <p>En Linux haz lo equivalente y comprueba con <code>df -h</code>:</p>
+
+<pre class="codigo">sudo dd if=/dev/zero of=/mnt/datos/relleno.bin bs=1M count=3500
+df -h /mnt/datos
+sudo rm /mnt/datos/relleno.bin
+df -h /mnt/datos</pre>
+
+                    <table>
+                        <tr><td>Mensaje exacto de Windows al intentar copiar</td><td><input type="text"></td></tr>
+                        <tr><td>Salida de <code>df -h</code> con disco lleno</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>8.2 - "Quité el USB sin expulsar"</h3>
+                    <p>Si copias archivos a un disco externo y lo desenchufas antes de que el sistema haya vaciado la caché de escritura, el FS queda inconsistente. Vamos a simularlo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Linux, monta el disco virtual y escribe varios archivos seguidos.</li>
+                            <li>Ejecuta <code>sync</code> para forzar el vaciado de caché. Esto es lo que hace por ti la "extracción segura".</li>
+                            <li>Compara el comportamiento al desmontar correctamente con desconectar el disco "en caliente":</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">sudo mount /dev/sdb1 /mnt/datos
+echo "test" | sudo tee /mnt/datos/escrito.txt
+# bien: sync + umount
+sudo sync
+sudo umount /mnt/datos
+# mal: cerrar la VM con el disco montado, equivale a tirar del USB</pre>
+
+                    <p>En la siguiente conexión, <code>fsck</code> detectará el FS como "not clean" y forzará una revisión.</p>
+
+                    <h3>8.3 - Provocar un FS corrupto y repararlo</h3>
+                    <div class="aviso">
+                        <strong>Sólo en el disco virtual de pruebas.</strong> NO ejecutes esto sobre un disco con datos reales.
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En Linux, asegúrate de que el disco virtual de la Parte 2 está desmontado.</li>
+                            <li>Sobreescribe los primeros sectores del FS con basura (esto destruye la cabecera del FS):</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">sudo umount /mnt/datos
+sudo dd if=/dev/urandom of=/dev/sdb1 bs=512 count=4 conv=notrunc</pre>
+
+                    <p>Comprueba el destrozo:</p>
+
+<pre class="codigo">sudo blkid /dev/sdb1            # ya no debería reconocer el FS
+sudo mount /dev/sdb1 /mnt/datos # debería fallar</pre>
+
+                    <p>Intenta repararlo. ext4 mantiene <em>superbloques de respaldo</em> a lo largo del disco; <code>fsck</code> los puede usar:</p>
+
+<pre class="codigo">sudo mkfs.ext4 -n /dev/sdb1            # -n = SOLO mostrar info, no formatear; lista los superbloques
+sudo fsck.ext4 -b 32768 /dev/sdb1      # restaura usando un superbloque de respaldo (el número viene de mkfs -n)</pre>
+
+                    <p>Vuelve a montar y comprueba si los datos siguen ahí.</p>
+
+                    <table>
+                        <tr><td>¿Reconoce <code>blkid</code> el FS tras el destrozo?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Consiguió <code>fsck -b</code> recuperarlo?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Sobreviven los archivos que había?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>8.4 - Recuperación de archivos borrados</h3>
+                    <p>Cuando borras un archivo, el FS no lo sobreescribe: simplemente marca sus bloques como libres. Hasta que el espacio se reutilice, el contenido sigue ahí en el disco. Existen herramientas de recuperación:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>TestDisk / PhotoRec</strong> (multiplataforma, libre): recupera particiones y archivos por firma. Lo vas a encontrar en cualquier kit de soporte.</li>
+                        <li><strong>Recuva</strong> (Windows, gratis): GUI sencilla.</li>
+                        <li><strong>extundelete</strong> (Linux): específico de ext3/ext4.</li>
+                        <li><strong>foremost</strong> (Linux): rescate por firma de cabecera, útil si el FS está destrozado.</li>
+                    </ul>
+
+                    <div class="truco">
+                        <strong>Si pierdes datos, lo primero que hay que hacer es <em>no escribir nada más en el disco</em>.</strong> Cuanto más tarde el sistema en reutilizar los bloques marcados como libres, más posibilidades de recuperación. Lo correcto es: apagar, sacar el disco, conectarlo en sólo lectura a otro equipo y trabajar con la herramienta de recuperación.
+                    </div>
+
+                    <h3>8.5 - Checklist "el disco no aparece"</h3>
+                    <p>Cuando un usuario te diga "conecté el disco y no aparece", repasa por orden:</p>
+                    <ol style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>¿Suena/vibra el disco al conectarlo? Si no enciende, problema de alimentación (cable USB, hub sin alimentación propia).</li>
+                        <li>¿Aparece en <em>Administrador de dispositivos</em> (Windows) o en <code>lsblk</code> (Linux)? Si no aparece, problema físico o de driver.</li>
+                        <li>¿Aparece como dispositivo pero no como volumen montable? Problema de FS: tabla de particiones o FS corrupto. Mira con <code>diskpart</code> / <code>fdisk -l</code>.</li>
+                        <li>¿Aparece como volumen sin letra (Windows)? Asígnale una desde Administración de discos.</li>
+                        <li>¿Pide formatear al conectarlo? FS no reconocido (ej. NTFS en Mac sin driver, ext4 en Windows). NO formatees todavía: hay que comprobar primero qué FS lleva.</li>
+                        <li>¿La capacidad es absurdamente baja (32 MB en lugar de 64 GB)? Pendrive falsificado o controlador roto. Caso para el cubo de la basura, no se recupera.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
             <!-- EVALUACIÓN                                                     -->
             <!-- ============================================================ -->
             <div class="seccion">
@@ -609,18 +1083,30 @@ sudo mount /dev/sdc /mnt/cifrado    # debería fallar</pre>
                         <textarea rows="3"></textarea>
                     </div>
 
+                    <div class="pregunta">
+                        <p>Diseña en cinco líneas la estrategia de copia de seguridad de una asesoría con un servidor de archivos de 200 GB. Aplica la regla 3-2-1 e incluye las herramientas concretas que usarías.</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
                     <div class="evaluacion">
                         <h3>Autoevaluación</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>He creado discos virtuales adicionales en VirtualBox y los he conectado como "discos externos" a las VMs</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>Distingo HDD, SSD SATA y NVMe y conozco las implicaciones (TRIM, wear leveling, TBW)</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>He creado discos virtuales adicionales en VirtualBox y los he conectado como "discos externos" a las VMs</td><td><input type="text"></td></tr>
                             <tr><td>He particionado y formateado discos en NTFS, exFAT, FAT32 y ext4 según el caso</td><td><input type="text"></td></tr>
+                            <tr><td>Sé elegir entre MBR y GPT y por qué</td><td><input type="text"></td></tr>
                             <tr><td>Sé elegir el sistema de archivos adecuado según el destino (Windows / mixto / Linux)</td><td><input type="text"></td></tr>
+                            <tr><td>He comprobado integridad con <code>chkdsk</code> (Windows) y <code>fsck</code> (Linux)</td><td><input type="text"></td></tr>
                             <tr><td>He configurado carpetas compartidas host-guest con Guest Additions</td><td><input type="text"></td></tr>
                             <tr><td>He montado un NAS con Samba en la VM Linux y conectado desde la VM Windows</td><td><input type="text"></td></tr>
                             <tr><td>Sé mapear unidades de red en Windows y montar discos en Linux con <code>fstab</code></td><td><input type="text"></td></tr>
                             <tr><td>He cifrado almacenamiento externo con BitLocker To Go y/o LUKS</td><td><input type="text"></td></tr>
                             <tr><td>Entiendo por qué la clave de recuperación de BitLocker es crítica</td><td><input type="text"></td></tr>
+                            <tr><td>Sé consultar SMART desde Linux (smartctl) y desde Windows (PowerShell)</td><td><input type="text"></td></tr>
+                            <tr><td>Sé hacer copias incrementales con robocopy y rsync, y programarlas</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco la regla 3-2-1 de copias de seguridad</td><td><input type="text"></td></tr>
+                            <tr><td>Soy capaz de diagnosticar disco lleno, FS corrupto y "extracción no segura"</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
