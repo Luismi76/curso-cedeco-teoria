@@ -333,14 +333,14 @@
 
                     <p>Verás una lista de los drivers <em>de terceros</em> en el almacén (cada uno con su "Nombre publicado" del tipo <code>oem12.inf</code>). Los drivers inbox de Microsoft <strong>no</strong> se listan aquí: <code>pnputil</code> sólo muestra los OEM. Si quieres ver <em>todos</em> los drivers (inbox incluidos), usa cualquiera de estas alternativas:</p>
 
-<pre class="codigo">:: 1) DISM (incluye inbox con /all)
-dism /online /get-drivers /all /format:table
+                    <p><strong>(1) DISM</strong> (CMD o PowerShell elevado; incluye drivers inbox con <code>/all</code>):</p>
+<pre class="codigo">dism /online /get-drivers /all /format:table</pre>
 
-:: 2) driverquery (lista todos los drivers cargados)
-driverquery /v /fo table
+                    <p><strong>(2) driverquery</strong> (CMD; lista todos los drivers cargados en kernel):</p>
+<pre class="codigo">driverquery /v /fo table</pre>
 
-:: 3) PowerShell (equivalente moderno de DISM)
-Get-WindowsDriver -Online -All | Format-Table -AutoSize</pre>
+                    <p><strong>(3) PowerShell</strong> (equivalente moderno de DISM, solo PowerShell):</p>
+<pre class="codigo">Get-WindowsDriver -Online -All | Format-Table -AutoSize</pre>
 
                     <p>Si lo que quieres es filtrar por <em>clase</em> de dispositivo con <code>pnputil</code> tienes que pasarle un GUID concreto, no un comodín. Por ejemplo, la clase "Adaptadores de red" tiene GUID <code>{4d36e972-e325-11ce-bfc1-08002be10318}</code>:</p>
 
@@ -349,12 +349,14 @@ Get-WindowsDriver -Online -All | Format-Table -AutoSize</pre>
                     <div class="pasos">
                         <ol start="3">
                             <li>Mira cuántos hay y apunta cualquier driver de proveedor llamativo (Oracle, VirtualBox, Intel, etc.).</li>
-                            <li>Lista también los dispositivos con sus driver asociados:</li>
+                            <li>Lista también los dispositivos con sus driver asociados. <code>pnputil /enum-devices</code> requiere Windows 10 21H2 o superior:</li>
                         </ol>
                     </div>
 
 <pre class="codigo">pnputil /enum-devices /connected
-pnputil /enum-devices /problem        :: solo los que tienen problema</pre>
+pnputil /enum-devices /problem</pre>
+
+                    <p>El segundo (<code>/problem</code>) lista sólo los que tienen problema; idealmente devolverá lista vacía.</p>
 
                     <table>
                         <tr><td>Número aproximado de drivers de terceros</td><td><input type="text"></td></tr>
@@ -387,9 +389,12 @@ pnputil /enum-devices /problem        :: solo los que tienen problema</pre>
                         </ol>
                     </div>
 
-<pre class="codigo">:: Vía GUI: clic derecho en el .inf &rarr; "Instalar"
-:: Vía línea de comandos (PowerShell como administrador):
-pnputil /add-driver C:\ruta\driver.inf /install</pre>
+                    <p>Hay dos vías para un paquete .inf:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Vía GUI:</strong> clic derecho sobre el <code>.inf</code> &rarr; "Instalar".</li>
+                        <li><strong>Vía línea de comandos</strong> (CMD o PowerShell elevado):</li>
+                    </ul>
+<pre class="codigo">pnputil /add-driver C:\ruta\driver.inf /install</pre>
 
                     <div class="aviso">
                         <strong>Si no puedes acceder a la web del fabricante:</strong> en la práctica esto puede pasar si el adaptador de red de tu VM justamente es el que estás reparando. Para esta práctica no es problema porque vamos a trabajar con el adaptador virtual de VirtualBox (Intel PRO/1000 MT) y el driver genérico de Windows ya es bueno. Te basta con conocer el procedimiento.
@@ -413,10 +418,18 @@ pnputil /add-driver C:\ruta\driver.inf /install</pre>
                     <h3>2.5 - Eliminar un driver del almacén</h3>
                     <p>"Desinstalar dispositivo" desinstala el binding entre el dispositivo y su driver, pero el driver sigue en el almacén. Para borrarlo del almacén (necesario cuando quieres forzar que Windows baje uno nuevo, o si el driver está estropeado):</p>
 
-<pre class="codigo">pnputil /enum-drivers                         :: encuentra el "Published Name" (oem##.inf)
-pnputil /delete-driver oem12.inf              :: elimina ese driver del almacén
-pnputil /delete-driver oem12.inf /uninstall   :: lo elimina y además desinstala el dispositivo
-pnputil /delete-driver oem12.inf /uninstall /force  :: forzado (úsalo con cuidado)</pre>
+                    <p>Flujo (en CMD o PowerShell elevado):</p>
+<pre class="codigo">pnputil /enum-drivers
+pnputil /delete-driver oem12.inf
+pnputil /delete-driver oem12.inf /uninstall
+pnputil /delete-driver oem12.inf /uninstall /force</pre>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>1ª línea: localiza el "Published Name" (<code>oemNN.inf</code>) del driver que quieres borrar.</li>
+                        <li>2ª línea: elimina ese driver del almacén.</li>
+                        <li>3ª línea: además desinstala el dispositivo asociado.</li>
+                        <li>4ª línea: forzado (úsalo con cuidado).</li>
+                    </ul>
 
                     <div class="aviso">
                         <strong>Atención:</strong> nunca borres del almacén un driver crítico (controladora de disco, GPU, adaptador de red si no tienes otro). Quédate de momento sólo con la lectura y la idea.
@@ -428,7 +441,11 @@ pnputil /delete-driver oem12.inf /uninstall /force  :: forzado (úsalo con cuida
                     <h3>2.7 - Política de firma de drivers</h3>
                     <p>Windows 64 bits bloquea por defecto los drivers no firmados. Para ver tu política actual abre PowerShell como administrador:</p>
 
+                    <p>Desde CMD:</p>
 <pre class="codigo">bcdedit /enum {current} | findstr "nointegritychecks testsigning"</pre>
+
+                    <p>Desde PowerShell hay que entrecomillar <code>{current}</code> porque si no lo trata como un ScriptBlock vacío:</p>
+<pre class="codigo">bcdedit /enum '{current}' | findstr "nointegritychecks testsigning"</pre>
 
                     <p>Si las dos opciones están en <em>No</em> o no aparecen, estás en modo normal (sólo se aceptan drivers firmados). En desarrollo se puede arrancar en modo "Test Signing", pero <strong>no es algo que vayas a tocar en un equipo de producción</strong>.</p>
 
@@ -519,11 +536,11 @@ sudo update-initramfs -u
                     <h3>3.7 - Mensajes del kernel: dmesg y journalctl</h3>
                     <p>Cuando el kernel detecta o pierde hardware, lo apunta. Verlo es esencial para diagnosticar.</p>
 
-<pre class="codigo">dmesg | tail -20                            # últimas 20 líneas del kernel
-dmesg --level=err,warn                      # sólo errores y avisos
-sudo journalctl -k -p err --since today     # errores del kernel de hoy</pre>
+<pre class="codigo">sudo dmesg | tail -20                       # últimas 20 líneas del kernel
+sudo dmesg --level=err,warn                  # sólo errores y avisos
+sudo journalctl -k -p err --since today      # errores del kernel de hoy</pre>
 
-                    <p>Cuando estés diagnosticando un dispositivo en Linux, abre un terminal con <code>dmesg -wH</code> (modo "watch", muestra los mensajes nuevos en tiempo real con timestamps legibles) antes de conectar/desconectar nada. Verás cada evento al instante.</p>
+                    <p>En Ubuntu moderno la lectura de <code>dmesg</code> está restringida a root (<code>kernel.dmesg_restrict=1</code>), por eso aquí se usa <code>sudo</code>. Cuando estés diagnosticando un dispositivo, abre un terminal con <code>sudo dmesg -wH</code> (modo "watch", muestra los mensajes nuevos en tiempo real con timestamps legibles) antes de conectar/desconectar nada. Verás cada evento al instante.</p>
 
                     <div class="pregunta">
                         <p>En Linux no hay un "Administrador de dispositivos" gráfico equivalente al de Windows. ¿Qué tres comandos consideras el sustituto más cercano y por qué?</p>
@@ -737,11 +754,14 @@ lsusb -v 2&gt;/dev/null | head -40 # detalle (necesita sudo para verlo todo)</pr
 
                     <div class="pasos">
                         <ol start="2">
-                            <li>Crea el archivo de blacklist (sustituye <code>e1000</code> por el que te haya salido):</li>
+                            <li>Crea el archivo de bloqueo. Usa <strong>dos directivas</strong>: <code>blacklist</code> y <code>install</code>. La directiva <code>blacklist</code> impide la carga automática por udev/alias, pero <em>no</em> impide la carga manual con <code>modprobe</code>. Para que <code>modprobe</code> también falle hay que añadir <code>install &lt;mod&gt; /bin/false</code>. Esta es una sutileza importante en Linux: muchos tutoriales sólo mencionan <code>blacklist</code> y se quedan cortos.</li>
                         </ol>
                     </div>
 
-<pre class="codigo">echo "blacklist e1000" | sudo tee /etc/modprobe.d/blacklist-roto.conf
+<pre class="codigo">cat &lt;&lt;'EOF' | sudo tee /etc/modprobe.d/blacklist-roto.conf
+blacklist e1000
+install e1000 /bin/false
+EOF
 sudo update-initramfs -u
 sudo reboot</pre>
 
@@ -751,13 +771,13 @@ sudo reboot</pre>
 
                     <div class="pasos">
                         <ol>
-                            <li>Síntoma: no hay red. <code>ping 8.8.8.8</code> falla con "Network is unreachable".</li>
+                            <li>Síntoma: no hay red. <code>ping 8.8.8.8</code> falla con "Network is unreachable" (o "Destination Host Unreachable").</li>
                             <li><code>ip a</code>: el adaptador no aparece (sólo <code>lo</code>).</li>
-                            <li><code>lspci -nnk | grep -A 3 -i ethernet</code>: el dispositivo PCI se ve, pero la línea "Kernel driver in use" está vacía. Pista clave: <em>el hardware está ahí pero el driver no se ha cargado</em>.</li>
-                            <li><code>lsmod | grep e1000</code> (o el módulo que sea): nada. No está cargado.</li>
-                            <li>Intenta cargarlo a mano: <code>sudo modprobe e1000</code>. Verás un mensaje del tipo <em>modprobe: ERROR: could not insert 'e1000': Operation not permitted</em> &rarr; está blacklisteado.</li>
+                            <li><code>lspci -nnk | grep -A 3 -i ethernet</code>: el dispositivo PCI se ve, pero la línea "Kernel driver in use" está vacía o ausente. Pista clave: <em>el hardware está ahí pero el driver no se ha cargado</em>.</li>
+                            <li><code>lsmod | grep e1000</code>: nada. No está cargado.</li>
+                            <li>Intenta cargarlo a mano: <code>sudo modprobe e1000</code>. Como añadiste <code>install ... /bin/false</code>, modprobe ejecuta <code>/bin/false</code> en lugar de cargar el módulo y devuelve un código de error. Verás un mensaje del tipo <em>"modprobe: ERROR: could not insert 'e1000': Operation not permitted"</em>.</li>
                             <li><code>grep -r "e1000" /etc/modprobe.d/</code>: localizas el archivo culpable.</li>
-                            <li><code>dmesg | grep -i e1000</code>: confirma que en el arranque no se cargó.</li>
+                            <li><code>sudo dmesg | grep -i e1000</code>: confirma que en el arranque no se cargó.</li>
                         </ol>
                     </div>
 
@@ -771,42 +791,57 @@ ping -c 3 8.8.8.8</pre>
 
                     <p>(También se podría reiniciar, pero <code>modprobe</code> a mano basta para recuperar la red al instante sin esperar el reboot).</p>
 
+                    <div class="nota">
+                        <strong>Por qué dos directivas:</strong> <code>blacklist</code> bloquea la carga "por alias" que dispara udev cuando ve el hardware. <code>install ... /bin/false</code> sustituye la acción de cargar por ejecutar <code>/bin/false</code>, que siempre devuelve error. La combinación es la receta canónica para impedir totalmente que un módulo se cargue, ni en el arranque ni a mano.
+                    </div>
+
                     <table>
                         <tr><td>Salida de <code>lspci -nnk | grep -A 3 -i ethernet</code> con el fallo</td><td><input type="text"></td></tr>
                         <tr><td>Archivo culpable encontrado en /etc/modprobe.d/</td><td><input type="text"></td></tr>
                         <tr><td>Comando exacto que resolvió la incidencia</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>5.5 - Caso E (Linux) - Módulo cargado pero con parámetro malo</h3>
+                    <h3>5.5 - Caso E (Linux) - Módulo con parámetro inválido</h3>
 
-                    <p><strong>Qué rompes:</strong> añades un parámetro inválido al módulo. El módulo carga pero se queja, o no funciona como esperaríamos.</p>
+                    <p><strong>Qué rompes:</strong> intentas cargar un módulo con un parámetro que el driver no admite. Modprobe rechaza la carga (o la acepta avisando, según el módulo y el kernel) y deja constancia en <code>dmesg</code>. Es un caso muy realista: alguien edita un archivo en <code>/etc/modprobe.d/</code> con un parámetro mal escrito y a partir de ahí el módulo no carga al arrancar.</p>
 
-                    <p>Para no comprometer el adaptador principal, vamos a trabajar con un módulo del altavoz interno o similar. Si no tienes <code>pcspkr</code>, usa otro módulo sin <code>used by</code>. Comprueba primero qué parámetros admite:</p>
+                    <p>Vamos a trabajar con un módulo no crítico. Comprueba primero qué parámetros admite (los que empiezan por <code>parm:</code>):</p>
 
-<pre class="codigo">modinfo pcspkr | grep -E "^parm"</pre>
+<pre class="codigo">modinfo pcspkr | grep -E "^parm"
+# si pcspkr no tiene parámetros o no existe en tu sistema, prueba con otro
+modinfo snd_intel8x0 2&gt;/dev/null | grep "^parm"
+modinfo loop | grep "^parm"               # loop suele tener parámetros (max_loop, max_part)</pre>
 
-                    <p>Si tu módulo no tiene parámetros, prueba con otro que sí tenga (por ejemplo <code>modinfo snd_intel8x0 | grep ^parm</code>). En cualquier caso, lo que vas a hacer es cargar el módulo con un valor de parámetro absurdo y ver cómo se queja el sistema.</p>
+                    <p>Elige un módulo que sí tenga parámetros. Vas a cargarlo con un parámetro <em>inventado</em>:</p>
 
                     <div class="pasos">
                         <ol>
-                            <li>Descarga el módulo si estaba cargado: <code>sudo modprobe -r pcspkr</code>.</li>
-                            <li>Intenta cargarlo con un parámetro que no existe: <code>sudo modprobe pcspkr parametro_inventado=999</code>.</li>
-                            <li>Mira <code>dmesg | tail -10</code>. Aparecerá un mensaje del tipo <em>"unknown parameter ..."</em>.</li>
+                            <li>Descarga el módulo si estaba cargado: <code>sudo modprobe -r &lt;modulo&gt;</code> (omite si no estaba).</li>
+                            <li>Intenta cargarlo con un parámetro que no existe (ejemplo con <code>loop</code>):
+                                <pre class="codigo">sudo modprobe loop parametro_inventado=999</pre>
+                            </li>
+                            <li>Comportamiento esperado: <strong>modprobe falla</strong> y devuelve un mensaje del tipo<br>
+                                <code>modprobe: ERROR: could not insert 'loop': Invalid argument</code><br>
+                                con detalle en <code>dmesg</code> sobre el parámetro desconocido. (En algunos módulos antiguos el comportamiento puede ser más permisivo: cargar con un aviso en <code>dmesg</code>. Lo importante es que <em>el problema queda registrado</em>.)</li>
+                            <li>Comprueba con <code>sudo dmesg | tail -10</code>. Verás algo como <em>"loop: unknown parameter 'parametro_inventado' ignored"</em> o <em>"Unknown parameter 'parametro_inventado'"</em>.</li>
                         </ol>
                     </div>
 
                     <p><strong>Diagnostica:</strong></p>
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>El usuario diría "instalé el driver pero no hace nada / no suena".</li>
-                        <li>El técnico mira <code>dmesg</code> y ve el rechazo del parámetro.</li>
-                        <li>Si en lugar de cargarlo a mano hubiera quedado escrito en <code>/etc/modprobe.d/</code>, sería un fallo recurrente que reaparecería en cada arranque.</li>
+                        <li>El usuario diría "instalé el driver pero no funciona / da error al cargar".</li>
+                        <li>El técnico ejecuta el comando y obtiene el código de salida no nulo (<code>echo $?</code> tras el modprobe → distinto de 0).</li>
+                        <li><code>sudo dmesg | tail</code> revela el motivo exacto (parámetro desconocido).</li>
+                        <li>Si el parámetro inválido estuviera escrito en un archivo de <code>/etc/modprobe.d/</code> con la forma <code>options &lt;mod&gt; parametro_inventado=999</code>, sería un fallo persistente que reaparecería en cada arranque. <code>grep -r "&lt;mod&gt;" /etc/modprobe.d/</code> lo encuentra al instante.</li>
                     </ul>
 
-                    <p><strong>Repara:</strong> carga el módulo sin parámetros (<code>sudo modprobe pcspkr</code>) o, si el problema estaba en un archivo de <code>/etc/modprobe.d/</code>, edítalo o elimínalo.</p>
+                    <p><strong>Repara:</strong> carga el módulo sin parámetros (<code>sudo modprobe &lt;modulo&gt;</code>) o, si el problema estaba en un archivo de <code>/etc/modprobe.d/</code>, edítalo (corrige el nombre del parámetro) o elimínalo.</p>
 
                     <table>
                         <tr><td>Módulo elegido</td><td><input type="text"></td></tr>
-                        <tr><td>Mensaje exacto en <code>dmesg</code></td><td><input type="text"></td></tr>
+                        <tr><td>Mensaje exacto que dio modprobe (terminal)</td><td><input type="text"></td></tr>
+                        <tr><td>Mensaje exacto en <code>sudo dmesg | tail</code></td><td><input type="text"></td></tr>
+                        <tr><td>Código de salida (<code>echo $?</code>)</td><td><input type="text" placeholder="0 o &gt;0"></td></tr>
                         <tr><td>Solución</td><td><input type="text"></td></tr>
                     </table>
 
@@ -836,14 +871,16 @@ ping -c 3 8.8.8.8</pre>
                     <h3>6.1 - DISM para gestionar drivers en una imagen offline</h3>
                     <p><strong>DISM</strong> (Deployment Image Servicing and Management) es la herramienta de Microsoft para manipular imágenes de Windows sin necesidad de arrancarlas. Sirve para "preparar" un sistema con sus drivers <em>antes</em> de instalarlo:</p>
 
-<pre class="codigo">:: Listar drivers de terceros del Windows que se está ejecutando (equivalente a pnputil)
-dism /online /get-drivers /format:table
+                    <p>(Todos los comandos siguientes desde CMD o PowerShell elevado.)</p>
 
-:: Inyectar drivers a una imagen montada (uso típico en despliegue masivo)
-dism /image:C:\offline-mount /add-driver /driver:C:\drivers\miNIC.inf
+                    <p>Listar drivers de terceros del Windows en ejecución (equivalente a <code>pnputil /enum-drivers</code>):</p>
+<pre class="codigo">dism /online /get-drivers /format:table</pre>
 
-:: Limpiar el almacén componentes (sin tocar drivers)
-dism /online /cleanup-image /startcomponentcleanup</pre>
+                    <p>Inyectar drivers en una imagen montada (uso típico en despliegue masivo):</p>
+<pre class="codigo">dism /image:C:\offline-mount /add-driver /driver:C:\drivers\miNIC.inf</pre>
+
+                    <p>Limpiar el almacén de componentes (sin tocar drivers):</p>
+<pre class="codigo">dism /online /cleanup-image /startcomponentcleanup</pre>
 
                     <p>En tu día a día como técnico de soporte de proximidad probablemente no integres drivers en imágenes, pero conviene saber que existe la opción para entornos corporativos con MDT o WDS.</p>
 
@@ -866,7 +903,7 @@ dism /online /cleanup-image /startcomponentcleanup</pre>
                     </div>
 
                     <h3>6.4 - Eventos en tiempo real en Linux</h3>
-                    <p>El equivalente Linux a "ver qué pasa cuando conecto algo" es <code>udevadm monitor</code> o <code>dmesg -wH</code>. Pruébalo:</p>
+                    <p>El equivalente Linux a "ver qué pasa cuando conecto algo" es <code>udevadm monitor</code> o <code>sudo dmesg -wH</code>. Pruébalo:</p>
 
 <pre class="codigo">sudo udevadm monitor --kernel --property --subsystem-match=usb
 # en otro terminal, cambia el adaptador USB de VirtualBox o conecta un dispositivo
