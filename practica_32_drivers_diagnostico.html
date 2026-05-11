@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practica 32: Drivers y diagnostico de perifericos</title>
+    <title>Práctica 32: Drivers y diagnóstico de periféricos en máquinas virtuales</title>
     <style>
-        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; }
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
         header { background: var(--azul); color: white; padding: 24px 32px; }
         header h1 { font-size: 22px; margin-bottom: 8px; }
         header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
@@ -22,6 +22,7 @@
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
         th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
         td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
@@ -32,9 +33,12 @@
         .pasos strong { color: var(--azul); }
         .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
         .pregunta { margin: 14px 0; }
         .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
         code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
         .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
         .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
         .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
@@ -55,285 +59,923 @@
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoria</a>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
     <div class="container">
         <header>
-            <h1>Practica 32: Drivers y diagnostico de perifericos</h1>
+            <h1>Práctica 32: Drivers y diagnóstico de periféricos en máquinas virtuales</h1>
             <div class="meta">
-                <strong>Modulo:</strong> MF0953_2 - Reparacion y ampliacion de equipos<br>
-                <strong>Unidad Formativa:</strong> UF0862 - Instalacion y configuracion de perifericos<br>
-                <strong>Sesiones:</strong> S9 (drivers) + S11 (diagnostico)<br>
-                <strong>Duracion estimada:</strong> 5 horas (1 sesion)<br>
-                <strong>Modalidad:</strong> Trabajo individual y por parejas<br>
-                <strong>Herramientas:</strong> PC con Windows, perifericos varios, conexion a internet
+                <strong>Módulo:</strong> MF0953_2 - Reparación y ampliación de equipos<br>
+                <strong>Unidad Formativa:</strong> UF0862 - Instalación y configuración de periféricos<br>
+                <strong>Sesiones:</strong> S9 (drivers) + S11 (diagnóstico)<br>
+                <strong>Duración estimada:</strong> 7-8 horas (puede partirse en dos sesiones)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> VirtualBox, VM Windows 10/11 Pro, VM Ubuntu, conexión a internet desde las VMs
             </div>
         </header>
 
         <div class="content">
+
             <div class="alumno-box">
-                <div class="campo"><label>Nombre y apellidos</label><input type="text"></div>
-                <div class="campo"><label>Fecha de realizacion</label><input type="date"></div>
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
             </div>
 
             <div class="nota">
-                <strong>Nota:</strong> En la parte de diagnostico, el profesor habra preparado varios puestos con problemas simulados. Trabajareis por parejas turnandoos como tecnico y como cliente.
+                <strong>De qué va esta práctica:</strong> en el aula no tenemos periféricos averiados ni puestos preparados con fallos. No los necesitamos. Vas a usar tus VMs Windows y Ubuntu para entender qué es un driver, cómo se instala, cómo se actualiza y cómo se diagnostica. Después <em>tú mismo</em> vas a provocar fallos controlados en la VM (desinstalar un driver, deshabilitarlo, ponerle uno "no firmado", bloquear un módulo del kernel en Linux), seguir la metodología paso a paso para diagnosticarlos y repararlos, y documentar cada caso con una ficha de incidencia como las que se rellenan en una empresa real. Toda la práctica se hace con software, sin hardware físico, y los fallos los pones tú: así sabes <em>qué deberías encontrar</em> y puedes comprobar si tu diagnóstico es correcto.
             </div>
 
+            <div class="nota">
+                <strong>Por qué provocar los fallos tú mismo:</strong> el técnico real no sabe qué le va a llegar. Pero para aprender, el mejor punto de partida es saber exactamente qué has roto y comprobar si tu diagnóstico llega a la misma conclusión. Si no, tienes una pista clara de en qué paso de la metodología has fallado.
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- OBJETIVOS                                                      -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Objetivos</h2>
+                <h2>Objetivos de la práctica</h2>
                 <div class="seccion-body">
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Manejar el Administrador de dispositivos: identificar dispositivos con problemas, ver detalles del driver.</li>
-                        <li>Instalar y actualizar drivers desde la web del fabricante.</li>
-                        <li>Aplicar la metodologia de diagnostico paso a paso.</li>
-                        <li>Documentar incidencias en una ficha tecnica.</li>
+                        <li>Entender qué es un <strong>driver</strong>, por qué los necesita el sistema operativo y qué diferencia hay entre <em>kernel mode</em> y <em>user mode</em>.</li>
+                        <li>Reconocer y aplicar los <strong>tipos de instalación</strong> de drivers: paquete del fabricante (.exe/.msi), instalación desde archivo .inf, drivers genéricos de Windows Update.</li>
+                        <li>Saber qué significa un driver <strong>firmado digitalmente</strong> (WHQL), por qué es importante y qué implica usar uno sin firmar.</li>
+                        <li>Manejar con soltura el <strong>Administrador de dispositivos</strong>: identificar problemas, leer códigos de error, examinar detalles de driver, ver hardware IDs.</li>
+                        <li>Usar <strong>pnputil</strong> para gestionar el almacén de drivers de Windows desde línea de comandos.</li>
+                        <li>Hacer <strong>rollback</strong> de un driver problemático y forzar la reinstalación desde el almacén.</li>
+                        <li>Gestionar los <strong>módulos del kernel</strong> en Linux con <code>lsmod</code>, <code>modinfo</code>, <code>modprobe</code> y <code>rmmod</code>; entender la estructura de <code>/lib/modules</code>.</li>
+                        <li>Identificar hardware desconocido a partir de su <strong>Vendor ID / Device ID</strong> con <code>lspci -nnk</code> y <code>lsusb -v</code>.</li>
+                        <li>Aplicar una <strong>metodología de diagnóstico</strong> paso a paso, de lo barato y rápido a lo caro y lento.</li>
+                        <li>Diagnosticar fallos provocados por uno mismo en la VM y repararlos: driver desinstalado, dispositivo deshabilitado, driver con rollback necesario, módulo de kernel bloqueado, dispositivo desconocido en Windows.</li>
+                        <li>Consultar el <strong>Visor de eventos</strong> de Windows y <code>dmesg</code> / <code>journalctl -k</code> en Linux para correlacionar problemas con eventos del sistema.</li>
+                        <li>Documentar incidencias en una <strong>ficha técnica profesional</strong> trazable y reutilizable.</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- PARTE 1: Administrador dispositivos -->
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Explorar el Administrador de dispositivos (40 min)</h2>
+                <h2>Parte 0 - Conceptos previos (60 min)</h2>
                 <div class="seccion-body">
-                    <h3>1.1 - Abrir y recorrer</h3>
+
+                    <h3>0.1 - Qué es un driver y por qué hace falta</h3>
+                    <p>Un <strong>driver</strong> (o controlador) es un pequeño programa que actúa de traductor entre el sistema operativo y un dispositivo concreto. El SO sabe hablar en términos genéricos ("escribe estos bytes en la impresora", "lee la posición del ratón"), pero cada modelo de impresora o ratón habla su propio dialecto: registros internos, formatos de paquetes, comandos específicos. El driver traduce la petición genérica al lenguaje específico del dispositivo.</p>
+
+                    <p>Por eso, sin el driver adecuado, un periférico nuevo no funciona aunque esté conectado correctamente: el sistema lo ve, pero no sabe qué decirle.</p>
+
+                    <h3>0.2 - Kernel mode vs user mode</h3>
+                    <p>Un sistema operativo moderno separa la memoria y los privilegios en dos zonas:</p>
+
+                    <table>
+                        <tr><th>Modo</th><th>Privilegios</th><th>Qué pasa si falla</th></tr>
+                        <tr><td><strong>Kernel mode</strong> (anillo 0)</td><td>Acceso total a hardware y memoria</td><td>Cuelga el sistema entero (BSOD en Windows, kernel panic en Linux)</td></tr>
+                        <tr><td><strong>User mode</strong> (anillo 3)</td><td>Acceso restringido, sólo a su propia memoria</td><td>Sólo se cae el programa, el SO sigue</td></tr>
+                    </table>
+
+                    <p>Los drivers que tocan directamente el hardware (red, disco, GPU) corren en kernel mode porque necesitan acceso a registros físicos. Por eso un driver mal escrito o un driver corrupto puede tirar el sistema entero: a diferencia de una app normal, no hay red de seguridad. Los drivers más modernos de Windows (UMDF, User-Mode Driver Framework) intentan llevar parte del código a user mode para reducir el riesgo: un escáner que se cuelga ya no debería tirar Windows.</p>
+
+                    <div class="nota">
+                        <strong>Idea clave:</strong> instalar un driver es la operación más arriesgada que hace un usuario normal en su sistema operativo. Por eso Windows pide consentimiento UAC y por eso te avisa cuando el driver no está firmado.
+                    </div>
+
+                    <h3>0.3 - Firma digital (WHQL)</h3>
+                    <p>Un driver <strong>firmado</strong> es un driver que Microsoft (o un certificado autorizado) ha "sellado" digitalmente. La firma garantiza dos cosas:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Autenticidad:</strong> el driver viene de quien dice venir (Intel, NVIDIA, Logitech...). Nadie ha sustituido el .sys legítimo por uno modificado.</li>
+                        <li><strong>Integridad:</strong> el binario no se ha alterado desde que se firmó (si alguien cambia un byte, la firma deja de cuadrar).</li>
+                    </ul>
+
+                    <p>El sello <strong>WHQL</strong> (Windows Hardware Quality Labs) significa además que el driver ha pasado el laboratorio de pruebas de Microsoft. En Windows 64 bits, instalar un driver sin firmar requiere arrancar el sistema en un modo especial; en producción no se hace nunca.</p>
+
+                    <h3>0.4 - Tipos de paquetes de drivers en Windows</h3>
+                    <table>
+                        <tr><th>Tipo</th><th>Cómo se instala</th><th>Cuándo lo encontrarás</th></tr>
+                        <tr><td><strong>Setup .exe / .msi</strong></td><td>Doble clic y siguiente-siguiente. Suele incluir software adicional (panel de control, suite del fabricante).</td><td>GPUs, impresoras multifunción, suites de marca</td></tr>
+                        <tr><td><strong>Paquete .inf + .sys + .cat</strong></td><td>Clic derecho sobre el .inf → Instalar, o <code>pnputil /add-driver</code>.</td><td>Drivers genéricos, paquetes de actualización descargados manualmente</td></tr>
+                        <tr><td><strong>Driver genérico de Windows Update</strong></td><td>Lo busca y lo instala automáticamente el SO al detectar el dispositivo.</td><td>Casi cualquier dispositivo nuevo arranca con esto</td></tr>
+                        <tr><td><strong>Driver embebido (inbox)</strong></td><td>Ya viene incluido en la ISO de instalación de Windows.</td><td>Controladoras estándar (USB, SATA AHCI, teclado HID)</td></tr>
+                    </table>
+
+                    <p>El <code>.inf</code> es un archivo de texto que describe el driver: a qué hardware se aplica (Vendor/Device IDs), qué archivos copiar y dónde, qué entradas de registro crear. El <code>.sys</code> es el binario que corre en el kernel. El <code>.cat</code> es el catálogo con la firma.</p>
+
+                    <h3>0.5 - El almacén de drivers (Driver Store)</h3>
+                    <p>Windows guarda una copia de cada driver instalado en <code>C:\Windows\System32\DriverStore\FileRepository</code>. Cuando un dispositivo se reconecta o se reinstala, Windows no necesita ir a buscar el driver a internet: lo saca del almacén. Por eso al desinstalar un dispositivo, Windows te ofrece dos opciones:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Sin marcar "eliminar el software del controlador":</strong> el dispositivo se desinstala pero el driver queda en el almacén. Al reconectarlo, se reinstala solo desde ahí.</li>
+                        <li><strong>Marcando la casilla:</strong> se borra también del almacén. La próxima vez Windows tiene que ir a Windows Update (o pedírtelo manualmente).</li>
+                    </ul>
+
+                    <h3>0.6 - Drivers en Linux: módulos del kernel</h3>
+                    <p>Linux no separa "el SO" del "driver" como Windows. En Linux los drivers son <strong>módulos del kernel</strong> (archivos <code>.ko</code>) que se cargan dinámicamente. Los módulos viven en <code>/lib/modules/$(uname -r)/</code>; la mayoría se carga automáticamente al detectar el hardware y muchos vienen ya compilados dentro del kernel.</p>
+
+                    <table>
+                        <tr><th>Comando Linux</th><th>Qué hace</th><th>Equivalente Windows</th></tr>
+                        <tr><td><code>lsmod</code></td><td>Lista los módulos cargados ahora mismo</td><td>(no hay equivalente directo)</td></tr>
+                        <tr><td><code>modinfo &lt;mod&gt;</code></td><td>Información de un módulo: autor, descripción, parámetros, firma</td><td>Pestaña "Detalles" del driver en Admin. de dispositivos</td></tr>
+                        <tr><td><code>modprobe &lt;mod&gt;</code></td><td>Carga un módulo (resolviendo dependencias)</td><td>Reinstalar driver</td></tr>
+                        <tr><td><code>modprobe -r &lt;mod&gt;</code> o <code>rmmod</code></td><td>Descarga un módulo</td><td>Desinstalar driver del dispositivo</td></tr>
+                        <tr><td><code>/etc/modprobe.d/*.conf</code></td><td>Configuración: blacklist, parámetros por defecto</td><td>Deshabilitar / configurar driver</td></tr>
+                        <tr><td><code>dmesg</code> / <code>journalctl -k</code></td><td>Mensajes del kernel (incluyendo drivers)</td><td>Visor de eventos → Sistema</td></tr>
+                    </table>
+
+                    <h3>0.7 - Metodología de diagnóstico paso a paso</h3>
+                    <p>Cuando un periférico no funciona, sigue siempre estos pasos <em>en este orden</em>. La idea es ir de lo barato y rápido a lo caro y lento, y descartar causas obvias antes de tocar nada complicado:</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Clic derecho en el boton de Inicio &rarr; <strong>Administrador de dispositivos</strong>.</li>
-                            <li>Despliega cada categoria y cuenta dispositivos en total.</li>
-                            <li>Apunta cuantos hay en cada categoria principal.</li>
+                            <li>¿Está <strong>conectado</strong>? Parece broma, pero es la causa número uno. Cables sueltos, USB a medio enchufar, jack de audio en la entrada de micro en vez de la salida de sonido.</li>
+                            <li>¿Está <strong>encendido</strong>? Interruptor, pilas, batería, indicador LED. Una impresora con error de tóner sigue "encendida" pero no imprime.</li>
+                            <li>¿Lo <strong>detecta el sistema</strong>? Administrador de dispositivos en Windows, <code>lsblk</code>/<code>lspci</code>/<code>lsusb</code> en Linux. Si no aparece, el problema es físico o de driver de muy bajo nivel.</li>
+                            <li>¿Tiene <strong>driver</strong>? ¿Triángulo amarillo? ¿"Dispositivo desconocido"? ¿Código de error en sus propiedades? El código te suele dar la pista exacta.</li>
+                            <li>¿Está <strong>habilitado</strong>? Un dispositivo puede estar instalado pero deshabilitado a propósito o por error.</li>
+                            <li>¿Hay <strong>conflicto con otro driver</strong>? Eventos del sistema, mensajes del kernel.</li>
+                            <li>Probar <strong>otro puerto / otro cable</strong>. Un cable USB barato falla con la misma frecuencia que la tarjeta de red.</li>
+                            <li>Probar el periférico en <strong>otro equipo</strong> (o aquí en otra VM). Si funciona, el problema está en el equipo original; si no, en el periférico.</li>
+                            <li>Si nada de lo anterior funciona, el periférico está averiado o el driver simplemente no existe para esa versión de Windows / esa distribución.</li>
                         </ol>
                     </div>
 
-                    <table>
-                        <tr><th>Categoria</th><th>Numero de dispositivos</th></tr>
-                        <tr><td>Adaptadores de pantalla</td><td><input type="text"></td></tr>
-                        <tr><td>Adaptadores de red</td><td><input type="text"></td></tr>
-                        <tr><td>Controladoras USB</td><td><input type="text"></td></tr>
-                        <tr><td>Dispositivos de sonido / video</td><td><input type="text"></td></tr>
-                        <tr><td>Procesadores</td><td><input type="text"></td></tr>
-                        <tr><td>Unidades de disco</td><td><input type="text"></td></tr>
-                        <tr><td><strong>Total estimado</strong></td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>1.2 - Detectar problemas</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Recorre todas las categorias.</li>
-                            <li>&iquest;Hay algun dispositivo con un <strong>triangulo amarillo &#9888;</strong>?</li>
-                            <li>&iquest;Hay algun "Dispositivo desconocido"?</li>
-                            <li>Si encuentras alguno, anota el nombre.</li>
-                        </ol>
+                    <div class="truco">
+                        <strong>Idea clave:</strong> un cable nuevo cuesta 5&nbsp;€ y se prueba en 30 segundos. Cambiar una impresora cuesta cientos de euros. <em>Primero descarta lo barato</em>. La mitad de las incidencias se resuelven en los pasos 1-3.
                     </div>
-                    <table>
-                        <tr><td>Dispositivos con triangulo amarillo</td><td><input type="text" placeholder="Lista o 'Ninguno'"></td></tr>
-                        <tr><td>Dispositivos desconocidos</td><td><input type="text"></td></tr>
-                    </table>
-
-                    <h3>1.3 - Examinar un driver</h3>
-                    <div class="pasos">
-                        <ol>
-                            <li>Clic derecho en tu <strong>tarjeta de red</strong> (o adaptador inalambrico) &rarr; <strong>Propiedades</strong>.</li>
-                            <li>Pestana <strong>Controlador</strong>.</li>
-                            <li>Anota los datos.</li>
-                        </ol>
-                    </div>
-                    <table>
-                        <tr><td>Proveedor del controlador</td><td><input type="text"></td></tr>
-                        <tr><td>Fecha del controlador</td><td><input type="text"></td></tr>
-                        <tr><td>Version del controlador</td><td><input type="text"></td></tr>
-                        <tr><td>&iquest;Esta firmado digitalmente?</td><td><input type="text"></td></tr>
-                    </table>
                 </div>
             </div>
 
-            <!-- PARTE 2: Instalar driver -->
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - ADMINISTRADOR DE DISPOSITIVOS                        -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 2 - Instalar un driver manualmente (50 min)</h2>
+                <h2>Parte 1 - Explorar el Administrador de dispositivos en la VM Windows (45 min)</h2>
                 <div class="seccion-body">
-                    <h3>2.1 - Desinstalar un driver</h3>
+
+                    <p>El Administrador de dispositivos es la herramienta principal de diagnóstico de hardware en Windows. Cualquier técnico abre esta ventana antes que nada cuando le dicen "no me funciona X".</p>
+
+                    <h3>1.1 - Abrir y recorrer</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Arranca la VM Windows.</li>
+                            <li>Botón derecho sobre el menú Inicio &rarr; <strong>Administrador de dispositivos</strong>. (Alternativa: <code>Win+R</code> &rarr; <code>devmgmt.msc</code>.)</li>
+                            <li>Despliega cada categoría y observa los dispositivos.</li>
+                        </ol>
+                    </div>
+
+                    <p>Anota cuántos dispositivos hay en cada categoría. En una VM verás bastantes menos que en un PC real (no hay periféricos reales conectados), pero las categorías principales están presentes.</p>
+
+                    <table>
+                        <tr><th>Categoría</th><th>Número de dispositivos</th></tr>
+                        <tr><td>Adaptadores de pantalla</td><td><input type="text"></td></tr>
+                        <tr><td>Adaptadores de red</td><td><input type="text"></td></tr>
+                        <tr><td>Controladoras de almacenamiento</td><td><input type="text"></td></tr>
+                        <tr><td>Controladoras USB (universal serial bus)</td><td><input type="text"></td></tr>
+                        <tr><td>Dispositivos de sistema</td><td><input type="text"></td></tr>
+                        <tr><td>Procesadores</td><td><input type="text"></td></tr>
+                        <tr><td>Unidades de disco</td><td><input type="text"></td></tr>
+                        <tr><td><strong>Total aproximado</strong></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Vista por conexión, recursos y dispositivos ocultos</h3>
+                    <p>En el menú <strong>Ver</strong>, prueba estas opciones:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Dispositivos por conexión:</strong> reorganiza el árbol mostrando la jerarquía real de buses (CPU &rarr; PCI &rarr; USB &rarr; dispositivos). Muy útil para entender de qué bus cuelga cada cosa.</li>
+                        <li><strong>Recursos por tipo:</strong> lista IRQs, rangos de memoria y puertos I/O. Antes era esencial (los conflictos de IRQ eran comunes); hoy PCI Express los asigna de forma dinámica y casi nunca hay conflictos.</li>
+                        <li><strong>Mostrar dispositivos ocultos:</strong> revela dispositivos no presentes en este momento pero recordados por Windows (controladores fantasma). Útil para limpiar restos.</li>
+                    </ul>
+
+                    <p>Cambia a "Dispositivos por conexión" y localiza tu adaptador de red. Anota de qué bus cuelga.</p>
+
+                    <table>
+                        <tr><td>Bus del que cuelga el adaptador de red</td><td><input type="text" placeholder="PCI Express, USB..."></td></tr>
+                    </table>
+
+                    <h3>1.3 - Examinar un driver al detalle</h3>
+                    <div class="pasos">
+                        <ol>
+                            <li>Vuelve a la vista por tipo. Doble clic sobre tu adaptador de red.</li>
+                            <li>Pestaña <strong>General</strong>: estado del dispositivo, número de ubicación. Apunta el "estado".</li>
+                            <li>Pestaña <strong>Controlador</strong>: aquí está toda la información del driver.</li>
+                            <li>Pestaña <strong>Detalles</strong>: cambia la propiedad mostrada y observa los <em>Hardware Ids</em>, <em>Compatible Ids</em>, <em>Class Guid</em> y <em>Driver Inf path</em>.</li>
+                            <li>Pestaña <strong>Eventos</strong>: muestra el historial de instalación y configuración del dispositivo.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Proveedor del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>Fecha del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>Versión del controlador</td><td><input type="text"></td></tr>
+                        <tr><td>¿Está firmado digitalmente? ¿Por quién?</td><td><input type="text"></td></tr>
+                        <tr><td>Hardware Id (el primero de la lista)</td><td><input type="text" placeholder="PCI\VEN_xxxx&amp;DEV_xxxx&amp;..."></td></tr>
+                        <tr><td>Driver Inf path (nombre del .inf usado)</td><td><input type="text" placeholder="oem... .inf o nombre del INF original"></td></tr>
+                    </table>
+
+                    <h3>1.4 - Códigos de error que verás en el día a día</h3>
+                    <p>Cuando un dispositivo tiene un triángulo amarillo, en su pestaña <strong>General</strong> aparece un mensaje del tipo "Este dispositivo no puede iniciarse (Código 10)". Conviene tener identificados los códigos más frecuentes para ahorrarse búsquedas:</p>
+
+                    <table>
+                        <tr><th>Código</th><th>Significado</th><th>Solución habitual</th></tr>
+                        <tr><td>1</td><td>El dispositivo no está configurado correctamente</td><td>Reinstalar driver</td></tr>
+                        <tr><td>10</td><td>No se puede iniciar</td><td>Actualizar / reinstalar driver, comprobar firmware</td></tr>
+                        <tr><td>12</td><td>No hay recursos suficientes</td><td>Desinstalar otro dispositivo conflictivo</td></tr>
+                        <tr><td>19</td><td>Registro dañado</td><td>Desinstalar y reinstalar el dispositivo</td></tr>
+                        <tr><td>22</td><td>Dispositivo deshabilitado</td><td>Botón derecho &rarr; Habilitar</td></tr>
+                        <tr><td>28</td><td>No hay controladores instalados</td><td>Instalar el driver del fabricante</td></tr>
+                        <tr><td>39</td><td>Controlador dañado o no encontrado</td><td>Reinstalar driver desde el almacén</td></tr>
+                        <tr><td>43</td><td>El dispositivo reporta problemas al SO (hardware o firmware)</td><td>Probar en otro equipo; si falla igual, está averiado</td></tr>
+                        <tr><td>45</td><td>El hardware no está conectado en este momento</td><td>Normal si lo desconectaste; con "mostrar ocultos" salen estos</td></tr>
+                        <tr><td>52</td><td>Driver sin firmar bloqueado</td><td>Firmar el driver o usar uno firmado</td></tr>
+                    </table>
+
+                    <h3>1.5 - El Visor de eventos como apoyo</h3>
+                    <p>El historial de la pestaña "Eventos" es un resumen. El detalle completo está en el Visor de eventos:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li><code>Win+R</code> &rarr; <code>eventvwr.msc</code>.</li>
+                            <li>Registros de Windows &rarr; <strong>Sistema</strong>.</li>
+                            <li>Filtra por origen <em>Service Control Manager</em>, <em>PlugPlayManager</em> o <em>UserPnp</em>.</li>
+                            <li>Mira si hay errores o advertencias recientes relacionadas con drivers.</li>
+                        </ol>
+                    </div>
+
+                    <p>El Visor de eventos será tu mejor aliado cuando un dispositivo falle silenciosamente: muchas veces el triángulo amarillo no aparece, pero el evento sí.</p>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - INSTALAR Y GESTIONAR DRIVERS EN WINDOWS              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 - Instalar, actualizar y desinstalar drivers en Windows (60 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Vas a aprender los cuatro mecanismos principales para gestionar drivers en Windows: por la GUI del Administrador, por <code>pnputil</code> en línea de comandos, mediante el rollback de Windows y mediante la instalación desde un .inf.</p>
+
+                    <h3>2.1 - Listar todo lo instalado con pnputil</h3>
+                    <p><strong>pnputil</strong> es la herramienta oficial de Microsoft para gestionar el almacén de drivers desde línea de comandos. Está incluida en cualquier Windows desde 7. Es la forma "profesional" de tocar drivers, sobre todo en scripts y despliegues.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <strong>PowerShell como administrador</strong> (botón derecho &rarr; Ejecutar como administrador).</li>
+                            <li>Ejecuta:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">pnputil /enum-drivers</pre>
+
+                    <p>Verás una lista de los drivers <em>de terceros</em> en el almacén (cada uno con su "Nombre publicado" del tipo <code>oem12.inf</code>). Los drivers inbox de Microsoft no se listan aquí: para verlos hace falta <code>pnputil /enum-drivers /class *</code> o filtrar por clase.</p>
+
+                    <div class="pasos">
+                        <ol start="3">
+                            <li>Mira cuántos hay y apunta cualquier driver de proveedor llamativo (Oracle, VirtualBox, Intel, etc.).</li>
+                            <li>Lista también los dispositivos con sus driver asociados:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">pnputil /enum-devices /connected
+pnputil /enum-devices /problem        :: solo los que tienen problema</pre>
+
+                    <table>
+                        <tr><td>Número aproximado de drivers de terceros</td><td><input type="text"></td></tr>
+                        <tr><td>Proveedores que aparecen en la lista</td><td><input type="text"></td></tr>
+                        <tr><td>Resultado de <code>/enum-devices /problem</code></td><td><input type="text" placeholder="Ninguno / lista"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Actualizar un driver desde Windows Update</h3>
+                    <p>La primera opción que prueba Windows ante un dispositivo nuevo es buscar el driver en su catálogo online. Vamos a forzar una búsqueda:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el Administrador de dispositivos, botón derecho sobre cualquier dispositivo &rarr; <strong>Actualizar controlador</strong>.</li>
+                            <li>Elige <strong>Buscar automáticamente controladores</strong>.</li>
+                            <li>Windows comprobará el almacén local y luego Windows Update.</li>
+                            <li>Si te dice "Los mejores controladores ya están instalados", pulsa <strong>Buscar controladores actualizados en Windows Update</strong> y déjalo terminar.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - Instalar el driver del fabricante (la forma profesional)</h3>
+                    <p>El driver genérico de Windows suele bastar para que el dispositivo arranque, pero <em>el driver del fabricante</em> añade funciones (utilidades, perfiles, optimizaciones). En GPUs e impresoras la diferencia es enorme.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Localiza el modelo exacto de tu adaptador de red (visible en la pestaña Detalles &rarr; Hardware Ids: el <code>VEN_xxxx</code> es el fabricante y el <code>DEV_xxxx</code> el modelo).</li>
+                            <li>Busca en la web oficial del fabricante (Intel, Realtek, etc.) el driver para tu versión de Windows.</li>
+                            <li>Descarga el paquete. Habitualmente vendrá como instalador (.exe) o como carpeta con .inf + .sys + .cat.</li>
+                            <li>Si es un .exe, ejecútalo como administrador y sigue el asistente.</li>
+                            <li>Si es un .inf, hay dos vías:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">:: Vía GUI: clic derecho en el .inf &rarr; "Instalar"
+:: Vía línea de comandos (PowerShell como administrador):
+pnputil /add-driver C:\ruta\driver.inf /install</pre>
+
                     <div class="aviso">
-                        <strong>Aviso:</strong> elige un dispositivo que NO sea critico (no la tarjeta grafica ni el disco del sistema). Mejor un dispositivo USB que puedes desconectar y volver a conectar sin riesgo.
+                        <strong>Si no puedes acceder a la web del fabricante:</strong> en la práctica esto puede pasar si el adaptador de red de tu VM justamente es el que estás reparando. Para esta práctica no es problema porque vamos a trabajar con el adaptador virtual de VirtualBox (Intel PRO/1000 MT) y el driver genérico de Windows ya es bueno. Te basta con conocer el procedimiento.
                     </div>
+
+                    <h3>2.4 - Rollback de un driver</h3>
+                    <p>Si actualizas un driver y empieza a fallar todo, Windows guarda automáticamente el anterior. Para volver a él:</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Clic derecho en el dispositivo elegido &rarr; <strong>Desinstalar dispositivo</strong>.</li>
-                            <li>Si te pregunta si quieres tambien borrar el archivo del driver, mira las dos opciones (con o sin borrar archivos) y prueba <strong>sin borrar</strong>.</li>
-                            <li>Confirma. El dispositivo desaparecera o aparecera con triangulo amarillo.</li>
+                            <li>Doble clic en el dispositivo &rarr; pestaña <strong>Controlador</strong>.</li>
+                            <li>Botón <strong>Revertir al controlador anterior</strong>.</li>
+                            <li>Si el botón está atenuado significa que Windows no tiene una versión anterior guardada (todavía no se ha actualizado nunca, o ya hiciste un rollback antes).</li>
                         </ol>
                     </div>
 
-                    <h3>2.2 - Reinstalar (Windows)</h3>
+                    <div class="truco">
+                        <strong>Reflejo profesional:</strong> si un equipo empezó a fallar justo después de una actualización de drivers (Windows Update, una herramienta del fabricante), <em>rollback antes que cualquier otra cosa</em>. Te ahorra horas de diagnóstico.
+                    </div>
+
+                    <h3>2.5 - Eliminar un driver del almacén</h3>
+                    <p>"Desinstalar dispositivo" desinstala el binding entre el dispositivo y su driver, pero el driver sigue en el almacén. Para borrarlo del almacén (necesario cuando quieres forzar que Windows baje uno nuevo, o si el driver está estropeado):</p>
+
+<pre class="codigo">pnputil /enum-drivers                         :: encuentra el "Published Name" (oem##.inf)
+pnputil /delete-driver oem12.inf              :: elimina ese driver del almacén
+pnputil /delete-driver oem12.inf /uninstall   :: lo elimina y además desinstala el dispositivo
+pnputil /delete-driver oem12.inf /uninstall /force  :: forzado (úsalo con cuidado)</pre>
+
+                    <div class="aviso">
+                        <strong>Atención:</strong> nunca borres del almacén un driver crítico (controladora de disco, GPU, adaptador de red si no tienes otro). Quédate de momento sólo con la lectura y la idea.
+                    </div>
+
+                    <h3>2.6 - Buscar cambios de hardware</h3>
+                    <p>Cuando desinstalas un dispositivo, el menú <strong>Acción &rarr; Buscar cambios de hardware</strong> obliga a Windows a re-escanear el bus y volver a detectarlo. Es equivalente a desconectar y reconectar el dispositivo físicamente.</p>
+
+                    <h3>2.7 - Política de firma de drivers</h3>
+                    <p>Windows 64 bits bloquea por defecto los drivers no firmados. Para ver tu política actual abre PowerShell como administrador:</p>
+
+<pre class="codigo">bcdedit /enum {current} | findstr "nointegritychecks testsigning"</pre>
+
+                    <p>Si las dos opciones están en <em>No</em> o no aparecen, estás en modo normal (sólo se aceptan drivers firmados). En desarrollo se puede arrancar en modo "Test Signing", pero <strong>no es algo que vayas a tocar en un equipo de producción</strong>.</p>
+
+                    <div class="pregunta">
+                        <p>¿Por qué la firma digital de un driver es más importante que la firma de una aplicación normal? ¿Qué podría hacer un driver malicioso firmado por alguien que se hace pasar por el fabricante?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - DRIVERS EN LINUX                                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Drivers (módulos del kernel) en la VM Ubuntu (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>En Linux la palabra "driver" se sustituye casi siempre por "módulo del kernel". El concepto es el mismo, pero el sistema de gestión es muy distinto al de Windows: no hay almacén ni Administrador de dispositivos, todo se hace con comandos y archivos de configuración.</p>
+
+                    <h3>3.1 - Ver los módulos cargados</h3>
+
+<pre class="codigo">lsmod | head -20
+lsmod | wc -l               # número total de módulos cargados</pre>
+
+                    <p>Cada fila es un módulo: nombre, tamaño en bytes y <em>used by</em> (cuántos otros módulos o procesos lo están usando). Un módulo con un <em>used by</em> en cero se puede descargar; uno con valor mayor que cero está siendo usado por otros y no se puede quitar sin descargar primero los que dependen de él.</p>
+
+                    <table>
+                        <tr><td>Número total de módulos cargados</td><td><input type="text"></td></tr>
+                        <tr><td>Tres módulos cualesquiera de la lista</td><td><input type="text" placeholder="ej. e1000, xhci_pci, ext4"></td></tr>
+                    </table>
+
+                    <h3>3.2 - Información detallada de un módulo</h3>
+                    <p><code>modinfo</code> muestra todo lo que se sabe de un módulo: autor, descripción, licencia, versión, firma, alias (qué hardware reclama) y parámetros que admite.</p>
+
+<pre class="codigo">modinfo e1000           # driver de muchas tarjetas de red Intel (incluida la de VirtualBox)
+modinfo ext4            # driver del FS ext4
+modinfo nvidia 2&gt;/dev/null || echo "no instalado"   # NVIDIA, sólo si lo hubiera</pre>
+
+                    <p>Localiza en la salida de <code>modinfo e1000</code> los campos <code>filename</code>, <code>license</code>, <code>description</code>, <code>author</code>, <code>vermagic</code> y los <code>alias</code> (los <em>alias</em> son los Vendor/Device IDs que reclama el driver).</p>
+
+                    <h3>3.3 - El directorio /lib/modules</h3>
+                    <p>Todos los módulos viven aquí, agrupados por versión de kernel:</p>
+
+<pre class="codigo">uname -r                                    # versión actual del kernel
+ls /lib/modules/                            # versiones de kernel instaladas
+ls /lib/modules/$(uname -r)/kernel | head
+find /lib/modules/$(uname -r) -name "e1000*"</pre>
+
+                    <p>Si tienes varios kernels instalados, cada uno tiene su carpeta. Por eso al actualizar el kernel a veces dejan de funcionar drivers de terceros: hay que recompilarlos para la nueva versión (eso es lo que hace <strong>DKMS</strong>, Dynamic Kernel Module Support).</p>
+
+                    <h3>3.4 - Cargar y descargar módulos</h3>
+
+<pre class="codigo"># probar a descargar un módulo que probablemente esté sin usar
+lsmod | grep -E "^pcspkr|^joydev"          # busca uno con "used by" en 0
+sudo modprobe -r pcspkr                    # descarga (si está cargado)
+lsmod | grep pcspkr                        # comprueba que ya no aparece
+sudo modprobe pcspkr                       # vuelve a cargarlo
+lsmod | grep pcspkr</pre>
+
+                    <p>Si un módulo está siendo usado, <code>modprobe -r</code> falla con un mensaje claro:</p>
+
+<pre class="codigo"># intento de descargar el driver del FS raíz: fallará porque está en uso
+sudo modprobe -r ext4 2&gt;&amp;1 | head -3</pre>
+
+                    <div class="nota">
+                        <strong>Diferencia entre modprobe e insmod:</strong> <code>insmod /ruta/archivo.ko</code> carga un módulo <em>exactamente</em>, sin resolver dependencias ni buscarlo. <code>modprobe nombre</code> lo busca en <code>/lib/modules</code> y carga también sus dependencias. En la práctica usa siempre <code>modprobe</code>; <code>insmod</code> sólo tiene sentido para pruebas de desarrollo.
+                    </div>
+
+                    <h3>3.5 - Bloquear (blacklistear) un módulo</h3>
+                    <p>A veces interesa que un módulo <em>no</em> se cargue automáticamente al arrancar: porque entra en conflicto con otro, porque consume demasiada batería, porque hay una versión propietaria mejor (caso clásico de <em>nouveau</em> vs <em>nvidia</em>). Para ello:</p>
+
+<pre class="codigo">sudo nano /etc/modprobe.d/blacklist-pcspkr.conf
+# contenido del archivo:
+blacklist pcspkr
+
+# regenera initramfs para que el cambio aplique también en arranques tempranos
+sudo update-initramfs -u
+# en el siguiente reinicio el módulo ya no se cargará automáticamente</pre>
+
+                    <p>Para deshacer el bloqueo basta con borrar el archivo y volver a ejecutar <code>update-initramfs -u</code>.</p>
+
+                    <h3>3.6 - Cargar un módulo siempre al arrancar</h3>
+                    <p>Lo contrario: forzar que un módulo opcional se cargue siempre:</p>
+
+<pre class="codigo">echo "pcspkr" | sudo tee -a /etc/modules-load.d/manual.conf
+# se cargará en el siguiente arranque</pre>
+
+                    <h3>3.7 - Mensajes del kernel: dmesg y journalctl</h3>
+                    <p>Cuando el kernel detecta o pierde hardware, lo apunta. Verlo es esencial para diagnosticar.</p>
+
+<pre class="codigo">dmesg | tail -20                            # últimas 20 líneas del kernel
+dmesg --level=err,warn                      # sólo errores y avisos
+sudo journalctl -k -p err --since today     # errores del kernel de hoy</pre>
+
+                    <p>Cuando estés diagnosticando un dispositivo en Linux, abre un terminal con <code>dmesg -wH</code> (modo "watch", muestra los mensajes nuevos en tiempo real con timestamps legibles) antes de conectar/desconectar nada. Verás cada evento al instante.</p>
+
+                    <div class="pregunta">
+                        <p>En Linux no hay un "Administrador de dispositivos" gráfico equivalente al de Windows. ¿Qué tres comandos consideras el sustituto más cercano y por qué?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - IDENTIFICAR HARDWARE DESCONOCIDO                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - Identificar hardware desconocido (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>El caso más típico: alguien te trae un PC con un "Dispositivo desconocido" en el Administrador de dispositivos y no sabe qué pieza es. La etiqueta del hardware se perdió, no hay manual, no sirve de nada el nombre genérico. La pista correcta son los <strong>identificadores de hardware</strong> (Vendor ID y Device ID).</p>
+
+                    <h3>4.1 - Vendor ID y Device ID</h3>
+                    <p>Cada dispositivo PCI o USB lleva grabados dos números:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Vendor ID (VID):</strong> 4 dígitos hexadecimales que identifican al fabricante (Intel = <code>8086</code>, Realtek = <code>10EC</code>, NVIDIA = <code>10DE</code>, etc.).</li>
+                        <li><strong>Device ID (DID o PID en USB):</strong> 4 dígitos hexadecimales que identifican el modelo concreto dentro de ese fabricante.</li>
+                    </ul>
+
+                    <p>Estos dos códigos identifican unívocamente cualquier dispositivo, aunque la pegatina exterior se haya perdido. Hay bases de datos públicas que los convierten en texto legible:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>pci.ids:</strong> base mantenida por la comunidad. En Linux está en <code>/usr/share/misc/pci.ids</code>.</li>
+                        <li><strong>usb.ids:</strong> equivalente para USB, en <code>/usr/share/misc/usb.ids</code>.</li>
+                        <li>Versión web: <em>pci-ids.ucw.cz</em> y <em>usb-ids.gowdy.us</em> (puedes consultarlas desde fuera).</li>
+                    </ul>
+
+                    <h3>4.2 - Sacar los IDs en Windows</h3>
                     <div class="pasos">
                         <ol>
-                            <li>En el menu del Administrador, elige <strong>Accion &rarr; Buscar cambios de hardware</strong>.</li>
-                            <li>Windows debe re-detectar el dispositivo y reinstalar el driver basico.</li>
-                            <li>Comprueba que el triangulo amarillo desaparece.</li>
+                            <li>Administrador de dispositivos &rarr; doble clic en cualquier dispositivo (por ejemplo, tu adaptador de red).</li>
+                            <li>Pestaña <strong>Detalles</strong> &rarr; en el desplegable elige <strong>Identificadores de hardware</strong>.</li>
+                            <li>Verás cadenas como <code>PCI\VEN_8086&amp;DEV_100E&amp;SUBSYS_001E8086&amp;REV_02</code>.</li>
+                            <li>El <code>VEN_8086</code> = vendor 8086 = Intel. El <code>DEV_100E</code> = device 100E = Intel 82540EM Gigabit Ethernet (la NIC virtual estándar de VirtualBox).</li>
                         </ol>
                     </div>
 
-                    <h3>2.3 - Instalar el driver del fabricante</h3>
+                    <table>
+                        <tr><td>VID de tu adaptador de red</td><td><input type="text" placeholder="VEN_xxxx"></td></tr>
+                        <tr><td>DID de tu adaptador de red</td><td><input type="text" placeholder="DEV_xxxx"></td></tr>
+                        <tr><td>Nombre comercial al que se traducen</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.3 - Sacar los IDs en Linux</h3>
+
+<pre class="codigo">lspci -nn                       # lista todos los dispositivos PCI con sus IDs entre corchetes
+lspci -nnk | head -30           # añade el módulo del kernel asociado a cada uno
+lsusb                           # lo mismo para USB
+lsusb -v 2&gt;/dev/null | head -40 # detalle (necesita sudo para verlo todo)</pre>
+
+                    <p>Localiza tu adaptador de red en la salida de <code>lspci -nnk</code> y anota qué <em>Kernel driver in use</em> tiene asociado:</p>
+
+                    <table>
+                        <tr><td>Línea del adaptador de red en <code>lspci -nn</code></td><td><input type="text"></td></tr>
+                        <tr><td>Kernel driver in use</td><td><input type="text" placeholder="ej. e1000"></td></tr>
+                        <tr><td>Kernel modules disponibles (si los hay)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.4 - Caso práctico: traducir un ID</h3>
+                    <p>Imagina que te encuentras este Hardware Id en una incidencia: <code>PCI\VEN_10DE&amp;DEV_1B81&amp;...</code></p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>VEN <code>10DE</code> &rarr; NVIDIA Corporation.</li>
+                        <li>DEV <code>1B81</code> &rarr; GP104 [GeForce GTX 1070].</li>
+                        <li>Con esos dos datos vas directo a la web oficial de NVIDIA, sección drivers, eliges GTX 1070 y descargas el correcto. Total: 30 segundos.</li>
+                    </ul>
+
+                    <p>Sin esta técnica, depender del nombre que te diga el cliente ("tengo una NVIDIA, creo que la 1060 o por ahí") es muy poco fiable.</p>
+
+                    <div class="truco">
+                        <strong>Para casa:</strong> apunta en una nota personal cinco VIDs habituales (Intel <code>8086</code>, NVIDIA <code>10DE</code>, AMD <code>1022</code>, Realtek <code>10EC</code>, Broadcom <code>14E4</code>). Reconocer al fabricante con sólo mirar el VID acelera mucho el diagnóstico.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - DIAGNÓSTICO AUTÓNOMO EN LA VM                        -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Provocar y diagnosticar tus propios fallos (90 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Aquí es donde se aprende de verdad. Vas a provocar tú mismo <strong>cinco fallos diferentes</strong> en tu VM, hacer como si los acabases de "encontrar" y aplicar la metodología de diagnóstico de la Parte 0.7. Después comparas el resultado con lo que sabes que rompiste.</p>
+
+                    <div class="aviso">
+                        <strong>Antes de empezar:</strong> haz un <strong>snapshot</strong> de cada VM en VirtualBox (Máquina &rarr; Tomar instantánea). Llámalo <code>antes-p32</code>. Si algún caso te deja la VM inservible, restauras y sigues sin perder tiempo.
+                    </div>
+
+                    <h3>5.1 - Caso A (Windows) - Driver desinstalado</h3>
+
+                    <p><strong>Qué rompes:</strong> el driver de un dispositivo de red secundario (o de un dispositivo de sistema poco crítico).</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>Localiza el modelo exacto del dispositivo (etiqueta o web).</li>
-                            <li>En la web oficial del fabricante, descarga el driver para tu version de Windows.</li>
-                            <li>Ejecuta el instalador. Si es solo .inf, clic derecho &rarr; <strong>Instalar</strong>.</li>
-                            <li>Reinicia si te lo pide.</li>
-                            <li>Vuelve al Administrador de dispositivos y comprueba que el dispositivo ahora muestra el driver del fabricante (no el generico de Windows).</li>
+                            <li>En la VM Windows, abre el Administrador de dispositivos.</li>
+                            <li>Busca un dispositivo no crítico. Una buena candidata: cualquier entrada bajo <em>Otros dispositivos</em> si la hay; si no, sirve <em>Adaptadores de pantalla &rarr; VirtualBox Graphics Adapter</em> (la pantalla se quedará en modo VGA básico pero la VM seguirá funcionando).</li>
+                            <li>Botón derecho &rarr; <strong>Desinstalar dispositivo</strong>. Marca la casilla "Intentar eliminar el controlador para este dispositivo" para complicarlo un poco más.</li>
+                            <li>Confirma y observa el efecto inmediato (la pantalla puede parpadear o cambiar de resolución).</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Ahora diagnostica como si no supieras qué pasó:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>¿Qué síntoma observa el usuario? (resolución mala, pantallazo de aviso, etc.)</li>
+                            <li>Abre el Administrador de dispositivos. ¿Hay triángulo amarillo o "Dispositivo desconocido"?</li>
+                            <li>Si lo hay, doble clic &rarr; pestaña General. ¿Qué código de error muestra?</li>
+                            <li>Pestaña Eventos: ¿qué dice el último evento? (verás "Dispositivo no migrado" o similar).</li>
+                            <li>Abre el Visor de eventos &rarr; Sistema y filtra por la última hora. Comprueba si hay errores correlacionados.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Acción &rarr; <strong>Buscar cambios de hardware</strong>. Windows debería redetectar el dispositivo.</li>
+                            <li>Si el driver lo borraste también del almacén, Windows instalará el inbox genérico. Para volver al driver del fabricante, instálalo de nuevo.</li>
+                            <li>Verifica que el dispositivo aparece sin advertencias y que la resolución de pantalla vuelve a la normal.</li>
                         </ol>
                     </div>
 
                     <table>
                         <tr><td>Dispositivo elegido</td><td><input type="text"></td></tr>
-                        <tr><td>URL del driver descargado</td><td><input type="text"></td></tr>
-                        <tr><td>Version del driver instalado</td><td><input type="text"></td></tr>
+                        <tr><td>Síntoma observado</td><td><input type="text"></td></tr>
+                        <tr><td>Código de error que mostró</td><td><input type="text"></td></tr>
+                        <tr><td>Evento relevante en el Visor de eventos</td><td><input type="text"></td></tr>
+                        <tr><td>¿Resuelto con "Buscar cambios de hardware"?</td><td><input type="text" placeholder="Sí / No / Sí + reinstalar driver"></td></tr>
                     </table>
 
-                    <div class="pregunta">
-                        <p>&iquest;Por que es preferible instalar el driver del fabricante en lugar del generico de Windows, especialmente en GPUs y impresoras?</p>
-                        <textarea rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
+                    <h3>5.2 - Caso B (Windows) - Dispositivo deshabilitado</h3>
 
-            <!-- PARTE 3: Metodologia de diagnostico -->
-            <div class="seccion">
-                <h2>Parte 3 - Metodologia de diagnostico (15 min teoria)</h2>
-                <div class="seccion-body">
-                    <p>Cuando un periferico no funciona, sigue siempre estos pasos en orden:</p>
+                    <p><strong>Qué rompes:</strong> deshabilitas un dispositivo (no lo desinstalas). El sistema lo sigue "viendo" pero el driver no carga. Es un caso muy frecuente en la realidad porque se hace en dos clics y a veces el usuario no recuerda haberlo hecho.</p>
+
                     <div class="pasos">
                         <ol>
-                            <li>&iquest;Esta <strong>conectado</strong>? (parece broma, pero es la causa nº1).</li>
-                            <li>&iquest;Esta <strong>encendido</strong>? (interruptor, pilas, bateria, indicador LED).</li>
-                            <li>&iquest;Lo detecta Windows? (Administrador de dispositivos).</li>
-                            <li>&iquest;Tiene <strong>driver</strong>? &iquest;Triangulo amarillo? &iquest;Desconocido?</li>
-                            <li>Probar <strong>otro puerto</strong> / otro cable.</li>
-                            <li>Probar el periferico en <strong>otro PC</strong>.</li>
-                            <li>Probar otro periferico del mismo tipo en este PC.</li>
-                            <li>Si nada de lo anterior funciona &rarr; el periferico esta averiado.</li>
+                            <li>Administrador de dispositivos &rarr; botón derecho sobre <strong>Adaptadores de red &rarr; Intel(R) PRO/1000</strong> (o el adaptador equivalente de tu VM) &rarr; <strong>Deshabilitar dispositivo</strong>.</li>
+                            <li>Confirma. Observa que el icono se vuelve gris con una flecha hacia abajo.</li>
+                            <li>Comprueba que la VM ya no tiene conectividad: abre CMD y haz <code>ping 8.8.8.8</code>. Fallará.</li>
                         </ol>
                     </div>
 
-                    <div class="nota">
-                        <strong>Idea clave:</strong> ir de lo barato y rapido a lo caro y lento. Un cable nuevo cuesta 5 €; cambiar la impresora, varios cientos.
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: el usuario no tiene internet. Empieza desde lo barato:</li>
+                            <li>¿Está conectado físicamente? (en una VM equivale a comprobar que en VirtualBox &rarr; Dispositivos &rarr; Red la casilla está marcada).</li>
+                            <li><code>ipconfig /all</code>. ¿Sale el adaptador? Si sólo aparece una etiqueta "Media disconnected" en otros adaptadores pero el principal no sale, sospecha de driver/disable.</li>
+                            <li>Administrador de dispositivos &rarr; mira el icono. Una flecha hacia abajo = deshabilitado. Un triángulo amarillo = problema de driver. Son cosas distintas.</li>
+                            <li>Pestaña General: el mensaje será claro ("Este dispositivo está deshabilitado, Código 22").</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong> botón derecho &rarr; Habilitar dispositivo. Comprueba con <code>ping</code> que vuelve la red.</p>
+
+                    <table>
+                        <tr><td>Mensaje de la pestaña General</td><td><input type="text"></td></tr>
+                        <tr><td>Código de error</td><td><input type="text" placeholder="22"></td></tr>
+                        <tr><td>Resultado de <code>ping</code> antes y después</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Caso C (Windows) - Hardware ID huérfano (dispositivo "desconocido")</h3>
+
+                    <p><strong>Qué rompes:</strong> añades un dispositivo virtual cuya identificación no coincide con ningún driver conocido. La forma sencilla es activar/desactivar un controlador opcional en VirtualBox para que aparezca un "Dispositivo desconocido".</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Apaga la VM Windows.</li>
+                            <li>En VirtualBox &rarr; Configuración de la VM &rarr; <strong>Audio</strong>. Si el controlador estaba en <em>Intel HD Audio</em>, cámbialo a <em>SoundBlaster 16</em> (o viceversa). Acepta.</li>
+                            <li>Arranca la VM. Es muy probable que el "nuevo" dispositivo de audio aparezca con triángulo amarillo o como <em>Dispositivo desconocido</em>.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: no hay sonido. Mira el icono del altavoz: probablemente con una X roja.</li>
+                            <li>Administrador de dispositivos: el triángulo amarillo está sobre el dispositivo de audio. Doble clic &rarr; General &rarr; ¿Código de error?</li>
+                            <li>Pestaña <strong>Detalles</strong> &rarr; <em>Identificadores de hardware</em>. Apunta el VEN_xxxx y DEV_xxxx.</li>
+                            <li>Con esos IDs podrías buscar el driver correcto. En este caso concreto sabes que es el chip de audio que emula VirtualBox; el driver inbox de Windows debería bastar.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong> botón derecho &rarr; <strong>Actualizar controlador &rarr; Buscar automáticamente</strong>. Si Windows tiene un driver inbox para ese chip, lo instala. Si no, vuelve a VirtualBox y restaura el controlador anterior; con eso el sonido debería volver.</p>
+
+                    <table>
+                        <tr><td>VID/DID del nuevo dispositivo de audio</td><td><input type="text"></td></tr>
+                        <tr><td>¿Pudo Windows resolver el driver solo?</td><td><input type="text"></td></tr>
+                        <tr><td>Solución aplicada</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.4 - Caso D (Linux) - Módulo del kernel bloqueado</h3>
+
+                    <p><strong>Qué rompes:</strong> blacklisteas el módulo del adaptador de red para que no se cargue en el siguiente arranque.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En la VM Ubuntu, antes de tocar nada, identifica qué módulo lleva tu adaptador de red:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">lspci -nnk | grep -A 3 -i ethernet</pre>
+
+                    <p>Verás algo como "Kernel driver in use: e1000". Ese es el módulo que vas a bloquear.</p>
+
+                    <div class="pasos">
+                        <ol start="2">
+                            <li>Crea el archivo de blacklist (sustituye <code>e1000</code> por el que te haya salido):</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">echo "blacklist e1000" | sudo tee /etc/modprobe.d/blacklist-roto.conf
+sudo update-initramfs -u
+sudo reboot</pre>
+
+                    <p>Al volver del reinicio la VM ya no tiene red.</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: no hay red. <code>ping 8.8.8.8</code> falla con "Network is unreachable".</li>
+                            <li><code>ip a</code>: el adaptador no aparece (sólo <code>lo</code>).</li>
+                            <li><code>lspci -nnk | grep -A 3 -i ethernet</code>: el dispositivo PCI se ve, pero la línea "Kernel driver in use" está vacía. Pista clave: <em>el hardware está ahí pero el driver no se ha cargado</em>.</li>
+                            <li><code>lsmod | grep e1000</code> (o el módulo que sea): nada. No está cargado.</li>
+                            <li>Intenta cargarlo a mano: <code>sudo modprobe e1000</code>. Verás un mensaje del tipo <em>modprobe: ERROR: could not insert 'e1000': Operation not permitted</em> &rarr; está blacklisteado.</li>
+                            <li><code>grep -r "e1000" /etc/modprobe.d/</code>: localizas el archivo culpable.</li>
+                            <li><code>dmesg | grep -i e1000</code>: confirma que en el arranque no se cargó.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong></p>
+
+<pre class="codigo">sudo rm /etc/modprobe.d/blacklist-roto.conf
+sudo update-initramfs -u
+sudo modprobe e1000          # carga el módulo ahora mismo
+ip a                          # ya aparece el adaptador
+ping -c 3 8.8.8.8</pre>
+
+                    <p>(También se podría reiniciar, pero <code>modprobe</code> a mano basta para recuperar la red al instante sin esperar el reboot).</p>
+
+                    <table>
+                        <tr><td>Salida de <code>lspci -nnk | grep -A 3 -i ethernet</code> con el fallo</td><td><input type="text"></td></tr>
+                        <tr><td>Archivo culpable encontrado en /etc/modprobe.d/</td><td><input type="text"></td></tr>
+                        <tr><td>Comando exacto que resolvió la incidencia</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.5 - Caso E (Linux) - Módulo cargado pero con parámetro malo</h3>
+
+                    <p><strong>Qué rompes:</strong> añades un parámetro inválido al módulo. El módulo carga pero se queja, o no funciona como esperaríamos.</p>
+
+                    <p>Para no comprometer el adaptador principal, vamos a trabajar con un módulo del altavoz interno o similar. Si no tienes <code>pcspkr</code>, usa otro módulo sin <code>used by</code>. Comprueba primero qué parámetros admite:</p>
+
+<pre class="codigo">modinfo pcspkr | grep -E "^parm"</pre>
+
+                    <p>Si tu módulo no tiene parámetros, prueba con otro que sí tenga (por ejemplo <code>modinfo snd_intel8x0 | grep ^parm</code>). En cualquier caso, lo que vas a hacer es cargar el módulo con un valor de parámetro absurdo y ver cómo se queja el sistema.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Descarga el módulo si estaba cargado: <code>sudo modprobe -r pcspkr</code>.</li>
+                            <li>Intenta cargarlo con un parámetro que no existe: <code>sudo modprobe pcspkr parametro_inventado=999</code>.</li>
+                            <li>Mira <code>dmesg | tail -10</code>. Aparecerá un mensaje del tipo <em>"unknown parameter ..."</em>.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Diagnostica:</strong></p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>El usuario diría "instalé el driver pero no hace nada / no suena".</li>
+                        <li>El técnico mira <code>dmesg</code> y ve el rechazo del parámetro.</li>
+                        <li>Si en lugar de cargarlo a mano hubiera quedado escrito en <code>/etc/modprobe.d/</code>, sería un fallo recurrente que reaparecería en cada arranque.</li>
+                    </ul>
+
+                    <p><strong>Repara:</strong> carga el módulo sin parámetros (<code>sudo modprobe pcspkr</code>) o, si el problema estaba en un archivo de <code>/etc/modprobe.d/</code>, edítalo o elimínalo.</p>
+
+                    <table>
+                        <tr><td>Módulo elegido</td><td><input type="text"></td></tr>
+                        <tr><td>Mensaje exacto en <code>dmesg</code></td><td><input type="text"></td></tr>
+                        <tr><td>Solución</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.6 - Tabla resumen de los cinco casos</h3>
+                    <table>
+                        <tr><th>Caso</th><th>Tiempo total (min)</th><th>Paso de la metodología donde estaba la pista clave</th><th>¿Lo resolverías hoy en 5 minutos?</th></tr>
+                        <tr><td>A - Driver desinstalado</td><td><input type="text"></td><td><input type="text" placeholder="ej. Paso 4"></td><td><input type="text"></td></tr>
+                        <tr><td>B - Dispositivo deshabilitado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>C - Hardware desconocido</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>D - Módulo blacklisteado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>E - Parámetro malo</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="reto">
+                        <strong>Reto adicional (opcional, +30 min):</strong> en la VM Windows, deshabilita la controladora USB principal (en Administrador de dispositivos &rarr; Controladoras USB &rarr; eXtensible Host Controller). Al hacerlo perderás cualquier teclado/ratón USB virtual, pero los dispositivos PS/2 que emula VirtualBox seguirán funcionando. Diagnostica con sólo teclado, repara con <code>devmgmt.msc</code> y, una vez resuelto, anota qué pasó.
                     </div>
                 </div>
             </div>
 
-            <!-- PARTE 4: Diagnostico practico -->
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - HERRAMIENTAS ADICIONALES                             -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 4 - Diagnosticar fallos simulados (75 min)</h2>
+                <h2>Parte 6 - Herramientas adicionales útiles en el día a día (30 min)</h2>
                 <div class="seccion-body">
-                    <p>El profesor ha preparado varios puestos con problemas. En parejas, recorred al menos <strong>3 puestos</strong> y diagnosticadlos:</p>
 
-                    <h3>Puesto A</h3>
+                    <h3>6.1 - DISM para gestionar drivers en una imagen offline</h3>
+                    <p><strong>DISM</strong> (Deployment Image Servicing and Management) es la herramienta de Microsoft para manipular imágenes de Windows sin necesidad de arrancarlas. Sirve para "preparar" un sistema con sus drivers <em>antes</em> de instalarlo:</p>
+
+<pre class="codigo">:: Listar drivers de terceros del Windows que se está ejecutando (equivalente a pnputil)
+dism /online /get-drivers /format:table
+
+:: Inyectar drivers a una imagen montada (uso típico en despliegue masivo)
+dism /image:C:\offline-mount /add-driver /driver:C:\drivers\miNIC.inf
+
+:: Limpiar el almacén componentes (sin tocar drivers)
+dism /online /cleanup-image /startcomponentcleanup</pre>
+
+                    <p>En tu día a día como técnico de soporte de proximidad probablemente no integres drivers en imágenes, pero conviene saber que existe la opción para entornos corporativos con MDT o WDS.</p>
+
+                    <h3>6.2 - Herramientas de información del sistema</h3>
                     <table>
-                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
-                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
-                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
-                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
-                        <tr><th>&iquest;Resuelto?</th><td><input type="text" placeholder="Si / No"></td></tr>
+                        <tr><th>Herramienta</th><th>Plataforma</th><th>Para qué sirve</th></tr>
+                        <tr><td><code>msinfo32</code></td><td>Windows</td><td>Inventario completo del sistema, IRQ, recursos, dispositivos con problemas (sección "Componentes &rarr; Dispositivos problemáticos")</td></tr>
+                        <tr><td><code>dxdiag</code></td><td>Windows</td><td>Diagnóstico de DirectX: GPU, audio, controladores de juego. Resume drivers gráficos y certificados WHQL</td></tr>
+                        <tr><td><code>driverquery /v /fo table</code></td><td>Windows (CMD)</td><td>Lista todos los drivers del sistema (incluyendo inbox) con su estado</td></tr>
+                        <tr><td><code>verifier.exe</code></td><td>Windows</td><td>Driver Verifier: estresa los drivers para detectar los que provocan BSOD. <strong>Sólo en pruebas, no en producción</strong></td></tr>
+                        <tr><td><code>hwinfo</code> / <code>inxi</code></td><td>Linux</td><td>Inventario detallado (<code>sudo apt install hwinfo</code> e <code>inxi</code>)</td></tr>
+                        <tr><td><code>udevadm</code></td><td>Linux</td><td>Información de eventos PnP. Muy potente: <code>udevadm monitor</code> muestra en tiempo real qué pasa al conectar/desconectar hardware</td></tr>
                     </table>
 
-                    <h3>Puesto B</h3>
-                    <table>
-                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
-                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
-                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
-                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
-                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
-                    </table>
+                    <h3>6.3 - Driver Verifier (rápido) en Windows</h3>
+                    <p>Es la herramienta que usan los ingenieros de Microsoft cuando un sistema tiene BSODs intermitentes que sospechan que provienen de un driver de tercero. Ejecuta los drivers con comprobaciones extra (acceso ilegal a memoria, fugas, IRQL incorrecta...) y, si encuentra algo, provoca un BSOD <em>controlado</em> apuntando al culpable. Después se analiza el volcado.</p>
 
-                    <h3>Puesto C</h3>
-                    <table>
-                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
-                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
-                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
-                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
-                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
-                    </table>
+                    <div class="aviso">
+                        <strong>No actives Driver Verifier en un equipo en producción.</strong> Si activas todas las comprobaciones sobre todos los drivers, lo normal es que el sistema no arranque. La forma correcta es: snapshot &rarr; <code>verifier /standard /driver miDriver.sys</code> &rarr; reiniciar &rarr; intentar reproducir el problema &rarr; analizar volcado con WinDbg. Para esta práctica basta con saber <em>que existe</em> y <em>cuándo se usa</em>.
+                    </div>
 
-                    <h3>Puesto D (opcional)</h3>
-                    <table>
-                        <tr><th>Sintoma observado</th><td><input type="text"></td></tr>
-                        <tr><th>Pasos seguidos (resumen)</th><td><textarea rows="3"></textarea></td></tr>
-                        <tr><th>Causa identificada</th><td><input type="text"></td></tr>
-                        <tr><th>Solucion aplicada</th><td><input type="text"></td></tr>
-                        <tr><th>&iquest;Resuelto?</th><td><input type="text"></td></tr>
-                    </table>
+                    <h3>6.4 - Eventos en tiempo real en Linux</h3>
+                    <p>El equivalente Linux a "ver qué pasa cuando conecto algo" es <code>udevadm monitor</code> o <code>dmesg -wH</code>. Pruébalo:</p>
+
+<pre class="codigo">sudo udevadm monitor --kernel --property --subsystem-match=usb
+# en otro terminal, cambia el adaptador USB de VirtualBox o conecta un dispositivo
+# verás aparecer los eventos KERNEL[...] add /devices/...</pre>
+
+                    <p>Es la versión Linux del "Eventos" del Administrador de dispositivos, sólo que en streaming.</p>
                 </div>
             </div>
 
-            <!-- PARTE 5: Ficha de incidencia -->
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - FICHA DE INCIDENCIA                                  -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 5 - Ficha de incidencia profesional (20 min)</h2>
+                <h2>Parte 7 - Documentar como un profesional (25 min)</h2>
                 <div class="seccion-body">
-                    <p>Elige uno de los puestos diagnosticados arriba y rellena una ficha como la que se usa en una empresa real:</p>
+
+                    <p>El último paso de cada incidencia es <em>dejarla escrita</em>. Una empresa pequeña puede llevarlas en un Excel; una más grande, en una herramienta como GLPI, Jira Service Management o un ticket de Helpdesk. La estructura, sea cual sea la herramienta, es la misma. Rellena una ficha completa para <strong>el caso que más te haya costado</strong> de la Parte 5:</p>
 
                     <div class="ficha">
                         <h4>FICHA DE INCIDENCIA Nº _______</h4>
-                        <label>Fecha</label>
-                        <input type="date">
-                        <label>Tecnico</label>
+                        <label>Fecha y hora de apertura</label>
+                        <input type="text" placeholder="2026-MM-DD HH:MM">
+                        <label>Técnico responsable</label>
                         <input type="text">
                         <label>Cliente / departamento</label>
+                        <input type="text" placeholder="ej. Contabilidad - Puesto 4">
+                        <label>Equipo (marca, modelo, número de inventario)</label>
                         <input type="text">
-                        <label>Equipo / periferico (marca y modelo)</label>
+                        <label>SO y versión / build</label>
+                        <input type="text" placeholder="ej. Windows 11 Pro 23H2 build 22631.3007">
+                        <label>Periférico afectado (marca y modelo)</label>
                         <input type="text">
-                        <label>Numero de serie</label>
+                        <label>Hardware Id / Vendor-Device ID</label>
                         <input type="text">
-                        <label>Descripcion del problema (lo que dice el usuario)</label>
+                        <label>Descripción del problema (lo que dice el usuario)</label>
                         <textarea rows="3"></textarea>
-                        <label>Sintomas observados (lo que ves tu)</label>
+                        <label>Síntomas observados por el técnico</label>
                         <textarea rows="3"></textarea>
-                        <label>Diagnostico realizado: pasos en orden</label>
-                        <textarea rows="5" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea>
-                        <label>Causa raiz identificada</label>
+                        <label>Diagnóstico paso a paso (en orden y con resultados de cada paso)</label>
+                        <textarea rows="6" placeholder="1) Conexión: OK&#10;2) Encendido: OK&#10;3) ipconfig /all: el adaptador no aparece&#10;4) Admin. dispositivos: ..."></textarea>
+                        <label>Causa raíz identificada</label>
                         <textarea rows="2"></textarea>
-                        <label>Solucion aplicada</label>
-                        <textarea rows="3"></textarea>
+                        <label>Solución aplicada (comandos exactos / pasos en GUI)</label>
+                        <textarea rows="4"></textarea>
                         <label>Tiempo total empleado (min)</label>
                         <input type="text">
                         <label>Materiales / consumibles usados</label>
-                        <input type="text">
-                        <label>&iquest;Resuelto?</label>
-                        <input type="text" placeholder="Si / No (motivo) / Pendiente">
+                        <input type="text" placeholder="ninguno / cable / driver descargado">
+                        <label>Estado final</label>
+                        <input type="text" placeholder="Resuelto / Pendiente / Escalado a nivel 2">
                         <label>Recomendaciones al usuario para que no vuelva a ocurrir</label>
                         <textarea rows="3"></textarea>
+                        <label>Lecciones aprendidas (para tu propia base de conocimiento)</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Por qué documentar tan al detalle:</strong> el caso volverá. En tres semanas otro usuario te traerá lo mismo y, si la ficha está bien hecha, lo resuelves en cinco minutos consultando la anterior. Una buena documentación es lo que distingue a un técnico junior de uno que rinde el doble.
                     </div>
                 </div>
             </div>
 
-            <!-- EVALUACION -->
+            <!-- ============================================================ -->
+            <!-- CONCLUSIONES Y EVALUACIÓN                                      -->
+            <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Conclusiones y evaluacion</h2>
+                <h2>Conclusiones y autoevaluación</h2>
                 <div class="seccion-body">
+
                     <div class="pregunta">
-                        <p>De todos los problemas que has visto en los puestos, &iquest;cual fue el mas dificil de diagnosticar y por que? &iquest;Que aprendiste de el?</p>
+                        <p>De los cinco casos que has provocado y diagnosticado, ¿cuál te ha costado más y por qué? ¿En qué paso de la metodología te atascaste?</p>
                         <textarea rows="4"></textarea>
                     </div>
 
+                    <div class="pregunta">
+                        <p>Un usuario te dice "ayer funcionaba y hoy no". Sospechas que Windows Update instaló una actualización de drivers anoche. Describe los tres primeros pasos que darías, en orden, antes de tocar nada.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Te traen un PC con un "Dispositivo desconocido" en Administrador de dispositivos. El usuario no recuerda qué hardware nuevo ha conectado. ¿Qué dato concreto buscarías primero y dónde, y cómo lo traducirías a un nombre y un driver concreto?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Compara cómo se gestionan los drivers en Windows y en Linux. Indica al menos tres diferencias prácticas que afecten al técnico (almacén, blacklist, firma, recompilación al cambiar kernel...).</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Imagina que asumes el soporte técnico de una empresa de 30 puestos Windows y 5 Linux. Diseña en cinco líneas la política de drivers: dónde guardar los drivers oficiales, cómo decidir si actualizar, qué hacer con BSODs intermitentes y cómo documentar incidencias.</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
                     <div class="evaluacion">
-                        <h3>Autoevaluacion</h3>
+                        <h3>Autoevaluación</h3>
                         <table>
                             <tr><th>Aspecto</th><th>Logrado</th></tr>
-                            <tr><td>Manejo el Administrador de dispositivos y se identificar drivers problematicos</td><td><input type="text" placeholder="Si / No / A medias"></td></tr>
-                            <tr><td>He instalado un driver desde la web del fabricante</td><td><input type="text"></td></tr>
-                            <tr><td>He aplicado la metodologia de diagnostico paso a paso en al menos 3 puestos</td><td><input type="text"></td></tr>
-                            <tr><td>He documentado al menos una incidencia con la ficha tecnica</td><td><input type="text"></td></tr>
-                            <tr><td>Distingo problemas de hardware (cable, puerto), de driver y de configuracion</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo qué es un driver y por qué corre en kernel mode</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>Sé qué significa un driver firmado (WHQL) y la diferencia con uno sin firmar</td><td><input type="text"></td></tr>
+                            <tr><td>Manejo el Administrador de dispositivos: identifico códigos de error y leo eventos</td><td><input type="text"></td></tr>
+                            <tr><td>He usado <code>pnputil</code> para listar drivers, actualizar y borrar entradas del almacén</td><td><input type="text"></td></tr>
+                            <tr><td>Sé hacer rollback de un driver y forzar "Buscar cambios de hardware"</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco los módulos del kernel de Linux: <code>lsmod</code>, <code>modinfo</code>, <code>modprobe</code></td><td><input type="text"></td></tr>
+                            <tr><td>Sé blacklistear un módulo y volverlo a habilitar</td><td><input type="text"></td></tr>
+                            <tr><td>Identifico hardware desconocido con Vendor/Device ID en Windows y en Linux</td><td><input type="text"></td></tr>
+                            <tr><td>Aplico la metodología de diagnóstico paso a paso</td><td><input type="text"></td></tr>
+                            <tr><td>He provocado y resuelto los cinco casos de la Parte 5 sin ayuda externa</td><td><input type="text"></td></tr>
+                            <tr><td>Consulto <code>dmesg</code> / <code>journalctl -k</code> y el Visor de eventos para correlacionar problemas con drivers</td><td><input type="text"></td></tr>
+                            <tr><td>Distingo entre dispositivo deshabilitado, dispositivo sin driver y dispositivo averiado</td><td><input type="text"></td></tr>
+                            <tr><td>Conozco DISM, Driver Verifier y udevadm y cuándo (no) usarlos</td><td><input type="text"></td></tr>
+                            <tr><td>He rellenado al menos una ficha de incidencia completa y trazable</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="botones">
             <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
-            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al indice</a>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
         </div>
     </div>
 </body>
