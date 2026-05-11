@@ -331,7 +331,20 @@
 
 <pre class="codigo">pnputil /enum-drivers</pre>
 
-                    <p>Verás una lista de los drivers <em>de terceros</em> en el almacén (cada uno con su "Nombre publicado" del tipo <code>oem12.inf</code>). Los drivers inbox de Microsoft no se listan aquí: para verlos hace falta <code>pnputil /enum-drivers /class *</code> o filtrar por clase.</p>
+                    <p>Verás una lista de los drivers <em>de terceros</em> en el almacén (cada uno con su "Nombre publicado" del tipo <code>oem12.inf</code>). Los drivers inbox de Microsoft <strong>no</strong> se listan aquí: <code>pnputil</code> sólo muestra los OEM. Si quieres ver <em>todos</em> los drivers (inbox incluidos), usa cualquiera de estas alternativas:</p>
+
+<pre class="codigo">:: 1) DISM (incluye inbox con /all)
+dism /online /get-drivers /all /format:table
+
+:: 2) driverquery (lista todos los drivers cargados)
+driverquery /v /fo table
+
+:: 3) PowerShell (equivalente moderno de DISM)
+Get-WindowsDriver -Online -All | Format-Table -AutoSize</pre>
+
+                    <p>Si lo que quieres es filtrar por <em>clase</em> de dispositivo con <code>pnputil</code> tienes que pasarle un GUID concreto, no un comodín. Por ejemplo, la clase "Adaptadores de red" tiene GUID <code>{4d36e972-e325-11ce-bfc1-08002be10318}</code>:</p>
+
+<pre class="codigo">pnputil /enum-drivers /class "{4d36e972-e325-11ce-bfc1-08002be10318}"</pre>
 
                     <div class="pasos">
                         <ol start="3">
