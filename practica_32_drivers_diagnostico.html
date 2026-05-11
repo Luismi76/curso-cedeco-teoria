@@ -988,8 +988,89 @@ dism /online /cleanup-image /startcomponentcleanup</pre>
 
         <div class="botones">
             <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-secondary" id="btn-guardar" type="button">Guardar progreso</button>
+            <button class="btn btn-secondary" id="btn-borrar" type="button">Borrar progreso</button>
             <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
         </div>
+        <div id="estado-guardado" class="no-print" style="text-align:center;padding:0 32px 20px;font-size:12.5px;color:#4a5568;min-height:20px"></div>
     </div>
+
+    <script>
+    (function() {
+        var CLAVE = 'practica32-progreso-v1';
+        var estado = document.getElementById('estado-guardado');
+        var btnGuardar = document.getElementById('btn-guardar');
+        var btnBorrar = document.getElementById('btn-borrar');
+
+        function camposGuardables() {
+            return document.querySelectorAll('.container input[type="text"], .container input[type="date"], .container textarea');
+        }
+
+        function clavePara(el, idx) {
+            return el.tagName + ':' + (el.type || '') + ':' + idx;
+        }
+
+        function guardar() {
+            var datos = {};
+            camposGuardables().forEach(function(el, idx) {
+                datos[clavePara(el, idx)] = el.value;
+            });
+            try {
+                localStorage.setItem(CLAVE, JSON.stringify({ guardado: new Date().toISOString(), datos: datos }));
+                mostrarEstado('Progreso guardado: ' + new Date().toLocaleString());
+            } catch (e) {
+                mostrarEstado('Error al guardar: ' + e.message, true);
+            }
+        }
+
+        function cargar(silencioso) {
+            var crudo = localStorage.getItem(CLAVE);
+            if (!crudo) {
+                if (!silencioso) mostrarEstado('No hay progreso guardado.');
+                return;
+            }
+            try {
+                var obj = JSON.parse(crudo);
+                camposGuardables().forEach(function(el, idx) {
+                    var valor = obj.datos[clavePara(el, idx)];
+                    if (valor !== undefined) el.value = valor;
+                });
+                var fecha = obj.guardado ? new Date(obj.guardado).toLocaleString() : '(sin fecha)';
+                mostrarEstado('Progreso cargado (último guardado: ' + fecha + ').');
+            } catch (e) {
+                mostrarEstado('Error al cargar: ' + e.message, true);
+            }
+        }
+
+        function borrar() {
+            if (!confirm('¿Borrar el progreso guardado en este navegador? Los campos del formulario se vaciarán.')) return;
+            localStorage.removeItem(CLAVE);
+            camposGuardables().forEach(function(el) { el.value = ''; });
+            mostrarEstado('Progreso borrado.');
+        }
+
+        function mostrarEstado(mensaje, esError) {
+            estado.textContent = mensaje;
+            estado.style.color = esError ? '#c53030' : '#276749';
+            setTimeout(function() { if (estado.textContent === mensaje) estado.style.color = '#4a5568'; }, 4000);
+        }
+
+        btnGuardar.addEventListener('click', guardar);
+        btnBorrar.addEventListener('click', borrar);
+
+        // autoguardado al cambiar cualquier campo (con debounce de 1 s)
+        var temporizador = null;
+        camposGuardables().forEach(function(el) {
+            el.addEventListener('input', function() {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(guardar, 1000);
+            });
+        });
+
+        // carga automática al abrir si hay progreso
+        document.addEventListener('DOMContentLoaded', function() { cargar(true); });
+        if (document.readyState !== 'loading') cargar(true);
+    })();
+    </script>
 </body>
 </html>
