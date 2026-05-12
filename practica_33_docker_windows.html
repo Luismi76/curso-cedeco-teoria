@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 33: Docker Desktop en Windows 11</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 33: Docker Desktop en Windows 11</h1>
+            <div class="meta">
+                <strong>Módulo:</strong> Práctica adicional - virtualización ligera y contenedores<br>
+                <strong>Relación con el temario:</strong> complementa UF0861 (instalación y configuración de SO) y UF0853 (explotación del sistema)<br>
+                <strong>Sesiones:</strong> práctica extra<br>
+                <strong>Duración estimada:</strong> 7-8 horas (puede partirse en dos sesiones)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> equipo físico con Windows 11 Pro o Home (no VM), virtualización habilitada en BIOS/UEFI, WSL2, Docker Desktop, conexión a internet
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> hasta ahora has trabajado dentro de máquinas virtuales con VirtualBox para no tocar tu equipo real. En esta práctica vas a salir de la VM y trabajar directamente sobre tu Windows 11 anfitrión, porque Docker necesita virtualización anidada del hardware (WSL2) y eso se complica mucho dentro de una VM. Vas a instalar Docker Desktop con backend WSL2, levantar contenedores reales (servidores web, bases de datos), construir tus propias imágenes con Dockerfile, gestionar volúmenes y redes, y al final vas a <em>tú mismo</em> a provocar fallos típicos (puerto en uso, contenedor que crece sin parar, build que falla) para diagnosticarlos con la misma metodología que en la práctica 32. Todo el trabajo es con software gratuito y sin hardware adicional.
+            </div>
+
+            <div class="nota">
+                <strong>Por qué Docker fuera del temario oficial:</strong> Docker no está en el currículo de IFCT0309 pero es la tecnología más demandada en ofertas de soporte/sysadmin junior desde 2018. Saber arrancar un contenedor para probar software, montar un entorno de desarrollo aislado o sustituir un servicio físico por uno containerizado es una habilidad transversal que se pide a todo perfil técnico. Esta práctica te da una base sólida en una jornada.
+            </div>
+
+            <div class="aviso">
+                <strong>Antes de empezar - requisitos imprescindibles:</strong> esta práctica <strong>no se puede hacer dentro de una VirtualBox</strong> con el rendimiento aceptable. Necesitas Windows 11 instalado directamente en hardware (tu portátil del aula o tu equipo personal). Si tu equipo es muy antiguo (CPU sin VT-x/AMD-V, menos de 8 GB de RAM, sin SSD) avisa al profesor: la práctica se podrá seguir mirando los pasos en pareja con un compañero.
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- OBJETIVOS                                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Entender qué es un <strong>contenedor</strong>, en qué se diferencia de una máquina virtual y qué problema resuelve.</li>
+                        <li>Conocer la <strong>arquitectura de Docker</strong> en Windows: Docker Desktop, dockerd, containerd, runc y el papel de WSL2.</li>
+                        <li>Diferenciar con soltura <strong>imagen</strong>, <strong>contenedor</strong>, <strong>capa</strong>, <strong>registry</strong> y <strong>Dockerfile</strong>.</li>
+                        <li>Instalar <strong>WSL2</strong> y <strong>Docker Desktop</strong> en Windows 11 y comprobar que funcionan.</li>
+                        <li>Usar <code>docker run</code>, <code>docker ps</code>, <code>docker logs</code>, <code>docker exec</code>, <code>docker stop</code> y <code>docker rm</code> con sus flags habituales.</li>
+                        <li>Gestionar <strong>imágenes</strong>: <code>docker pull</code>, <code>docker images</code>, <code>docker rmi</code>, <code>docker system prune</code>.</li>
+                        <li>Distinguir <strong>bind mounts</strong>, <strong>volúmenes con nombre</strong> y <strong>tmpfs</strong>; saber cuándo se usa cada uno.</li>
+                        <li>Trabajar con las <strong>redes de Docker</strong> (bridge por defecto, redes definidas por el usuario, modo host) y conectar contenedores entre sí.</li>
+                        <li>Escribir tu primer <strong>Dockerfile</strong> con <code>FROM</code>, <code>RUN</code>, <code>COPY</code>, <code>WORKDIR</code>, <code>EXPOSE</code> y <code>CMD</code>; construir la imagen con <code>docker build</code>.</li>
+                        <li>Provocar y diagnosticar cinco fallos típicos: puerto en uso, contenedor que no arranca, volumen con permisos, contenedor que consume todo el disco, build que falla.</li>
+                        <li>Conocer <strong>Docker Compose</strong> a nivel básico: levantar una aplicación multi-servicio con un único archivo YAML.</li>
+                        <li>Documentar incidencias relacionadas con contenedores en una <strong>ficha técnica profesional</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 0 - Conceptos previos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 - Qué es un contenedor y por qué nació Docker</h3>
+                    <p>Un <strong>contenedor</strong> es un proceso (o grupo de procesos) que se ejecuta en el sistema operativo del anfitrión pero <em>aislado</em> del resto: ve su propio sistema de archivos, sus propios procesos, su propia red. No es una máquina virtual: comparte el kernel del anfitrión y por eso arranca en milisegundos y consume muy poca RAM.</p>
+
+                    <p>Antes de los contenedores, instalar un programa con sus dependencias podía romper otros programas del mismo equipo (versión de Python distinta, una librería del sistema que se actualizaba, configuraciones que se pisaban). El típico "en mi máquina funciona" era el dolor de cabeza permanente. Docker resuelve eso encapsulando cada aplicación con todo lo que necesita en una imagen autocontenida.</p>
+
+                    <h3>0.2 - Contenedor vs máquina virtual</h3>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>Máquina virtual</th><th>Contenedor</th></tr>
+                        <tr><td>Aislamiento</td><td>Total (hardware virtualizado)</td><td>Procesos aislados con namespaces y cgroups</td></tr>
+                        <tr><td>Kernel</td><td>Cada VM lleva el suyo</td><td>Comparten el del anfitrión</td></tr>
+                        <tr><td>Arranque</td><td>30 s a varios minutos</td><td>Décimas de segundo</td></tr>
+                        <tr><td>Tamaño en disco</td><td>10-50 GB típico</td><td>10-500 MB típico</td></tr>
+                        <tr><td>RAM por instancia</td><td>1-8 GB reservados</td><td>10-200 MB según uso</td></tr>
+                        <tr><td>Cuántas puedes arrancar a la vez</td><td>2-5 en un portátil normal</td><td>20-100 sin despeinarse</td></tr>
+                        <tr><td>Uso típico</td><td>Sistemas operativos completos, lab de redes, malware</td><td>Servicios concretos (web, BD, microservicios)</td></tr>
+                    </table>
+
+                    <p>Conclusión práctica: las VMs siguen siendo la herramienta correcta para emular un PC completo (lo que has hecho en las prácticas anteriores). Los contenedores son la herramienta correcta cuando lo único que quieres es un proceso aislado (un servidor web de pruebas, un MariaDB temporal, una herramienta sin instalar).</p>
+
+                    <h3>0.3 - Arquitectura de Docker en Windows</h3>
+
+                    <p>En Windows, Docker no corre nativamente sobre el kernel de Windows (los contenedores Linux necesitan un kernel Linux). El truco es:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>WSL2</strong> (Windows Subsystem for Linux 2) arranca una VM Linux ligera y oculta gestionada por Hyper-V.</li>
+                            <li>Dentro de esa VM corre el <strong>dockerd</strong> (daemon de Docker) y por debajo <strong>containerd</strong> + <strong>runc</strong> (el runtime que de verdad lanza los contenedores).</li>
+                            <li><strong>Docker Desktop</strong> es la aplicación que orquesta todo lo anterior y te da una GUI bonita en Windows.</li>
+                            <li>Cuando ejecutas <code>docker run</code> desde PowerShell o CMD de Windows, el comando viaja a través de un canal a <code>dockerd</code> dentro de WSL2, que arranca el contenedor.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Por qué importa entender esto:</strong> cuando algo falla (un contenedor no arranca, un puerto no responde, una carpeta no se monta), la causa suele estar en la "frontera" entre Windows y WSL2: rutas, permisos, firewall, recursos asignados a WSL. Si sabes que hay una VM Linux en medio, los síntomas dejan de parecer mágicos.
+                    </div>
+
+                    <h3>0.4 - Vocabulario imprescindible</h3>
+
+                    <table>
+                        <tr><th>Concepto</th><th>Qué es</th><th>Analogía</th></tr>
+                        <tr><td><strong>Imagen</strong></td><td>Plantilla inmutable: el sistema de archivos y la configuración para crear contenedores</td><td>El instalador .iso de Windows</td></tr>
+                        <tr><td><strong>Contenedor</strong></td><td>Instancia en ejecución (o parada) creada a partir de una imagen</td><td>El Windows ya instalado y arrancado</td></tr>
+                        <tr><td><strong>Capa (layer)</strong></td><td>Cada cambio sobre la imagen base se guarda como una capa apilable. Permite compartir partes comunes entre imágenes</td><td>Bandejas transparentes apiladas, ves la suma de todas</td></tr>
+                        <tr><td><strong>Registry</strong></td><td>Almacén remoto de imágenes. El público es <em>Docker Hub</em>; las empresas tienen los suyos (Harbor, GitHub Container Registry, AWS ECR...)</td><td>App Store / Play Store</td></tr>
+                        <tr><td><strong>Tag</strong></td><td>Etiqueta de versión de una imagen (<code>nginx:1.25</code>, <code>nginx:latest</code>, <code>nginx:alpine</code>)</td><td>El número de versión del paquete</td></tr>
+                        <tr><td><strong>Dockerfile</strong></td><td>Receta en texto plano para construir una imagen propia</td><td>Un script de instalación + configuración</td></tr>
+                        <tr><td><strong>Volumen</strong></td><td>Espacio en disco persistente que sobrevive al contenedor</td><td>Una carpeta compartida del NAS montada en un PC desechable</td></tr>
+                        <tr><td><strong>Red</strong></td><td>Red virtual a la que se conectan los contenedores para hablar entre ellos</td><td>VLAN dedicada a un grupo de servidores</td></tr>
+                    </table>
+
+                    <h3>0.5 - Por qué un contenedor "vacío" no sirve para casi nada</h3>
+                    <p>Una imagen sin la aplicación dentro no tiene sentido. Por eso casi siempre <em>partes</em> de una imagen existente:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>nginx</code> - servidor web ligero</li>
+                        <li><code>httpd</code> - Apache</li>
+                        <li><code>mariadb</code>, <code>postgres</code>, <code>redis</code> - bases de datos</li>
+                        <li><code>python</code>, <code>node</code>, <code>php</code> - intérpretes para tus apps</li>
+                        <li><code>ubuntu</code>, <code>debian</code>, <code>alpine</code> - base genérica si construyes tu propia imagen</li>
+                    </ul>
+
+                    <p>Una imagen sale de un <strong>registry</strong>. Docker viene configurado por defecto contra Docker Hub, así que <code>docker pull nginx</code> baja la imagen oficial de nginx de Docker Hub.</p>
+
+                    <h3>0.6 - Almacenamiento: ¿dónde va lo que escribe un contenedor?</h3>
+                    <p>Por defecto, los cambios que un contenedor escribe en su sistema de archivos viven sólo mientras el contenedor exista. Si lo borras, los datos se van. Para datos que tienen que <em>persistir</em> hay tres opciones:</p>
+
+                    <table>
+                        <tr><th>Tipo</th><th>Dónde se guarda</th><th>Cuándo usarlo</th></tr>
+                        <tr><td><strong>Volumen con nombre</strong> (volume)</td><td>Carpeta gestionada por Docker (<code>/var/lib/docker/volumes</code> dentro de WSL2)</td><td>Datos de aplicaciones y bases de datos en producción. Lo normal.</td></tr>
+                        <tr><td><strong>Bind mount</strong></td><td>Una ruta concreta de tu sistema de archivos del anfitrión</td><td>Desarrollo: editas un archivo en Windows y el contenedor lo ve al instante</td></tr>
+                        <tr><td><strong>tmpfs</strong></td><td>RAM (no se escribe en disco)</td><td>Datos sensibles que no deben tocar disco, o archivos temporales que no quieres persistir</td></tr>
+                    </table>
+
+                    <h3>0.7 - Metodología de aprendizaje y de diagnóstico</h3>
+                    <p>Para no perderte, ve siempre de menos a más:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>Lanzar contenedores ya hechos</strong> (Parte 2): nginx, hello-world, ubuntu. Te acostumbras a la sintaxis de <code>docker run</code> sin nada más.</li>
+                            <li><strong>Persistir datos</strong> (Parte 3): cuando ya tienes contenedores que arrancan, aprendes a no perder el trabajo. Volúmenes y bind mounts.</li>
+                            <li><strong>Construir tu propia imagen</strong> (Parte 4): cuando dominas lo anterior, pasas a Dockerfile.</li>
+                            <li><strong>Diagnóstico</strong> (Parte 5): provocas fallos y los resuelves siguiendo el orden de la práctica 32 - de lo barato y rápido a lo caro y lento.</li>
+                            <li><strong>Orquestación básica</strong> (Parte 6): cuando tienes que arrancar dos o tres contenedores que hablan entre sí, Compose te ahorra escribir muchos comandos.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Idea clave:</strong> el 90% del trabajo diario con Docker es <code>docker run</code>, <code>docker ps</code> y <code>docker logs</code>. Si dominas esos tres comandos resuelves casi todo. El resto son detalles que vas aprendiendo cuando aparecen.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - INSTALACIÓN                                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 1 - Instalar WSL2 y Docker Desktop (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Vas a preparar tu Windows 11 anfitrión. Es la única parte de la práctica que toca configuración del sistema; el resto es trabajo con comandos.</p>
+
+                    <h3>1.1 - Comprobar requisitos</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Versión de Windows. Abre PowerShell y ejecuta <code>winver</code>. Necesitas Windows 11 (cualquier edición, incluida Home).</li>
+                            <li>Virtualización en BIOS/UEFI. Abre el Administrador de tareas (<code>Ctrl+Shift+Esc</code>) &rarr; pestaña <strong>Rendimiento</strong> &rarr; <strong>CPU</strong>. En la parte inferior derecha aparece "Virtualización: <em>Habilitada</em> / <em>Deshabilitada</em>". Si está deshabilitada, hay que entrar a la UEFI al arrancar (F2/Supr/F10 según marca) y activar VT-x (Intel) o SVM/AMD-V (AMD).</li>
+                            <li>RAM y disco. Mínimo razonable: 8 GB de RAM y 20 GB libres en C:.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Versión de Windows 11 (winver)</td><td><input type="text" placeholder="ej. 23H2 build 22631..."></td></tr>
+                        <tr><td>Virtualización (Admin. tareas)</td><td><input type="text" placeholder="Habilitada / Deshabilitada"></td></tr>
+                        <tr><td>RAM total</td><td><input type="text"></td></tr>
+                        <tr><td>Espacio libre en C:</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Instalar WSL2</h3>
+
+                    <p>Desde Windows 11 instalar WSL2 es un solo comando. Abre <strong>PowerShell como administrador</strong>:</p>
+
+<pre class="codigo">wsl --install</pre>
+
+                    <p>Este comando hace varias cosas a la vez: activa las características de Windows necesarias (<em>Plataforma de máquina virtual</em> y <em>Subsistema de Windows para Linux</em>), descarga el kernel de WSL2, lo establece como predeterminado, y descarga e instala Ubuntu como distribución por defecto. Es probable que te pida reiniciar.</p>
+
+                    <p>Tras reiniciar, al abrir Ubuntu por primera vez te pedirá crear un usuario y una contraseña para esa distribución Linux. Apunta el nombre de usuario.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Verifica que WSL2 está activo:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">wsl --status
+wsl --list --verbose</pre>
+
+                    <p>En la salida de <code>wsl -l -v</code> tienes que ver tu Ubuntu con <em>VERSION 2</em>. Si pone <em>VERSION 1</em>, conviértelo:</p>
+
+<pre class="codigo">wsl --set-version Ubuntu 2</pre>
+
+                    <table>
+                        <tr><td>Distribución instalada</td><td><input type="text" placeholder="ej. Ubuntu"></td></tr>
+                        <tr><td>Versión de WSL</td><td><input type="text" placeholder="1 o 2"></td></tr>
+                        <tr><td>Usuario creado en Ubuntu</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Detalle importante:</strong> Docker Desktop <em>no necesita</em> que tengas una distribución de Linux instalada (mete la suya propia, <em>docker-desktop</em>), pero tener Ubuntu a mano es muy útil para probar comandos Linux nativos y para entender de dónde vienen las cosas. Déjala instalada.
+                    </div>
+
+                    <h3>1.3 - Descargar e instalar Docker Desktop</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre el navegador y ve a <strong>docker.com/products/docker-desktop</strong>. Descarga el instalador para Windows (Intel chip o ARM según tu equipo).</li>
+                            <li>Ejecuta el instalador. En la pantalla de configuración deja marcada la opción <strong>Use WSL 2 instead of Hyper-V</strong>. Esto es crítico: si no la marcas, Docker Desktop intentará usar Hyper-V puro y necesitarás Windows 11 <em>Pro</em>. Con WSL2 funciona también en Home.</li>
+                            <li>Cuando termine, cierra sesión de Windows y vuelve a entrar (lo pide el instalador).</li>
+                            <li>Arranca Docker Desktop desde el menú Inicio. Acepta los términos y, si te pide tutorial, sáltalo (lo vas a hacer aquí).</li>
+                            <li>Espera al icono de la ballena en la bandeja del sistema. Cuando deje de animarse y ponga "Docker Desktop is running", está listo.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Licencia comercial de Docker Desktop:</strong> Docker Desktop es gratuito para uso personal, educativo y open source, y para empresas pequeñas (menos de 250 empleados y menos de 10 M$ de facturación). Empresas más grandes necesitan suscripción de pago. Para esta práctica (curso, uso educativo) estás claramente dentro del uso gratuito.
+                    </div>
+
+                    <h3>1.4 - Comprobar que Docker funciona</h3>
+
+                    <p>Abre una <strong>nueva</strong> PowerShell (no la elevada anterior, una normal). Ejecuta los siguientes comandos uno a uno y anota la versión que reportan:</p>
+
+<pre class="codigo">docker version
+docker info
+docker run hello-world</pre>
+
+                    <p>El último comando descarga la imagen <code>hello-world</code> (un par de MB) y la ejecuta. Si todo va bien, ves un mensaje que empieza por <em>"Hello from Docker!"</em> explicando los pasos que acaba de hacer (cliente, daemon, registry, contenedor).</p>
+
+                    <table>
+                        <tr><td>Versión de Docker client</td><td><input type="text"></td></tr>
+                        <tr><td>Versión de Docker server (daemon)</td><td><input type="text"></td></tr>
+                        <tr><td>Server OS/Arch (qué dice <code>docker info</code> en "Operating System")</td><td><input type="text" placeholder="ej. Docker Desktop Linux"></td></tr>
+                        <tr><td>¿Salió correctamente el mensaje de hello-world?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.5 - Códigos de error frecuentes en la instalación</h3>
+
+                    <table>
+                        <tr><th>Mensaje</th><th>Causa probable</th><th>Solución</th></tr>
+                        <tr><td>"WSL 2 installation is incomplete"</td><td>Falta el paquete del kernel de WSL2</td><td>Ejecutar <code>wsl --update</code> en PowerShell</td></tr>
+                        <tr><td>"Hardware assisted virtualization and data execution protection must be enabled"</td><td>Virtualización deshabilitada en BIOS</td><td>Entrar en UEFI y activarla</td></tr>
+                        <tr><td>"Docker Desktop is starting..." que no termina nunca</td><td>WSL2 lento al arrancar o conflicto con antivirus</td><td>Esperar 2 min, reiniciar Docker Desktop, comprobar antivirus</td></tr>
+                        <tr><td>"error during connect: ... The system cannot find the file specified"</td><td>Cliente docker está, pero el daemon no responde</td><td>Abrir Docker Desktop manualmente y esperar al "running"</td></tr>
+                        <tr><td>"unauthorized: incorrect username or password" al hacer pull</td><td>Estás intentando bajar una imagen privada sin login</td><td><code>docker login</code> o usar imagen pública</td></tr>
+                    </table>
+
+                    <h3>1.6 - Recursos asignados a WSL2</h3>
+
+                    <p>Docker Desktop limita por defecto cuánta RAM y CPU puede usar WSL2. Para verlo y ajustarlo: icono de la ballena &rarr; <strong>Settings</strong> &rarr; <strong>Resources</strong>.</p>
+
+                    <p>Si vas a trabajar con varios contenedores a la vez, sube la RAM a 4-6 GB. Si tu equipo tiene poca, déjalo en 2 GB y arranca pocos contenedores a la vez.</p>
+
+                    <div class="pregunta">
+                        <p>¿Por qué Docker Desktop necesita WSL2 (o Hyper-V) para correr contenedores Linux en Windows? ¿Por qué no puede ejecutarlos directamente sobre el kernel de Windows?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - IMÁGENES Y CONTENEDORES                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 - Imágenes y contenedores básicos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Aquí entras en el flujo real: descargar imágenes, arrancar contenedores, mirarlos, pararlos, borrarlos. Todo desde PowerShell. Mantén una ventana abierta durante toda esta parte.</p>
+
+                    <h3>2.1 - Descargar imágenes (pull) y listarlas</h3>
+
+<pre class="codigo">docker pull nginx
+docker pull ubuntu
+docker pull mariadb:11
+
+docker images</pre>
+
+                    <p>Observa la salida de <code>docker images</code>. Cada imagen tiene un <em>REPOSITORY</em>, un <em>TAG</em> (versión; <em>latest</em> si no especificas), un <em>IMAGE ID</em> corto y un <em>SIZE</em>.</p>
+
+                    <p>El concepto del tag es importante: <code>nginx</code> es equivalente a <code>nginx:latest</code>, pero "latest" no es ninguna garantía de estabilidad: simplemente es la etiqueta que el mantenedor ha asignado a la última versión que él considera estable. <strong>En producción siempre se fija una versión concreta</strong> (<code>nginx:1.25.3-alpine</code>) para que el comportamiento no cambie sin avisar.</p>
+
+                    <table>
+                        <tr><td>Tamaño de la imagen nginx</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño de la imagen ubuntu</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño de la imagen mariadb</td><td><input type="text"></td></tr>
+                        <tr><td>¿Cuál es la más pequeña? ¿Por qué crees que es así?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>2.2 - Tu primer contenedor: nginx en primer plano</h3>
+
+<pre class="codigo">docker run --rm -p 8080:80 nginx</pre>
+
+                    <p>Lee la línea entera antes de pulsar enter. Significa:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>docker run</code>: crea y arranca un contenedor.</li>
+                        <li><code>--rm</code>: borra automáticamente el contenedor cuando se pare. Útil para pruebas; sin esto se quedan acumulados.</li>
+                        <li><code>-p 8080:80</code>: publica el puerto. <strong>Lado izquierdo = puerto en tu Windows; lado derecho = puerto dentro del contenedor</strong>. El nginx escucha en su puerto 80, y tú lo vas a ver en <code>http://localhost:8080</code>.</li>
+                        <li><code>nginx</code>: la imagen a usar.</li>
+                    </ul>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Ejecuta el comando. La terminal queda "pegada" mostrando los logs de nginx.</li>
+                            <li>Abre el navegador y entra a <code>http://localhost:8080</code>. Tienes que ver la página de bienvenida de nginx.</li>
+                            <li>Recarga unas cuantas veces. En la terminal vas viendo las peticiones GET en tiempo real.</li>
+                            <li>Vuelve a la terminal y pulsa <code>Ctrl+C</code>. El contenedor se para; como pusiste <code>--rm</code>, se borra solo.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - El contenedor en segundo plano (detached)</h3>
+
+<pre class="codigo">docker run -d --name web1 -p 8080:80 nginx
+docker ps</pre>
+
+                    <p>Los flags nuevos:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>-d</code>: <em>detached</em>, en segundo plano. La terminal te devuelve el control inmediatamente.</li>
+                        <li><code>--name web1</code>: le pones un nombre legible. Sin esto Docker te asigna nombres aleatorios graciosos (<em>silly_einstein</em>, <em>nostalgic_curie</em>...).</li>
+                    </ul>
+
+                    <p><code>docker ps</code> lista contenedores en marcha. Con <code>docker ps -a</code> ves también los parados. Anota lo que devuelve el primero:</p>
+
+                    <table>
+                        <tr><td>CONTAINER ID corto</td><td><input type="text"></td></tr>
+                        <tr><td>STATUS</td><td><input type="text" placeholder="ej. Up 30 seconds"></td></tr>
+                        <tr><td>PORTS</td><td><input type="text" placeholder="0.0.0.0:8080->80/tcp"></td></tr>
+                    </table>
+
+                    <h3>2.4 - Ver logs y entrar al contenedor</h3>
+
+<pre class="codigo">docker logs web1
+docker logs -f web1            # streaming, Ctrl+C para salir
+docker logs --tail 20 web1</pre>
+
+                    <p><code>docker logs</code> muestra todo lo que el contenedor ha escrito a stdout/stderr. Para nginx, eso son las peticiones HTTP. <strong>Esta es la primera herramienta de diagnóstico que usarás siempre que un contenedor "no funciona".</strong></p>
+
+                    <p>Para entrar dentro del contenedor (como si fuese SSH a un Linux):</p>
+
+<pre class="codigo">docker exec -it web1 bash
+# ahora estás dentro del contenedor
+cat /etc/nginx/nginx.conf | head -10
+ls /usr/share/nginx/html
+exit                            # vuelves a Windows</pre>
+
+                    <p>Los flags <code>-it</code> son <em>interactive + tty</em>: necesarios para tener una shell interactiva. El comando final (<code>bash</code>) es lo que quieres ejecutar dentro del contenedor.</p>
+
+                    <div class="truco">
+                        <strong>Diferencia entre <code>run</code> y <code>exec</code>:</strong> <code>run</code> crea un contenedor nuevo a partir de una imagen. <code>exec</code> ejecuta un comando en un contenedor que <em>ya está</em> en marcha. Confundirlos es un error muy típico de principiante.
+                    </div>
+
+                    <h3>2.5 - Parar, arrancar, reiniciar y borrar</h3>
+
+<pre class="codigo">docker stop web1
+docker ps                       # ya no aparece
+docker ps -a                    # sí aparece, con STATUS "Exited"
+
+docker start web1
+docker restart web1
+
+docker stop web1
+docker rm web1                  # ahora sí desaparece del todo
+docker ps -a</pre>
+
+                    <p>Si intentas <code>docker rm</code> sobre un contenedor en marcha, falla. Para forzarlo: <code>docker rm -f web1</code> (lo para y lo borra en un solo paso).</p>
+
+                    <h3>2.6 - Variables de entorno y bases de datos</h3>
+
+                    <p>La mayoría de imágenes oficiales se configuran por variables de entorno. Vas a levantar un MariaDB:</p>
+
+<pre class="codigo">docker run -d --name db1 -e MARIADB_ROOT_PASSWORD=secreto -p 3306:3306 mariadb:11
+docker logs db1 | tail -20      # espera a ver "ready for connections"</pre>
+
+                    <p>Para comprobar que funciona, entra al contenedor y abre el cliente:</p>
+
+<pre class="codigo">docker exec -it db1 mariadb -uroot -psecreto
+# dentro del cliente:
+SHOW DATABASES;
+CREATE DATABASE pruebas;
+SHOW DATABASES;
+EXIT;</pre>
+
+                    <p>Acabas de levantar un servidor MariaDB completo en menos de un minuto, sin instalar nada en tu Windows. Cuando pares y borres el contenedor todo desaparece (lo que es bueno para pruebas y malo si querías guardar la BD; eso lo resuelve la Parte 3).</p>
+
+                    <h3>2.7 - Limpieza periódica</h3>
+
+                    <p>Las imágenes y contenedores acumulados se comen el disco. Para limpiar:</p>
+
+<pre class="codigo">docker ps -a                          # lista contenedores (también parados)
+docker rm $(docker ps -aq)            # borra todos los contenedores (en PowerShell: docker rm @(docker ps -aq))
+docker images                         # lista imágenes
+docker rmi nombre_imagen
+docker system prune                   # borra contenedores parados, redes no usadas y caché de build
+docker system prune -a --volumes      # más agresivo: incluye imágenes sin contenedor y volúmenes huérfanos</pre>
+
+                    <p>El <code>system prune -a --volumes</code> es la opción nuclear. Útil al final del trimestre cuando tu C: está al 90%; peligroso en un servidor con datos importantes.</p>
+
+                    <div class="nota">
+                        <strong>En PowerShell, el subshell <code>$(...)</code> existe pero los flags se evalúan distinto.</strong> Si <code>docker rm $(docker ps -aq)</code> te falla, usa la forma de PowerShell: <code>docker rm @(docker ps -aq)</code> o bien <code>docker ps -aq | ForEach-Object { docker rm $_ }</code>.
+                    </div>
+
+                    <table>
+                        <tr><td>Espacio que recupera <code>docker system prune -a</code> en tu equipo</td><td><input type="text" placeholder="MB / GB"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - VOLÚMENES Y REDES                                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Persistencia y redes (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>El sistema de archivos de un contenedor es desechable. Si quieres que la BD sobreviva al <code>docker rm</code>, tienes que sacar los datos fuera.</p>
+
+                    <h3>3.1 - Volumen con nombre (la opción habitual)</h3>
+
+<pre class="codigo">docker volume create datos_db
+docker volume ls
+docker volume inspect datos_db</pre>
+
+                    <p>Y ahora arranca MariaDB pidiéndole que guarde los datos en ese volumen:</p>
+
+<pre class="codigo">docker run -d --name db2 -e MARIADB_ROOT_PASSWORD=secreto `
+  -v datos_db:/var/lib/mysql -p 3307:3306 mariadb:11</pre>
+
+                    <p>(En PowerShell el acento grave <code>`</code> sirve para partir un comando en varias líneas. En CMD se usa <code>^</code>. En una sola línea también funciona.)</p>
+
+                    <p>El flag <code>-v datos_db:/var/lib/mysql</code> dice "monta el volumen <em>datos_db</em> en la ruta <em>/var/lib/mysql</em> dentro del contenedor". MariaDB guarda sus datos justo ahí, así que ahora <strong>los datos viven en el volumen, no en el contenedor</strong>.</p>
+
+                    <p>Pruébalo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una base de datos dentro de <code>db2</code> (igual que en 2.6).</li>
+                            <li>Borra el contenedor: <code>docker rm -f db2</code>.</li>
+                            <li>Crea otro contenedor montando el mismo volumen: <code>docker run -d --name db3 -e MARIADB_ROOT_PASSWORD=secreto -v datos_db:/var/lib/mysql -p 3307:3306 mariadb:11</code>.</li>
+                            <li>Entra al cliente y comprueba que la base de datos que habías creado sigue ahí.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Comando exacto que confirmó que los datos sobrevivieron</td><td><input type="text"></td></tr>
+                        <tr><td>¿Dónde guarda Docker el volumen físicamente? (pista: <code>docker volume inspect</code> &rarr; Mountpoint)</td><td><input type="text" placeholder="/var/lib/docker/volumes/..."></td></tr>
+                    </table>
+
+                    <h3>3.2 - Bind mount (la opción de desarrollo)</h3>
+
+                    <p>Un <em>bind mount</em> monta una carpeta de tu Windows dentro del contenedor. Lo que edites en Windows lo ve el contenedor al instante. Ideal para servir tu propia web:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una carpeta en tu equipo, por ejemplo <code>C:\docker\web</code>.</li>
+                            <li>Dentro, crea un <code>index.html</code> con el texto que quieras:
+                                <pre class="codigo">&lt;h1&gt;Hola desde mi bind mount&lt;/h1&gt;</pre>
+                            </li>
+                            <li>Levanta un nginx montando esa carpeta como su raíz web:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">docker run -d --name web2 -v C:\docker\web:/usr/share/nginx/html:ro -p 8081:80 nginx</pre>
+
+                    <p>El <code>:ro</code> al final monta la carpeta de sólo lectura, lo que es buena práctica cuando el contenedor no debe poder modificar tus archivos. Si quieres permitir escritura, omítelo.</p>
+
+                    <p>Abre <code>http://localhost:8081</code> y verás tu HTML. Ahora edita el HTML desde Notepad y recarga la página: cambia al instante.</p>
+
+                    <div class="aviso">
+                        <strong>Detalle de Docker Desktop:</strong> los bind mounts entre Windows y WSL2 pasan por una traducción de rutas. Funcionan, pero <em>son más lentos</em> que un volumen nativo. Para muchos archivos pequeños (un <code>node_modules</code> con 30 mil archivos) la diferencia es enorme. La práctica habitual con stacks de desarrollo en Docker en Windows es poner el código <em>dentro de WSL2</em> (en <code>\\wsl$\Ubuntu\home\tu_usuario</code>) y ahí el rendimiento es nativo.
+                    </div>
+
+                    <h3>3.3 - Red por defecto y red personalizada</h3>
+
+                    <p>Lista las redes que Docker creó al instalarse:</p>
+
+<pre class="codigo">docker network ls</pre>
+
+                    <p>Por defecto verás tres: <code>bridge</code>, <code>host</code> y <code>none</code>. <code>bridge</code> es donde se conectan tus contenedores si no especificas nada.</p>
+
+                    <p>Problema con la <code>bridge</code> por defecto: los contenedores no pueden encontrarse entre sí por nombre. Para que <em>web</em> pueda conectarse a <em>db</em> usando "db" como hostname, hay que crear una red personalizada:</p>
+
+<pre class="codigo">docker network create miapp
+docker network ls
+docker network inspect miapp</pre>
+
+                    <h3>3.4 - Conectar dos contenedores</h3>
+
+                    <p>Vas a hacer un mini-stack: una BD MariaDB y un contenedor cliente que se conecta a ella usando el nombre.</p>
+
+<pre class="codigo">docker run -d --name db --network miapp -e MARIADB_ROOT_PASSWORD=secreto mariadb:11
+docker run --rm -it --network miapp mariadb:11 mariadb -hdb -uroot -psecreto</pre>
+
+                    <p>Fíjate en dos cosas:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>La BD no exporta el puerto al anfitrión (no hay <code>-p</code>): no hace falta, porque sólo le va a hablar otro contenedor dentro de la misma red.</li>
+                        <li>El cliente le habla a <code>-h db</code>: <strong>db es el nombre del contenedor</strong>, y Docker resuelve eso a su IP automáticamente dentro de la red <em>miapp</em>.</li>
+                    </ul>
+
+                    <p>Esta es la base de cómo hablan los servicios containerizados en producción. En Compose y en Kubernetes el mecanismo es el mismo: nombre del servicio &rarr; resolución DNS interna.</p>
+
+                    <div class="pregunta">
+                        <p>¿Por qué exponer un puerto con <code>-p</code> sólo tiene sentido si quieres acceder al contenedor desde fuera (el host o internet)? ¿Qué pasaría si publicas 3306 a internet con la contraseña "secreto"?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - DOCKERFILE                                           -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - Construir tu propia imagen con Dockerfile (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Hasta aquí has usado imágenes oficiales. En el trabajo real lo normal es que tengas que construir <em>la imagen de tu aplicación</em>. Un Dockerfile es la receta para hacerlo.</p>
+
+                    <h3>4.1 - Anatomía de un Dockerfile</h3>
+
+                    <table>
+                        <tr><th>Directiva</th><th>Qué hace</th></tr>
+                        <tr><td><code>FROM</code></td><td>Imagen base. La primera línea de cualquier Dockerfile.</td></tr>
+                        <tr><td><code>WORKDIR</code></td><td>Cambia el directorio de trabajo dentro de la imagen. Equivale a <code>cd</code>.</td></tr>
+                        <tr><td><code>COPY</code></td><td>Copia archivos desde tu equipo a la imagen.</td></tr>
+                        <tr><td><code>RUN</code></td><td>Ejecuta un comando <em>al construir</em> la imagen. Útil para instalar paquetes, compilar, etc.</td></tr>
+                        <tr><td><code>EXPOSE</code></td><td>Documenta qué puerto escucha la app. No publica nada; es informativo (publicar se hace con <code>-p</code> al correr).</td></tr>
+                        <tr><td><code>ENV</code></td><td>Define variables de entorno persistentes en la imagen.</td></tr>
+                        <tr><td><code>CMD</code></td><td>Qué comando se ejecuta cuando arranca el contenedor. <strong>Sólo se ejecuta una vez por contenedor.</strong></td></tr>
+                        <tr><td><code>ENTRYPOINT</code></td><td>Variante de CMD: define el ejecutable; CMD aporta argumentos por defecto.</td></tr>
+                    </table>
+
+                    <h3>4.2 - Tu primer Dockerfile</h3>
+
+                    <p>Vas a crear una mini-web personalizada empaquetada en su propia imagen.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una carpeta nueva: <code>C:\docker\miweb</code>.</li>
+                            <li>Dentro pon dos archivos: <code>index.html</code> con cualquier contenido, y <code>Dockerfile</code> (sin extensión) con este contenido:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">FROM nginx:1.25-alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+# CMD está implícito en la imagen base (arranca nginx). No hace falta repetirlo.</pre>
+
+                    <p>Construye la imagen:</p>
+
+<pre class="codigo">cd C:\docker\miweb
+docker build -t miweb:1.0 .</pre>
+
+                    <p>El punto final es importante: es el <em>contexto de build</em>, la carpeta cuyo contenido Docker va a tener disponible para copiar. La <code>-t miweb:1.0</code> es el tag (nombre + versión).</p>
+
+                    <p>Arranca un contenedor de tu imagen y comprueba que sirve tu HTML:</p>
+
+<pre class="codigo">docker run -d --name miweb1 -p 8082:80 miweb:1.0
+# abre http://localhost:8082</pre>
+
+                    <h3>4.3 - Capas y caché</h3>
+
+                    <p>Cada directiva de un Dockerfile crea una capa. Docker cachea las capas: si construyes la imagen dos veces seguidas sin cambiar nada, la segunda vez es instantánea ("Using cache" en cada paso).</p>
+
+                    <p>La regla práctica de oro: <strong>pon las directivas que cambian poco al principio del Dockerfile, y las que cambian mucho al final</strong>. Así aprovechas la caché.</p>
+
+                    <p>Ejemplo: en una app Python, el patrón canónico es</p>
+
+<pre class="codigo">FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "main.py"]</pre>
+
+                    <p>Razón: las dependencias (<code>requirements.txt</code>) cambian poco; el código de la app cambia constantemente. Si pusieras <code>COPY . .</code> antes del <code>pip install</code>, cada vez que tocases un comentario en tu .py se reinstalarían todas las dependencias.</p>
+
+                    <h3>4.4 - .dockerignore</h3>
+
+                    <p>El contexto de build (el "<code>.</code>" final) se envía completo al daemon antes de empezar. Si tu carpeta tiene un <code>.git</code> de 1 GB o un <code>node_modules</code> gordo, el build empieza copiando todo eso aunque no lo necesites.</p>
+
+                    <p>Solución: crea un <code>.dockerignore</code> en la raíz con la sintaxis de <code>.gitignore</code>:</p>
+
+<pre class="codigo">.git
+node_modules
+*.log
+.env
+Dockerfile.dev</pre>
+
+                    <h3>4.5 - Buenas prácticas de Dockerfile</h3>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Imagen base ligera:</strong> elige variantes <code>-alpine</code> o <code>-slim</code> cuando puedas. La nginx oficial pasa de 200 MB a 50 MB usando Alpine.</li>
+                        <li><strong>Una sola responsabilidad por contenedor:</strong> no metas nginx + PHP-FPM + MySQL en la misma imagen. Cada cosa en un contenedor.</li>
+                        <li><strong>No corras como root:</strong> usa <code>USER nodeuser</code> tras instalar. Reduce el daño si alguien escapa del contenedor.</li>
+                        <li><strong>Tags semánticos:</strong> <code>miapp:1.2.3</code>, no sólo <code>miapp:latest</code>.</li>
+                        <li><strong>Limpia en la misma capa:</strong> <code>RUN apt-get update &amp;&amp; apt-get install -y curl &amp;&amp; rm -rf /var/lib/apt/lists/*</code> (todo en un mismo RUN para que la limpieza esté en la misma capa).</li>
+                    </ul>
+
+                    <div class="truco">
+                        <strong>Truco profesional:</strong> ejecuta <code>docker image history miweb:1.0</code>. Te muestra cada capa con su tamaño. Es la mejor forma de detectar capas innecesariamente gordas y entender qué ocupa tu imagen.
+                    </div>
+
+                    <table>
+                        <tr><td>Tamaño de tu imagen <code>miweb:1.0</code></td><td><input type="text"></td></tr>
+                        <tr><td>Número de capas que muestra <code>docker image history</code></td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - DIAGNÓSTICO AUTÓNOMO                                 -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Provocar y diagnosticar tus propios fallos (90 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Igual que en la práctica 32, vas a provocar tú mismo cinco fallos típicos, simular que los acabas de encontrar y aplicar la metodología de diagnóstico paso a paso. Después comparas el resultado con lo que sabes que rompiste.</p>
+
+                    <div class="aviso">
+                        <strong>Antes de empezar:</strong> deja al menos un contenedor de los anteriores parado (no hace falta limpiar nada). Para cada caso vas a usar contenedores nuevos y desechables; al final basta con <code>docker rm -f</code> para limpiarlos.
+                    </div>
+
+                    <h3>5.1 - Caso A - Puerto ya en uso</h3>
+
+                    <p><strong>Qué rompes:</strong> levantas dos contenedores que intentan publicar el mismo puerto en Windows. El segundo no arranca.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Asegúrate de que tienes un nginx en marcha con el puerto 8080: <code>docker run -d --name webA -p 8080:80 nginx</code>. Comprueba que responde en <code>http://localhost:8080</code>.</li>
+                            <li>Intenta arrancar otro al mismo puerto:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">docker run -d --name webB -p 8080:80 nginx</pre>
+
+                    <p>Verás un error del tipo <em>"Error response from daemon: ports are not available: ... bind: An attempt was made to access a socket in a way forbidden by its access permissions"</em>.</p>
+
+                    <p><strong>Diagnostica como si no supieras qué pasó:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: el comando <code>docker run</code> falla con un mensaje sobre puertos.</li>
+                            <li><code>docker ps</code>: ¿hay otro contenedor publicando el mismo puerto? Mira la columna PORTS.</li>
+                            <li>Si no es otro contenedor, busca qué proceso de Windows está usando el puerto:
+                                <pre class="codigo">netstat -ano | findstr :8080</pre>
+                                El PID que devuelve lo cruzas con el Administrador de tareas (pestaña Detalles, columna PID) para saber el ejecutable.</li>
+                            <li>Comprobación cruzada: el contenedor que <em>sí</em> arrancó es el que viste en <code>docker ps</code> en el paso 2.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong> tres opciones, según el caso real:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Cambiar el puerto del segundo contenedor: <code>docker run -d --name webB -p 8090:80 nginx</code>.</li>
+                        <li>Parar el primero si ya no lo necesitas: <code>docker stop webA</code>.</li>
+                        <li>Si el puerto lo ocupaba un proceso de Windows, cerrar ese proceso o cambiar el puerto del contenedor.</li>
+                    </ul>
+
+                    <table>
+                        <tr><td>Mensaje exacto que devolvió docker</td><td><input type="text"></td></tr>
+                        <tr><td>¿Era otro contenedor o un proceso de Windows?</td><td><input type="text"></td></tr>
+                        <tr><td>Solución aplicada</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.2 - Caso B - Contenedor que se cierra inmediatamente</h3>
+
+                    <p><strong>Qué rompes:</strong> arrancas un contenedor con un CMD que falla. El contenedor pasa de "Up" a "Exited" en menos de un segundo y parece que "no funciona Docker".</p>
+
+<pre class="codigo">docker run -d --name caja_rota ubuntu echo "hola"
+docker ps</pre>
+
+                    <p><code>docker ps</code> no muestra ese contenedor. Parece que no se creó. ¿Se ha perdido?</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><code>docker ps -a</code>: aparece, con STATUS "Exited (0) hace 5 segundos". Pista clave: el código de salida 0 = terminó <em>correctamente</em>, no es un error real.</li>
+                            <li><code>docker logs caja_rota</code>: muestra <em>hola</em> y nada más. Confirmas que ejecutó lo que pediste y terminó.</li>
+                            <li>Explicación: un contenedor vive <em>mientras viva su proceso principal</em>. Le pediste a Ubuntu que ejecutara <code>echo "hola"</code>, lo hizo, el proceso terminó, el contenedor se paró. <strong>No es un fallo; es el comportamiento esperado.</strong></li>
+                        </ol>
+                    </div>
+
+                    <p>Reproduce ahora un fallo <em>real</em>:</p>
+
+<pre class="codigo">docker run -d --name caja_rota2 ubuntu comando_que_no_existe
+docker ps -a
+docker logs caja_rota2</pre>
+
+                    <p>Verás STATUS "Exited (127)" y en los logs <em>"exec: 'comando_que_no_existe': executable file not found in $PATH"</em>. El código 127 en convenciones POSIX es "comando no encontrado".</p>
+
+                    <p><strong>Repara:</strong> arregla el CMD para que ejecute algo real. Si quieres un Ubuntu vivo para hacer pruebas, usa <code>docker run -it --rm ubuntu bash</code>: el <code>-it</code> mantiene la shell abierta como proceso principal.</p>
+
+                    <table>
+                        <tr><td>STATUS de <code>caja_rota</code></td><td><input type="text"></td></tr>
+                        <tr><td>STATUS y código de salida de <code>caja_rota2</code></td><td><input type="text" placeholder="ej. Exited (127)"></td></tr>
+                        <tr><td>Comando que produce un contenedor Ubuntu que se mantiene en marcha</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Caso C - Bind mount con permisos / archivo no encontrado</h3>
+
+                    <p><strong>Qué rompes:</strong> intentas montar una ruta de Windows que no existe o que está mal escrita. El contenedor arranca, pero la web sirve "403 Forbidden" o el directorio sale vacío.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Monta una carpeta inexistente:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">docker run -d --name webC -v C:\docker\carpeta_que_no_existe:/usr/share/nginx/html:ro -p 8083:80 nginx</pre>
+
+                    <p>Docker no se queja: <em>crea</em> la carpeta vacía y monta una carpeta vacía dentro del contenedor. La web abre pero da 403 o "index of /" vacío.</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: la web devuelve 403 Forbidden o "Index of /" sin archivos.</li>
+                            <li><code>docker exec -it webC ls /usr/share/nginx/html</code>: la carpeta dentro está vacía. <em>Aquí confirmas que el montaje "funcionó" pero la carpeta origen no tenía nada útil</em>.</li>
+                            <li><code>docker inspect webC --format '{{json .Mounts}}'</code>: te muestra el Source exacto. Compáralo con la ruta que querías montar; lo más común es un typo (<em>carpeta_que_no_existe</em> en lugar de <em>web</em>) o una mayúscula mal.</li>
+                            <li>Mira tu unidad C: en el Explorador. Verás que Docker te creó la carpeta vacía. <strong>Este es el comportamiento "amable" que confunde:</strong> Docker crea el origen si no existe en vez de fallar.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong> borra el contenedor, comprueba la ruta correcta en el Explorador, vuelve a arrancarlo con la ruta buena.</p>
+
+                    <table>
+                        <tr><td>Source que reportó <code>docker inspect</code></td><td><input type="text"></td></tr>
+                        <tr><td>Causa concreta del fallo</td><td><input type="text" placeholder="typo / mayúscula / etc."></td></tr>
+                    </table>
+
+                    <h3>5.4 - Caso D - Contenedor que llena el disco</h3>
+
+                    <p><strong>Qué rompes:</strong> arrancas un contenedor que genera muchos logs sin parar. Es una causa real de incidentes en producción: un servicio en debug log durante semanas y el disco lleno sin que nadie se entere.</p>
+
+<pre class="codigo">docker run -d --name spam ubuntu bash -c "while true; do echo 'gasto disco con logs sin parar'; sleep 0.1; done"</pre>
+
+                    <p>Déjalo unos minutos y mira:</p>
+
+<pre class="codigo">docker ps -s                          # añade columna SIZE
+docker inspect spam --format '{{.LogPath}}'
+docker logs spam | wc -l              # cuántas líneas lleva (en PowerShell: (docker logs spam).Count)</pre>
+
+                    <p>Verás que el campo SIZE no crece (el contenedor en sí no escribe a disco), pero el archivo de logs (LogPath) sí. Va dentro de WSL2, en <code>/var/lib/docker/containers/&lt;id&gt;/&lt;id&gt;-json.log</code>.</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: el disco del anfitrión va menguando sin razón aparente.</li>
+                            <li><code>docker ps --size</code>: identifica contenedores grandes.</li>
+                            <li><code>docker system df</code>: te dice cuánto ocupan imágenes, contenedores, volúmenes y caché de build.</li>
+                            <li>Si un contenedor concreto sospechoso tiene muchísimos logs, ese es el culpable.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Parar y borrar el contenedor problemático: <code>docker rm -f spam</code>.</li>
+                            <li>Limitar logs en el futuro: al arrancar el contenedor pásale <code>--log-opt max-size=10m --log-opt max-file=3</code>. Eso le pone tope de tamaño y rotación.</li>
+                            <li>O configurarlo a nivel global en <em>Docker Desktop &rarr; Settings &rarr; Docker Engine</em> añadiendo al JSON: <code>"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"3"}</code>.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Tamaño del archivo de logs al detectarlo</td><td><input type="text"></td></tr>
+                        <tr><td>Comando exacto con límite de logs</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.5 - Caso E - Dockerfile que falla en build</h3>
+
+                    <p><strong>Qué rompes:</strong> creas un Dockerfile con un error típico (paquete que no existe, archivo que no se copia bien, sintaxis mal). El build casca y hay que leer el error.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una carpeta <code>C:\docker\roto</code>.</li>
+                            <li>Dentro, un Dockerfile con este contenido:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo">FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y paquete_inventado_xyz
+COPY index.html /var/www/html/
+CMD ["/bin/sh", "-c", "tail -f /dev/null"]</pre>
+
+                    <p>Sin crear el <code>index.html</code> a propósito, lanza el build:</p>
+
+<pre class="codigo">cd C:\docker\roto
+docker build -t roto:1.0 .</pre>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>El build se para en la línea del RUN. Mira el error: <em>"E: Unable to locate package paquete_inventado_xyz"</em>. Eso es lo más fácil: nombre de paquete incorrecto.</li>
+                            <li>Arregla esa línea (cámbiala por <code>curl</code> u otro paquete real) y vuelve a construir.</li>
+                            <li>Ahora el build se para en el COPY: <em>"failed to compute cache key: '/index.html' not found"</em>. Pista: el archivo no existe en el contexto.</li>
+                            <li>Crea un <code>index.html</code> vacío en la carpeta y vuelve a construir. Esta vez termina.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Idea de diagnóstico clave:</strong> los errores de <code>docker build</code> siempre te dicen <em>qué línea</em> del Dockerfile ha fallado (<em>"ERROR [3/4] COPY..."</em>). El número entre corchetes es el paso. Cuenta líneas en tu Dockerfile y verás cuál es. Eso elimina el 90% del trabajo de diagnóstico.</p>
+
+                    <table>
+                        <tr><td>Primer error que dio el build</td><td><input type="text"></td></tr>
+                        <tr><td>Segundo error tras la primera corrección</td><td><input type="text"></td></tr>
+                        <tr><td>¿En qué paso del Dockerfile estaba cada uno?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.6 - Tabla resumen de los cinco casos</h3>
+                    <table>
+                        <tr><th>Caso</th><th>Tiempo total (min)</th><th>Comando de diagnóstico que dio la pista clave</th><th>¿Lo resolverías hoy en 5 minutos?</th></tr>
+                        <tr><td>A - Puerto en uso</td><td><input type="text"></td><td><input type="text" placeholder="ej. netstat / docker ps"></td><td><input type="text"></td></tr>
+                        <tr><td>B - Contenedor que se cierra</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>C - Bind mount mal</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>D - Logs llenan disco</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>E - Build roto</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="reto">
+                        <strong>Reto adicional (opcional, +30 min):</strong> arranca un MariaDB sin volumen, crea una base de datos con varias tablas y datos, bórralo con <code>docker rm -f</code> y comprueba que efectivamente los datos se han perdido. Después repite el experimento <em>con</em> volumen y verifica que sobreviven. Documenta los dos casos con la misma estructura que los anteriores.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - DOCKER COMPOSE                                       -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Docker Compose: varios contenedores con un solo archivo (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Lanzar dos o tres contenedores con <code>docker run</code> cada vez que reinicias el equipo es trabajo manual y propenso a errores. <strong>Docker Compose</strong> describe el stack completo en un archivo YAML y lo levanta con un comando.</p>
+
+                    <h3>6.1 - Tu primer docker-compose.yml</h3>
+
+                    <p>Crea la carpeta <code>C:\docker\compose-demo</code> y dentro un archivo <code>docker-compose.yml</code>:</p>
+
+<pre class="codigo">services:
+  web:
+    image: nginx:1.25-alpine
+    ports:
+      - "8090:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: secreto
+      MARIADB_DATABASE: pruebas
+    volumes:
+      - datos_db:/var/lib/mysql
+
+volumes:
+  datos_db:</pre>
+
+                    <p>Crea también <code>./html/index.html</code> con cualquier contenido. Ahora desde esa carpeta:</p>
+
+<pre class="codigo">docker compose up -d
+docker compose ps
+docker compose logs db
+docker compose logs -f web</pre>
+
+                    <p>Compose ha hecho varias cosas a la vez:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Ha creado una red propia para este stack (Compose crea una red por proyecto por defecto).</li>
+                        <li>Ha levantado los dos contenedores con nombres predecibles (<em>compose-demo-web-1</em>, <em>compose-demo-db-1</em>).</li>
+                        <li>Ha creado el volumen <code>datos_db</code> y lo ha montado en la BD.</li>
+                        <li>Ha respetado <code>depends_on</code> (arranca la BD antes que el web). Importante: <em>depends_on</em> sólo espera a que el contenedor exista, no a que el servicio dentro esté listo. Para esperar a la BD a estar respondiendo se usa <em>healthcheck</em>.</li>
+                    </ul>
+
+                    <p>Para parar todo:</p>
+
+<pre class="codigo">docker compose down              # para y borra contenedores y red, mantiene volúmenes
+docker compose down -v            # incluye volúmenes (datos perdidos)</pre>
+
+                    <div class="truco">
+                        <strong>Por qué Compose es tan útil:</strong> imagina que tu jefe te dice "monta una instancia de WordPress de pruebas". Sin Compose: dos <code>docker run</code> con seis flags cada uno, dos volúmenes, una red. Con Compose: un YAML de 20 líneas que copias del README oficial y un <code>docker compose up -d</code>. Lo mismo que ya hace muchas otras herramientas pero con sintaxis estándar.
+                    </div>
+
+                    <h3>6.2 - Operaciones habituales de Compose</h3>
+
+                    <table>
+                        <tr><th>Comando</th><th>Para qué</th></tr>
+                        <tr><td><code>docker compose up -d</code></td><td>Levanta el stack en segundo plano</td></tr>
+                        <tr><td><code>docker compose ps</code></td><td>Estado de los servicios del proyecto actual</td></tr>
+                        <tr><td><code>docker compose logs -f</code></td><td>Logs combinados de todos los servicios en streaming</td></tr>
+                        <tr><td><code>docker compose exec web sh</code></td><td>Shell dentro del servicio web</td></tr>
+                        <tr><td><code>docker compose restart db</code></td><td>Reinicia un servicio</td></tr>
+                        <tr><td><code>docker compose pull</code></td><td>Actualiza las imágenes a la última versión disponible</td></tr>
+                        <tr><td><code>docker compose down</code></td><td>Para y limpia (sin borrar volúmenes)</td></tr>
+                    </table>
+
+                    <h3>6.3 - Compose en el día a día</h3>
+
+                    <p>En proyectos reales el <code>docker-compose.yml</code> suele estar en el repositorio git del proyecto y es <strong>el primer archivo que un nuevo compañero ejecuta el día 1</strong> para tener el entorno listo. Saber leerlo y modificarlo es una habilidad de empleabilidad pura.</p>
+
+                    <table>
+                        <tr><td>Comando con el que verificaste que la web hablaba con la BD</td><td><input type="text"></td></tr>
+                        <tr><td>Nombre del volumen que Compose creó en tu sistema</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - FICHA DE INCIDENCIA                                  -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 7 - Documentar como un profesional (25 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Igual que en la práctica 32, rellena una ficha completa para <strong>el caso que más te haya costado</strong> de la Parte 5. La estructura sirve para cualquier incidencia que documentes en el futuro, tenga o no que ver con Docker.</p>
+
+                    <div class="ficha">
+                        <h4>FICHA DE INCIDENCIA Nº _______</h4>
+                        <label>Fecha y hora de apertura</label>
+                        <input type="text" placeholder="2026-MM-DD HH:MM">
+                        <label>Técnico responsable</label>
+                        <input type="text">
+                        <label>Cliente / departamento / proyecto</label>
+                        <input type="text" placeholder="ej. Desarrollo - entorno local">
+                        <label>Equipo (marca, modelo, número de inventario)</label>
+                        <input type="text">
+                        <label>SO y versión de Docker Desktop / engine</label>
+                        <input type="text" placeholder="ej. Windows 11 Pro 23H2 + Docker Desktop 4.x">
+                        <label>Servicio / contenedor afectado</label>
+                        <input type="text">
+                        <label>Imagen base y tag</label>
+                        <input type="text" placeholder="ej. nginx:1.25-alpine">
+                        <label>Descripción del problema (lo que dice el usuario)</label>
+                        <textarea rows="3"></textarea>
+                        <label>Síntomas observados por el técnico</label>
+                        <textarea rows="3"></textarea>
+                        <label>Diagnóstico paso a paso (en orden, con resultados de cada paso)</label>
+                        <textarea rows="6" placeholder="1) docker ps: ...&#10;2) docker logs ...: ...&#10;3) netstat -ano | findstr :PORT: ...&#10;4) docker inspect ...: ..."></textarea>
+                        <label>Causa raíz identificada</label>
+                        <textarea rows="2"></textarea>
+                        <label>Solución aplicada (comandos exactos)</label>
+                        <textarea rows="4"></textarea>
+                        <label>Tiempo total empleado (min)</label>
+                        <input type="text">
+                        <label>Recursos consultados (docs, Stack Overflow, GitHub issue)</label>
+                        <input type="text">
+                        <label>Estado final</label>
+                        <input type="text" placeholder="Resuelto / Pendiente / Escalado">
+                        <label>Cambios permanentes aplicados para que no vuelva a pasar (logs rotation, healthcheck, .dockerignore...)</label>
+                        <textarea rows="3"></textarea>
+                        <label>Lecciones aprendidas</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Por qué documentar Docker tan al detalle:</strong> los problemas con contenedores suelen ser "extraños" (un puerto se queda colgado, un volumen no actualiza, una imagen funciona en otro equipo pero no en el tuyo). Sin documentar los pasos exactos, tres meses después no recuerdas qué hiciste. Una ficha bien hecha es la diferencia entre 5 minutos y 2 horas la próxima vez.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- CONCLUSIONES Y EVALUACIÓN                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Conclusiones y autoevaluación</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>De los cinco fallos que has provocado en la Parte 5, ¿cuál te ha costado más diagnosticar y por qué? ¿Qué comando concreto te dio la pista definitiva?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Un compañero te dice: "tengo una app que funciona en mi portátil pero en el servidor falla". Sabes que ambos usan Docker. Describe los tres primeros pasos que darías para acotar el problema antes de tocar nada.</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Diferencia entre una imagen y un contenedor con tus propias palabras. ¿Por qué <code>docker rm</code> borra un contenedor pero la imagen sigue ahí?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Compara la práctica 32 (drivers y diagnóstico de hardware) con esta 33 (contenedores). ¿Qué método de diagnóstico tienen en común y en qué se diferencian las herramientas concretas que usas?</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Te encargan montar un entorno de pruebas para que un programador trabaje en una app Python con MariaDB. ¿Por qué usarías Docker y no una VM completa? ¿Qué pondrías en el <code>docker-compose.yml</code> en cinco líneas?</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluación</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>Entiendo qué es un contenedor y en qué se diferencia de una VM</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>He instalado WSL2 y Docker Desktop en mi Windows 11 y arrancado hello-world</td><td><input type="text"></td></tr>
+                            <tr><td>Sé hacer <code>docker pull</code>, <code>docker run</code>, <code>docker ps</code> y entender la salida</td><td><input type="text"></td></tr>
+                            <tr><td>Manejo <code>docker logs</code> y <code>docker exec</code> para diagnosticar contenedores</td><td><input type="text"></td></tr>
+                            <tr><td>Distingo bind mount, volumen con nombre y tmpfs y sé cuándo usar cada uno</td><td><input type="text"></td></tr>
+                            <tr><td>He conectado dos contenedores en una red personalizada por nombre de servicio</td><td><input type="text"></td></tr>
+                            <tr><td>He escrito mi primer Dockerfile, construido la imagen y servido contenido propio</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo el papel de las capas y la caché en <code>docker build</code></td><td><input type="text"></td></tr>
+                            <tr><td>He provocado y resuelto los cinco fallos de la Parte 5</td><td><input type="text"></td></tr>
+                            <tr><td>Sé identificar quién ocupa un puerto en Windows con <code>netstat -ano</code></td><td><input type="text"></td></tr>
+                            <tr><td>He levantado un stack multi-servicio con Docker Compose</td><td><input type="text"></td></tr>
+                            <tr><td>Soy capaz de limpiar el sistema con <code>docker system prune</code> sin miedo a borrar lo importante</td><td><input type="text"></td></tr>
+                            <tr><td>He rellenado al menos una ficha de incidencia completa</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-secondary" id="btn-guardar" type="button">Guardar progreso</button>
+            <button class="btn btn-secondary" id="btn-borrar" type="button">Borrar progreso</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
+        </div>
+        <div id="estado-guardado" class="no-print" style="text-align:center;padding:0 32px 20px;font-size:12.5px;color:#4a5568;min-height:20px"></div>
+    </div>
+
+    <script>
+    (function() {
+        var CLAVE = 'practica33-progreso-v1';
+        var estado = document.getElementById('estado-guardado');
+        var btnGuardar = document.getElementById('btn-guardar');
+        var btnBorrar = document.getElementById('btn-borrar');
+
+        function camposGuardables() {
+            return document.querySelectorAll('.container input[type="text"], .container input[type="date"], .container textarea');
+        }
+
+        function clavePara(el, idx) {
+            return el.tagName + ':' + (el.type || '') + ':' + idx;
+        }
+
+        function guardar() {
+            var datos = {};
+            camposGuardables().forEach(function(el, idx) {
+                datos[clavePara(el, idx)] = el.value;
+            });
+            try {
+                localStorage.setItem(CLAVE, JSON.stringify({ guardado: new Date().toISOString(), datos: datos }));
+                mostrarEstado('Progreso guardado: ' + new Date().toLocaleString());
+            } catch (e) {
+                mostrarEstado('Error al guardar: ' + e.message, true);
+            }
+        }
+
+        function cargar(silencioso) {
+            var crudo = localStorage.getItem(CLAVE);
+            if (!crudo) {
+                if (!silencioso) mostrarEstado('No hay progreso guardado.');
+                return;
+            }
+            try {
+                var obj = JSON.parse(crudo);
+                camposGuardables().forEach(function(el, idx) {
+                    var valor = obj.datos[clavePara(el, idx)];
+                    if (valor !== undefined) el.value = valor;
+                });
+                var fecha = obj.guardado ? new Date(obj.guardado).toLocaleString() : '(sin fecha)';
+                mostrarEstado('Progreso cargado (último guardado: ' + fecha + ').');
+            } catch (e) {
+                mostrarEstado('Error al cargar: ' + e.message, true);
+            }
+        }
+
+        function borrar() {
+            if (!confirm('¿Borrar el progreso guardado en este navegador? Los campos del formulario se vaciarán.')) return;
+            localStorage.removeItem(CLAVE);
+            camposGuardables().forEach(function(el) { el.value = ''; });
+            mostrarEstado('Progreso borrado.');
+        }
+
+        function mostrarEstado(mensaje, esError) {
+            estado.textContent = mensaje;
+            estado.style.color = esError ? '#c53030' : '#276749';
+            setTimeout(function() { if (estado.textContent === mensaje) estado.style.color = '#4a5568'; }, 4000);
+        }
+
+        btnGuardar.addEventListener('click', guardar);
+        btnBorrar.addEventListener('click', borrar);
+
+        var temporizador = null;
+        camposGuardables().forEach(function(el) {
+            el.addEventListener('input', function() {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(guardar, 1000);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() { cargar(true); });
+        if (document.readyState !== 'loading') cargar(true);
+    })();
+    </script>
+</body>
+</html>
