@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 34: Nextcloud autoalojado y publicado en internet con Cloudflare Tunnel</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 34: Nextcloud autoalojado y publicado en internet con Cloudflare Tunnel</h1>
+            <div class="meta">
+                <strong>Módulo:</strong> Práctica adicional - servicios autohospedados con contenedores<br>
+                <strong>Requisito previo:</strong> Práctica 33 (Docker Desktop en Windows 11) terminada<br>
+                <strong>Sesiones:</strong> práctica extra<br>
+                <strong>Duración estimada:</strong> 7-8 horas (puede partirse en dos sesiones)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> Windows 11 anfitrión con Docker Desktop ya funcionando, smartphone Android o iOS, conexión a internet (la del aula sirve, pero al final probarás también desde 4G)
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> vas a montar tu propio Google Drive / iCloud / OneDrive en tu portátil. Una nube real, con interfaz web, con clientes para móvil y escritorio, con sincronización de fotos del móvil, con compartición por enlace, en la que tú eres el dueño de los datos. Y la vas a publicar en internet con una URL pública HTTPS sin abrir un solo puerto del router del aula, sin contratar dominio, sin pagar nada. La vas a poder enseñar a tus padres conectándose desde su 4G y verán tus archivos. Es la práctica de Docker que demuestra para qué sirven los contenedores: una herramienta seria, multi-servicio, levantada en cinco minutos.
+            </div>
+
+            <div class="nota">
+                <strong>Por qué Nextcloud:</strong> Nextcloud es una alternativa libre y autoalojable a Google Drive, Dropbox, OneDrive y Google Photos juntos. Lo usan miles de empresas, universidades y administraciones europeas para no depender de los gigantes americanos. Sin Docker, instalarlo "a mano" lleva 1-2 horas (Apache, PHP, MariaDB, Redis, certificado SSL, configuración, ajustes del kernel...). Con un <code>docker compose up -d</code> de un YAML de 30 líneas, tienes el mismo resultado en 90 segundos. Esa diferencia es el motivo por el que Docker se ha comido el mundo del despliegue.
+            </div>
+
+            <div class="aviso">
+                <strong>Antes de empezar:</strong> necesitas tener la práctica 33 superada y Docker Desktop funcionando en tu Windows 11. Si arrancas un <code>docker run hello-world</code> y no responde, vuelve a la 33 y arregla la instalación antes de seguir. Esta práctica va a tirar de los fundamentos que aprendiste allí (volúmenes, redes, Compose, logs, exec).
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- OBJETIVOS                                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Entender qué es <strong>Nextcloud</strong> y por qué tiene sentido autohospedar servicios en lugar de depender de la nube comercial.</li>
+                        <li>Diseñar un <strong>stack multi-servicio</strong> realista (aplicación + base de datos + túnel) y describirlo en un único <code>docker-compose.yml</code>.</li>
+                        <li>Resolver el problema clásico del <strong>acceso desde el exterior</strong> sin tocar el router, sin IP fija y sin dominio, mediante <strong>Cloudflare Tunnel</strong> en modo quick.</li>
+                        <li>Comprender la diferencia entre exponer puertos hacia internet "a la antigua" (port forwarding + DDNS + certificado SSL) y un <strong>túnel saliente</strong>.</li>
+                        <li>Configurar Nextcloud con su CLI (<code>occ</code>) desde dentro del contenedor: <code>trusted_domains</code>, <code>overwriteprotocol</code>, <code>overwrite.cli.url</code>.</li>
+                        <li>Conectar la <strong>app móvil de Nextcloud</strong> a tu servidor publicado y activar la <strong>auto-subida de fotos</strong>: cuando hagas una foto con el móvil, aparecerá segundos después en el navegador del portátil.</li>
+                        <li>Compartir archivos por <strong>enlace público</strong> con caducidad y contraseña.</li>
+                        <li>Diagnosticar cinco fallos típicos de un despliegue Nextcloud detrás de túnel: URL del túnel cambiada, base de datos caída, volumen mal montado, archivo demasiado grande, túnel sin conectividad.</li>
+                        <li>Distinguir la opción gratuita y temporal (<code>trycloudflare.com</code>) de un despliegue serio con dominio propio y túnel nombrado, y saber cuándo elegir cada una.</li>
+                        <li>Documentar el despliegue en una <strong>ficha técnica</strong> reutilizable.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 0 - Conceptos previos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 - Qué es Nextcloud</h3>
+                    <p><strong>Nextcloud</strong> es una plataforma libre de servicios "tipo nube" autoalojable. Lo más conocido es la sincronización y compartición de archivos (estilo Dropbox), pero por encima incluye fotos (estilo Google Photos), calendario y contactos (compatible con CalDAV/CardDAV, sustituye a Google Calendar), notas, tareas, ofimática colaborativa (Collabora/OnlyOffice), videoconferencia (Talk), chat tipo Slack (Deck), gestor de contraseñas... todo en una sola interfaz web y un solo conjunto de usuarios.</p>
+
+                    <p>Lo usan administraciones europeas (gobierno francés, Comisión Europea), universidades, hospitales y miles de pymes que no quieren que sus datos sensibles vivan en Google o Microsoft.</p>
+
+                    <h3>0.2 - Autohospedar vs nube comercial</h3>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>Servicio comercial (Drive, Dropbox)</th><th>Autohospedado (Nextcloud)</th></tr>
+                        <tr><td>Coste mensual</td><td>5-10 €/mes por usuario</td><td>El de tu equipo y conexión</td></tr>
+                        <tr><td>Capacidad</td><td>Lo que pagues</td><td>Lo que tengas en disco</td></tr>
+                        <tr><td>Privacidad</td><td>Sus servidores, sus reglas, sus subcontratistas</td><td>Tus datos no salen de tu equipo</td></tr>
+                        <tr><td>Disponibilidad</td><td>99.9% gestionada por ellos</td><td>La que mantengas tú</td></tr>
+                        <tr><td>Curva de aprendizaje</td><td>Cero</td><td>Esta práctica</td></tr>
+                        <tr><td>Dependencia de empresa externa</td><td>Total</td><td>Ninguna</td></tr>
+                    </table>
+
+                    <p>No es "uno mejor que otro": son herramientas distintas. Para una pyme de cinco personas que mueve documentos sensibles, Nextcloud autoalojado en un NAS o un servidor barato es perfectamente razonable. Para un usuario doméstico que no quiere mantener nada, Google Drive es más sensato.</p>
+
+                    <h3>0.3 - Arquitectura típica de Nextcloud</h3>
+
+                    <p>Nextcloud no es un único proceso, son <strong>varios servicios trabajando juntos</strong>:</p>
+
+                    <table>
+                        <tr><th>Componente</th><th>Qué hace</th><th>Cuándo es opcional</th></tr>
+                        <tr><td><strong>App de Nextcloud</strong> (PHP + Apache)</td><td>El servidor web con todo el código de Nextcloud</td><td>Imprescindible</td></tr>
+                        <tr><td><strong>Base de datos</strong> (MariaDB, PostgreSQL o SQLite)</td><td>Guarda metadatos: usuarios, archivos, permisos, calendarios</td><td>Imprescindible (SQLite vale para una persona; MariaDB para todo lo demás)</td></tr>
+                        <tr><td><strong>Caché</strong> (Redis)</td><td>Acelera consultas y bloqueos de archivos en accesos concurrentes</td><td>Opcional pero muy recomendado en producción</td></tr>
+                        <tr><td><strong>Cron</strong></td><td>Tareas en segundo plano (limpieza, notificaciones, indexado)</td><td>Imprescindible (puede correr dentro del propio contenedor de la app)</td></tr>
+                        <tr><td><strong>Proxy / túnel</strong></td><td>Pone HTTPS delante y/o publica el servicio</td><td>Imprescindible si lo expones a internet</td></tr>
+                    </table>
+
+                    <p>En esta práctica vas a montar tres contenedores: <strong>app</strong>, <strong>base de datos</strong> y <strong>túnel</strong>. Sin Redis (innecesario para uno o dos usuarios) y con cron embebido en la app. Es una configuración suficiente para cuatro o cinco usuarios reales.</p>
+
+                    <h3>0.4 - El problema clásico del acceso desde el exterior</h3>
+
+                    <p>Tu portátil tiene una IP privada (192.168.x.x). El router del aula tiene una IP pública asignada por el ISP, pero esa IP suele cambiar cada poco tiempo y, sobre todo, hay un router de por medio que <em>no deja entrar conexiones</em> por defecto. Para publicar un servicio a la antigua usanza necesitarías:</p>
+
+                    <ol style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Abrir un puerto en el router (<em>port forwarding</em>) hacia tu portátil: en una red ajena (aula, oficina, hotel) <strong>esto no es opción</strong>.</li>
+                        <li>Saber tu IP pública en cada momento (<em>DDNS</em>: noip.com, duckdns.org).</li>
+                        <li>Conseguir un <strong>certificado HTTPS</strong> válido para que los navegadores no chillen (Let's Encrypt requiere un dominio).</li>
+                        <li>Tener un <strong>dominio</strong> propio.</li>
+                        <li>Asumir que tu IP queda expuesta a escaneos automáticos de internet (botnets que buscan servicios mal configurados 24/7).</li>
+                    </ol>
+
+                    <p>Con <strong>Cloudflare Tunnel</strong> resuelves los cinco puntos a la vez sin tocar nada.</p>
+
+                    <h3>0.5 - Cómo funciona Cloudflare Tunnel</h3>
+
+                    <p>El truco es invertir el sentido de la conexión. En lugar de que internet llame a tu portátil (lo que requiere abrir puertos), tu portátil <strong>establece una conexión saliente</strong> hacia los servidores de Cloudflare y la mantiene abierta. Cuando alguien quiere acceder a tu servicio:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>El visitante teclea <code>https://random-words.trycloudflare.com</code>.</li>
+                            <li>La petición HTTPS llega a un servidor de Cloudflare en el datacenter más cercano al visitante.</li>
+                            <li>Cloudflare la enruta por el túnel <em>saliente</em> que tu portátil mantiene abierto.</li>
+                            <li>Tu cliente <code>cloudflared</code> recibe la petición, la pasa al contenedor de Nextcloud, recoge la respuesta y la devuelve por el túnel.</li>
+                            <li>Cloudflare la sirve al visitante con <strong>HTTPS válido</strong> (el certificado lo aporta Cloudflare).</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Por qué esto funciona en redes hostiles:</strong> el aula, la oficina, el hotel y el 4G del móvil bloquean conexiones <em>entrantes</em>, pero <em>permiten</em> conexiones <em>salientes</em> a HTTPS (como cualquier navegador). Cloudflare Tunnel sólo necesita poder salir hacia los servidores de Cloudflare, y todas las redes lo dejan.
+                    </div>
+
+                    <h3>0.6 - Modo quick vs modo nombrado</h3>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>Modo quick (esta práctica)</th><th>Modo nombrado (producción)</th></tr>
+                        <tr><td>Cuenta Cloudflare</td><td>No hace falta</td><td>Sí (gratuita)</td></tr>
+                        <tr><td>Dominio propio</td><td>No hace falta</td><td>Sí</td></tr>
+                        <tr><td>URL</td><td><code>random-words.trycloudflare.com</code> generada al vuelo</td><td><code>nube.tudominio.com</code></td></tr>
+                        <tr><td>Persistencia</td><td>La URL cambia cada vez que reinicias el túnel</td><td>Permanente</td></tr>
+                        <tr><td>Para qué sirve</td><td>Demos, pruebas, talleres, este aula</td><td>Despliegue real para usuarios</td></tr>
+                        <tr><td>Coste</td><td>0 €</td><td>0 € (sólo el dominio, ~10 €/año)</td></tr>
+                    </table>
+
+                    <p>En esta práctica usamos modo quick porque "no tenemos dominio". Al final mencionaremos cómo se daría el salto a modo nombrado el día que tengas uno.</p>
+
+                    <h3>0.7 - Metodología de la práctica</h3>
+
+                    <p>Vamos en este orden, idéntico al de la práctica 33:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Levantar Nextcloud sólo en local y verificar que arranca (Parte 1).</li>
+                            <li>Aprender a no perder los datos: volúmenes y backup básico (Parte 2).</li>
+                            <li>Añadir el túnel y publicarlo a internet (Parte 3).</li>
+                            <li>Conectar la app del móvil y activar auto-subida de fotos (Parte 4).</li>
+                            <li>Romper a propósito y diagnosticar (Parte 5).</li>
+                            <li>Endurecer y planear el siguiente paso (Parte 6).</li>
+                            <li>Documentar (Parte 7).</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Idea clave:</strong> al terminar esta práctica habrás montado, expuesto a internet, sincronizado fotos del móvil y compartido por enlace una nube privada en menos de una jornada. Sin Docker, esto era trabajo de varias semanas y un servidor dedicado.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - NEXTCLOUD EN LOCAL                                   -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 1 - Levantar Nextcloud en local con Compose (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Primero vas a montar Nextcloud sólo accesible desde tu propio Windows en <code>http://localhost:8080</code>. Sin túnel, sin internet, sólo verificar que el stack funciona. Cuando esté firme añadiremos la publicación.</p>
+
+                    <h3>1.1 - Crear la carpeta de trabajo</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el Explorador de Windows, crea una carpeta <code>C:\docker\nextcloud</code>.</li>
+                            <li>Dentro de ella crearás un único archivo, <code>docker-compose.yml</code>. Los datos no irán aquí: Docker los mete en volúmenes propios para que sobrevivan a borrar el contenedor.</li>
+                        </ol>
+                    </div>
+
+                    <h3>1.2 - El docker-compose.yml inicial</h3>
+
+                    <p>Crea el archivo <code>C:\docker\nextcloud\docker-compose.yml</code> con este contenido. Usa Visual Studio Code o cualquier editor de texto (Notepad <em>también</em> sirve, pero asegúrate de que al guardar no le añade <code>.txt</code>: en el diálogo "Guardar como", elige "Todos los archivos" en el desplegable de tipo).</p>
+
+<pre class="codigo">services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      MARIADB_ROOT_PASSWORD: rootsecreto
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: ncsecreto
+    volumes:
+      - db:/var/lib/mysql
+
+  app:
+    image: nextcloud:stable
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: ncsecreto
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: cambiame
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost
+    depends_on:
+      - db
+    volumes:
+      - nc_html:/var/www/html
+
+volumes:
+  db:
+  nc_html:</pre>
+
+                    <p>Lee el archivo entero antes de seguir. Los puntos clave:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Dos servicios</strong> ahora mismo: <code>db</code> (MariaDB) y <code>app</code> (Nextcloud). El túnel lo añadimos en la Parte 3.</li>
+                        <li>El <strong>command</strong> de MariaDB con <code>READ-COMMITTED</code> y <code>binlog-format=ROW</code> es lo que pide la documentación oficial de Nextcloud para evitar bloqueos extraños bajo carga.</li>
+                        <li>Las <strong>contraseñas en texto plano</strong> son aceptables para una práctica, pero en producción se usan <em>secrets</em> de Compose o variables de entorno externas, nunca el archivo en git.</li>
+                        <li><code>NEXTCLOUD_TRUSTED_DOMAINS: localhost</code> indica desde qué dominios admite peticiones. Si entras desde un dominio que no esté en la lista, Nextcloud te bloquea. Esta sutileza generará el primer fallo de la Parte 5.</li>
+                        <li>Dos <strong>volúmenes con nombre</strong>: <code>db</code> (datos de MariaDB) y <code>nc_html</code> (todo el árbol de Nextcloud, que incluye sus archivos). Sobrevivirán a un <code>compose down</code>.</li>
+                    </ul>
+
+                    <h3>1.3 - Primer arranque</h3>
+
+                    <p>Abre PowerShell, sitúate en la carpeta y arranca:</p>
+
+<pre class="codigo">cd C:\docker\nextcloud
+docker compose up -d
+docker compose ps</pre>
+
+                    <p>El primer <code>up</code> tarda un par de minutos: descarga las imágenes (Nextcloud son ~700 MB, MariaDB ~150 MB) e inicializa la base de datos. Mira los logs en directo en otra ventana de PowerShell para entender qué pasa:</p>
+
+<pre class="codigo">docker compose logs -f app</pre>
+
+                    <p>Verás líneas como <em>"Initializing nextcloud..."</em>, <em>"Installing with MySQL database"</em>, <em>"Apache/2.4.x ... configured -- resuming normal operations"</em>. Cuando aparezca esa última línea, Nextcloud está listo. Ctrl+C para salir del log (no para el contenedor, sólo deja de mostrar logs).</p>
+
+                    <table>
+                        <tr><td>Tiempo aproximado de arranque del primer up</td><td><input type="text" placeholder="ej. 90 s"></td></tr>
+                        <tr><td>STATUS de los dos contenedores en <code>docker compose ps</code></td><td><input type="text" placeholder="Up X minutes (healthy)"></td></tr>
+                    </table>
+
+                    <h3>1.4 - Primera entrada por el navegador</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <code>http://localhost:8080</code> en tu navegador.</li>
+                            <li>Te sale la pantalla de login (no la de instalación: <code>NEXTCLOUD_ADMIN_USER</code> y <code>NEXTCLOUD_ADMIN_PASSWORD</code> ya hicieron la instalación inicial automática).</li>
+                            <li>Entra con <code>admin</code> / <code>cambiame</code>.</li>
+                            <li>Cierra el tour de bienvenida si aparece.</li>
+                        </ol>
+                    </div>
+
+                    <p>Ya estás dentro de tu Nextcloud. Tienes una nube privada en local. Date una vuelta:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Subir un archivo arrastrándolo desde el escritorio.</li>
+                        <li>Crear una carpeta y subir varios archivos dentro.</li>
+                        <li>Botón <em>+</em> &rarr; "Plantillas": Nextcloud trae plantillas de documentos.</li>
+                        <li>Esquina superior derecha &rarr; tu avatar &rarr; <em>Aplicaciones</em>: ojea el catálogo enorme de aplicaciones que se pueden activar.</li>
+                    </ul>
+
+                    <table>
+                        <tr><td>Nombre del primer archivo que has subido</td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño que reporta Nextcloud para ese archivo</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>1.5 - Cambiar la contraseña de admin</h3>
+
+                    <p>"cambiame" es un nombre que pide a gritos que lo cambies. Hazlo desde la propia interfaz: avatar &rarr; <em>Configuración personal</em> &rarr; <em>Seguridad</em> &rarr; <em>Cambiar contraseña</em>. Ponle una contraseña fuerte de verdad: <strong>la vas a publicar a internet en la Parte 3</strong>.</p>
+
+                    <div class="aviso">
+                        <strong>Crítico:</strong> hasta el final de la Parte 3 tu Nextcloud es inalcanzable desde fuera. Pero en cuanto lo expongas, cualquier bot de internet va a probar admin/admin, admin/password, admin/123456 contra tu URL en cuestión de minutos. Cambia la contraseña <em>ahora</em>, no luego.
+                    </div>
+
+                    <table>
+                        <tr><td>¿Has cambiado la contraseña de admin?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                    </table>
+
+                    <h3>1.6 - Comprobar la línea de comandos de Nextcloud (occ)</h3>
+
+                    <p>Nextcloud trae una herramienta CLI llamada <strong>occ</strong> que permite hacer absolutamente todo desde dentro: gestionar usuarios, configurar parámetros, reparar la BD, generar informes. Vas a usarla mucho en la Parte 3 y en los diagnósticos. Pruébala ahora:</p>
+
+<pre class="codigo">docker compose exec --user www-data app php occ status
+docker compose exec --user www-data app php occ user:list
+docker compose exec --user www-data app php occ config:system:get trusted_domains</pre>
+
+                    <p>El <code>--user www-data</code> es necesario porque Apache/PHP corre como ese usuario y los archivos pertenecen a él; ejecutar <code>occ</code> como root da problemas de permisos.</p>
+
+                    <table>
+                        <tr><td>Versión de Nextcloud que reporta <code>occ status</code></td><td><input type="text"></td></tr>
+                        <tr><td>Trusted domains actuales</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Acabas de levantar Nextcloud con dos contenedores y un YAML de 30 líneas. Calcula a ojo cuánto tardarías en montar lo mismo "a mano" en una Ubuntu virgen (instalar Apache, PHP con sus 15 módulos, MariaDB, configurar el virtualhost, descomprimir Nextcloud, ajustar permisos, ejecutar el asistente). ¿Por qué esta diferencia es la razón por la que Docker se ha extendido tanto?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - PERSISTENCIA Y BACKUP                                -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 - Persistencia y backup básico (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Antes de exponer nada a internet, tienes que demostrarte a ti mismo que los datos sobreviven a borrar contenedores. Si esto falla, lo descubres ahora; no cuando tengas 200 fotos del móvil sincronizadas.</p>
+
+                    <h3>2.1 - Inspeccionar los volúmenes</h3>
+
+<pre class="codigo">docker volume ls | findstr nextcloud
+docker volume inspect nextcloud_db
+docker volume inspect nextcloud_nc_html</pre>
+
+                    <p>El prefijo <code>nextcloud_</code> lo añade Compose porque se llama así la carpeta. Anota la ruta del campo <em>Mountpoint</em>: ahí dentro de WSL2 viven tus datos.</p>
+
+                    <table>
+                        <tr><td>Mountpoint del volumen <code>nc_html</code></td><td><input type="text" placeholder="/var/lib/docker/volumes/..."></td></tr>
+                    </table>
+
+                    <h3>2.2 - El experimento "borro y recreo"</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Sube un archivo nuevo desde el navegador, por ejemplo <em>prueba_persistencia.txt</em>.</li>
+                            <li>Para los contenedores conservando los volúmenes:
+                                <pre class="codigo">docker compose down</pre>
+                                Verás que para y elimina los dos contenedores y la red. Los volúmenes <em>no</em> se tocan.
+                            </li>
+                            <li>Comprueba: <code>docker volume ls | findstr nextcloud</code> &mdash; ahí siguen.</li>
+                            <li>Vuelve a levantar el stack:
+                                <pre class="codigo">docker compose up -d</pre>
+                                Esta vez es rápido (no descarga imágenes ni recrea la BD).
+                            </li>
+                            <li>Entra a <code>http://localhost:8080</code> con tu usuario admin: el archivo <em>prueba_persistencia.txt</em> sigue ahí.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 - Lo que NO hay que hacer</h3>
+
+<pre class="codigo">docker compose down -v</pre>
+
+                    <p>El flag <code>-v</code> elimina <em>también</em> los volúmenes. Es la forma de empezar de cero, pero <strong>borra todos los datos sin preguntar</strong>. Memoriza la diferencia: <code>down</code> sin flag conserva datos; <code>down -v</code> los pulveriza.</p>
+
+                    <div class="aviso">
+                        <strong>Trampa de novato número 1 con Nextcloud:</strong> alguien hace <code>docker compose down -v</code> "para reiniciar el problema desde cero" y se carga 6 meses de datos sincronizados. Por eso, en producción nunca se ejecuta ese comando sin un backup previo.
+                    </div>
+
+                    <h3>2.4 - Backup mínimo viable</h3>
+
+                    <p>Backup serio = dump de la BD + copia del volumen de archivos. Para esta práctica te basta saber el patrón:</p>
+
+<pre class="codigo"># 1. Dump de la base de datos a un archivo del host
+docker compose exec db sh -c "mariadb-dump -uroot -prootsecreto nextcloud" &gt; backup_db.sql
+
+# 2. Copiar el contenido del volumen de archivos a un .tar dentro del host
+docker run --rm -v nextcloud_nc_html:/data -v ${PWD}:/backup alpine `
+  tar czf /backup/backup_nc_html.tgz -C /data .</pre>
+
+                    <p>El segundo comando levanta un contenedor Alpine efímero, le monta el volumen de Nextcloud en <code>/data</code> y la carpeta actual de Windows en <code>/backup</code>, y comprime los datos en un .tgz dentro de tu carpeta. Es el patrón canónico para hacer backup de un volumen Docker desde el anfitrión sin instalar nada.</p>
+
+                    <p>Ejecútalo y comprueba que se generan dos archivos en la carpeta <code>C:\docker\nextcloud</code>. Apunta el tamaño del .tgz: te da una idea de cuánto pesa Nextcloud "vacío".</p>
+
+                    <table>
+                        <tr><td>Tamaño de <code>backup_db.sql</code></td><td><input type="text"></td></tr>
+                        <tr><td>Tamaño de <code>backup_nc_html.tgz</code></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Pregunta de entrevista:</strong> "¿cómo se hace backup de un volumen de Docker?". La respuesta canónica es exactamente la del segundo comando: contenedor efímero + dos montajes (volumen y destino) + tar. Apréndete el patrón.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - PUBLICAR CON CLOUDFLARE TUNNEL                       -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Publicar en internet con Cloudflare Tunnel (60 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Hasta aquí tienes una nube privada que sólo tú ves desde tu Windows. Ahora vas a darle URL pública HTTPS sin tocar nada del router.</p>
+
+                    <h3>3.1 - Añadir el servicio cloudflared al compose</h3>
+
+                    <p>Edita <code>C:\docker\nextcloud\docker-compose.yml</code> y añade un tercer servicio al final, justo antes del bloque <code>volumes:</code>:</p>
+
+<pre class="codigo">services:
+  db:
+    # ... lo de antes, sin cambios
+
+  app:
+    # ... lo de antes, sin cambios
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://app:80
+    depends_on:
+      - app
+
+volumes:
+  db:
+  nc_html:</pre>
+
+                    <p>El comando <code>tunnel --url http://app:80</code> en modo <em>quick</em> (sin token, sin cuenta) hace dos cosas:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Establece una conexión saliente al edge de Cloudflare.</li>
+                        <li>Solicita una URL <code>*.trycloudflare.com</code> aleatoria que enrute hacia <code>http://app:80</code> (el servicio Nextcloud, accesible por DNS dentro de la red de Compose con el nombre <code>app</code>).</li>
+                    </ul>
+
+                    <h3>3.2 - Levantar el túnel</h3>
+
+<pre class="codigo">docker compose up -d
+docker compose ps
+docker compose logs tunnel</pre>
+
+                    <p>En los logs verás algo parecido a esto:</p>
+
+<pre class="codigo">tunnel-1  | 2026-... INF +--------------------------------------------------------------------------------------------+
+tunnel-1  | 2026-... INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+tunnel-1  | 2026-... INF |  https://random-words-here.trycloudflare.com                                               |
+tunnel-1  | 2026-... INF +--------------------------------------------------------------------------------------------+</pre>
+
+                    <p>Esa URL es tuya, ahora mismo, accesible desde cualquier dispositivo con internet en el mundo. Cópiala. Para verla cómodamente en cualquier momento:</p>
+
+<pre class="codigo">docker compose logs tunnel | Select-String trycloudflare</pre>
+
+                    <table>
+                        <tr><td>URL pública que te ha dado el túnel</td><td><input type="text" placeholder="https://...trycloudflare.com"></td></tr>
+                    </table>
+
+                    <h3>3.3 - El primer susto: "Access through untrusted domain"</h3>
+
+                    <p>Abre la URL del túnel en tu navegador. Te aparecerá una pantalla blanca con texto del tipo:</p>
+
+<pre class="codigo">Access through untrusted domain
+Please contact your administrator. If you are an administrator, edit the
+"trusted_domains" setting in config/config.php like the example in
+config.sample.php.</pre>
+
+                    <p>Es el comportamiento de seguridad que mencionamos en la Parte 1.4. Nextcloud sólo acepta peticiones desde dominios autorizados. <code>localhost</code> está en la lista, <code>random-words.trycloudflare.com</code> no.</p>
+
+                    <h3>3.4 - Añadir el dominio del túnel a trusted_domains</h3>
+
+                    <p>Sustituye <code>random-words.trycloudflare.com</code> por la URL real que te dio tu túnel (sin <code>https://</code>) y ejecuta:</p>
+
+<pre class="codigo">docker compose exec --user www-data app php occ config:system:set `
+  trusted_domains 1 --value=random-words.trycloudflare.com</pre>
+
+                    <p>El "1" es la posición en el array de dominios (la 0 está ocupada por <code>localhost</code> que vino del compose). Si ahora consultas:</p>
+
+<pre class="codigo">docker compose exec --user www-data app php occ config:system:get trusted_domains</pre>
+
+                    <p>...verás los dos dominios. Recarga la URL del túnel en el navegador. Esta vez aparece el login de Nextcloud.</p>
+
+                    <h3>3.5 - Configurar URLs absolutas para el túnel</h3>
+
+                    <p>Hay dos parámetros más que es importante poner cuando Nextcloud está detrás de un túnel/proxy con HTTPS terminado fuera (caso de Cloudflare):</p>
+
+<pre class="codigo">docker compose exec --user www-data app php occ config:system:set `
+  overwriteprotocol --value=https
+
+docker compose exec --user www-data app php occ config:system:set `
+  overwrite.cli.url --value=https://random-words.trycloudflare.com
+
+docker compose exec --user www-data app php occ config:system:set `
+  overwritehost --value=random-words.trycloudflare.com</pre>
+
+                    <p>Sin esto Nextcloud puede generar enlaces internos en HTTP (cuando todo el mundo le habla por HTTPS), o usar <code>localhost</code> en URLs de notificaciones por correo. Estos tres parámetros le dicen "ignora lo que veas en las cabeceras y asume <em>siempre</em> esta URL pública".</p>
+
+                    <h3>3.6 - Probar desde otro dispositivo</h3>
+
+                    <p>El acid test:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Coge tu móvil. <strong>Desactiva el WiFi</strong> y déjalo con datos 4G/5G. Eso garantiza que la conexión no pasa por la red del aula y demuestra que la URL es realmente pública.</li>
+                            <li>Abre el navegador del móvil y entra a la URL del túnel.</li>
+                            <li>Loguéate con admin y la contraseña que pusiste.</li>
+                            <li>Sube una foto desde el móvil arrastrándola al botón <em>+</em>.</li>
+                            <li>Vuelve al portátil y refresca: la foto está ahí.</li>
+                        </ol>
+                    </div>
+
+                    <p>Acabas de hacer subir un archivo desde tu móvil con 4G a un servidor que tienes en tu portátil del aula sin abrir un puerto. Esto es el "wow" de la práctica. Si funciona, todo el resto va a fluir.</p>
+
+                    <table>
+                        <tr><td>¿Cargó el login de Nextcloud desde el móvil con 4G?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                        <tr><td>¿Aparece la foto subida en el navegador del portátil al refrescar?</td><td><input type="text"></td></tr>
+                        <tr><td>Latencia subjetiva (rápido / normal / lento)</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>3.7 - Compartir un archivo por enlace público</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En la web, clic en el icono de "compartir" de un archivo.</li>
+                            <li>Pestaña <strong>Enlaces compartidos</strong> &rarr; <strong>+</strong>.</li>
+                            <li>Activa la <em>caducidad</em> a tres días y pon una <em>contraseña</em>.</li>
+                            <li>Copia el enlace y mándatelo por WhatsApp/Telegram a ti mismo.</li>
+                            <li>Ábrelo en el móvil. Te pide la contraseña, la metes y descargas el archivo.</li>
+                        </ol>
+                    </div>
+
+                    <p>Esto es lo que hace WeTransfer. Acabas de implementarlo en tu propio servidor en cinco clics. Sin límite de 2 GB, sin publicidad, sin caducidad obligatoria a los tres días.</p>
+
+                    <div class="pregunta">
+                        <p>Explica con tus palabras qué papel juega Cloudflare en esta arquitectura. ¿Por qué tu portátil <em>no</em> tiene que abrir ningún puerto en el router? ¿Qué pasa si tu portátil pierde la conexión a internet durante 30 segundos?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - APP MÓVIL Y AUTO-FOTOS                               -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - App móvil y auto-subida de fotos (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>El navegador del móvil sirve para empezar, pero la experiencia "Google Photos" la da la <strong>app oficial de Nextcloud</strong>: corre en segundo plano y va subiendo cada foto que haces a tu servidor automáticamente.</p>
+
+                    <h3>4.1 - Instalar la app oficial</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el móvil, abre Play Store (Android) o App Store (iOS).</li>
+                            <li>Busca <strong>Nextcloud</strong> e instala la app oficial (autor: <em>Nextcloud GmbH</em>; tiene el logo azul en forma de nube).</li>
+                            <li>Ábrela y pulsa <strong>Iniciar sesión</strong>.</li>
+                            <li>En "Dirección del servidor" pega la URL del túnel (la <code>https://...trycloudflare.com</code>).</li>
+                            <li>La app abre el navegador del móvil, te pide login (admin + contraseña), pulsas <em>Conceder acceso</em>, y vuelve a la app.</li>
+                        </ol>
+                    </div>
+
+                    <p>Si todo va bien, la app muestra tus archivos. Si te da error de SSL o "no se puede conectar", revisa que la URL del túnel sigue activa (<code>docker compose logs tunnel</code>) y que has añadido el dominio a <code>trusted_domains</code>.</p>
+
+                    <h3>4.2 - Activar auto-subida de fotos</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Dentro de la app, menú lateral &rarr; <strong>Auto-subida</strong>.</li>
+                            <li>Activa la <strong>cámara</strong> como carpeta a sincronizar.</li>
+                            <li>Elige carpeta destino en el servidor: <em>Photos</em> es buena opción (la crea Nextcloud por defecto).</li>
+                            <li>Activa la subida también con datos móviles si quieres ser radical (ojo al consumo).</li>
+                            <li>Acepta los permisos que pida Android/iOS para acceder a la galería en segundo plano.</li>
+                        </ol>
+                    </div>
+
+                    <h3>4.3 - El experimento "haz una foto y mírala en el portátil"</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Cierra la app de Nextcloud (déjala en segundo plano).</li>
+                            <li>Abre la cámara del móvil. Haz una foto cualquiera.</li>
+                            <li>Espera 30-60 segundos. La app de Nextcloud detecta la foto nueva, la sube en segundo plano.</li>
+                            <li>En el portátil, abre <code>https://...trycloudflare.com</code> y entra a la carpeta <em>Photos</em>.</li>
+                            <li>Ahí está la foto recién hecha.</li>
+                        </ol>
+                    </div>
+
+                    <p>Acabas de implementar Google Photos en tu propio servidor. Cualquier foto que hagas, mientras la app esté instalada y haya internet, irá a tu nube privada en menos de un minuto.</p>
+
+                    <table>
+                        <tr><td>Hora exacta a la que hiciste la foto de prueba</td><td><input type="text" placeholder="HH:MM:SS"></td></tr>
+                        <tr><td>Hora a la que apareció en el portátil</td><td><input type="text"></td></tr>
+                        <tr><td>Tiempo total de propagación</td><td><input type="text" placeholder="ej. 35 s"></td></tr>
+                    </table>
+
+                    <h3>4.4 - Cliente de escritorio (opcional, +20 min)</h3>
+
+                    <p>Si quieres replicar el comportamiento de "carpeta de Dropbox", también hay cliente de escritorio para Windows/Mac/Linux:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Descarga el cliente desde <em>nextcloud.com/install</em>, sección "Desktop clients".</li>
+                            <li>Instálalo en tu Windows.</li>
+                            <li>Conecta a la URL del túnel con admin y tu contraseña.</li>
+                            <li>Elige una carpeta local (por ejemplo <code>C:\Users\tu_usuario\Nextcloud</code>) y déjalo sincronizar.</li>
+                            <li>Mueve un archivo a esa carpeta. Se sincroniza al servidor en segundos. Refresca el navegador y aparece.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Reto extra:</strong> instala el cliente también en otro equipo (el de un compañero, tu sobremesa, lo que sea). Cuando subas algo en uno, aparece en el otro automáticamente. Eso es exactamente Dropbox/OneDrive y lo has montado tú con software libre.
+                    </div>
+
+                    <h3>4.5 - Apps útiles que puedes activar</h3>
+
+                    <p>En el navegador, avatar &rarr; <em>Aplicaciones</em>. Algunas que pruebas en cinco segundos y se te quedan:</p>
+
+                    <table>
+                        <tr><th>App</th><th>Para qué</th></tr>
+                        <tr><td><strong>Calendario</strong></td><td>Sustituto de Google Calendar. Sincroniza con el calendario nativo del móvil por CalDAV</td></tr>
+                        <tr><td><strong>Contactos</strong></td><td>Lo mismo para la libreta de direcciones (CardDAV)</td></tr>
+                        <tr><td><strong>Notes</strong></td><td>Sustituto de Google Keep / Apple Notes con sincronización entre dispositivos</td></tr>
+                        <tr><td><strong>Tasks</strong></td><td>Lista de tareas con CalDAV</td></tr>
+                        <tr><td><strong>Talk</strong></td><td>Chat y videoconferencia tipo WhatsApp/Zoom dentro de tu propia nube</td></tr>
+                        <tr><td><strong>Deck</strong></td><td>Tableros tipo Trello para organizar proyectos</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - DIAGNÓSTICO AUTÓNOMO                                 -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Provocar y diagnosticar tus propios fallos (90 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Igual que en las dos prácticas anteriores, vas a romper a propósito cinco cosas, hacer como si te las acabases de encontrar y diagnosticar. Esta vez los fallos son los típicos de un Nextcloud expuesto detrás de un túnel.</p>
+
+                    <div class="aviso">
+                        <strong>Antes de empezar:</strong> haz un dump rápido de la BD (<em>Parte 2.4</em>) por si acaso. Y vuelve a apuntar la URL actual del túnel: la vas a perder en el primer caso.
+                    </div>
+
+                    <h3>5.1 - Caso A - El túnel se reinicia y la URL cambia</h3>
+
+                    <p><strong>Qué rompes:</strong> reinicias el contenedor del túnel. Modo quick = URL nueva al arrancar. Resultado: tu app móvil deja de conectar, los enlaces compartidos que mandaste por WhatsApp dan 404, los clientes de escritorio fallan.</p>
+
+<pre class="codigo">docker compose restart tunnel
+docker compose logs tunnel | Select-String trycloudflare</pre>
+
+                    <p>La nueva URL es distinta de la anterior. Si abres la antigua en el navegador, ya no responde.</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma del usuario: "ayer funcionaba, hoy desde el móvil no abre la nube".</li>
+                            <li>Primer reflejo: ¿está la app del servidor viva? <code>docker compose ps</code>: sí, los tres contenedores Up.</li>
+                            <li>¿Responde en local? Abre <code>http://localhost:8080</code>: sí, el portal va.</li>
+                            <li>Por tanto el problema está entre el túnel y el cliente. <code>docker compose logs tunnel | Select-String trycloudflare</code>: la URL <em>actual</em> del túnel es distinta de la que tenías guardada en el móvil.</li>
+                            <li>Verifica entrando con la URL nueva en el navegador del portátil: vuelve a salir el login (o el "Access through untrusted domain" si todavía no añadiste la nueva URL a trusted_domains).</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Añade la nueva URL a trusted_domains:
+                                <pre class="codigo">docker compose exec --user www-data app php occ config:system:set `
+  trusted_domains 1 --value=NUEVA-URL.trycloudflare.com</pre>
+                            </li>
+                            <li>Actualiza <code>overwrite.cli.url</code> y <code>overwritehost</code> con la nueva URL.</li>
+                            <li>En el móvil, en la app de Nextcloud, ve a <em>Configuración</em> &rarr; <em>tu cuenta</em> &rarr; <em>Eliminar cuenta</em> y vuelve a iniciar sesión con la URL nueva.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Por qué pasa:</strong> el modo quick de Cloudflare Tunnel está pensado para demos y pruebas, no para servicios estables. La URL es efímera por diseño. Solución definitiva: dominio propio + túnel nombrado (Parte 6).</p>
+
+                    <table>
+                        <tr><td>URL antigua</td><td><input type="text"></td></tr>
+                        <tr><td>URL nueva tras el restart</td><td><input type="text"></td></tr>
+                        <tr><td>¿Cuántos sitios has tenido que actualizar la URL?</td><td><input type="text" placeholder="trusted_domains, móvil, ..."></td></tr>
+                    </table>
+
+                    <h3>5.2 - Caso B - La base de datos se cae</h3>
+
+                    <p><strong>Qué rompes:</strong> paras el contenedor de la base de datos. Nextcloud queda vivo pero sin BD detrás. Es la simulación clásica de "la BD se quedó sin disco" o "alguien reinició el servidor de BD por error".</p>
+
+<pre class="codigo">docker compose stop db
+docker compose ps</pre>
+
+                    <p>Recarga la URL del túnel en el navegador. Tras un par de segundos verás un error "Internal Server Error" o una pantalla "MySQL server has gone away".</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Síntoma: la nube devuelve "Internal Server Error" desde cualquier navegador.</li>
+                            <li><code>docker compose ps</code>: la <em>db</em> aparece "Exited", la <em>app</em> sigue Up. <strong>Pista clave en 10 segundos.</strong></li>
+                            <li><code>docker compose logs --tail 30 app</code>: verás errores PHP del tipo "SQLSTATE[HY000] [2002] Connection refused" o similares.</li>
+                            <li>Comprobación cruzada: <code>docker compose logs db | tail -10</code> te dirá por qué se paró (en este caso, porque tú lo paraste; en producción podría ser un OOM-kill, falta de espacio, etc.).</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Repara:</strong></p>
+
+<pre class="codigo">docker compose start db
+docker compose ps                # vuelve a Up
+# espera 10-15 s a que MariaDB acabe de arrancar
+docker compose logs --tail 5 db</pre>
+
+                    <p>Recarga el navegador: Nextcloud vuelve. Apunta el tiempo desde que arrancas la BD hasta que el portal responde:</p>
+
+                    <table>
+                        <tr><td>Mensaje exacto que mostró el navegador</td><td><input type="text"></td></tr>
+                        <tr><td>Línea más reveladora de <code>docker compose logs app</code></td><td><input type="text"></td></tr>
+                        <tr><td>Tiempo entre <code>start db</code> y "todo va"</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Caso C - Se borró el volumen de datos sin querer</h3>
+
+                    <p><strong>Qué rompes:</strong> simulas el horror absoluto. Alguien hace <code>down -v</code> "para reiniciar limpio" y se carga el volumen de la BD. Vas a ver la pantalla de bienvenida de Nextcloud como si fuese el primer día y a recuperar los datos del backup que (por suerte) hiciste en la Parte 2.</p>
+
+                    <div class="aviso">
+                        <strong>Asegúrate de tener los archivos <code>backup_db.sql</code> y <code>backup_nc_html.tgz</code> en <code>C:\docker\nextcloud</code>.</strong> Si no los tienes, vuelve a la Parte 2.4 y créalos antes de seguir. Sin backup este caso te deja a cero de verdad.
+                    </div>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Para todo y borra los volúmenes:
+                                <pre class="codigo">docker compose down -v</pre>
+                            </li>
+                            <li>Confirma el desastre: <code>docker volume ls | findstr nextcloud</code> ya no muestra nada.</li>
+                            <li>Levanta de nuevo: <code>docker compose up -d</code>. Como los volúmenes se crearon vacíos, Nextcloud te recibirá con el asistente de instalación inicial (o pantalla de login con admin recién creado).</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Síntoma: "ayer tenía 200 fotos y hoy no hay nada en mi nube".</li>
+                        <li><code>docker volume ls</code>: hay volúmenes nuevos creados al instante (mira la columna <em>CREATED</em> con <code>docker volume inspect</code>).</li>
+                        <li>Comparado con tu apunte de la Parte 2.1, son volúmenes <em>distintos</em>: los anteriores se borraron y se crearon otros vacíos.</li>
+                        <li>Causa: <code>docker compose down -v</code> ejecutado por alguien.</li>
+                    </ul>
+
+                    <p><strong>Repara restaurando los backups:</strong></p>
+
+<pre class="codigo"># 1. Restaurar el contenido del volumen de archivos
+docker compose stop app
+docker run --rm -v nextcloud_nc_html:/data -v ${PWD}:/backup alpine `
+  sh -c "cd /data && tar xzf /backup/backup_nc_html.tgz"
+
+# 2. Restaurar la base de datos
+docker compose start app
+docker compose exec -T db sh -c "mariadb -uroot -prootsecreto nextcloud" &lt; backup_db.sql
+
+# 3. Reiniciar la app
+docker compose restart app</pre>
+
+                    <p>Tras esto entras al portal y todos tus datos están ahí.</p>
+
+                    <table>
+                        <tr><td>Estado tras el down -v</td><td><input type="text" placeholder="ej. asistente vacío"></td></tr>
+                        <tr><td>¿Recuperaste todo lo que tenías?</td><td><input type="text"></td></tr>
+                        <tr><td>Tiempo total del incidente y restauración</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.4 - Caso D - "Archivo demasiado grande"</h3>
+
+                    <p><strong>Qué rompes:</strong> intentas subir un archivo de varios GB y la subida casca. Es uno de los problemas más comunes con Nextcloud detrás de un proxy/túnel: hay límites en varios sitios distintos y hay que tocarlos todos.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Ten a mano un archivo grande. Genera uno rápido en PowerShell:
+                                <pre class="codigo">$arr = New-Object byte[] (1024 * 1024 * 1024)   # 1 GB de bytes a cero
+[System.IO.File]::WriteAllBytes("C:\docker\nextcloud\big.bin", $arr)</pre>
+                            </li>
+                            <li>Intenta subirlo desde el navegador a tu Nextcloud (a través de la URL del túnel).</li>
+                            <li>Es probable que falle con "Error en la subida" o similar.</li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Mira en la web: avatar &rarr; <em>Configuración de administración</em> &rarr; <em>Resumen</em>. Nextcloud te dice qué problemas detecta.</li>
+                        <li><code>docker compose logs --tail 30 app</code> tras el intento: busca líneas con <em>"upload"</em> o <em>"PHP Fatal error"</em>.</li>
+                        <li>Por defecto PHP en la imagen de Nextcloud limita las subidas a algunos cientos de MB con <code>upload_max_filesize</code> y <code>post_max_size</code>.</li>
+                        <li>Adicionalmente Cloudflare en plan gratuito limita las cargas a 100 MB por petición. Esto es una restricción <em>externa</em> que no se arregla tocando Nextcloud.</li>
+                    </ul>
+
+                    <p><strong>Repara (parcialmente):</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Sube el límite de PHP creando un archivo en el contenedor. Para no perder el cambio al recrear, en producción se usaría un volumen extra o una imagen propia. Para esta práctica vale con:
+                                <pre class="codigo">docker compose exec app sh -c "echo 'upload_max_filesize=2G' &gt;&gt; /usr/local/etc/php/conf.d/uploads.ini"
+docker compose exec app sh -c "echo 'post_max_size=2G' &gt;&gt; /usr/local/etc/php/conf.d/uploads.ini"
+docker compose restart app</pre>
+                            </li>
+                            <li>Ahora subiendo desde local (<code>http://localhost:8080</code>) puedes subir archivos grandes.</li>
+                            <li>Si lo subes <em>por la URL del túnel</em>, Cloudflare seguirá limitándolo a 100 MB por trozo. La solución es la <strong>subida fragmentada</strong> que el cliente de escritorio y la app móvil sí hacen automáticamente; el navegador no.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Mensaje exacto al intentar la subida</td><td><input type="text"></td></tr>
+                        <tr><td>¿Subió por localhost tras tocar PHP?</td><td><input type="text"></td></tr>
+                        <tr><td>¿Subió por el túnel desde el cliente de escritorio?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.5 - Caso E - El túnel se queda sin internet</h3>
+
+                    <p><strong>Qué rompes:</strong> simulas pérdida de conectividad de salida del túnel. La app del aula sigue funcionando (puede acceder por <code>http://localhost:8080</code>), pero los clientes externos no.</p>
+
+                    <p>Forma sencilla de provocarlo: pausar el contenedor del túnel.</p>
+
+<pre class="codigo">docker compose pause tunnel
+docker compose ps</pre>
+
+                    <p>El estado de <em>tunnel</em> aparece como <em>Paused</em>. Desde el móvil con 4G la URL del túnel deja de responder (o devuelve 530/502 desde Cloudflare).</p>
+
+                    <p><strong>Diagnostica:</strong></p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Síntoma: el usuario externo dice "no me carga". Tú internamente accedes sin problema.</li>
+                        <li><code>docker compose ps</code>: el túnel está <em>Paused</em> (o Exited, según el caso).</li>
+                        <li><code>docker compose logs --tail 20 tunnel</code>: si está parado por un fallo real, verás errores de conexión a los edges de Cloudflare ("failed to dial", "context canceled").</li>
+                        <li>En 4G, la respuesta HTTP de Cloudflare 530 o 1033 indica "el origen no está disponible": confirma que el problema está en tu lado.</li>
+                    </ul>
+
+                    <p><strong>Repara:</strong></p>
+
+<pre class="codigo">docker compose unpause tunnel
+docker compose logs tunnel | Select-String trycloudflare</pre>
+
+                    <p>Como el contenedor sólo se pausó, al despausarlo la conexión se restablece y la URL es <em>la misma</em> (no cambia, porque no se ha reiniciado la negociación inicial). Si hubieras hecho <code>restart</code>, sí cambiaría (eso es el Caso A).</p>
+
+                    <table>
+                        <tr><td>Código HTTP que devolvía Cloudflare en 4G mientras pausado</td><td><input type="text" placeholder="530, 1033..."></td></tr>
+                        <tr><td>¿La URL se mantuvo tras unpause?</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>5.6 - Tabla resumen de los cinco casos</h3>
+                    <table>
+                        <tr><th>Caso</th><th>Tiempo total (min)</th><th>Comando que dio la pista clave</th><th>¿Lo resolverías hoy en 5 minutos?</th></tr>
+                        <tr><td>A - URL del túnel cambiada</td><td><input type="text"></td><td><input type="text" placeholder="ej. logs tunnel"></td><td><input type="text"></td></tr>
+                        <tr><td>B - BD caída</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>C - Volumen borrado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>D - Archivo grande</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>E - Túnel pausado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="reto">
+                        <strong>Reto adicional (opcional, +30 min):</strong> añade Redis al stack como tercer servicio (imagen <code>redis:alpine</code>) y configura Nextcloud para usarlo como caché y para los bloqueos de archivos. Deberás tocar el <code>config.php</code> con varias entradas (memcache.local, memcache.locking, redis.host). Comprueba en la página de Resumen de la administración que los avisos de "memoria caché no configurada" desaparecen.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - ENDURECIMIENTO Y SIGUIENTE PASO                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Endurecimiento y siguientes pasos (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Lo que tienes ahora mismo es funcional pero "de juguete". Para que sea algo de lo que fiarte hay tres frentes a cerrar.</p>
+
+                    <h3>6.1 - Cuenta admin como Dios manda</h3>
+
+                    <p>Si todavía tienes la contraseña que pusiste en la Parte 1.5, evalúa en la página <em>haveibeenpwned.com</em> si está filtrada. En cualquier caso:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea un usuario admin nuevo con un nombre <em>no</em> obvio:
+                                <pre class="codigo">docker compose exec --user www-data app php occ user:add `
+  --display-name="Tu Nombre" tu_nick_admin</pre>
+                                Te pide la contraseña por stdin.
+                            </li>
+                            <li>Promociónalo a admin:
+                                <pre class="codigo">docker compose exec --user www-data app php occ group:adduser admin tu_nick_admin</pre>
+                            </li>
+                            <li>Entra con el nuevo usuario y, ya logueado, deshabilita o elimina el usuario <code>admin</code> original.</li>
+                        </ol>
+                    </div>
+
+                    <p>Cualquier bot que escanee URLs de Nextcloud va a probar primero <code>admin</code> como usuario. Quitarle ese vector es un upgrade enorme con coste casi cero.</p>
+
+                    <h3>6.2 - Activar segundo factor (2FA)</h3>
+
+                    <p>En el portal: avatar &rarr; <em>Configuración personal</em> &rarr; <em>Seguridad</em> &rarr; activa <em>TOTP (autentificador)</em> y escanéalo con Google Authenticator, Aegis o el que uses. A partir de aquí cualquier login pide tu código del móvil.</p>
+
+                    <h3>6.3 - Limitaciones serias del modo quick</h3>
+
+                    <p>Recapitulando lo que has visto:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>La URL <code>trycloudflare.com</code> cambia al reiniciar el túnel (Caso A).</li>
+                        <li>Cloudflare puede capar uploads grandes a través del túnel quick.</li>
+                        <li>No puedes apuntar tu propio dominio a esa URL.</li>
+                        <li>Los términos de servicio dicen explícitamente que es para <em>desarrollo y pruebas</em>, no para producción.</li>
+                    </ul>
+
+                    <p>Para algo serio el siguiente paso es:</p>
+
+                    <h3>6.4 - El día que tengas dominio: túnel nombrado</h3>
+
+                    <p>Es un procedimiento corto (lo dejamos como referencia, no para hacerlo en clase si no tenéis dominio):</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Compra un dominio (los <code>.eu</code> y <code>.com</code> rondan 8-12 €/año en Namecheap, OVH, Porkbun...).</li>
+                            <li>Crea cuenta gratuita en Cloudflare y mete el dominio bajo gestión (cambias los nameservers en el registrador).</li>
+                            <li>En el panel de Cloudflare &rarr; <em>Zero Trust</em> &rarr; <em>Networks</em> &rarr; <em>Tunnels</em> &rarr; <em>Create a tunnel</em>. Le das nombre (<em>nube</em>) y te genera un <strong>token</strong>.</li>
+                            <li>En tu compose sustituyes el comando del servicio tunnel por:
+                                <pre class="codigo">command: tunnel --no-autoupdate run --token TU_TOKEN</pre>
+                            </li>
+                            <li>En el panel asocias <code>nube.tudominio.com</code> al servicio interno <code>http://app:80</code>.</li>
+                        </ol>
+                    </div>
+
+                    <p>Ya tienes URL fija con HTTPS válido y certificado renovado automáticamente. La parte de Nextcloud no cambia: el mismo <code>occ config:system:set</code> de las Partes 3.4 y 3.5.</p>
+
+                    <h3>6.5 - Backup automatizado</h3>
+
+                    <p>El backup de la Parte 2.4 es manual. En producción se programa con el Programador de tareas de Windows o, mejor, dentro del propio compose con un servicio que ejecute el dump cada noche y suba el resultado a un almacenamiento externo (otro NAS, S3, Backblaze B2). Patrón típico: contenedor con cron que ejecuta el dump y un cliente como <code>restic</code> o <code>rclone</code>. Fuera del alcance de esta práctica, pero anótalo como deberes.</p>
+
+                    <div class="pregunta">
+                        <p>De los tres frentes (cuenta admin segura, 2FA, dominio propio), ¿cuál harías el primer día y cuál puede esperar? ¿Por qué?</p>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - FICHA DE INCIDENCIA                                  -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 7 - Documentar el despliegue (25 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Esta vez la ficha cambia: en lugar de una incidencia puntual, vas a documentar el <strong>despliegue completo</strong>. Es el documento que dejarías a un compañero para que pueda mantener el servicio si tú no estás.</p>
+
+                    <div class="ficha">
+                        <h4>FICHA DE DESPLIEGUE - NEXTCLOUD AUTOALOJADO</h4>
+                        <label>Fecha de puesta en marcha</label>
+                        <input type="text" placeholder="2026-MM-DD">
+                        <label>Responsable técnico</label>
+                        <input type="text">
+                        <label>Equipo anfitrión (marca, modelo, SO, RAM, espacio libre)</label>
+                        <input type="text">
+                        <label>Versión de Docker Desktop / Docker Engine</label>
+                        <input type="text">
+                        <label>Versión de Nextcloud desplegada</label>
+                        <input type="text" placeholder="ej. 30.0.x">
+                        <label>Versión de MariaDB</label>
+                        <input type="text">
+                        <label>URL pública del servicio</label>
+                        <input type="text" placeholder="https://....trycloudflare.com">
+                        <label>Tipo de túnel (quick / nombrado)</label>
+                        <input type="text">
+                        <label>Usuario administrador (sin contraseña)</label>
+                        <input type="text">
+                        <label>Ruta del docker-compose.yml en el equipo</label>
+                        <input type="text" placeholder="C:\docker\nextcloud">
+                        <label>Volúmenes que persisten datos (nombre y ruta)</label>
+                        <textarea rows="3"></textarea>
+                        <label>Comandos para arrancar y parar el servicio</label>
+                        <textarea rows="3"></textarea>
+                        <label>Procedimiento de backup (comandos y dónde se guarda)</label>
+                        <textarea rows="4"></textarea>
+                        <label>Procedimiento de restauración (paso a paso)</label>
+                        <textarea rows="4"></textarea>
+                        <label>Cuáles son las tres cosas más probables que se rompan y cómo arreglarlas (resumen de la Parte 5)</label>
+                        <textarea rows="5"></textarea>
+                        <label>Qué clientes están conectados (móviles, escritorios, etc.)</label>
+                        <textarea rows="2"></textarea>
+                        <label>Pendientes / mejoras planeadas</label>
+                        <textarea rows="3"></textarea>
+                        <label>Contactos en caso de problema (proveedor, soporte, compañero)</label>
+                        <textarea rows="2"></textarea>
+                    </div>
+
+                    <div class="truco">
+                        <strong>La diferencia entre un despliegue serio y uno casero</strong> está exactamente en este documento. Un servicio sin documento de despliegue se convierte en un problema en cuanto la persona que lo montó deja de estar. Lo has visto en mil empresas y lo verás en muchas más.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- CONCLUSIONES Y EVALUACIÓN                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Conclusiones y autoevaluación</h2>
+                <div class="seccion-body">
+
+                    <div class="pregunta">
+                        <p>Has montado, expuesto y usado una nube privada en una jornada. Sin Docker, calcula a ojo cuánto te habría llevado y cuántas cosas distintas habrías tenido que aprender (LAMP, certificados, port forwarding, DDNS, configuración de Apache...). ¿Qué función concreta de Docker te ha ahorrado más tiempo?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Compara la solución "abrir puertos del router + DDNS + Let's Encrypt" con "Cloudflare Tunnel". ¿Qué ventajas e inconvenientes tiene cada una en términos de seguridad, mantenimiento y dependencia de un tercero?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Una pyme de 8 empleados quiere dejar de pagar 80 €/mes en Microsoft 365 y montar su propia nube. ¿Recomendarías Nextcloud autoalojado? Lista al menos tres condiciones que tendrían que cumplir para que sea sensato.</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>El responsable de seguridad te pregunta si exponer Nextcloud a internet con Cloudflare Tunnel es seguro. ¿Qué respondes y qué medidas mínimas le pedirías al usuario para considerarlo "razonablemente seguro"?</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Compara las prácticas 33 (Docker básico) y 34 (Nextcloud + Tunnel). ¿Qué concepto de la 33 te ha parecido más útil al hacer la 34? ¿Hay algo de la 33 que <em>no</em> hayas necesitado?</p>
+                        <textarea rows="5"></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Autoevaluación</h3>
+                        <table>
+                            <tr><th>Aspecto</th><th>Logrado</th></tr>
+                            <tr><td>Entiendo qué es Nextcloud y qué problema resuelve frente a la nube comercial</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
+                            <tr><td>Sé describir la arquitectura mínima del stack (app + BD + túnel)</td><td><input type="text"></td></tr>
+                            <tr><td>He levantado el stack con un único <code>docker compose up -d</code></td><td><input type="text"></td></tr>
+                            <tr><td>He probado que los datos sobreviven a un <code>compose down</code> (sin -v)</td><td><input type="text"></td></tr>
+                            <tr><td>Sé hacer backup y restore de un volumen Docker con un contenedor efímero + tar</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo cómo funciona Cloudflare Tunnel (conexión saliente, sin puertos abiertos)</td><td><input type="text"></td></tr>
+                            <tr><td>He resuelto el aviso "Access through untrusted domain" con <code>occ</code></td><td><input type="text"></td></tr>
+                            <tr><td>He accedido a mi nube desde el móvil con 4G, sin pasar por la WiFi del aula</td><td><input type="text"></td></tr>
+                            <tr><td>Tengo la app móvil de Nextcloud sincronizando fotos automáticamente</td><td><input type="text"></td></tr>
+                            <tr><td>He compartido al menos un archivo por enlace público con caducidad y contraseña</td><td><input type="text"></td></tr>
+                            <tr><td>He provocado y resuelto los cinco fallos de la Parte 5</td><td><input type="text"></td></tr>
+                            <tr><td>Diferencio modo quick (URL temporal) de modo nombrado (URL fija con dominio)</td><td><input type="text"></td></tr>
+                            <tr><td>He cambiado la contraseña de admin a una contraseña fuerte</td><td><input type="text"></td></tr>
+                            <tr><td>He rellenado la ficha de despliegue completa</td><td><input type="text"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-secondary" id="btn-guardar" type="button">Guardar progreso</button>
+            <button class="btn btn-secondary" id="btn-borrar" type="button">Borrar progreso</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
+        </div>
+        <div id="estado-guardado" class="no-print" style="text-align:center;padding:0 32px 20px;font-size:12.5px;color:#4a5568;min-height:20px"></div>
+    </div>
+
+    <script>
+    (function() {
+        var CLAVE = 'practica34-progreso-v1';
+        var estado = document.getElementById('estado-guardado');
+        var btnGuardar = document.getElementById('btn-guardar');
+        var btnBorrar = document.getElementById('btn-borrar');
+
+        function camposGuardables() {
+            return document.querySelectorAll('.container input[type="text"], .container input[type="date"], .container textarea');
+        }
+
+        function clavePara(el, idx) {
+            return el.tagName + ':' + (el.type || '') + ':' + idx;
+        }
+
+        function guardar() {
+            var datos = {};
+            camposGuardables().forEach(function(el, idx) {
+                datos[clavePara(el, idx)] = el.value;
+            });
+            try {
+                localStorage.setItem(CLAVE, JSON.stringify({ guardado: new Date().toISOString(), datos: datos }));
+                mostrarEstado('Progreso guardado: ' + new Date().toLocaleString());
+            } catch (e) {
+                mostrarEstado('Error al guardar: ' + e.message, true);
+            }
+        }
+
+        function cargar(silencioso) {
+            var crudo = localStorage.getItem(CLAVE);
+            if (!crudo) {
+                if (!silencioso) mostrarEstado('No hay progreso guardado.');
+                return;
+            }
+            try {
+                var obj = JSON.parse(crudo);
+                camposGuardables().forEach(function(el, idx) {
+                    var valor = obj.datos[clavePara(el, idx)];
+                    if (valor !== undefined) el.value = valor;
+                });
+                var fecha = obj.guardado ? new Date(obj.guardado).toLocaleString() : '(sin fecha)';
+                mostrarEstado('Progreso cargado (último guardado: ' + fecha + ').');
+            } catch (e) {
+                mostrarEstado('Error al cargar: ' + e.message, true);
+            }
+        }
+
+        function borrar() {
+            if (!confirm('¿Borrar el progreso guardado en este navegador? Los campos del formulario se vaciarán.')) return;
+            localStorage.removeItem(CLAVE);
+            camposGuardables().forEach(function(el) { el.value = ''; });
+            mostrarEstado('Progreso borrado.');
+        }
+
+        function mostrarEstado(mensaje, esError) {
+            estado.textContent = mensaje;
+            estado.style.color = esError ? '#c53030' : '#276749';
+            setTimeout(function() { if (estado.textContent === mensaje) estado.style.color = '#4a5568'; }, 4000);
+        }
+
+        btnGuardar.addEventListener('click', guardar);
+        btnBorrar.addEventListener('click', borrar);
+
+        var temporizador = null;
+        camposGuardables().forEach(function(el) {
+            el.addEventListener('input', function() {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(guardar, 1000);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() { cargar(true); });
+        if (document.readyState !== 'loading') cargar(true);
+    })();
+    </script>
+</body>
+</html>
