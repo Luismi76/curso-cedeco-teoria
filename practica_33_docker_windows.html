@@ -912,11 +912,38 @@ docker build -t roto:1.0 .</pre>
                 <h2>Parte 6 - Docker Compose: varios contenedores con un solo archivo (30 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Lanzar dos o tres contenedores con <code>docker run</code> cada vez que reinicias el equipo es trabajo manual y propenso a errores. <strong>Docker Compose</strong> describe el stack completo en un archivo YAML y lo levanta con un comando.</p>
+                    <p>Hasta ahora has lanzado cada contenedor con su propio <code>docker run</code> y sus flags. Para uno o dos sueltos es razonable, pero cuando un entorno necesita arrancar a la vez web + BD + Redis + worker, escribir cuatro <code>docker run</code> largos cada vez que reinicias el equipo es repetitivo y se cometen errores (flags olvidados, redes mal conectadas, orden de arranque...). <strong>Docker Compose</strong> resuelve eso: describes todo el conjunto en un archivo YAML versionable y lo levantas o tiras con un solo comando.</p>
 
-                    <h3>6.1 - Tu primer docker-compose.yml</h3>
+                    <h3>6.1 - Antes del YAML: tres reglas mínimas del formato</h3>
 
-                    <p>Crea la carpeta <code>C:\docker\compose-demo</code> y dentro un archivo <code>docker-compose.yml</code>:</p>
+                    <p>YAML es un formato de texto plano para describir datos estructurados. Lo usan Docker Compose, Kubernetes, GitHub Actions y muchas otras herramientas. Con tres reglas tienes suficiente para esta práctica:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Indentación con espacios, no con tabuladores</strong>, y todos los hijos del mismo padre con la misma cantidad de espacios (lo normal: 2 espacios). Si mezclas tabs y espacios, falla y el mensaje no siempre es claro.</li>
+                        <li><code>clave: valor</code> separa con dos puntos seguidos de un espacio.</li>
+                        <li>Las listas se marcan con un guión y un espacio: <code>- elemento</code>.</li>
+                    </ul>
+
+                    <div class="nota">
+                        <strong>Cómo editar archivos YAML en Windows:</strong> usa <em>Visual Studio Code</em> (gratis, lo verás instalado en muchas empresas) o <em>Notepad++</em>. <strong>Evita el Bloc de notas clásico</strong> para YAML: a veces guarda con BOM o saltos de línea raros y Compose se queja sin que entiendas el motivo.
+                    </div>
+
+                    <h3>6.2 - Crear los archivos del proyecto</h3>
+
+                    <p>Vas a montar un stack pequeño: un servidor web <em>nginx</em> que sirve un HTML estático y una base de datos <em>MariaDB</em>. Al principio la web no usa la BD (es estática), pero levantar las dos juntas te servirá para ver la red interna que crea Compose entre los contenedores. Abre PowerShell y crea la estructura:</p>
+
+<pre class="codigo">New-Item -ItemType Directory -Path C:\docker\compose-demo\html -Force
+Set-Location C:\docker\compose-demo</pre>
+
+                    <p>Esto crea <code>C:\docker\compose-demo\</code> con una subcarpeta <code>html\</code> dentro, y te deja con esa carpeta como directorio actual. Comprueba con <code>Get-Location</code> (alias <code>pwd</code>) que estás dentro.</p>
+
+                    <p>Crea el archivo del stack con tu editor:</p>
+
+<pre class="codigo">code docker-compose.yml          # si usas VS Code
+# o si no:
+notepad docker-compose.yml</pre>
+
+                    <p>Pega este contenido y guárdalo:</p>
 
 <pre class="codigo">services:
   web:
@@ -939,31 +966,84 @@ docker build -t roto:1.0 .</pre>
 volumes:
   datos_db:</pre>
 
-                    <p>Crea también <code>./html/index.html</code> con cualquier contenido. Ahora desde esa carpeta:</p>
+                    <p>Crea ahora <code>html\index.html</code> con cualquier contenido (lo importante es que el archivo exista para que nginx tenga algo que servir). Si no se te ocurre nada, pega esto:</p>
+
+<pre class="codigo">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hola desde Docker Compose&lt;/h1&gt;
+  &lt;p&gt;Esta página la sirve un contenedor nginx levantado con docker compose up.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+                    <h3>6.3 - El docker-compose.yml por bloques</h3>
+
+                    <p>Antes de levantarlo, asegúrate de entender qué hace cada bloque. Esta es la parte que vas a leer y modificar mil veces en tu vida laboral:</p>
+
+                    <table>
+                        <tr><th>Bloque</th><th>Qué significa</th></tr>
+                        <tr><td><code>services:</code></td><td>Sección donde se declaran los contenedores del stack. Cada hijo (<em>web</em>, <em>db</em>) es un servicio; el nombre que le pongas será también el nombre por el que el resto de contenedores podrá encontrarlo por red.</td></tr>
+                        <tr><td><code>image:</code></td><td>Qué imagen usar. Aquí <code>nginx:1.25-alpine</code> (servidor web ligero) y <code>mariadb:11</code> (base de datos). Si no las tienes localmente, Compose las descarga sola la primera vez.</td></tr>
+                        <tr><td><code>ports:</code></td><td>Publicación de puertos al anfitrión, formato <em>"puerto_windows:puerto_contenedor"</em>. <code>"8090:80"</code> = abre el 8090 en tu Windows y reenvíalo al 80 de nginx. La BD <strong>no publica</strong> ningún puerto a propósito: sólo será accesible desde otros contenedores del mismo stack, que es lo seguro.</td></tr>
+                        <tr><td><code>volumes:</code> en <em>web</em></td><td><em>Bind mount</em>: <code>./html:/usr/share/nginx/html:ro</code> monta la carpeta <code>html</code> de tu Windows dentro del contenedor en la ruta donde nginx busca el sitio, en modo solo lectura (<code>:ro</code>).</td></tr>
+                        <tr><td><code>volumes:</code> en <em>db</em></td><td><em>Named volume</em>: <code>datos_db:/var/lib/mysql</code> usa un volumen llamado <em>datos_db</em> gestionado por Docker para que los datos de la BD sobrevivan si paras y vuelves a arrancar.</td></tr>
+                        <tr><td><code>environment:</code></td><td>Variables de entorno que el contenedor recibe al arrancar. <code>MARIADB_ROOT_PASSWORD</code> y <code>MARIADB_DATABASE</code> son <em>parámetros estándar de la imagen mariadb</em>: configuran la contraseña de root y crean una base de datos vacía con ese nombre en el primer arranque.</td></tr>
+                        <tr><td><code>depends_on:</code></td><td>Orden de arranque: <em>web</em> no arranca hasta que el contenedor <em>db</em> esté creado. Ojo: no espera a que MariaDB <strong>esté lista para aceptar conexiones</strong>, sólo a que el contenedor exista. Para esperar "lista de verdad" hace falta <code>healthcheck</code>, que queda fuera del alcance de esta práctica.</td></tr>
+                        <tr><td><code>volumes:</code> al final del archivo (en la raíz, no dentro de un servicio)</td><td>Declaración del volumen con nombre <em>datos_db</em>. Si lo usas en un servicio tienes que declararlo aquí, si no Compose se queja.</td></tr>
+                    </table>
+
+                    <h3>6.4 - Levantar el stack</h3>
+
+                    <p>Desde <code>C:\docker\compose-demo</code>:</p>
 
 <pre class="codigo">docker compose up -d
-docker compose ps
-docker compose logs db
-docker compose logs -f web</pre>
+docker compose ps</pre>
+
+                    <p>El primer comando descarga las imágenes (la primera vez tarda unos minutos), crea la red, los volúmenes y los contenedores, y los arranca en segundo plano (<code>-d</code> = <em>detached</em>). El segundo te muestra el estado: dos servicios, ambos en <em>running</em>.</p>
 
                     <p>Compose ha hecho varias cosas a la vez:</p>
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li>Ha creado una red propia para este stack (Compose crea una red por proyecto por defecto).</li>
-                        <li>Ha levantado los dos contenedores con nombres predecibles (<em>compose-demo-web-1</em>, <em>compose-demo-db-1</em>).</li>
-                        <li>Ha creado el volumen <code>datos_db</code> y lo ha montado en la BD.</li>
-                        <li>Ha respetado <code>depends_on</code> (arranca la BD antes que el web). Importante: <em>depends_on</em> sólo espera a que el contenedor exista, no a que el servicio dentro esté listo. Para esperar a la BD a estar respondiendo se usa <em>healthcheck</em>.</li>
+                        <li>Ha creado una red propia llamada <code>compose-demo_default</code> (Compose crea una red por proyecto, y el nombre del proyecto por defecto es el de la carpeta).</li>
+                        <li>Ha levantado dos contenedores con nombres predecibles: <em>compose-demo-web-1</em> y <em>compose-demo-db-1</em>.</li>
+                        <li>Ha creado el volumen <code>compose-demo_datos_db</code> y lo ha montado en la BD.</li>
+                        <li>Ha respetado <code>depends_on</code> arrancando primero <em>db</em> y después <em>web</em>.</li>
                     </ul>
 
-                    <p>Para parar todo:</p>
+                    <p>Echa un vistazo a los logs para confirmar que MariaDB ha arrancado bien:</p>
 
-<pre class="codigo">docker compose down              # para y borra contenedores y red, mantiene volúmenes
-docker compose down -v            # incluye volúmenes (datos perdidos)</pre>
+<pre class="codigo">docker compose logs db
+docker compose logs -f web      # Ctrl+C para salir del modo seguir</pre>
 
-                    <div class="truco">
-                        <strong>Por qué Compose es tan útil:</strong> imagina que tu jefe te dice "monta una instancia de WordPress de pruebas". Sin Compose: dos <code>docker run</code> con seis flags cada uno, dos volúmenes, una red. Con Compose: un YAML de 20 líneas que copias del README oficial y un <code>docker compose up -d</code>. Lo mismo que ya hace muchas otras herramientas pero con sintaxis estándar.
+                    <h3>6.5 - Verificar que funciona</h3>
+
+                    <p>Tres comprobaciones rápidas para ver que el stack está vivo y, sobre todo, que los dos contenedores comparten una red interna donde se encuentran por nombre:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li><strong>nginx sirve tu HTML.</strong> Abre el navegador en <code>http://localhost:8090</code>. Debes ver el "Hola desde Docker Compose" del archivo que creaste.</li>
+                            <li><strong>La BD responde y existe la base "pruebas".</strong>
+                                <pre class="codigo">docker compose exec db mariadb -uroot -psecreto -e "SHOW DATABASES;"</pre>
+                                Debe listar <em>information_schema</em>, <em>mysql</em>, <em>performance_schema</em>, <em>sys</em> y la tuya, <em>pruebas</em>.</li>
+                            <li><strong>El contenedor web "ve" al contenedor db por su nombre de servicio.</strong> Esto es lo realmente potente de Compose: la red interna trae DNS automático para los nombres de los servicios.
+                                <pre class="codigo">docker compose exec web ping -c 2 db
+# si tu imagen no tuviera ping, vale también:
+docker compose exec web nslookup db</pre>
+                                Debes ver una IP del rango 172.x.x.x respondiendo. Si tuvieras una aplicación PHP/Node/Python en el contenedor web, podría conectar a la BD usando <code>db</code> como hostname, sin saber su IP. Eso es lo que hace utilísimo Compose.</li>
+                        </ol>
                     </div>
 
-                    <h3>6.2 - Operaciones habituales de Compose</h3>
+                    <div class="truco">
+                        <strong>¿Por qué la BD no está publicada en ningún puerto del anfitrión?</strong> Porque no hace falta. Sólo el web necesita acceder a ella, y lo hace por la red interna del proyecto. Publicar puertos de bases de datos hacia el exterior ("por si acaso") es uno de los errores más típicos en entornos de desarrollo que acaban expuestos en internet. En Compose, mientras no pongas <code>ports:</code> en el servicio db, la BD queda aislada del exterior.
+                    </div>
+
+                    <h3>6.6 - Parar y limpiar</h3>
+
+<pre class="codigo">docker compose down              # para y borra contenedores y la red, conserva los volúmenes (los datos sobreviven)
+docker compose down -v           # incluye los volúmenes (pierdes los datos de la BD)</pre>
+
+                    <p>Tras un <code>docker compose down</code> normal puedes hacer otra vez <code>docker compose up -d</code> y volverás a tener el stack con los datos intactos. Es la forma habitual de trabajar día a día.</p>
+
+                    <h3>6.7 - Operaciones habituales de Compose</h3>
 
                     <table>
                         <tr><th>Comando</th><th>Para qué</th></tr>
@@ -976,13 +1056,15 @@ docker compose down -v            # incluye volúmenes (datos perdidos)</pre>
                         <tr><td><code>docker compose down</code></td><td>Para y limpia (sin borrar volúmenes)</td></tr>
                     </table>
 
-                    <h3>6.3 - Compose en el día a día</h3>
+                    <h3>6.8 - Compose en el día a día</h3>
 
-                    <p>En proyectos reales el <code>docker-compose.yml</code> suele estar en el repositorio git del proyecto y es <strong>el primer archivo que un nuevo compañero ejecuta el día 1</strong> para tener el entorno listo. Saber leerlo y modificarlo es una habilidad de empleabilidad pura.</p>
+                    <p>En proyectos reales el <code>docker-compose.yml</code> suele estar en el repositorio git del proyecto y es <strong>el primer archivo que un nuevo compañero ejecuta el día 1</strong> para tener el entorno listo. Saber leerlo, entender cada bloque y modificarlo (cambiar una imagen, añadir una variable de entorno, abrir un puerto) es una habilidad de empleabilidad pura.</p>
 
                     <table>
-                        <tr><td>Comando con el que verificaste que la web hablaba con la BD</td><td><input type="text"></td></tr>
-                        <tr><td>Nombre del volumen que Compose creó en tu sistema</td><td><input type="text"></td></tr>
+                        <tr><td>URL que abriste en el navegador y resultado obtenido</td><td><input type="text"></td></tr>
+                        <tr><td>Comando con el que listaste las bases de datos dentro del contenedor db</td><td><input type="text"></td></tr>
+                        <tr><td>Comando con el que comprobaste que el contenedor web resuelve el nombre <em>db</em> por la red de Compose</td><td><input type="text"></td></tr>
+                        <tr><td>Nombre del volumen que Compose creó en tu sistema (lo ves con <code>docker volume ls</code>)</td><td><input type="text"></td></tr>
                     </table>
                 </div>
             </div>
