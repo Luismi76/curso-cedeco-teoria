@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Práctica 35: Servidor de Minecraft autoalojado con Docker y publicado con playit.gg</title>
+    <title>Práctica 35: Servidor de Minecraft autoalojado con Docker para jugar en red local</title>
     <style>
         :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,6 +19,7 @@
         .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
         .seccion { margin-bottom: 28px; page-break-inside: avoid; }
         .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
         .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
         .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
         .seccion h3:first-child { margin-top: 0; }
@@ -43,6 +44,7 @@
         .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
         .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
         .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
         .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
         .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
         .evaluacion th { background: #c6f6d5; color: var(--verde); }
@@ -56,6 +58,7 @@
             .botones, .no-print { display: none !important; }
             .seccion { page-break-inside: avoid; }
             header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
             textarea { min-height: auto !important; overflow: visible; height: auto; }
@@ -67,14 +70,14 @@
     <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
     <div class="container">
         <header>
-            <h1>Práctica 35: Servidor de Minecraft autoalojado con Docker y publicado con playit.gg</h1>
+            <h1>Práctica 35: Servidor de Minecraft autoalojado con Docker para jugar en red local</h1>
             <div class="meta">
                 <strong>Módulo:</strong> Práctica adicional - servicios autohospedados con contenedores<br>
                 <strong>Requisito previo:</strong> Práctica 33 (Docker Desktop en Windows 11) terminada. La práctica 34 ayuda pero no es imprescindible.<br>
                 <strong>Sesiones:</strong> práctica extra<br>
-                <strong>Duración estimada:</strong> 6-7 horas (puede partirse en dos sesiones)<br>
+                <strong>Duración estimada:</strong> 5-6 horas (el Anexo de exposición a internet es opcional y suma ~1 hora)<br>
                 <strong>Modalidad:</strong> trabajo individual<br>
-                <strong>Herramientas:</strong> Windows 11 anfitrión con Docker Desktop ya funcionando, cliente de Minecraft Java Edition (de pago, ~24 €; si no lo tienes, en la práctica se explica cómo seguirla igualmente en pareja), conexión a internet
+                <strong>Herramientas:</strong> Windows 11 anfitrión con Docker Desktop ya funcionando, cliente de Minecraft Java Edition (de pago, ~24 €; si no lo tienes, la práctica se explica cómo seguirla en pareja), y al menos otro equipo en tu misma red para la prueba multijugador (sirve el de un compañero)
             </div>
         </header>
 
@@ -92,15 +95,15 @@
             </div>
 
             <div class="nota">
-                <strong>De qué va esta práctica:</strong> vas a montar tu propio servidor de Minecraft Java Edition en tu portátil con un único <code>docker-compose.yml</code>, demostrar que el mundo sobrevive a borrar contenedores, y publicarlo en internet con una dirección pública para que jueguen contigo personas de fuera del aula, sin abrir un solo puerto del router y sin pagar por hosting. Es la misma idea que la práctica 34 (un servicio autoalojado expuesto a internet por un túnel), pero aplicada a algo que mueve a casi todo el mundo: un servidor de juego. Y al hacerla aprendes exactamente los mismos conceptos profesionales: stack multi-servicio, persistencia de datos, túneles, administración por consola y diagnóstico de fallos.
+                <strong>De qué va esta práctica:</strong> vas a montar tu propio servidor de Minecraft Java Edition en tu portátil con un único <code>docker-compose.yml</code>, demostrar que el mundo sobrevive a borrar contenedores, y abrirlo para que jueguen contigo los compañeros que estén en tu misma red. Es el mismo tipo de proyecto que la práctica 34 (un servicio autoalojado), pero aplicado a algo que mueve a casi todo el mundo: un servidor de juego. Y al hacerla aprendes los mismos conceptos profesionales: stack de contenedores, persistencia de datos, publicación de puertos, administración por consola y diagnóstico de fallos. Al final, un <strong>Anexo opcional</strong> te enseña a abrirlo también a internet con un túnel.
             </div>
 
             <div class="nota">
-                <strong>Por qué un servidor de Minecraft:</strong> montar un servidor de juego "a mano" es el caso clásico de "tengo Java instalado pero no la versión correcta", "se me ha llenado el disco de mundos", "funciona en mi PC pero no sé abrirlo a mis amigos". Es uno de los primeros proyectos de informática casera de muchísima gente, y normalmente acaba mal. Con Docker, el servidor, su versión exacta de Java, su configuración y su mundo viven encapsulados en una imagen y un volumen; con un túnel, la publicación a internet es un contenedor más. Ver ese contraste —el caos de hacerlo a mano frente a tres servicios declarados en 25 líneas de YAML— es el objetivo pedagógico real de la práctica.
+                <strong>Por qué un servidor de Minecraft:</strong> montar un servidor de juego "a mano" es el caso clásico de "tengo Java instalado pero no la versión correcta", "se me ha llenado el disco de mundos", "funciona en mi PC pero no sé abrirlo a los demás". Es uno de los primeros proyectos de informática casera de muchísima gente, y normalmente acaba mal. Con Docker, el servidor, su versión exacta de Java, su configuración y su mundo viven encapsulados en una imagen y un volumen. Ver ese contraste —el caos de hacerlo a mano frente a un servicio declarado en 15 líneas de YAML— es el objetivo pedagógico real de la práctica.
             </div>
 
             <div class="aviso">
-                <strong>Antes de empezar:</strong> necesitas la práctica 33 superada y Docker Desktop funcionando. Comprueba con <code>docker run hello-world</code>; si no responde, vuelve a la 33. <strong>Sobre el cliente de Minecraft:</strong> el servidor lo monta cualquiera, pero para <em>conectarte</em> y comprobar que funciona necesitas el cliente de Minecraft Java Edition, que es de pago. Si no lo tienes, haz la práctica en pareja con alguien que sí: tú montas el servidor, esa persona se conecta, y os turnáis. Todo lo demás (Docker, el túnel, la consola del servidor) es gratuito.
+                <strong>Antes de empezar:</strong> necesitas la práctica 33 superada y Docker Desktop funcionando. Comprueba con <code>docker run hello-world</code>; si no responde, vuelve a la 33. <strong>Sobre el cliente de Minecraft:</strong> el servidor lo monta cualquiera, pero para <em>conectarte</em> y comprobar que funciona necesitas el cliente de Minecraft Java Edition, que es de pago. Si no lo tienes, haz la práctica en pareja con alguien que sí: tú montas el servidor, esa persona se conecta, y os turnáis. Todo lo demás (Docker, la consola del servidor) es gratuito.
             </div>
 
             <!-- ============================================================ -->
@@ -114,12 +117,14 @@
                         <li>Levantar el servidor con un único <code>docker-compose.yml</code> usando la imagen <code>itzg/minecraft-server</code>, la estándar de facto.</li>
                         <li>Comprender el papel del fichero <code>eula.txt</code> y la variable <code>EULA</code>: el primer "fallo" con el que te vas a topar.</li>
                         <li>Demostrar que el <strong>mundo persiste</strong> en un volumen Docker y que sobrevive a recrear el contenedor; hacer y restaurar un backup correcto (con <em>flush</em> previo del mundo).</li>
-                        <li>Publicar el servidor a internet con <strong>playit.gg</strong>, un túnel TCP, y entender por qué un servidor de juego necesita un túnel distinto al de la práctica 34 (que era HTTP).</li>
-                        <li>Comparar la publicación "a la antigua" (abrir el puerto 25565 en el router) con un túnel saliente, en términos de seguridad y de viabilidad en una red ajena.</li>
-                        <li>Administrar el servidor en caliente con su <strong>consola RCON</strong> desde dentro del contenedor: operadores, lista blanca, dificultad, mensajes, expulsiones.</li>
+                        <li>Entender la <strong>publicación de puertos</strong> de Docker y cómo gracias a ella el servidor es accesible desde otros equipos de la red local sin tocar nada.</li>
+                        <li>Averiguar la <strong>IP de tu equipo en la red</strong> y conseguir que se conecten compañeros de tu misma red.</li>
+                        <li>Diagnosticar los problemas típicos que impiden la conexión en red local: <strong>firewall de Windows</strong> y <strong>aislamiento de clientes</strong>.</li>
+                        <li>Administrar el servidor en caliente con su <strong>consola RCON</strong>: operadores, lista blanca, dificultad, mensajes, expulsiones.</li>
                         <li>Conocer la diferencia entre servidor <strong>VANILLA</strong> y <strong>PAPER</strong>, y cuándo merece la pena cada uno.</li>
-                        <li>Provocar y diagnosticar cinco fallos típicos: EULA sin aceptar, memoria insuficiente, desajuste de versiones cliente/servidor, volumen del mundo borrado, túnel caído.</li>
-                        <li>Endurecer el servidor: lista blanca obligatoria, operadores mínimos, <code>online-mode</code>, contraseña de RCON y backups programados.</li>
+                        <li>Provocar y diagnosticar cinco fallos típicos: EULA sin aceptar, memoria insuficiente, desajuste de versiones cliente/servidor, volumen del mundo borrado, puerto publicado cambiado.</li>
+                        <li>Endurecer el servidor: lista blanca, operadores mínimos, <code>online-mode</code>, contraseña de RCON y backups.</li>
+                        <li><span class="badge-opc">OPCIONAL</span> Abrir el servidor a internet con un túnel TCP para que jueguen personas de fuera de tu red.</li>
                         <li>Documentar el despliegue en una <strong>ficha técnica</strong> reutilizable.</li>
                     </ul>
                 </div>
@@ -129,7 +134,7 @@
             <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
             <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 0 - Conceptos previos (60 min)</h2>
+                <h2>Parte 0 - Conceptos previos (45 min)</h2>
                 <div class="seccion-body">
 
                     <h3>0.1 - Qué es un servidor de Minecraft</h3>
@@ -152,63 +157,51 @@
 
                     <h3>0.3 - Arquitectura de esta práctica</h3>
 
-                    <p>Vas a montar <strong>dos contenedores</strong>:</p>
-
-                    <table>
-                        <tr><th>Servicio</th><th>Imagen</th><th>Qué hace</th></tr>
-                        <tr><td><strong>mc</strong> (el servidor)</td><td><code>itzg/minecraft-server</code></td><td>El servidor de Minecraft con su Java, su configuración y el mundo</td></tr>
-                        <tr><td><strong>playit</strong> (el túnel)</td><td><code>ghcr.io/playit-cloud/playit-agent</code></td><td>Publica el puerto del servidor en internet sin tocar el router</td></tr>
-                    </table>
-
-                    <p>El servidor de Minecraft escucha en el puerto <strong>25565/TCP</strong>. En la Parte 1 lo levantas solo y te conectas desde tu propio equipo. En la Parte 3 añades el túnel y lo abres al mundo.</p>
+                    <p>El cuerpo de la práctica usa <strong>un único contenedor</strong>: el servicio <code>mc</code>, con la imagen <code>itzg/minecraft-server</code>, que es el servidor de Minecraft con su Java, su configuración y el mundo. Nada más. En el <strong>Anexo opcional</strong> del final se añade un segundo contenedor para abrir el servidor también a internet, pero para jugar con tu clase en la misma red no hace falta.</p>
 
                     <div class="nota">
                         <strong>Sobre la imagen <code>itzg/minecraft-server</code>:</strong> es un proyecto de la comunidad, mantenido desde hace años, que se ha convertido en el estándar de facto para correr Minecraft en Docker. Se configura entero por variables de entorno (versión, memoria, dificultad, operadores...) y trae herramientas dentro, como la consola RCON, que vas a usar en la Parte 4.
                     </div>
 
-                    <h3>0.4 - El problema de abrir el servidor a internet</h3>
+                    <h3>0.4 - Red local frente a internet</h3>
 
-                    <p>Igual que en la práctica 34: tu portátil tiene IP privada, el router del aula no deja entrar conexiones, y la IP pública del aula no es tuya para tocarla. Para publicar un servidor de Minecraft "a la antigua" necesitarías abrir el puerto 25565 en el router (port forwarding), tener una IP pública estable o un DDNS, y aceptar que tu IP queda expuesta a los escaneos constantes de internet. En una red ajena —el aula— esto directamente no es una opción.</p>
-
-                    <h3>0.5 - Por qué playit.gg y no Cloudflare Tunnel</h3>
-
-                    <p>En la práctica 34 usaste Cloudflare Tunnel para publicar Nextcloud. Aquí no sirve igual, y la razón es un concepto importante:</p>
+                    <p>Hay dos escenarios muy distintos para "abrir" un servidor, y entender la diferencia es clave:</p>
 
                     <table>
-                        <tr><th></th><th>Nextcloud (práctica 34)</th><th>Minecraft (esta práctica)</th></tr>
-                        <tr><td>Protocolo</td><td>HTTP/HTTPS</td><td>Protocolo propio de Minecraft sobre TCP</td></tr>
-                        <tr><td>Túnel adecuado</td><td>Cloudflare Tunnel modo quick (es un túnel HTTP)</td><td>Un túnel <strong>TCP genérico</strong></td></tr>
-                        <tr><td>Por qué</td><td>El navegador habla HTTP; Cloudflare entiende HTTP</td><td>El cliente de Minecraft no habla HTTP; necesita que le pasen los bytes TCP "en crudo"</td></tr>
+                        <tr><th></th><th>Red local (LAN)</th><th>Internet</th></tr>
+                        <tr><td>Quién se conecta</td><td>Equipos de tu misma red: el aula, tu casa</td><td>Cualquiera, desde cualquier sitio</td></tr>
+                        <tr><td>Cómo se conectan</td><td>Directamente, a la IP privada de tu equipo</td><td>Hace falta un túnel o abrir puertos del router</td></tr>
+                        <tr><td>Configuración necesaria</td><td>Casi ninguna: Docker ya publica el puerto</td><td>Cuenta en un servicio de túnel, o tocar el router</td></tr>
+                        <tr><td>Esta práctica</td><td><strong>El cuerpo principal</strong></td><td>El Anexo opcional del final</td></tr>
                     </table>
 
-                    <p><strong>playit.gg</strong> es un servicio de túneles TCP/UDP pensado precisamente para servidores de juego. Funciona con la misma idea de fondo que Cloudflare Tunnel —una conexión <em>saliente</em> desde tu equipo que se mantiene abierta, de modo que no hace falta abrir puertos— pero a nivel TCP en lugar de a nivel HTTP. Te da una dirección pública (algo como <code>algo.playit.gg</code> o una IP con puerto) que tus amigos ponen como dirección del servidor en su Minecraft.</p>
+                    <p>Cuando dos equipos están en la <strong>misma red local</strong>, se ven directamente: uno puede hablar con el otro usando su IP privada (las que empiezan por <code>192.168.</code> o <code>10.</code>). No hay router de por medio bloqueando nada, porque el tráfico no sale de la red. Por eso, para jugar con tu clase, no necesitas túneles ni configurar el router: basta con que Docker publique el puerto del servidor y que tus compañeros conozcan tu IP.</p>
 
-                    <div class="nota">
-                        <strong>Diferencia con la práctica 34:</strong> el túnel quick de Cloudflare no necesitaba cuenta. playit.gg <em>sí</em> necesita una cuenta gratuita, porque la dirección que te da queda asociada a tu cuenta y es estable mientras la mantengas. Esto en realidad es una ventaja: la dirección no cambia cada vez que reinicias, al contrario que las URLs <code>trycloudflare.com</code> de la práctica 34.
-                    </div>
+                    <p>El problema aparece cuando quieres que entre alguien de <em>fuera</em> de tu red: ahí sí hay un router que no deja pasar conexiones entrantes, y se necesita un túnel. Eso es lo que resuelve el Anexo, y es el mismo concepto que usaste en la práctica 34 con Nextcloud.</p>
 
-                    <h3>0.6 - online-mode y cuentas premium</h3>
+                    <h3>0.5 - online-mode y cuentas premium</h3>
 
                     <p>El servidor tiene un ajuste, <code>online-mode</code>, que por defecto está en <code>true</code>. Significa que <strong>verifica con los servidores de Mojang/Microsoft que cada jugador que entra tiene una cuenta legítima de Minecraft</strong>. Es lo correcto y lo que vas a dejar puesto: garantiza que cada jugador es quien dice ser y protege el servidor. La consecuencia es que sólo podrán conectarse personas con el juego de pago. No vamos a desactivarlo: un servidor con <code>online-mode=false</code> es un coladero y además incumple las condiciones del juego.</p>
 
-                    <h3>0.7 - Metodología de la práctica</h3>
+                    <h3>0.6 - Metodología de la práctica</h3>
 
                     <p>Mismo orden que las prácticas 33 y 34:</p>
 
                     <div class="pasos">
                         <ol>
-                            <li>Levantar el servidor sólo en local y verificar que arranca (Parte 1).</li>
+                            <li>Levantar el servidor y verificar que arranca (Parte 1).</li>
                             <li>Demostrar que el mundo persiste y aprender a hacer backup (Parte 2).</li>
-                            <li>Añadir el túnel y publicarlo a internet (Parte 3).</li>
+                            <li>Conseguir que se conecten compañeros de tu red local (Parte 3).</li>
                             <li>Administrar el servidor por consola RCON (Parte 4).</li>
                             <li>Romper a propósito y diagnosticar (Parte 5).</li>
                             <li>Endurecer el servidor (Parte 6).</li>
                             <li>Documentar (Parte 7).</li>
+                            <li><span class="badge-opc">OPCIONAL</span> Abrir el servidor a internet con un túnel (Anexo).</li>
                         </ol>
                     </div>
 
                     <div class="truco">
-                        <strong>Idea clave:</strong> al terminar, habrás montado, publicado y administrado un servidor de juego real en una jornada, y lo más importante: habrás visto que los conceptos —stack multi-servicio, volúmenes, túnel saliente, consola de administración, diagnóstico— son <em>exactamente los mismos</em> que en la práctica 34. Cambia el servicio; no cambia la ingeniería.
+                        <strong>Idea clave:</strong> al terminar, habrás montado y administrado un servidor de juego real en una jornada, y lo más importante: habrás visto que los conceptos —contenedor con estado, volúmenes, publicación de puertos, consola de administración, diagnóstico— son <em>los mismos</em> de cualquier servicio en Docker. Cambia el servicio; no cambia la ingeniería.
                     </div>
                 </div>
             </div>
@@ -217,10 +210,10 @@
             <!-- PARTE 1 - SERVIDOR EN LOCAL                                    -->
             <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 1 - Levantar el servidor en local con Compose (50 min)</h2>
+                <h2>Parte 1 - Levantar el servidor con Compose (50 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Primero vas a montar el servidor accesible sólo desde tu propio Windows. Sin túnel, sin internet, sólo verificar que el stack funciona. Cuando esté firme, añadiremos la publicación.</p>
+                    <p>Primero vas a montar el servidor y comprobar que funciona conectándote desde tu propio Windows. Cuando esté firme, en la Parte 3 lo abrirás al resto de la red.</p>
 
                     <h3>1.1 - Crear la carpeta de trabajo</h3>
 
@@ -231,7 +224,7 @@
                         </ol>
                     </div>
 
-                    <h3>1.2 - El docker-compose.yml inicial</h3>
+                    <h3>1.2 - El docker-compose.yml</h3>
 
                     <p>Crea <code>C:\docker\minecraft\docker-compose.yml</code> con este contenido. Usa Visual Studio Code o cualquier editor; si usas el Bloc de notas, al guardar elige "Todos los archivos" en el tipo para que no le añada <code>.txt</code>.</p>
 
@@ -258,12 +251,12 @@ volumes:
                     <p>Lee el archivo entero antes de seguir. Los puntos clave:</p>
 
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
-                        <li><strong>Un solo servicio</strong> de momento: <code>mc</code>. El túnel lo añadimos en la Parte 3.</li>
+                        <li><strong>Un solo servicio</strong>, <code>mc</code>. Es todo lo que necesitas para jugar en red local.</li>
                         <li><code>EULA: "TRUE"</code> es tu aceptación del acuerdo de licencia de Minecraft. <strong>Sin esto el servidor no arranca</strong>: es de hecho el primer fallo que provocarás en la Parte 5. Déjalo en TRUE para que arranque ahora.</li>
                         <li><code>TYPE: VANILLA</code> es el servidor oficial sin modificar. En la Parte 4 verás <code>PAPER</code>, una variante optimizada que admite plugins.</li>
                         <li><code>VERSION: LATEST</code> coge la última versión estable. En el Caso C de la Parte 5 lo fijarás a una versión concreta a propósito.</li>
                         <li><code>MEMORY: 2G</code> es la RAM que se asigna al servidor. Demasiado poca y se cae (Caso B); demasiada y ahogas tu Windows.</li>
-                        <li><code>ports: "25565:25565"</code> publica el puerto del servidor en tu Windows, para poder conectarte en local y, más adelante, para que el túnel llegue a él.</li>
+                        <li><code>ports: "25565:25565"</code> publica el puerto del servidor: lo saca del contenedor y lo expone en tu Windows. Esta línea es la que, en la Parte 3, hará que el servidor sea accesible desde otros equipos de la red. <strong>El número de la izquierda</strong> es el puerto en tu Windows; el de la derecha, el de dentro del contenedor.</li>
                         <li>Un <strong>volumen con nombre</strong>, <code>mc_data</code>, montado en <code>/data</code>: ahí dentro vive el mundo, la configuración y los registros. Sobrevive a un <code>compose down</code>.</li>
                     </ul>
 
@@ -309,11 +302,11 @@ docker compose ps</pre>
                     <p>Estás dentro de tu propio servidor. Verás el mensaje del día (<em>MOTD</em>) que pusiste en el compose. Date una vuelta: rompe algún bloque, construye algo pequeño. Eso ya es estado del mundo que tiene que persistir.</p>
 
                     <div class="nota">
-                        <strong>Si no tienes el cliente:</strong> pídele a tu pareja de práctica que se conecte poniendo en "Dirección del servidor" la IP de tu equipo en la red del aula (la que te da <code>ipconfig</code>) seguida de <code>:25565</code>. Si estáis en la misma red, funcionará. Esto, de paso, es la prueba de que el servidor está bien montado aunque tú no puedas entrar.
+                        <strong>Si no tienes el cliente:</strong> de momento sáltate la conexión y sigue con la práctica; en la Parte 3, cuando el servidor esté abierto a la red, tu pareja de práctica se conectará y eso valida que el servidor está bien montado.
                     </div>
 
                     <table>
-                        <tr><td>¿Cargó el mundo al conectarte por <code>localhost</code>?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                        <tr><td>¿Cargó el mundo al conectarte por <code>localhost</code>?</td><td><input type="text" placeholder="Sí / No / No tengo cliente"></td></tr>
                         <tr><td>¿Qué construiste o rompiste como "marca" para comprobar la persistencia luego?</td><td><input type="text"></td></tr>
                     </table>
 
@@ -348,7 +341,7 @@ docker compose ps</pre>
                 <h2>Parte 2 - Persistencia y backup del mundo (30 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Antes de exponer nada a internet, demuéstrate que el mundo sobrevive a borrar contenedores. Si esto falla, lo descubres ahora; no cuando lleves semanas de construcciones.</p>
+                    <p>Antes de abrir el servidor a nadie, demuéstrate que el mundo sobrevive a borrar contenedores. Si esto falla, lo descubres ahora; no cuando lleves semanas de construcciones.</p>
 
                     <h3>2.1 - Inspeccionar el volumen</h3>
 
@@ -365,7 +358,7 @@ docker volume inspect minecraft_mc_data</pre>
 
                     <div class="pasos">
                         <ol>
-                            <li>Asegúrate de tener tu "marca" del paso 1.4 hecha en el mundo (un bloque roto, una construcción).</li>
+                            <li>Asegúrate de tener tu "marca" del paso 1.4 hecha en el mundo (un bloque roto, una construcción). Si no tienes cliente, salta este experimento o pídele a tu pareja que deje una marca en la Parte 3.</li>
                             <li>Para los contenedores conservando el volumen:
                                 <pre class="codigo">docker compose down</pre>
                                 Para y elimina el contenedor y la red. El volumen <em>no</em> se toca.
@@ -375,7 +368,7 @@ docker volume inspect minecraft_mc_data</pre>
                                 <pre class="codigo">docker compose up -d</pre>
                                 Esta vez es rápido: no descarga la imagen ni regenera el mundo.
                             </li>
-                            <li>Conéctate de nuevo con el cliente: tu marca sigue ahí. El mundo es el mismo.</li>
+                            <li>Conéctate de nuevo: tu marca sigue ahí. El mundo es el mismo.</li>
                         </ol>
                     </div>
 
@@ -383,11 +376,11 @@ docker volume inspect minecraft_mc_data</pre>
 
 <pre class="codigo">docker compose down -v</pre>
 
-                    <p>El flag <code>-v</code> elimina <em>también</em> el volumen. Es la forma de empezar de cero, pero <strong>borra el mundo entero sin preguntar</strong>. Memoriza la diferencia: <code>down</code> sin flag conserva el mundo; <code>down -v</code> lo pulveriza. Este es exactamente el Caso C de la Parte 5.</p>
+                    <p>El flag <code>-v</code> elimina <em>también</em> el volumen. Es la forma de empezar de cero, pero <strong>borra el mundo entero sin preguntar</strong>. Memoriza la diferencia: <code>down</code> sin flag conserva el mundo; <code>down -v</code> lo pulveriza. Este es exactamente el Caso D de la Parte 5.</p>
 
                     <h3>2.4 - Backup correcto del mundo</h3>
 
-                    <p>Aquí hay un detalle importante que no aparecía en la práctica 34: el servidor mantiene parte del mundo en memoria y lo va guardando a disco poco a poco. Si copias el volumen mientras el servidor está escribiendo, puedes copiar un mundo a medio guardar. La forma correcta es <strong>pedirle al servidor que vuelque todo a disco y pause el guardado</strong> mientras copias.</p>
+                    <p>Aquí hay un detalle importante: el servidor mantiene parte del mundo en memoria y lo va guardando a disco poco a poco. Si copias el volumen mientras el servidor está escribiendo, puedes copiar un mundo a medio guardar. La forma correcta es <strong>pedirle al servidor que vuelque todo a disco y pause el guardado</strong> mientras copias.</p>
 
 <pre class="codigo"># 1. Forzar el guardado del mundo y pausar nuevas escrituras
 docker compose exec mc rcon-cli save-off
@@ -400,7 +393,7 @@ docker run --rm -v minecraft_mc_data:/data -v ${PWD}:/backup alpine `
 # 3. Reactivar el guardado automático
 docker compose exec mc rcon-cli save-on</pre>
 
-                    <p>El comando del medio es el mismo patrón canónico de la práctica 34: un contenedor Alpine efímero con el volumen montado en <code>/data</code> y la carpeta actual de Windows en <code>/backup</code>, que comprime todo en un <code>.tgz</code>. La novedad es el <code>save-off</code> / <code>save-all</code> / <code>save-on</code> alrededor: sin eso, el backup puede salir inconsistente.</p>
+                    <p>El comando del medio es el patrón canónico: un contenedor Alpine efímero con el volumen montado en <code>/data</code> y la carpeta actual de Windows en <code>/backup</code>, que comprime todo en un <code>.tgz</code>. La novedad frente a la práctica 34 es el <code>save-off</code> / <code>save-all</code> / <code>save-on</code> alrededor: sin eso, el backup puede salir inconsistente.</p>
 
                     <div class="aviso">
                         <strong>Si te dejas el <code>save-off</code> puesto</strong> y no haces <code>save-on</code> después, el servidor deja de guardar el mundo: todo lo que construyan los jugadores se perderá al parar el contenedor. El <code>save-on</code> del paso 3 no es opcional.
@@ -418,124 +411,84 @@ docker compose exec mc rcon-cli save-on</pre>
             </div>
 
             <!-- ============================================================ -->
-            <!-- PARTE 3 - PUBLICAR CON PLAYIT.GG                               -->
+            <!-- PARTE 3 - JUGAR EN RED LOCAL                                   -->
             <!-- ============================================================ -->
             <div class="seccion">
-                <h2>Parte 3 - Publicar en internet con playit.gg (60 min)</h2>
+                <h2>Parte 3 - Jugar en red local con tus compañeros (45 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Hasta aquí tienes un servidor que sólo ven los que están en tu red. Ahora vas a darle una dirección pública para que juegue contigo gente de fuera, sin tocar el router.</p>
+                    <p>Hasta aquí tienes un servidor que sólo tú ves desde tu propio Windows. Ahora vas a comprobar que cualquiera de tu misma red puede entrar, sin tocar el router ni configurar absolutamente nada más.</p>
 
-                    <h3>3.1 - Crear la cuenta y generar la clave del agente</h3>
+                    <h3>3.1 - Por qué ya está casi hecho</h3>
 
-                    <div class="pasos">
-                        <ol>
-                            <li>Entra en <code>playit.gg</code> y crea una cuenta gratuita.</li>
-                            <li>En el panel, empieza el asistente para añadir un agente nuevo y elige la opción <strong>Docker</strong>.</li>
-                            <li>El asistente te pide un nombre para el agente (por ejemplo <code>servidor-curso</code>) y te genera una <strong>clave secreta</strong> (<em>secret key</em>): una cadena larga de letras y números. Cópiala.</li>
-                        </ol>
-                    </div>
+                    <p>Recuerda la línea <code>ports: "25565:25565"</code> del compose. Eso publica el puerto del servidor en tu Windows en <strong>todas las interfaces de red</strong>, no sólo en <code>localhost</code>. Es decir: tu equipo ya está escuchando peticiones de Minecraft en el puerto 25565, vengan de donde vengan dentro de tu red. No hay que añadir nada al compose. Lo único que falta es que tus compañeros sepan a qué dirección apuntar.</p>
 
-                    <div class="nota">
-                        <strong>El panel de playit.gg cambia de aspecto cada cierto tiempo.</strong> Los textos de los botones pueden no ser exactamente estos. La idea es siempre la misma: registrarte, decir que vas a usar Docker, y obtener una <em>secret key</em>. Si te pierdes, busca en su panel la sección de agentes o "add agent".
-                    </div>
+                    <h3>3.2 - Averiguar tu IP en la red</h3>
+
+                    <p>Tus compañeros no se conectan a <code>localhost</code> (eso es "este mismo equipo" para cada uno). Se conectan a la <strong>IP de tu equipo dentro de la red</strong>. Averíguala:</p>
+
+<pre class="codigo">ipconfig</pre>
+
+                    <p>Busca el adaptador que estés usando de verdad —<em>Adaptador de LAN inalámbrica Wi-Fi</em> si vas por wifi, <em>Adaptador de Ethernet</em> si vas por cable— y apunta el campo <strong>Dirección IPv4</strong>. Será algo como <code>192.168.1.45</code> o <code>10.0.0.23</code>.</p>
 
                     <div class="aviso">
-                        <strong>La secret key es una credencial.</strong> Cualquiera que la tenga puede crear túneles en tu cuenta. No la subas a git, no la pegues en chats, no la dejes en capturas de pantalla.
+                        <strong>Ojo:</strong> ignora las direcciones que empiezan por <code>172.</code> que verás en adaptadores llamados <em>vEthernet</em> o <em>WSL</em>: esas son las redes internas de Docker y WSL, no la de tu aula. La buena es la del adaptador Wi-Fi o Ethernet real, normalmente <code>192.168.x.x</code>.
                     </div>
 
                     <table>
-                        <tr><td>Nombre que le has puesto al agente</td><td><input type="text"></td></tr>
+                        <tr><td>Adaptador que usas (Wi-Fi / Ethernet)</td><td><input type="text"></td></tr>
+                        <tr><td>Tu Dirección IPv4 en la red</td><td><input type="text" placeholder="ej. 192.168.1.45"></td></tr>
                     </table>
 
-                    <h3>3.2 - Añadir el servicio playit al compose</h3>
-
-                    <p>Edita <code>C:\docker\minecraft\docker-compose.yml</code> y añade un segundo servicio. Fíjate en la línea <code>network_mode</code>: hace que el contenedor del túnel comparta la red del contenedor del servidor, de modo que para el túnel el servidor está en <code>127.0.0.1:25565</code>.</p>
-
-<pre class="codigo">services:
-  mc:
-    image: itzg/minecraft-server:latest
-    restart: unless-stopped
-    ports:
-      - "25565:25565"
-    environment:
-      EULA: "TRUE"
-      TYPE: VANILLA
-      VERSION: LATEST
-      MEMORY: 2G
-      MOTD: "Servidor del curso - Practica 35"
-      DIFFICULTY: normal
-      MAX_PLAYERS: 10
-    volumes:
-      - mc_data:/data
-
-  playit:
-    image: ghcr.io/playit-cloud/playit-agent:latest
-    restart: unless-stopped
-    network_mode: "service:mc"
-    environment:
-      SECRET_KEY: pega_aqui_tu_secret_key
-    depends_on:
-      - mc
-
-volumes:
-  mc_data:</pre>
-
-                    <p>Sustituye <code>pega_aqui_tu_secret_key</code> por la clave real que copiaste en el paso 3.1. Luego levanta el stack:</p>
-
-<pre class="codigo">docker compose up -d
-docker compose ps
-docker compose logs playit</pre>
-
-                    <p>En los logs del túnel verás que el agente se conecta a playit.gg y queda a la espera de que le asignes un túnel. Si ves errores de autenticación, casi siempre es que la <code>SECRET_KEY</code> está mal copiada (un espacio de más, un carácter cortado).</p>
-
-                    <h3>3.3 - Crear el túnel en el panel</h3>
+                    <h3>3.3 - Que se conecte alguien de tu red</h3>
 
                     <div class="pasos">
                         <ol>
-                            <li>En el panel de playit.gg, con tu agente ya conectado, crea un <strong>túnel nuevo</strong>.</li>
-                            <li>Elige el tipo <strong>Minecraft Java</strong> (playit ya sabe que es el puerto 25565/TCP).</li>
-                            <li>Asígnalo a tu agente <code>servidor-curso</code>.</li>
-                            <li>Como dirección local del túnel, deja <code>127.0.0.1</code> y puerto <code>25565</code>. Gracias al <code>network_mode: "service:mc"</code> del compose, esa dirección, vista desde el contenedor del túnel, <em>es</em> tu servidor de Minecraft.</li>
-                            <li>El panel te muestra la <strong>dirección pública</strong> del túnel: algo como <code>algo.playit.gg</code> o <code>una-ip:un-puerto</code>. Esa es la dirección que se pone en Minecraft.</li>
+                            <li>Dale a un compañero de tu misma red tu IP y el puerto. La dirección que tiene que poner en su Minecraft es <code>TU_IP:25565</code>, por ejemplo <code>192.168.1.45:25565</code>.</li>
+                            <li>Esa persona abre Minecraft, <strong>Multijugador</strong> &rarr; <strong>Añadir servidor</strong>, y pega esa dirección.</li>
+                            <li>Entra. Si todo está bien, ve tu mundo y tu MOTD.</li>
+                            <li>Compruébalo tú con la consola: <code>docker compose exec mc rcon-cli list</code> debe mostrar a ese jugador conectado.</li>
                         </ol>
                     </div>
 
-                    <table>
-                        <tr><td>Dirección pública que te ha dado playit.gg</td><td><input type="text" placeholder="algo.playit.gg / ip:puerto"></td></tr>
-                    </table>
-
-                    <h3>3.4 - El acid test: comprobar que el túnel funciona</h3>
-
-                    <p><strong>Prueba mínima (la haces tú solo, siempre se puede):</strong> en tu propio cliente de Minecraft, añade un servidor nuevo pero esta vez pon como dirección la <strong>dirección pública de playit.gg</strong> en lugar de <code>localhost</code>. Si entras, el tráfico ha salido de tu equipo hacia los servidores de playit.gg y ha vuelto por el túnel: eso ya demuestra que el túnel está publicado y operativo. Compruébalo además con la consola:</p>
-
-<pre class="codigo">docker compose exec mc rcon-cli list</pre>
-
-                    <p><strong>Prueba ideal (si puedes coordinarla):</strong> que entre alguien de <em>otra red</em>.</p>
-
-                    <div class="pasos">
-                        <ol>
-                            <li>Manda la dirección pública a alguien que esté en <strong>otra red</strong> (un compañero en su casa, un amigo). Que no esté en la red del aula: eso confirma que la dirección es alcanzable desde cualquier parte, no sólo desde tu red local.</li>
-                            <li>Esa persona la añade en su Minecraft como dirección del servidor y entra.</li>
-                            <li>Vuelve a comprobar con <code>docker compose exec mc rcon-cli list</code>: debe aparecer ese jugador.</li>
-                        </ol>
-                    </div>
-
-                    <div class="nota">
-                        <strong>Si no consigues coordinar a alguien de otra red,</strong> la prueba mínima es suficiente para dar la práctica por superada: conectarte a la dirección de playit.gg en vez de a <code>localhost</code> ya prueba que el túnel hace su trabajo. La prueba ideal solo añade el "wow" de ver a otra persona dentro.
-                    </div>
-
-                    <p>Con la prueba ideal acabas de tener a alguien jugando en un servidor que corre en tu portátil del aula, sin haber abierto un solo puerto del router. Es exactamente el mismo logro que la foto subida desde 4G de la práctica 34: un servicio tuyo, en tu equipo, alcanzable desde cualquier parte por un túnel saliente.</p>
+                    <p>Acabas de tener a alguien jugando en un servidor que corre en tu portátil, sin haber instalado nada en su equipo más que el propio Minecraft y sin haber tocado la red. Eso es exactamente lo que hace un servidor profesional: publica un puerto y la gente se conecta a él.</p>
 
                     <table>
-                        <tr><td>¿Entraste tú por la dirección de playit.gg (prueba mínima)?</td><td><input type="text" placeholder="Sí / No"></td></tr>
-                        <tr><td>¿Quién hizo de "jugador externo" y desde qué red? (prueba ideal)</td><td><input type="text" placeholder="o 'no coordinada'"></td></tr>
+                        <tr><td>¿Quién se conectó y desde qué equipo?</td><td><input type="text"></td></tr>
                         <tr><td>¿Apareció en <code>rcon-cli list</code>?</td><td><input type="text" placeholder="Sí / No"></td></tr>
-                        <tr><td>Latencia (ping) por el túnel</td><td><input type="text" placeholder="ej. 60 ms"></td></tr>
+                        <tr><td>Latencia (ping) que veía ese jugador</td><td><input type="text" placeholder="ej. 5 ms"></td></tr>
+                    </table>
+
+                    <h3>3.4 - Si no se conectan: los dos sospechosos habituales</h3>
+
+                    <p>Si tú entras por <code>localhost</code> pero tu compañero no entra por tu IP, el servidor está bien: el problema está en la red o en el firewall. Hay dos causas que cubren casi todos los casos.</p>
+
+                    <h4>Sospechoso 1: el Firewall de Windows</h4>
+                    <p>El Firewall de Windows puede estar bloqueando las conexiones entrantes al puerto 25565. Docker Desktop a veces añade la regla solo, pero no siempre. Para crear la regla a mano:</p>
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <em>Firewall de Windows Defender con seguridad avanzada</em> (búscalo en el menú Inicio).</li>
+                            <li><strong>Reglas de entrada</strong> &rarr; <strong>Nueva regla</strong>.</li>
+                            <li>Tipo <strong>Puerto</strong> &rarr; <strong>TCP</strong> &rarr; puerto específico <strong>25565</strong>.</li>
+                            <li><strong>Permitir la conexión</strong>. Aplícala al perfil de red que uses (normalmente <em>Privada</em>; en el aula podría ser <em>Pública</em>, pregunta si dudas).</li>
+                            <li>Ponle un nombre reconocible, por ejemplo <em>Minecraft servidor 25565</em>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Sospechoso 2: aislamiento de clientes en la red</h4>
+                    <p>Algunas redes de centros, oficinas y wifis públicas tienen <strong>aislamiento de clientes</strong> ("client isolation" / "AP isolation"): los equipos tienen internet pero <em>no se ven entre sí</em>. Si es eso, no hay nada que tocar en tu equipo: es la configuración de la red, y la red local no funcionará por mucho que ajustes el firewall.</p>
+                    <p>Se comprueba en 10 segundos: que tu compañero te haga un <code>ping</code> a tu IP.</p>
+<pre class="codigo">ping 192.168.1.45</pre>
+                    <p>(con tu IP real). Si el ping responde, los equipos se ven y el problema es el firewall. Si el ping no responde pero ambos tenéis internet, es aislamiento de clientes: la red no deja. En ese caso, para hacer la prueba multijugador necesitaríais una red sin aislamiento (un punto de acceso propio, compartir datos del móvil entre los dos equipos, etc.) o usar el Anexo para salir por internet.</p>
+
+                    <table>
+                        <tr><td>¿Tuviste que crear la regla de firewall?</td><td><input type="text" placeholder="Sí / No / Ya estaba"></td></tr>
+                        <tr><td>¿Respondió el <code>ping</code> entre los dos equipos?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                        <tr><td>Diagnóstico final si no conectaba (firewall / aislamiento / IP mal / otro)</td><td><input type="text"></td></tr>
                     </table>
 
                     <div class="pregunta">
-                        <p>Explica con tus palabras por qué tu portátil no necesita abrir el puerto 25565 en el router para que entre gente de fuera. ¿Qué papel juega el contenedor <code>playit</code> y qué papel juegan los servidores de playit.gg? ¿Qué pasaría si tu portátil pierde internet 30 segundos?</p>
+                        <p>Explica con tus palabras por qué tus compañeros se conectan a tu IP <code>192.168.x.x</code> y no a <code>localhost</code>. ¿Por qué en una red local no hace falta tocar el router, y sí haría falta si quisieras que entrara alguien desde su casa?</p>
                         <textarea rows="4"></textarea>
                     </div>
                 </div>
@@ -548,7 +501,7 @@ docker compose logs playit</pre>
                 <h2>Parte 4 - Administrar el servidor por consola (40 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Un servidor abierto a internet hay que administrarlo: dar permisos a quien debe tenerlos, controlar quién entra, ajustar las reglas del juego. Todo eso se hace por la consola RCON que probaste en la Parte 1.5.</p>
+                    <p>Un servidor con gente conectada hay que administrarlo: dar permisos a quien debe tenerlos, controlar quién entra, ajustar las reglas del juego. Todo eso se hace por la consola RCON que probaste en la Parte 1.5.</p>
 
                     <h3>4.1 - Comandos básicos de administración</h3>
 
@@ -581,11 +534,11 @@ docker compose logs playit</pre>
 
                     <h3>4.3 - Lista blanca: que sólo entre quien tú quieras</h3>
 
-                    <p>Mientras el servidor esté publicado, cualquiera que averigüe la dirección puede intentar entrar. La <strong>lista blanca</strong> (<em>whitelist</em>) le da la vuelta: sólo entran los jugadores que tú añadas explícitamente.</p>
+                    <p>En la red del aula, cualquiera que averigüe tu IP puede intentar entrar a tu servidor. La <strong>lista blanca</strong> (<em>whitelist</em>) le da la vuelta: sólo entran los jugadores que tú añadas explícitamente.</p>
 
 <pre class="codigo">docker compose exec mc rcon-cli whitelist on
 docker compose exec mc rcon-cli whitelist add TuNombreDeMinecraft
-docker compose exec mc rcon-cli whitelist add NombreDeTuAmigo
+docker compose exec mc rcon-cli whitelist add NombreDeTuCompañero
 docker compose exec mc rcon-cli whitelist list</pre>
 
                     <p>Desde que activas la lista blanca, quien no esté en ella recibe un "no estás en la lista blanca de este servidor" al intentar conectarse. Pruébalo: pide a alguien que <em>no</em> hayas añadido que intente entrar, y luego añádelo y que vuelva a probar.</p>
@@ -622,10 +575,10 @@ docker compose exec mc rcon-cli whitelist list</pre>
                 <h2>Parte 5 - Provocar y diagnosticar tus propios fallos (90 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Como en las prácticas anteriores, vas a romper a propósito cinco cosas, hacer como si te las acabases de encontrar y diagnosticarlas. Son los fallos típicos de un servidor de Minecraft containerizado y publicado.</p>
+                    <p>Como en las prácticas anteriores, vas a romper a propósito cinco cosas, hacer como si te las acabases de encontrar y diagnosticarlas. Son los fallos típicos de un servidor de Minecraft containerizado.</p>
 
                     <div class="aviso">
-                        <strong>Antes de empezar:</strong> haz un backup del mundo (Parte 2.4). El Caso C lo vas a necesitar de verdad.
+                        <strong>Antes de empezar:</strong> haz un backup del mundo (Parte 2.4). El Caso D lo vas a necesitar de verdad.
                     </div>
 
                     <h3>5.1 - Caso A - El servidor no arranca: EULA sin aceptar</h3>
@@ -756,36 +709,35 @@ docker compose start mc</pre>
                         <tr><td>¿Recuperaste tus construcciones con el backup?</td><td><input type="text"></td></tr>
                     </table>
 
-                    <h3>5.5 - Caso E - Los de fuera no entran: el túnel caído</h3>
+                    <h3>5.5 - Caso E - Nadie encuentra el servidor: el puerto publicado cambiado</h3>
 
-                    <p><strong>Qué rompes:</strong> simulas que el túnel deja de funcionar. Los que están en tu red siguen jugando; los externos, no.</p>
+                    <p><strong>Qué rompes:</strong> en el compose, cambia el puerto publicado de <code>"25565:25565"</code> a <code>"25566:25565"</code> y recrea:</p>
 
-<pre class="codigo">docker compose stop playit
+<pre class="codigo">docker compose up -d
 docker compose ps</pre>
 
-                    <p>El servicio <code>playit</code> aparece <em>Exited</em>. Desde otra red, la dirección pública deja de responder.</p>
+                    <p>El servidor sigue Up y (healthy). Pero ni tú por <code>localhost:25565</code> ni tus compañeros por <code>TU_IP:25565</code> conseguís entrar: la dirección de siempre ya no responde.</p>
 
                     <p><strong>Diagnostica:</strong></p>
 
                     <div class="pasos">
                         <ol>
-                            <li>Síntoma: un jugador externo dice "no me conecta", pero tú en local entras sin problema.</li>
-                            <li><code>docker compose ps</code>: <code>mc</code> sigue <em>Up (healthy)</em>, pero <code>playit</code> está <em>Exited</em>. <strong>Pista clave en 10 segundos.</strong></li>
-                            <li>Como tú entras por <code>localhost</code> y el externo no entra por la dirección de playit, el problema está claramente en el túnel, no en el servidor.</li>
-                            <li><code>docker compose logs --tail 20 playit</code>: si hubiera sido un fallo real (no un <code>stop</code> tuyo), aquí verías errores de conexión del agente.</li>
+                            <li>Síntoma: "el servidor está perfecto en <code>docker compose ps</code> pero nadie se conecta a la dirección de siempre".</li>
+                            <li><code>docker compose ps</code>: fíjate en la columna <em>PORTS</em>. Ahora pone <code>0.0.0.0:25566-&gt;25565/tcp</code>: el puerto de fuera ya no es el 25565. <strong>Pista clave.</strong></li>
+                            <li>Como el contenedor está sano y el cambio es de mapeo de puertos, el problema está en la publicación, no en el servidor.</li>
+                            <li>Causa: alguien tocó el lado izquierdo del <code>ports</code>. El servidor sigue escuchando en su 25565 interno, pero hacia fuera se publica en otro puerto.</li>
                         </ol>
                     </div>
 
-                    <p><strong>Repara:</strong></p>
-
-<pre class="codigo">docker compose start playit
-docker compose logs --tail 10 playit</pre>
-
-                    <p>El agente se reconecta. Como la dirección pública de playit.gg está ligada a tu cuenta y a tu túnel, <strong>no cambia</strong> al reiniciar el agente: los jugadores externos no tienen que actualizar nada. Es una diferencia importante frente a las URLs efímeras de la práctica 34.</p>
+                    <p><strong>Repara:</strong> tienes dos caminos válidos, y verlos los dos enseña cómo funciona el mapeo de puertos:</p>
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Volver el compose a <code>"25565:25565"</code> y <code>docker compose up -d</code>: la dirección de siempre vuelve a funcionar.</li>
+                        <li>O dejarlo en 25566 y avisar a todos de que ahora la dirección es <code>TU_IP:25566</code>. Funciona igual, pero todo el mundo tiene que actualizar la dirección guardada. Esto te enseña por qué el puerto publicado no se cambia "porque sí" una vez que hay gente conectándose.</li>
+                    </ul>
 
                     <table>
-                        <tr><td>¿Qué veía el jugador externo con el túnel parado?</td><td><input type="text"></td></tr>
-                        <tr><td>¿La dirección pública siguió siendo la misma tras reiniciar?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                        <tr><td>Qué ponía la columna PORTS con el puerto cambiado</td><td><input type="text" placeholder="0.0.0.0:...->25565/tcp"></td></tr>
+                        <tr><td>¿Resolviste volviendo a 25565 o avisando del nuevo puerto?</td><td><input type="text"></td></tr>
                     </table>
 
                     <h3>5.6 - Tabla resumen de los cinco casos</h3>
@@ -795,11 +747,11 @@ docker compose logs --tail 10 playit</pre>
                         <tr><td>B - Memoria insuficiente</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
                         <tr><td>C - Desajuste de versiones</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
                         <tr><td>D - Volumen borrado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
-                        <tr><td>E - Túnel caído</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                        <tr><td>E - Puerto publicado cambiado</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
                     </table>
 
                     <div class="reto">
-                        <strong>Reto adicional (opcional, +20 min):</strong> provoca un sexto fallo tú solo. Idea: cambia el puerto publicado en el compose a uno ya ocupado en tu Windows y observa qué dice <code>docker compose up</code>. Documenta el síntoma, el comando que lo confirma y la solución, con el mismo formato que los cinco casos anteriores.
+                        <strong>Reto adicional (opcional, +20 min):</strong> provoca un sexto fallo tú solo. Idea: en el compose, escribe mal el nombre de una variable (por ejemplo <code>MEMORYY</code> en lugar de <code>MEMORY</code>) y observa qué pasa al levantar y qué dicen los logs. Documenta el síntoma, el comando que lo confirma y la solución, con el mismo formato que los cinco casos anteriores.
                     </div>
                 </div>
             </div>
@@ -811,14 +763,14 @@ docker compose logs --tail 10 playit</pre>
                 <h2>Parte 6 - Endurecer el servidor (30 min)</h2>
                 <div class="seccion-body">
 
-                    <p>Lo que tienes funciona, pero un servidor publicado en internet hay que asegurarlo. Cuatro frentes a cerrar.</p>
+                    <p>Lo que tienes funciona, pero un servidor con gente conectándose hay que asegurarlo. Cuatro frentes a cerrar.</p>
 
                     <h3>6.1 - Lista blanca siempre activa</h3>
 
-                    <p>Si el servidor va a estar publicado, la lista blanca de la Parte 4.3 no es opcional: es la diferencia entre "sólo entran mis amigos" y "entra cualquiera que averigüe la dirección". Déjala activada y, para que se mantenga al recrear el contenedor, añade al bloque <code>environment</code> del servicio <code>mc</code>:</p>
+                    <p>La lista blanca de la Parte 4.3 no es opcional en cuanto haya gente que conozca tu IP: es la diferencia entre "sólo entran mis compañeros" y "entra cualquiera del aula que averigüe la dirección". Déjala activada y, para que se mantenga al recrear el contenedor, añade al bloque <code>environment</code> del servicio <code>mc</code>:</p>
 
 <pre class="codigo">      ENABLE_WHITELIST: "TRUE"
-      WHITELIST: "TuNombre,NombreAmigo1,NombreAmigo2"</pre>
+      WHITELIST: "TuNombre,NombreCompañero1,NombreCompañero2"</pre>
 
                     <div class="nota">
                         <strong>Ojo a un detalle:</strong> si ya manipulaste la lista blanca con <code>rcon-cli</code> en la Parte 4.3, existe un fichero <code>whitelist.json</code> en el volumen y la variable <code>WHITELIST</code> puede no machacarlo. Para que el contenido de la variable mande siempre, añade también <code>OVERRIDE_WHITELIST: "TRUE"</code>. Si no, simplemente sigue gestionando la lista con <code>rcon-cli whitelist add/remove</code>, que escribe directamente en ese fichero. Lo que sí surte efecto siempre es <code>ENABLE_WHITELIST</code>: activa o desactiva la comprobación.
@@ -826,11 +778,11 @@ docker compose logs --tail 10 playit</pre>
 
                     <h3>6.2 - Operadores: los mínimos</h3>
 
-                    <p>Ser operador es poder total sobre el mundo y el servidor. Da <code>op</code> sólo a quien de verdad lo necesita, y revísalo con <code>docker compose exec mc rcon-cli</code> y el comando que liste operadores. Un amigo que sólo quiere jugar no necesita ser operador.</p>
+                    <p>Ser operador es poder total sobre el mundo y el servidor. Da <code>op</code> sólo a quien de verdad lo necesita. Un compañero que sólo quiere jugar no necesita ser operador.</p>
 
                     <h3>6.3 - Mantener online-mode en true</h3>
 
-                    <p>Recuerda lo de la Parte 0.6: <code>online-mode</code> debe quedarse en <code>true</code> (su valor por defecto). Es lo que garantiza que cada jugador es quien dice ser. No lo toques. Si en algún tutorial de internet te dicen que lo pongas en <code>false</code> "para que entren más", están abriendo el servidor a cualquiera y saltándose las condiciones del juego.</p>
+                    <p>Recuerda lo de la Parte 0.5: <code>online-mode</code> debe quedarse en <code>true</code> (su valor por defecto). Es lo que garantiza que cada jugador es quien dice ser. No lo toques. Si en algún tutorial de internet te dicen que lo pongas en <code>false</code> "para que entren más", están abriendo el servidor a cualquiera y saltándose las condiciones del juego.</p>
 
                     <h3>6.4 - Cambiar la contraseña de RCON</h3>
 
@@ -845,7 +797,7 @@ docker compose logs --tail 10 playit</pre>
                     <p>El backup de la Parte 2.4 es manual. En producción se automatiza. La propia imagen <code>itzg/minecraft-server</code> tiene un proyecto hermano para backups automáticos, y también puedes programar el patrón de la Parte 2.4 con el Programador de tareas de Windows. Un servidor de juego sin backups automáticos es cuestión de tiempo que pierda semanas de trabajo de todos los que juegan en él.</p>
 
                     <div class="pregunta">
-                        <p>De los cuatro frentes (lista blanca, operadores mínimos, online-mode, RCON), ¿cuál consideras más crítico para un servidor recién publicado y por qué? ¿Cuál es el que más gente se salta?</p>
+                        <p>De los cuatro frentes (lista blanca, operadores mínimos, online-mode, RCON), ¿cuál consideras más crítico para un servidor con gente conectándose y por qué? ¿Cuál es el que más gente se salta?</p>
                         <textarea rows="3"></textarea>
                     </div>
                 </div>
@@ -874,9 +826,9 @@ docker compose logs --tail 10 playit</pre>
                         <input type="text">
                         <label>Memoria asignada al servidor</label>
                         <input type="text" placeholder="ej. 2G">
-                        <label>Dirección pública del servidor (túnel playit.gg)</label>
-                        <input type="text">
-                        <label>Nombre del agente en playit.gg</label>
+                        <label>Dirección del servidor en la red (IP:puerto)</label>
+                        <input type="text" placeholder="ej. 192.168.1.45:25565">
+                        <label>¿Está abierto a internet? (no / sí, con qué túnel - ver Anexo)</label>
                         <input type="text">
                         <label>Ruta del docker-compose.yml en el equipo</label>
                         <input type="text" placeholder="C:\docker\minecraft">
@@ -892,7 +844,7 @@ docker compose logs --tail 10 playit</pre>
                         <textarea rows="4"></textarea>
                         <label>Las tres cosas más probables que se rompan y cómo arreglarlas (resumen Parte 5)</label>
                         <textarea rows="5"></textarea>
-                        <label>Medidas de seguridad aplicadas (lista blanca, online-mode, RCON...)</label>
+                        <label>Regla de firewall creada (puerto, perfil) y medidas de seguridad (lista blanca, online-mode, RCON...)</label>
                         <textarea rows="3"></textarea>
                         <label>Pendientes / mejoras planeadas</label>
                         <textarea rows="3"></textarea>
@@ -905,6 +857,83 @@ docker compose logs --tail 10 playit</pre>
             </div>
 
             <!-- ============================================================ -->
+            <!-- ANEXO OPCIONAL - ABRIR A INTERNET                              -->
+            <!-- ============================================================ -->
+            <div class="seccion opcional">
+                <h2>Anexo (opcional) - Abrir el servidor a internet con un túnel (45 min)</h2>
+                <div class="seccion-body">
+
+                    <div class="nota">
+                        <strong>Esto es opcional.</strong> Con las Partes 1 a 7 la práctica está completa: tienes un servidor montado, persistente, jugable en red local, administrado y documentado. Este anexo es para quien quiera además que entren personas de <em>fuera</em> de su red (un amigo desde su casa). Depende de un servicio externo (ngrok) cuya web puede cambiar de aspecto con el tiempo.
+                    </div>
+
+                    <h3>A.1 - Por qué hace falta un túnel y de qué tipo</h3>
+
+                    <p>En red local, dos equipos se ven directamente. Desde internet, no: hay un router que no deja entrar conexiones. La solución, igual que en la práctica 34, es un <strong>túnel saliente</strong>: tu equipo abre una conexión <em>hacia fuera</em> que se mantiene viva, y el tráfico de los jugadores entra por ahí, sin necesidad de abrir puertos del router.</p>
+
+                    <p>Pero hay una diferencia con la práctica 34. Allí publicaste Nextcloud, que habla <strong>HTTP</strong>, y Cloudflare Tunnel es un túnel HTTP. Minecraft no habla HTTP: usa su propio protocolo sobre <strong>TCP</strong>. Necesita un túnel <strong>TCP genérico</strong>, que pase los bytes "en crudo". Por eso aquí se usa <strong>ngrok</strong>, que sí ofrece túneles TCP.</p>
+
+                    <table>
+                        <tr><th></th><th>Nextcloud (práctica 34)</th><th>Minecraft (este anexo)</th></tr>
+                        <tr><td>Protocolo</td><td>HTTP/HTTPS</td><td>Protocolo propio sobre TCP</td></tr>
+                        <tr><td>Túnel adecuado</td><td>Cloudflare Tunnel (HTTP)</td><td>ngrok en modo TCP</td></tr>
+                    </table>
+
+                    <h3>A.2 - Crear la cuenta y obtener el authtoken</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea una cuenta gratuita en <code>dashboard.ngrok.com</code> (no pide tarjeta).</li>
+                            <li>En el panel, busca la sección <strong>Your Authtoken</strong> y copia el token: una cadena larga de letras y números.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>El authtoken es una credencial.</strong> No lo subas a git, no lo pegues en chats, no lo dejes en capturas.
+                    </div>
+
+                    <h3>A.3 - Añadir el servicio ngrok al compose</h3>
+
+                    <p>Añade este segundo servicio al <code>docker-compose.yml</code>, dentro del bloque <code>services:</code>. El <code>network_mode: "service:mc"</code> hace que ngrok comparta la red del contenedor del servidor, así <code>tcp 25565</code> apunta directo a Minecraft:</p>
+
+<pre class="codigo">  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    network_mode: "service:mc"
+    command: tcp 25565
+    environment:
+      NGROK_AUTHTOKEN: pega_aqui_tu_authtoken
+    depends_on:
+      - mc</pre>
+
+                    <p>Sustituye <code>pega_aqui_tu_authtoken</code> por el token real. Levanta y mira la dirección pública:</p>
+
+<pre class="codigo">docker compose up -d
+docker compose logs ngrok | Select-String url=</pre>
+
+                    <p>Verás una línea con <code>url=tcp://N.tcp.XX.ngrok.io:PUERTO</code>. Esa dirección (sin el <code>tcp://</code> de delante) es la que tus amigos de fuera ponen en Minecraft. También aparece en el panel de ngrok.</p>
+
+                    <table>
+                        <tr><td>Dirección pública que te ha dado ngrok</td><td><input type="text" placeholder="N.tcp.XX.ngrok.io:PUERTO"></td></tr>
+                        <tr><td>¿Entró alguien desde fuera de tu red?</td><td><input type="text" placeholder="Sí / No"></td></tr>
+                    </table>
+
+                    <h3>A.4 - Las pegas del plan gratuito</h3>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>El plan gratuito de ngrok permite <strong>un túnel a la vez</strong>.</li>
+                        <li>La dirección TCP <strong>cambia cada vez que reinicias</strong> el contenedor de ngrok. Igual que las URLs <code>trycloudflare.com</code> de la práctica 34: es efímera por diseño. Si reinicias, hay que volver a mirar los logs y repartir la dirección nueva.</li>
+                        <li>Para una dirección fija haría falta un dominio propio y un plan de pago, o saltar a otro servicio. Fuera del alcance de esta práctica.</li>
+                    </ul>
+
+                    <div class="pregunta">
+                        <p>Compara las tres formas de "abrir" un servidor que has visto en el curso: red local directa (esta práctica), Cloudflare Tunnel HTTP (práctica 34) y ngrok TCP (este anexo). ¿Cuándo usarías cada una? ¿Qué tienen en común los dos túneles frente a abrir puertos del router?</p>
+                        <textarea rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
             <!-- CONCLUSIONES Y EVALUACIÓN                                      -->
             <!-- ============================================================ -->
             <div class="seccion">
@@ -912,22 +941,22 @@ docker compose logs --tail 10 playit</pre>
                 <div class="seccion-body">
 
                     <div class="pregunta">
-                        <p>Has montado, publicado y administrado un servidor de juego en una jornada. Sin Docker, calcula a ojo cuánto te habría llevado y cuántas cosas distintas habrías tenido que aprender (instalar la versión correcta de Java, configurar el servidor, abrir puertos...). ¿Qué función concreta de Docker te ha ahorrado más tiempo?</p>
+                        <p>Has montado, abierto y administrado un servidor de juego en una jornada. Sin Docker, calcula a ojo cuánto te habría llevado y cuántas cosas distintas habrías tenido que aprender (instalar la versión correcta de Java, configurar el servidor...). ¿Qué función concreta de Docker te ha ahorrado más tiempo?</p>
                         <textarea rows="4"></textarea>
                     </div>
 
                     <div class="pregunta">
-                        <p>Compara la solución "abrir el puerto 25565 en el router" con "usar playit.gg". ¿Qué ventajas e inconvenientes tiene cada una en seguridad, mantenimiento y dependencia de un tercero?</p>
+                        <p>Explica qué hace exactamente la línea <code>ports: "25565:25565"</code> del compose. ¿Por qué gracias a ella no tuviste que configurar nada más para que entraran compañeros de tu red? ¿Qué pasó en el Caso E cuando cambiaste el lado izquierdo?</p>
                         <textarea rows="4"></textarea>
                     </div>
 
                     <div class="pregunta">
-                        <p>En la práctica 34 publicaste Nextcloud con Cloudflare Tunnel y aquí publicaste Minecraft con playit.gg. ¿Por qué no se pudo usar el mismo túnel para los dos? Explica la diferencia entre un túnel HTTP y un túnel TCP.</p>
+                        <p>Compara jugar en red local (lo que has hecho) con abrir el servidor a internet (el Anexo). ¿Qué ventajas e inconvenientes tiene cada opción en cuanto a simplicidad, alcance y seguridad? ¿Para el aula cuál es la sensata?</p>
                         <textarea rows="4"></textarea>
                     </div>
 
                     <div class="pregunta">
-                        <p>El responsable de un centro juvenil te pide montar un servidor de Minecraft para los chavales. ¿Recomendarías este montaje? Lista al menos tres condiciones o medidas que pondrías antes de dárselo en uso.</p>
+                        <p>El responsable de un centro juvenil te pide montar un servidor de Minecraft para los chavales, que se conectarán desde los equipos de la sala. ¿Recomendarías este montaje? Lista al menos tres condiciones o medidas que pondrías antes de dárselo en uso.</p>
                         <textarea rows="5"></textarea>
                     </div>
 
@@ -943,17 +972,18 @@ docker compose logs --tail 10 playit</pre>
                             <tr><td>Entiendo qué es un servidor de Minecraft y por qué containerizarlo resuelve problemas reales</td><td><input type="text" placeholder="Sí / No / A medias"></td></tr>
                             <tr><td>He levantado el servidor con un único <code>docker compose up -d</code></td><td><input type="text"></td></tr>
                             <tr><td>Entiendo el papel de la variable <code>EULA</code></td><td><input type="text"></td></tr>
-                            <tr><td>Me he conectado al servidor en local con el cliente</td><td><input type="text"></td></tr>
                             <tr><td>He probado que el mundo sobrevive a un <code>compose down</code> (sin -v)</td><td><input type="text"></td></tr>
                             <tr><td>Sé hacer un backup correcto del mundo (con flush previo) y restaurarlo</td><td><input type="text"></td></tr>
-                            <tr><td>He publicado el servidor a internet con playit.gg</td><td><input type="text"></td></tr>
-                            <tr><td>Ha entrado al menos un jugador desde otra red distinta a la del aula</td><td><input type="text"></td></tr>
+                            <tr><td>Entiendo qué hace <code>ports: "25565:25565"</code> y cómo publica el servidor en la red</td><td><input type="text"></td></tr>
+                            <tr><td>Sé averiguar la IP de mi equipo con <code>ipconfig</code> e identificar el adaptador correcto</td><td><input type="text"></td></tr>
+                            <tr><td>Se ha conectado al menos un compañero de mi red local al servidor</td><td><input type="text"></td></tr>
+                            <tr><td>Sé diagnosticar un problema de conexión: firewall vs aislamiento de clientes</td><td><input type="text"></td></tr>
                             <tr><td>Sé usar la consola RCON: op, whitelist, kick, say...</td><td><input type="text"></td></tr>
                             <tr><td>Entiendo la diferencia entre VANILLA y PAPER</td><td><input type="text"></td></tr>
                             <tr><td>He provocado y resuelto los cinco fallos de la Parte 5</td><td><input type="text"></td></tr>
-                            <tr><td>Entiendo por qué Minecraft necesita un túnel TCP y no el túnel HTTP de la práctica 34</td><td><input type="text"></td></tr>
                             <tr><td>He activado la lista blanca y dejado <code>online-mode</code> en true</td><td><input type="text"></td></tr>
                             <tr><td>He rellenado la ficha de despliegue completa</td><td><input type="text"></td></tr>
+                            <tr><td><span class="badge-opc">OPCIONAL</span> He abierto el servidor a internet con un túnel TCP (Anexo)</td><td><input type="text"></td></tr>
                         </table>
                     </div>
                 </div>
@@ -972,7 +1002,7 @@ docker compose logs --tail 10 playit</pre>
 
     <script>
     (function() {
-        var CLAVE = 'practica35-progreso-v1';
+        var CLAVE = 'practica35-progreso-v2';
         var estado = document.getElementById('estado-guardado');
         var btnGuardar = document.getElementById('btn-guardar');
         var btnBorrar = document.getElementById('btn-borrar');
