@@ -892,28 +892,42 @@ docker compose ps</pre>
                         <strong>El authtoken es una credencial.</strong> No lo subas a git, no lo pegues en chats, no lo dejes en capturas.
                     </div>
 
-                    <h3>A.3 - Añadir el servicio ngrok al compose</h3>
+                    <h3>A.3 - Instalar el agente de ngrok en Windows</h3>
 
-                    <p>Añade este segundo servicio al <code>docker-compose.yml</code>, dentro del bloque <code>services:</code>. El <code>network_mode: "service:mc"</code> hace que ngrok comparta la red del contenedor del servidor, así <code>tcp 25565</code> apunta directo a Minecraft:</p>
+                    <p>Aquí no hace falta tocar el <code>docker-compose.yml</code> ni añadir contenedores. La clave está en algo que ya tienes: la línea <code>ports: "25565:25565"</code> del compose hace que el servidor esté escuchando en el puerto 25565 de tu propio Windows. El agente de ngrok, instalado como un programa normal de Windows, sólo tiene que apuntar a ese puerto local.</p>
 
-<pre class="codigo">  ngrok:
-    image: ngrok/ngrok:latest
-    restart: unless-stopped
-    network_mode: "service:mc"
-    command: tcp 25565
-    environment:
-      NGROK_AUTHTOKEN: pega_aqui_tu_authtoken
-    depends_on:
-      - mc</pre>
+                    <p><strong>Instala el agente.</strong> Desde PowerShell, con el gestor de paquetes de Windows:</p>
 
-                    <p>Sustituye <code>pega_aqui_tu_authtoken</code> por el token real. Levanta y mira la dirección pública:</p>
+<pre class="codigo">winget install ngrok</pre>
 
-<pre class="codigo">docker compose up -d
-docker compose logs ngrok | Select-String url=</pre>
+                    <p>Si <code>winget</code> no está disponible o falla, descarga el agente desde <code>ngrok.com/download</code> (sección Windows) y descomprímelo. Comprueba que ha quedado instalado:</p>
 
-                    <p>Verás una línea con <code>url=tcp://N.tcp.XX.ngrok.io:PUERTO</code>. Esa dirección (sin el <code>tcp://</code> de delante) es la que tus amigos de fuera ponen en Minecraft. También aparece en el panel de ngrok.</p>
+<pre class="codigo">ngrok version</pre>
+
+                    <div class="nota">
+                        <strong>Si <code>ngrok</code> no se reconoce como comando</strong> justo después de instalarlo con winget, cierra y vuelve a abrir PowerShell: la ventana ya abierta no se entera de los cambios en el PATH hasta que se reinicia.
+                    </div>
+
+                    <p><strong>Configura tu authtoken</strong> (el del paso A.2). Se hace una sola vez: ngrok lo guarda en tu perfil de usuario y no hay que repetirlo:</p>
+
+<pre class="codigo">ngrok config add-authtoken pega_aqui_tu_authtoken</pre>
+
+                    <p><strong>Levanta el túnel TCP</strong> apuntando al puerto 25565 que publica tu servidor:</p>
+
+<pre class="codigo">ngrok tcp 25565</pre>
+
+                    <p>ngrok ocupa la ventana de PowerShell con un panel de estado. Fíjate en la línea <strong>Forwarding</strong>, que mostrará algo así:</p>
+
+<pre class="codigo">Forwarding   tcp://N.tcp.XX.ngrok.io:PUERTO -> localhost:25565</pre>
+
+                    <p>Esa dirección de la izquierda (sin el <code>tcp://</code> de delante) es la que tus amigos de fuera ponen en Minecraft como dirección del servidor.</p>
+
+                    <div class="aviso">
+                        <strong>Esa ventana de PowerShell tiene que quedarse abierta.</strong> ngrok corre como un proceso en primer plano: mientras la ventana esté abierta, el túnel funciona; si la cierras o pulsas Ctrl+C, el túnel se cae. Para administrar el servidor con <code>rcon-cli</code> mientras tanto, abre <em>otra</em> ventana de PowerShell.
+                    </div>
 
                     <table>
+                        <tr><td>¿Cómo instalaste ngrok (winget / descarga manual)?</td><td><input type="text"></td></tr>
                         <tr><td>Dirección pública que te ha dado ngrok</td><td><input type="text" placeholder="N.tcp.XX.ngrok.io:PUERTO"></td></tr>
                         <tr><td>¿Entró alguien desde fuera de tu red?</td><td><input type="text" placeholder="Sí / No"></td></tr>
                     </table>
@@ -922,7 +936,7 @@ docker compose logs ngrok | Select-String url=</pre>
 
                     <ul style="margin-left:20px;line-height:1.8;font-size:13px">
                         <li>El plan gratuito de ngrok permite <strong>un túnel a la vez</strong>.</li>
-                        <li>La dirección TCP <strong>cambia cada vez que reinicias</strong> el contenedor de ngrok. Igual que las URLs <code>trycloudflare.com</code> de la práctica 34: es efímera por diseño. Si reinicias, hay que volver a mirar los logs y repartir la dirección nueva.</li>
+                        <li>La dirección TCP <strong>cambia cada vez que paras ngrok y lo vuelves a lanzar</strong>. Igual que las URLs <code>trycloudflare.com</code> de la práctica 34: es efímera por diseño. Cada vez que relances <code>ngrok tcp 25565</code>, mira la nueva línea <em>Forwarding</em> y reparte la dirección nueva.</li>
                         <li>Para una dirección fija haría falta un dominio propio y un plan de pago, o saltar a otro servicio. Fuera del alcance de esta práctica.</li>
                     </ul>
 
