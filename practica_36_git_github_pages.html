@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 36: Git, GitHub y tu primera web publicada en GitHub Pages</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: middle; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 36: Git, GitHub y tu primera web publicada en GitHub Pages</h1>
+            <div class="meta">
+                <strong>Módulo:</strong> Práctica adicional - control de versiones y publicación web<br>
+                <strong>Requisito previo:</strong> ninguno técnico. Conviene tener instalado un editor de código (Visual Studio Code) y haber pasado por las prácticas de consola (10 y 11).<br>
+                <strong>Sesiones:</strong> práctica extra<br>
+                <strong>Duración estimada:</strong> 5 horas<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Herramientas:</strong> Windows 11 anfitrión, Visual Studio Code (gratis), Git para Windows (gratis), GitHub CLI (gratis), una cuenta de correo activa y un móvil con datos para comprobar la web desde fuera de la red del aula
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> vas a aprender el sistema <strong>Git</strong> (control de versiones), te vas a crear una cuenta en <strong>GitHub</strong>, vas a construir una mini web personal en HTML, y la vas a publicar gratis en internet con <strong>GitHub Pages</strong>. Al acabar tendrás una URL pública del tipo <code>https://tu-usuario.github.io</code> que podrás enseñar desde cualquier móvil, y sabrás guardar cualquier proyecto (apuntes, scripts, configuraciones) en un repositorio versionado. Es la misma herramienta que usa cualquier técnico o desarrollador del sector cuando comparte trabajo.
+            </div>
+
+            <div class="aviso">
+                <strong>Antes de empezar:</strong> esta práctica te pedirá <strong>verificar el correo</strong> de GitHub y <strong>activar la verificación en dos pasos (2FA)</strong>. Si llevas el móvil al curso te ahorrarás tiempo. Si no, puedes usar la app de autenticación de Microsoft o Google Authenticator desde un PC, pero es menos cómodo. Usa una contraseña que recuerdes: la cuenta de GitHub te va a sobrevivir al curso, no la conviertas en un usar-y-tirar.
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- OBJETIVOS                                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Entender qué es el <strong>control de versiones</strong> y por qué Git se ha convertido en el estándar de facto.</li>
+                        <li>Distinguir claramente <strong>Git</strong> (el programa que llevas en tu ordenador) de <strong>GitHub</strong> (un servicio web que aloja repositorios). Son cosas distintas y se confunden constantemente.</li>
+                        <li>Instalar <strong>Git para Windows</strong> y la <strong>GitHub CLI</strong> (<code>gh</code>), y configurar tu identidad de Git por primera vez.</li>
+                        <li>Crear una <strong>cuenta de GitHub</strong> bien configurada (correo verificado, 2FA, nombre de usuario decente) y autenticarla en tu PC con <code>gh auth login</code>.</li>
+                        <li>Hacer tus primeros commits "de verdad" desde la consola: <code>git init</code>, <code>git add</code>, <code>git commit</code>, <code>git log</code>, <code>git status</code>; entender qué es el <strong>staging area</strong>.</li>
+                        <li>Escribir una mini <strong>web personal en HTML+CSS</strong> a la que pondrás tu nombre, una foto/avatar, una mini-bio y dos o tres enlaces.</li>
+                        <li>Subir la web a un <strong>repositorio público de GitHub</strong> y entender la diferencia entre el repositorio local y el remoto.</li>
+                        <li>Activar <strong>GitHub Pages</strong> sobre ese repositorio y comprobar la URL pública desde tu PC y <strong>desde el móvil con datos</strong> (para verificar que sale de verdad a internet).</li>
+                        <li>Modificar la web y publicar los cambios usando un <strong>cliente gráfico</strong> (Visual Studio Code), entendiendo qué comandos está ejecutando por debajo.</li>
+                        <li>Diagnosticar cinco fallos típicos: olvidar <code>git add</code>, conflicto al hacer push contra un repo no vacío, Pages tarda en activarse, caché del navegador, cambios sin commit que se pierden.</li>
+                        <li>Documentar tu repositorio y su URL pública en una <strong>ficha técnica</strong> que entregarás al profesor.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 0 - Conceptos previos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 - El problema que resuelve Git: el control de versiones</h3>
+
+                    <p>Antes de que existiera Git, casi todo el mundo guardaba sus proyectos así:</p>
+
+                    <pre class="codigo">trabajo.docx
+trabajo_v2.docx
+trabajo_v2_final.docx
+trabajo_v2_final_BUENO.docx
+trabajo_v2_final_BUENO_(este_sí).docx</pre>
+
+                    <p>Esto es el <strong>control de versiones a mano</strong>, y todo el mundo lo ha hecho alguna vez. Funciona regular para un documento, fatal en cuanto entran dos personas a tocarlo, e imposible en cuanto se trata de un proyecto con cientos de archivos.</p>
+
+                    <p>Un <strong>sistema de control de versiones</strong> (VCS, <em>version control system</em>) es un programa que automatiza esa idea de "guardar versiones", pero hecho en serio: guarda <strong>cada cambio</strong> que haces, con su autor, su fecha, una descripción de qué cambió y por qué, y te permite volver a cualquier versión anterior sin tener que mantener veinte copias del archivo. Y, sobre todo, deja que varias personas trabajen sobre lo mismo a la vez sin pisarse.</p>
+
+                    <p><strong>Git</strong> es el sistema de control de versiones más usado del mundo. Lo creó Linus Torvalds en 2005 para llevar el código del propio Linux. Hoy lo usa prácticamente cualquier proyecto de software, y muchos otros tipos de proyecto: documentación técnica, configuraciones de servidores, libros, recetas, contenido web. Cualquier cosa que sean archivos de texto.</p>
+
+                    <h3>0.2 - Git no es GitHub (y todos los confunden)</h3>
+
+                    <p>Esto es lo primero que hay que tener claro, porque la gente lo mezcla constantemente:</p>
+
+                    <table>
+                        <tr><th></th><th>Git</th><th>GitHub</th></tr>
+                        <tr><td>Qué es</td><td>Un programa que se instala en tu PC</td><td>Una página web (un servicio)</td></tr>
+                        <tr><td>Quién lo hizo</td><td>Linus Torvalds y la comunidad, 2005</td><td>Una empresa, comprada por Microsoft en 2018</td></tr>
+                        <tr><td>Para qué sirve</td><td>Llevar el historial de cambios de tus archivos</td><td>Guardar repositorios Git en internet y trabajar en equipo</td></tr>
+                        <tr><td>Funciona sin lo otro</td><td>Sí, sin GitHub. Git va solo en tu disco.</td><td>No tiene mucho sentido sin Git por debajo.</td></tr>
+                        <tr><td>Coste</td><td>Gratis, código abierto</td><td>Hay capa gratis (la que vas a usar) y capas de pago</td></tr>
+                        <tr><td>Alternativas</td><td>Mercurial, Subversion, Fossil (apenas se usan ya)</td><td>GitLab, Bitbucket, Codeberg, Gitea (autoalojable)</td></tr>
+                    </table>
+
+                    <p>Una analogía que ayuda: <strong>Git es como Word</strong> (el programa que tienes en el PC para editar documentos), y <strong>GitHub es como OneDrive o Google Drive</strong> (un sitio en internet donde guardas y compartes esos documentos). Puedes usar Word sin OneDrive perfectamente. Y puedes usar Git sin GitHub también: tu repositorio local sigue siendo un repositorio Git completo. Lo que aporta GitHub es alojamiento, colaboración, control de issues, integración con servicios... y, en esta práctica, <strong>publicación web</strong>.</p>
+
+                    <div class="nota">
+                        <strong>Lo que dice el sector:</strong> hoy se da por hecho que cualquier técnico mira algo en GitHub al menos una vez por semana, aunque sea para descargar un proyecto, leer una documentación o copiar un fragmento de configuración. Tener cuenta y saberte mover por ella no es opcional.
+                    </div>
+
+                    <h3>0.3 - Los cuatro conceptos de Git que tienes que entender</h3>
+
+                    <p>Olvídate del resto. Con estos cuatro ya puedes hacer el 95 % del trabajo:</p>
+
+                    <h4>Repositorio (repo)</h4>
+                    <p>Una carpeta que Git "vigila". Por dentro es una carpeta normal con tus archivos, más una subcarpeta oculta <code>.git</code> donde Git guarda toda la historia. Cuando haces <code>git init</code> sobre una carpeta, se crea ese <code>.git</code> y a partir de ahí esa carpeta es un repositorio. Borrar <code>.git</code> es lo único que devuelve la carpeta a su estado "tonto" (sin historial).</p>
+
+                    <h4>Commit</h4>
+                    <p>Una <strong>foto</strong> del repositorio en un instante. Cada commit lleva: el estado completo de los archivos en ese momento, quién lo hizo, cuándo, una descripción ("mensaje de commit") y un identificador único de 40 caracteres (un <em>hash</em>, normalmente se ven los 7 primeros, tipo <code>3a4ac0e</code>). Un commit es <strong>inmutable</strong>: una vez hecho, queda ahí para siempre, y el historial es una cadena de commits unos detrás de otros.</p>
+
+                    <p>Hacer un commit es el equivalente a <em>"esto que tengo ahora me convence, guárdalo en el historial"</em>. Si más adelante todo se rompe, siempre puedes volver a cualquier commit anterior y recuperar exactamente cómo estaba el proyecto entonces.</p>
+
+                    <h4>Rama (branch)</h4>
+                    <p>Una línea de commits en paralelo. Por defecto hay una rama que se llama <code>main</code> (antes era <code>master</code>) y, en proyectos sencillos como este, no vas a usar otra. Las ramas son lo que permite que dos personas trabajen a la vez en cosas distintas sin pisarse, y se fusionan luego con <em>merge</em>. En esta práctica vamos a quedarnos sólo con <code>main</code>: ramas las verás cuando el proyecto sea más complejo.</p>
+
+                    <h4>Remoto (remote)</h4>
+                    <p>Una copia del repositorio que vive en otro sitio, normalmente en internet. El remoto típico se llama <code>origin</code> y es la dirección del repositorio en GitHub. Subir tus commits al remoto se llama <strong>push</strong>; bajar los commits que haya nuevos en el remoto se llama <strong>pull</strong>. Mientras no haces push, tu trabajo está sólo en tu PC; en cuanto haces push, está en GitHub y otros pueden verlo.</p>
+
+                    <div class="truco">
+                        <strong>Imagen mental que sirve:</strong> el commit es como pulsar "Guardar" en un videojuego (creas un punto de guardado al que puedes volver), y el push es como <em>subir esa partida guardada a la nube de la consola</em>. Mientras no subes la partida, sólo está en tu consola; si se rompe la consola, la pierdes.
+                    </div>
+
+                    <h3>0.4 - El flujo de trabajo básico (el que vas a usar todo el rato)</h3>
+
+                    <p>Una y otra vez vas a hacer este ciclo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Cambias o creas archivos en tu carpeta de trabajo.</li>
+                            <li><code>git add &lt;archivo&gt;</code> &mdash; le dices a Git "estos cambios entran en el próximo commit". Esto es el <strong>staging area</strong>: una zona intermedia donde preparas qué va a entrar.</li>
+                            <li><code>git commit -m "mensaje"</code> &mdash; haces la foto. Quedan registrados los cambios que añadiste con <code>add</code>.</li>
+                            <li><code>git push</code> &mdash; subes la foto al remoto (GitHub).</li>
+                        </ol>
+                    </div>
+
+                    <p>El <strong>staging area</strong> (paso 2) confunde a todo el mundo al principio. La idea es que pueda haber muchos archivos cambiados a la vez pero tú quieras agruparlos en commits distintos. <em>"Estos tres archivos los he tocado por el bug del menú; estos dos, por la mejora del login. Quiero dos commits separados"</em>. El <code>git add</code> es el que decide qué entra en el próximo commit.</p>
+
+                    <p>Si todo lo cambiado tiene que entrar de golpe (que será tu caso casi siempre en esta práctica), puedes hacer <code>git add .</code> (un punto: <em>"todo lo que hay en este directorio"</em>).</p>
+
+                    <h3>0.5 - Qué es GitHub Pages</h3>
+
+                    <p><strong>GitHub Pages</strong> es un servicio gratuito de GitHub que <strong>sirve como página web pública cualquier repositorio que contenga HTML</strong>. Si tu repo tiene un <code>index.html</code> en la raíz, GitHub te da una URL del tipo:</p>
+
+                    <pre class="codigo">https://tu-usuario.github.io/nombre-del-repo/</pre>
+
+                    <p>Y si el repositorio se llama exactamente <code>tu-usuario.github.io</code> (mismo nombre que tu usuario), GitHub lo trata como tu "sitio personal" y te lo sirve en la raíz, sin la parte del nombre del repo:</p>
+
+                    <pre class="codigo">https://tu-usuario.github.io/</pre>
+
+                    <p>Esta es la URL que vas a conseguir en esta práctica. Es gratis, no requiere tarjeta, no requiere dominio propio, y la mantiene Microsoft: te vas a casa y la web sigue ahí. Limitaciones:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Sólo sirve <strong>contenido estático</strong>: HTML, CSS, imágenes, JavaScript que se ejecuta en el navegador. No hay PHP ni base de datos: no puedes hacer un foro o un blog dinámico con esto solo.</li>
+                        <li>El repositorio que la sirve tiene que ser <strong>público</strong> (en la capa gratuita).</li>
+                        <li>Hay un límite blando de tamaño y tráfico (1 GB de repo, 100 GB de ancho de banda al mes). Para una web personal sobra dos órdenes de magnitud.</li>
+                    </ul>
+
+                    <h3>0.6 - Por qué hacemos esta práctica</h3>
+
+                    <p>Tres motivos profesionales, no académicos:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Cualquier oferta de empleo técnico medio asume que tienes cuenta en GitHub. Pueden pedirte tu usuario en la propia entrevista para mirar qué tienes subido. Vacía es mejor que nada, pero con algo, aunque sea pequeño, es mucho mejor.</li>
+                        <li>Es la forma más profesional de tener un <strong>portfolio</strong>: una URL pública que enseñas en tu CV, mantenida sin coste, que puedes mejorar año tras año.</li>
+                        <li>Y en el día a día técnico, casi cualquier documentación de software (Docker, scripts de PowerShell, drivers, herramientas de diagnóstico) está en GitHub. Saber clonar un repo, leer un <code>README</code> y abrir un <em>issue</em> es vocabulario básico de la profesión.</li>
+                    </ul>
+
+                    <h3>0.7 - Metodología de la práctica</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Instalar Git y GitHub CLI en tu Windows (Parte 1).</li>
+                            <li>Crear y blindar la cuenta de GitHub, y autenticarla con <code>gh</code> (Parte 2).</li>
+                            <li>Hacer tus primeros commits en una carpeta de prueba para entender el flujo (Parte 3).</li>
+                            <li>Construir la web personal en HTML (Parte 4).</li>
+                            <li>Subir la web a GitHub y activar Pages (Parte 5).</li>
+                            <li>Editar la web con cliente gráfico (Parte 6).</li>
+                            <li>Provocar y diagnosticar fallos típicos (Parte 7).</li>
+                            <li>Documentar y entregar (Parte 8).</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Idea clave:</strong> al final del día tendrás una URL pública en internet con tu nombre en ella. Pero más importante que la web concreta es haber entendido <strong>el ciclo</strong>: editar &rarr; add &rarr; commit &rarr; push, y haber visto que ese ciclo funciona exactamente igual para una web, para un script de PowerShell o para el código de un sistema operativo entero.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - INSTALACIÓN                                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 1 - Instalar Git y GitHub CLI (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Necesitas dos programas en tu Windows: <strong>Git</strong> (el control de versiones en sí) y <strong>GitHub CLI</strong> (una herramienta que conecta tu Git con la web de GitHub sin que tengas que pelearte con contraseñas y tokens).</p>
+
+                    <h3>1.1 - Comprobar si ya están instalados</h3>
+
+                    <p>Abre <strong>PowerShell</strong> (Win+R, escribe <code>powershell</code>, Enter). Comprueba las dos versiones:</p>
+
+<pre class="codigo">git --version
+gh --version</pre>
+
+                    <p>Posibles respuestas:</p>
+
+                    <table>
+                        <tr><th>Lo que sale</th><th>Qué significa</th></tr>
+                        <tr><td><code>git version 2.x.x.windows.x</code></td><td>Git ya está. No hace falta reinstalarlo.</td></tr>
+                        <tr><td><code>'git' no se reconoce...</code></td><td>No está. Salta al apartado 1.2.</td></tr>
+                        <tr><td><code>gh version 2.x.x</code></td><td>GitHub CLI ya está.</td></tr>
+                        <tr><td><code>'gh' no se reconoce...</code></td><td>No está. Salta al apartado 1.3.</td></tr>
+                    </table>
+
+                    <table>
+                        <tr><td>Versión de Git instalada</td><td><input type="text" placeholder="ej. 2.45.0.windows.1 o NINGUNA"></td></tr>
+                        <tr><td>Versión de gh instalada</td><td><input type="text" placeholder="ej. 2.50.0 o NINGUNA"></td></tr>
+                    </table>
+
+                    <h3>1.2 - Instalar Git para Windows</h3>
+
+                    <p>La forma más limpia es con <strong>winget</strong>, el gestor de paquetes que ya trae Windows 11. En PowerShell:</p>
+
+<pre class="codigo">winget install --id Git.Git -e --source winget</pre>
+
+                    <p>Acepta los avisos. Tarda un par de minutos. Cuando acabe, <strong>cierra y vuelve a abrir PowerShell</strong> (porque la variable <code>PATH</code> se actualiza al abrir consolas nuevas) y vuelve a probar:</p>
+
+<pre class="codigo">git --version</pre>
+
+                    <p>Ahora debería responder con la versión instalada.</p>
+
+                    <div class="nota">
+                        <strong>Si winget falla</strong> (rara vez en Windows 11, pero pasa): descárgalo manualmente desde <code>git-scm.com</code>, ejecuta el instalador y pulsa "Next" en todas las pantallas dejando los valores por defecto. Son una docena de pantallas; ninguna de las opciones que ofrecen es importante para esta práctica.
+                    </div>
+
+                    <h3>1.3 - Instalar GitHub CLI</h3>
+
+                    <p>Igual, con winget:</p>
+
+<pre class="codigo">winget install --id GitHub.cli -e --source winget</pre>
+
+                    <p>Cierra y abre PowerShell otra vez. Comprueba:</p>
+
+<pre class="codigo">gh --version</pre>
+
+                    <h3>1.4 - Configurar tu identidad en Git</h3>
+
+                    <p>Git pone tu nombre y correo en <strong>cada commit que haces</strong>. No te identifica ante GitHub (eso lo hará el <code>gh</code> en la Parte 2), pero sí <em>firma</em> cada commit con esos datos. Tienes que configurarlos <strong>una sola vez</strong> en este PC, y se quedan guardados para siempre.</p>
+
+<pre class="codigo">git config --global user.name "Nombre Apellido"
+git config --global user.email "tu-correo@ejemplo.com"</pre>
+
+                    <p>Usa <strong>el mismo correo</strong> con el que te vas a registrar en GitHub en la Parte 2: así GitHub asociará automáticamente tus commits con tu cuenta y aparecerá tu avatar al lado de cada uno. Si pones otro correo, los commits saldrán como "anónimos" en GitHub aunque los hayas hecho tú.</p>
+
+                    <div class="aviso">
+                        <strong>Esto se vuelve público.</strong> El correo que pongas aquí queda escrito en cada commit y, si subes el repo a GitHub, queda visible para cualquiera que mire los commits. Si te molesta, GitHub ofrece un "correo no-reply" alternativo (<code>12345+usuario@users.noreply.github.com</code>) que se puede usar en su lugar; lo verás en la Parte 2 cuando configures la cuenta. Por defecto, para esta práctica, usa tu correo real: no es nada que no esté ya en mil sitios.
+                    </div>
+
+                    <p>Configura también que la rama por defecto se llame <code>main</code> (es el estándar moderno; las versiones viejas de Git la creaban con el nombre <code>master</code> y a veces da problemas con GitHub que asume <code>main</code>):</p>
+
+<pre class="codigo">git config --global init.defaultBranch main</pre>
+
+                    <p>Comprueba tu configuración:</p>
+
+<pre class="codigo">git config --global --list</pre>
+
+                    <p>Tienen que aparecer al menos <code>user.name</code>, <code>user.email</code> e <code>init.defaultBranch=main</code>.</p>
+
+                    <table>
+                        <tr><td>Nombre configurado (<code>user.name</code>)</td><td><input type="text"></td></tr>
+                        <tr><td>Correo configurado (<code>user.email</code>)</td><td><input type="text"></td></tr>
+                        <tr><td><code>init.defaultBranch</code></td><td><input type="text" placeholder="main"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>El <code>--global</strong></code>:</strong> esto guarda la configuración en tu perfil de usuario de Windows (<code>C:\Users\TuUsuario\.gitconfig</code>), no en un proyecto concreto. Significa que esa identidad se usará para <em>todos</em> los repos que crees en este PC, salvo que la sobrescribas en un proyecto concreto con <code>git config user.name "Otro"</code> (sin <code>--global</code>) dentro de la carpeta de ese repo.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - CUENTA GITHUB                                        -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 - Crear y blindar tu cuenta de GitHub (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>La cuenta de GitHub te va a sobrevivir al curso. Vas a tener un usuario en internet con tu nombre, posiblemente para muchos años. Vale la pena dedicar 10 minutos a elegir bien el nombre y a configurar la seguridad como Dios manda.</p>
+
+                    <h3>2.1 - Elegir el nombre de usuario</h3>
+
+                    <p>El nombre de usuario en GitHub se ve en cada URL pública que generas. La URL de tu web va a tener tu nombre dentro:</p>
+
+                    <pre class="codigo">https://<strong>tu-usuario</strong>.github.io/</pre>
+
+                    <p>Por eso conviene que sea <strong>profesional</strong>. Recomendaciones:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Algo parecido a tu nombre real: <code>juan-perez</code>, <code>jperez85</code>, <code>juan-perez-dev</code>. Si tu nombre es muy común y está pillado, añade una sigla, una profesión o un número discreto.</li>
+                        <li>Letras, números y guion medio. Sin tildes, sin ñ, sin espacios.</li>
+                        <li><strong>Evita</strong> los nombres de gaming, motes de instituto o referencias que dentro de cinco años te van a dar vergüenza si te miran un CV. Esto se va a ver en una entrevista de trabajo.</li>
+                        <li>Cambiarlo después se puede, pero rompe enlaces y es engorroso. Es mucho mejor pensarlo dos minutos ahora.</li>
+                    </ul>
+
+                    <h3>2.2 - Crear la cuenta</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Abre <code>https://github.com</code> en tu navegador y pulsa <strong>Sign up</strong> (Registrarse).</li>
+                            <li>Pon tu <strong>correo</strong>: el mismo que has metido en <code>git config user.email</code>.</li>
+                            <li>Elige una <strong>contraseña fuerte</strong>: al menos 15 caracteres mezclando letras y números. GitHub te la pedirá pocas veces (te suele autenticar con <code>gh</code>), así que apuntala en un gestor de contraseñas si no la vas a recordar.</li>
+                            <li>Elige <strong>nombre de usuario</strong>: el que hayas pensado en 2.1.</li>
+                            <li>Te llegará un correo con un código de verificación. Mételo. Cuando lo aceptes, tu cuenta queda creada.</li>
+                            <li>GitHub te hace un par de preguntas sobre para qué vas a usarla (estudiante, autodidacta, etc.); responde lo que quieras, no afecta a nada.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Mi nombre de usuario de GitHub</td><td><input type="text" placeholder="ej. juan-perez"></td></tr>
+                        <tr><td>URL de mi perfil</td><td><input type="text" placeholder="https://github.com/tu-usuario"></td></tr>
+                    </table>
+
+                    <h3>2.3 - Verificación en dos pasos (2FA): obligatoria</h3>
+
+                    <p>Desde 2023, GitHub <strong>exige</strong> activar la verificación en dos pasos para poder hacer push de código. Lo va a pedir antes o después, así que mejor configurarlo ya.</p>
+
+                    <p>La 2FA significa que para entrar en tu cuenta hace falta tu contraseña <strong>y</strong> un código de un solo uso que cambia cada 30 segundos, generado por una app en tu móvil. Aunque alguien te robe la contraseña, no puede entrar sin tu móvil.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En GitHub, arriba a la derecha, click en tu avatar &rarr; <strong>Settings</strong> &rarr; <strong>Password and authentication</strong>.</li>
+                            <li>Busca <strong>Two-factor authentication</strong> y pulsa <strong>Enable</strong>.</li>
+                            <li>GitHub te ofrecerá varios métodos. Elige <strong>Set up using an app</strong> (app autenticadora) salvo que ya uses Passkey.</li>
+                            <li>En tu móvil instala <strong>Microsoft Authenticator</strong>, <strong>Google Authenticator</strong> o <strong>Aegis</strong> (esta última es <em>open source</em> y, si me preguntas, mi favorita). Si tienes ya una usada antes, vale igual.</li>
+                            <li>En GitHub te aparece un <strong>código QR</strong>. Ábrelo en la app del móvil con la opción "Añadir cuenta &rarr; Escanear QR". A partir de ese momento la app te da un código de 6 cifras que cambia cada 30 segundos.</li>
+                            <li>Vuelve a GitHub y mete el código que aparezca <em>ahora</em> en la app. Si caduca antes de meterlo (porque cambia muy rápido), espera al siguiente y vuelve a intentarlo.</li>
+                            <li>GitHub te dará un puñado de <strong>códigos de recuperación</strong> (single-use). <strong>Guárdalos en algún sitio que no sea sólo tu móvil</strong> (correo, una nota en otro PC, una foto a un papel). Si pierdes el móvil, son la única forma de recuperar la cuenta.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Esto no es opcional ni paranoico:</strong> si pierdes el móvil y no tienes los códigos de recuperación, no hay forma humana de recuperar el acceso. GitHub no recupera cuentas con 2FA sin esos códigos. Tarda 30 segundos en hacer una foto al papel con los códigos; hazla.
+                    </div>
+
+                    <h3>2.4 - Autenticar tu Windows ante GitHub con <code>gh auth login</code></h3>
+
+                    <p>Ya tienes la cuenta. Ahora vamos a vincularla con tu PC para no tener que estar metiendo usuario y contraseña cada vez que subes algo. El truco moderno es la GitHub CLI: hace un <strong>flujo OAuth</strong> (el mismo que cuando "entras con Google" en una web cualquiera) y deja la sesión guardada en tu Windows.</p>
+
+                    <p>En PowerShell:</p>
+
+<pre class="codigo">gh auth login</pre>
+
+                    <p><code>gh</code> te va a preguntar varias cosas, contesta así:</p>
+
+                    <table>
+                        <tr><th>Pregunta</th><th>Respuesta</th></tr>
+                        <tr><td>Where do you use GitHub?</td><td><strong>GitHub.com</strong></td></tr>
+                        <tr><td>What is your preferred protocol for Git operations?</td><td><strong>HTTPS</strong></td></tr>
+                        <tr><td>Authenticate Git with your GitHub credentials?</td><td><strong>Y</strong> (yes)</td></tr>
+                        <tr><td>How would you like to authenticate GitHub CLI?</td><td><strong>Login with a web browser</strong></td></tr>
+                    </table>
+
+                    <p>Te enseñará un <strong>código de un solo uso</strong> en la consola, tipo <code>1A2B-3C4D</code>, y te dirá que pulses Enter para abrir el navegador. Pulsa Enter:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Se abre GitHub.com en tu navegador, te pide loguearte si no lo estás, y te muestra un cuadro <strong>"Authorize GitHub CLI"</strong> con un campo para pegar el código.</li>
+                            <li>Pega el código <code>1A2B-3C4D</code> que te dio la consola.</li>
+                            <li>Pulsa <strong>Authorize</strong>.</li>
+                            <li>Te pedirá <strong>el código de 2FA</strong> de tu app autenticadora (porque acabas de activar 2FA). Mételo.</li>
+                            <li>Te dirá "Congratulations, you're all set!" o algo similar. Cierra esa pestaña.</li>
+                            <li>Vuelve a PowerShell: verás que ya ha terminado el comando con un "Logged in as tu-usuario" en verde.</li>
+                        </ol>
+                    </div>
+
+                    <p>Comprueba que efectivamente quedaste logueado:</p>
+
+<pre class="codigo">gh auth status</pre>
+
+                    <p>Tiene que decir algo del estilo <em>"Logged in to github.com account tu-usuario"</em> con un check verde.</p>
+
+                    <table>
+                        <tr><td>¿Aparece tu usuario en <code>gh auth status</code>?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Lo que acaba de pasar por debajo:</strong> <code>gh</code> ha generado un <em>token de acceso</em> con permisos para operar contra tu cuenta de GitHub, y ha configurado además el "credential helper" de Git para que use ese token automáticamente cuando hagas <code>git push</code>. Resultado: <strong>nunca más tendrás que escribir tu contraseña</strong> de GitHub en esta consola. Esto es el sustituto moderno de los antiguos "Personal Access Tokens" hechos a mano.
+                    </div>
+
+                    <div class="nota">
+                        <strong>Si trabajas en varios PCs</strong> (clase y casa, por ejemplo), tendrás que hacer este <code>gh auth login</code> en cada uno. La cuenta es la misma; lo que se guarda en cada Windows es la sesión local.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - PRIMEROS COMMITS EN CLI                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 - Tus primeros commits en consola (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Antes de tocar la web, vamos a ensayar el ciclo de Git en una carpeta tonta. Aquí lo importante es entender los comandos, no el contenido: trabajarás con tres notas en <code>.txt</code> para que veas el flujo en estado puro.</p>
+
+                    <h3>3.1 - Crear la carpeta de prácticas</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el Explorador de Windows, crea la carpeta <code>C:\Proyectos\practica-git</code>. Si no existe <code>C:\Proyectos</code>, créala también.</li>
+                            <li>Abre <strong>Visual Studio Code</strong>. <em>File &rarr; Open Folder</em> &rarr; selecciona esa carpeta.</li>
+                            <li>En VS Code, abre una terminal integrada: menú <em>Terminal &rarr; New Terminal</em> (o atajo <code>Ctrl + ñ</code>). Te aparecerá una PowerShell que <strong>ya está dentro de la carpeta del proyecto</strong>. A partir de aquí, todos los comandos los harás en esa terminal.</li>
+                        </ol>
+                    </div>
+
+                    <div class="nota">
+                        <strong>Trabajar desde la terminal de VS Code</strong> es muy cómodo: editas en la ventana de arriba, ves los comandos abajo, y no te tienes que andar moviendo entre el editor y una PowerShell suelta. Es como vas a trabajar el resto de la práctica.
+                    </div>
+
+                    <h3>3.2 - Convertir la carpeta en un repositorio Git</h3>
+
+<pre class="codigo">git init</pre>
+
+                    <p>Una sola línea. Git responde algo como <em>"Initialized empty Git repository in C:/Proyectos/practica-git/.git/"</em>. Lo que ha pasado:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Ha creado una subcarpeta oculta <code>.git</code> dentro de tu proyecto. Si activas "ver archivos ocultos" en el Explorador la verás. Ahí es donde Git guarda toda la historia y la configuración del repo.</li>
+                        <li>A partir de ahora esa carpeta es un <strong>repositorio Git</strong>. Cualquier comando <code>git</code> que ejecutes dentro entenderá que pertenece a este repo.</li>
+                        <li>Aún no hay ningún commit. La historia está vacía.</li>
+                    </ul>
+
+                    <p>Comprueba el estado del repo recién creado:</p>
+
+<pre class="codigo">git status</pre>
+
+                    <p>Te dice "On branch main", "No commits yet", "nothing to commit". Es decir: el repo existe, estás en la rama <code>main</code>, no hay historial, y de momento no hay archivos que registrar. Perfecto.</p>
+
+                    <h3>3.3 - Crear tu primer archivo</h3>
+
+                    <p>En VS Code, crea un archivo <code>notas.txt</code> (en el panel del Explorador del proyecto, botón derecho &rarr; New File) y escribe dentro algo cualquiera, por ejemplo:</p>
+
+<pre class="codigo">Practica 36 - Git y GitHub
+Esto es mi primera nota.</pre>
+
+                    <p>Guarda. Vuelve a la terminal:</p>
+
+<pre class="codigo">git status</pre>
+
+                    <p>Ahora Git ya tiene algo que decir: aparece <strong>Untracked files</strong> y lista <code>notas.txt</code>. <em>"He visto un archivo nuevo, pero no sé nada de él porque no lo has añadido"</em>.</p>
+
+                    <p><strong>Untracked</strong> ("sin seguir") significa que Git ve que el archivo existe pero no le está prestando atención todavía. Hasta que tú no le digas explícitamente "este archivo me interesa, sígueme los cambios", lo va a ignorar.</p>
+
+                    <h3>3.4 - Añadir al staging area y hacer el primer commit</h3>
+
+<pre class="codigo">git add notas.txt
+git status</pre>
+
+                    <p>Ahora <code>git status</code> dice <strong>"Changes to be committed"</strong> y lista el archivo en verde. Está en el <em>staging area</em>: <em>"esto entra en el próximo commit"</em>. Hagamos el commit:</p>
+
+<pre class="codigo">git commit -m "Primer commit: notas iniciales"</pre>
+
+                    <p>Git responde con algo del estilo:</p>
+
+<pre class="codigo">[main (root-commit) 3a4ac0e] Primer commit: notas iniciales
+ 1 file changed, 2 insertions(+)
+ create mode 100644 notas.txt</pre>
+
+                    <p>Anota lo que aparece:</p>
+
+                    <table>
+                        <tr><td>Hash corto de tu primer commit</td><td><input type="text" placeholder="ej. 3a4ac0e"></td></tr>
+                        <tr><td>¿Te aparece <code>root-commit</code>?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <p>"root-commit" significa "es el primer commit del repositorio", no tiene padre detrás. A partir de ahora cada nuevo commit tendrá como padre al anterior.</p>
+
+                    <p>Mira la historia:</p>
+
+<pre class="codigo">git log</pre>
+
+                    <p>Aparece un solo commit con su hash completo (40 caracteres), tu nombre, tu correo, fecha y mensaje. Pulsa <code>q</code> para salir del visor.</p>
+
+                    <div class="truco">
+                        <strong>Un buen mensaje de commit</strong> empieza con verbo en imperativo y explica el <em>qué</em> y el <em>por qué</em>, no el cómo (el cómo está en el diff). "Arreglar typo en cabecera" es mejor que "cambios" o "actualización". A futuro, cuando tengas 100 commits, los mensajes son el único mapa que te queda para encontrar cuándo pasó cada cosa.
+                    </div>
+
+                    <h3>3.5 - Ciclo completo: editar &rarr; add &rarr; commit (otra vez)</h3>
+
+                    <p>Edita <code>notas.txt</code> en VS Code, añade una línea más:</p>
+
+<pre class="codigo">Practica 36 - Git y GitHub
+Esto es mi primera nota.
+Y esta es la segunda, anadida en otro commit.</pre>
+
+                    <p>Guarda. Ahora hay dos cosas interesantes que probar antes de hacer el commit:</p>
+
+<pre class="codigo">git status
+git diff</pre>
+
+                    <p><code>git status</code> te dice <strong>"modified: notas.txt"</strong>: ha visto que cambia pero todavía no le has dicho que añada el cambio al staging.</p>
+
+                    <p><code>git diff</code> te enseña el cambio en sí, línea a línea: en rojo lo eliminado, en verde lo añadido. Esta es la herramienta que más vas a usar para revisar tu propio trabajo antes de hacer commit, y es lo que te enseñará VS Code en la Parte 6 cuando uses el cliente gráfico.</p>
+
+                    <p>Cierra el visor (<code>q</code>) y haz el ciclo:</p>
+
+<pre class="codigo">git add notas.txt
+git commit -m "Anadir segunda nota"</pre>
+
+                    <p>Y mira la historia ahora:</p>
+
+<pre class="codigo">git log --oneline</pre>
+
+                    <p><code>--oneline</code> es la forma compacta: un commit por línea, hash corto y mensaje. Ya tienes dos. Anótalos:</p>
+
+                    <table>
+                        <tr><td>Hash + mensaje del primer commit</td><td><input type="text" placeholder="3a4ac0e Primer commit: ..."></td></tr>
+                        <tr><td>Hash + mensaje del segundo commit</td><td><input type="text" placeholder="b58e974 Anadir segunda nota"></td></tr>
+                    </table>
+
+                    <h3>3.6 - Crear un segundo archivo y agruparlos con <code>git add .</code></h3>
+
+                    <p>Crea dos archivos a la vez en la carpeta: <code>ideas.txt</code> y <code>tareas.txt</code> con cualquier contenido. <code>git status</code> los listará a los dos como <em>untracked</em>. En lugar de hacer dos <code>git add</code>, atajo:</p>
+
+<pre class="codigo">git add .
+git status</pre>
+
+                    <p>El punto significa "todos los cambios del directorio actual y subdirectorios". Los dos archivos están ahora en staging. Comítelos juntos:</p>
+
+<pre class="codigo">git commit -m "Anadir ideas y tareas"</pre>
+
+                    <p>Y otra vez:</p>
+
+<pre class="codigo">git log --oneline</pre>
+
+                    <p>Tres commits. Has hecho ya un mini-historial real.</p>
+
+                    <div class="reto">
+                        <strong>Pequeño reto para fijar:</strong> haz tres commits más añadiendo, modificando y borrando contenido en cualquiera de los tres archivos. Cuando acabes, <code>git log --oneline</code> tiene que enseñar <strong>6 commits</strong>. Pega aquí cómo queda la lista (los seis hashes y mensajes):
+                    </div>
+
+                    <textarea placeholder="Pega aquí el contenido completo de git log --oneline tras los seis commits"></textarea>
+
+                    <h3>3.7 - Limpiar (opcional)</h3>
+
+                    <p>Cuando termines de jugar con esta carpeta puedes borrarla entera y olvidarte. Para la práctica real (la web) usarás otra carpeta en la Parte 4.</p>
+
+                    <div class="nota">
+                        <strong>Lo que tienes que llevarte de esta parte:</strong> el ciclo <code>edit &rarr; add &rarr; commit</code> es lo que vas a repetir <em>siempre</em>. Da igual el tipo de proyecto. Una web, un script, un libro: editas, añades al staging, haces commit. Cuando lo tengas mecanizado en consola, los clientes gráficos de la Parte 6 te parecerán transparentes porque sabrás qué están haciendo por dentro.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - CONSTRUIR LA WEB                                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 - Construir tu mini web personal (50 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Vamos a montar la web que después subirás a GitHub Pages. <strong>No es</strong> una práctica de diseño web: el objetivo es tener un <code>index.html</code> presentable, no que el resultado parezca una agencia de Madrid. La estructura está hecha; lo que cambia de un alumno a otro son los datos.</p>
+
+                    <h3>4.1 - Crear la carpeta del proyecto</h3>
+
+                    <p>El nombre de la carpeta da igual <em>en local</em>, pero conviene llamarla como vas a llamar al repositorio en GitHub. Como queremos que la URL final sea <code>https://tu-usuario.github.io/</code> (sin la parte del nombre del repo), el repo se tiene que llamar exactamente <code>tu-usuario.github.io</code>. Por tanto:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Crea la carpeta <code>C:\Proyectos\<strong>tu-usuario</strong>.github.io</code> (reemplaza <em>tu-usuario</em> por el tuyo real).</li>
+                            <li>Abrela en VS Code: <em>File &rarr; Open Folder</em>.</li>
+                            <li>Abre la terminal integrada (<code>Ctrl + ñ</code>).</li>
+                            <li>Inicializa el repo:
+<pre class="codigo">git init</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>Nombre exacto de la carpeta del proyecto</td><td><input type="text" placeholder="ej. juan-perez.github.io"></td></tr>
+                    </table>
+
+                    <h3>4.2 - El archivo <code>index.html</code></h3>
+
+                    <p>Crea un archivo <code>index.html</code> en la raíz de la carpeta con este contenido. <strong>Cambia las partes en MAYÚSCULAS</strong> por tus datos reales. Si quieres, modifica también colores, textos y enlaces; lo único que tiene que estar es la estructura mínima.</p>
+
+<pre class="codigo">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;TU NOMBRE - Tecnico informatico&lt;/title&gt;
+    &lt;style&gt;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .tarjeta {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            overflow: hidden;
+        }
+        .cabecera {
+            background: #1a365d;
+            color: white;
+            padding: 40px 32px;
+            text-align: center;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #4a5568;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            border: 4px solid white;
+        }
+        .cabecera h1 { font-size: 28px; margin-bottom: 6px; }
+        .cabecera p { opacity: .85; font-size: 16px; }
+        .contenido { padding: 32px; }
+        .contenido h2 {
+            color: #1a365d;
+            font-size: 20px;
+            margin: 0 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .contenido p { margin-bottom: 16px; font-size: 15px; }
+        .enlaces {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .enlaces a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2b6cb0;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background .2s;
+        }
+        .enlaces a:hover { background: #1a365d; }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f7fafc;
+            color: #718096;
+            font-size: 13px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="tarjeta"&gt;
+        &lt;div class="cabecera"&gt;
+            &lt;div class="avatar"&gt;TN&lt;/div&gt;
+            &lt;h1&gt;TU NOMBRE Y APELLIDOS&lt;/h1&gt;
+            &lt;p&gt;Tecnico microinformatico en formacion&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="contenido"&gt;
+            &lt;h2&gt;Sobre mi&lt;/h2&gt;
+            &lt;p&gt;
+                Soy alumno del certificado de profesionalidad IFCT0309
+                (Montaje y reparacion de sistemas microinformaticos)
+                en el centro CEDECO. Esta es mi primera web publicada
+                en internet, y la estoy usando para aprender Git,
+                GitHub y como funciona el control de versiones.
+            &lt;/p&gt;
+            &lt;h2&gt;Lo que estoy aprendiendo&lt;/h2&gt;
+            &lt;p&gt;
+                Montaje y diagnostico de hardware, instalacion y
+                administracion de Windows y Linux, redes basicas,
+                copias de seguridad, virtualizacion con VirtualBox
+                y contenedores con Docker.
+            &lt;/p&gt;
+            &lt;h2&gt;Donde encontrarme&lt;/h2&gt;
+            &lt;div class="enlaces"&gt;
+                &lt;a href="https://github.com/TU-USUARIO"&gt;Mi GitHub&lt;/a&gt;
+                &lt;a href="mailto:TU-CORREO@ejemplo.com"&gt;Escribirme&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;footer&gt;
+            Hecho con HTML, Git y GitHub Pages - Practica 36
+        &lt;/footer&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+                    <h3>4.3 - Probar la web en local (sin GitHub aún)</h3>
+
+                    <p>Antes de subirla, vamos a verla en el navegador para asegurarnos de que se ve bien. Abre el Explorador de Windows, ve a la carpeta del proyecto, y haz <strong>doble click en <code>index.html</code></strong>. Se abre en el navegador. Verás tu web tal cual.</p>
+
+                    <p>Comprueba:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Aparece tu nombre, no "TU NOMBRE Y APELLIDOS".</li>
+                        <li>El círculo del avatar muestra <em>tus iniciales</em> (puedes editar el <code>&lt;div class="avatar"&gt;TN&lt;/div&gt;</code> y poner las que correspondan, por ejemplo <code>JP</code> para Juan Pérez).</li>
+                        <li>El botón de "Mi GitHub" enlaza a <code>https://github.com/tu-usuario</code> real, no a <code>TU-USUARIO</code>.</li>
+                        <li>El botón de "Escribirme" lleva a tu correo de verdad.</li>
+                    </ul>
+
+                    <p>Si no se ve como esperas, edítalo en VS Code, guarda, y refresca el navegador (F5). Itera hasta que estés contento.</p>
+
+                    <table>
+                        <tr><td>URL en la barra del navegador cuando abres el HTML</td><td><input type="text" placeholder="empezara por file:///C:/..."></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>file:// significa que estás viendo el archivo en tu disco</strong>, no servido por un servidor web. Para esta práctica vale (el resultado se ve igual), pero algunas cosas avanzadas, como imágenes referenciadas con rutas absolutas o llamadas a APIs, no funcionarían así y sólo funcionarán cuando GitHub Pages lo sirva en la siguiente parte.
+                    </div>
+
+                    <h3>4.4 - Primer commit del proyecto</h3>
+
+                    <p>Con la web razonablemente lista, hacemos el primer commit en este repositorio:</p>
+
+<pre class="codigo">git status
+git add .
+git commit -m "Version inicial de la web personal"
+git log --oneline</pre>
+
+                    <p>Un commit en el historial. Estado:</p>
+
+                    <table>
+                        <tr><td>Hash + mensaje de este commit</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <h3>4.5 - Mejora opcional: añadir un favicon</h3>
+
+                    <p>Esto no es obligatorio, pero es un detalle que da el pego. Un <strong>favicon</strong> es ese iconito que aparece en la pestaña del navegador. Si quieres añadir uno:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Mete una imagen cuadrada pequeña (32x32 o 64x64 píxeles) llamada <code>favicon.png</code> en la misma carpeta. Vale cualquier PNG: tu inicial pintada en Paint, una foto recortada, un avatar de internet.</li>
+                            <li>En el <code>&lt;head&gt;</code> del HTML, justo antes de <code>&lt;/head&gt;</code>, añade:
+<pre class="codigo">&lt;link rel="icon" type="image/png" href="favicon.png"&gt;</pre>
+                            </li>
+                            <li>Refresca el navegador. Aparecerá el icono en la pestaña.</li>
+                            <li>Haz un commit nuevo:
+<pre class="codigo">git add .
+git commit -m "Anadir favicon"</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="reto">
+                        <strong>Reto extra (también opcional):</strong> mete una foto tuya real (o un avatar) en lugar del círculo con iniciales. Sustituye el <code>&lt;div class="avatar"&gt;TN&lt;/div&gt;</code> por <code>&lt;img src="avatar.png" class="avatar" alt="mi foto"&gt;</code> y mete el archivo en la carpeta. Tendrás que tocar el CSS de <code>.avatar</code> para que la imagen no salga descuadrada (quita <code>display:flex</code> y <code>font-size</code>, añade <code>object-fit:cover</code>). Si lo logras, otro commit más.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - PUSH Y PAGES                                         -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 - Subir el proyecto y activar GitHub Pages (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Hasta ahora todo lo que has hecho vive sólo en tu PC. Si se rompe el disco, lo pierdes. Ahora vas a subir el repositorio a GitHub y a activar Pages para que esa carpeta se sirva como web pública.</p>
+
+                    <h3>5.1 - Crear el repositorio en GitHub con <code>gh</code></h3>
+
+                    <p>Podríamos crear el repo en la web de GitHub (botón "+" arriba a la derecha &rarr; New repository), pero como ya tienes <code>gh</code> instalado y autenticado, lo haces en una sola línea sin salir de la consola. Desde la terminal de VS Code, en la carpeta del proyecto:</p>
+
+<pre class="codigo">gh repo create tu-usuario.github.io --public --source=. --remote=origin --push</pre>
+
+                    <p><strong>Reemplaza <code>tu-usuario</code></strong> por tu usuario real de GitHub. Explicación de cada parte:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><code>tu-usuario.github.io</code>: el nombre del repo. Es <strong>imprescindible</strong> que coincida exactamente con tu usuario seguido de <code>.github.io</code> para que la URL final sea limpia (<code>https://tu-usuario.github.io/</code>).</li>
+                        <li><code>--public</code>: lo crea público. GitHub Pages gratuito requiere repos públicos.</li>
+                        <li><code>--source=.</code>: usa la carpeta actual como contenido inicial. El punto significa "el directorio donde estoy ahora".</li>
+                        <li><code>--remote=origin</code>: configura el remoto y lo llama <code>origin</code> (el nombre estándar para el remoto principal).</li>
+                        <li><code>--push</code>: hace el push de tus commits acto seguido. Es el equivalente a hacer <code>git push -u origin main</code> a mano.</li>
+                    </ul>
+
+                    <p>Cuando termine, <code>gh</code> te dará la URL del repo en GitHub (algo como <code>https://github.com/tu-usuario/tu-usuario.github.io</code>). Ábrela en el navegador: tu <code>index.html</code> ya está ahí, junto con tu commit. Mira el historial pulsando en la pestaña <strong>Commits</strong>.</p>
+
+                    <table>
+                        <tr><td>URL del repositorio en GitHub</td><td><input type="text" placeholder="https://github.com/tu-usuario/tu-usuario.github.io"></td></tr>
+                        <tr><td>Número de commits que se ven en GitHub</td><td><input type="text"></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Comprueba el remoto desde la consola</strong> para ver qué ha hecho <code>gh</code>:
+<pre class="codigo">git remote -v</pre>
+                        Tienen que aparecer dos líneas con <code>origin</code> y la URL HTTPS de tu repo. Eso confirma que tu Git local sabe a dónde mandar los próximos push.
+                    </div>
+
+                    <h3>5.2 - Activar GitHub Pages</h3>
+
+                    <p>El repositorio existe en GitHub, pero Pages todavía no está activo: GitHub no sirve el contenido como web salvo que lo pidas explícitamente. Lo activas desde la web del repo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En tu repo en GitHub, click en <strong>Settings</strong> (arriba a la derecha de la lista de pestañas del repo, no Settings de tu cuenta).</li>
+                            <li>En el menú lateral izquierdo, baja hasta <strong>Pages</strong>.</li>
+                            <li>En <strong>"Build and deployment"</strong>:
+                                <ul style="margin-left:18px">
+                                    <li><strong>Source</strong>: <em>Deploy from a branch</em>.</li>
+                                    <li><strong>Branch</strong>: <em>main</em>, carpeta <em>/ (root)</em>.</li>
+                                </ul>
+                            </li>
+                            <li>Pulsa <strong>Save</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <p>Aparecerá un mensaje del estilo <em>"Your site is live at https://tu-usuario.github.io/"</em>. <strong>Tarda entre 30 segundos y un par de minutos</strong> la primera vez (GitHub procesa el contenido y lo sirve por su CDN). Si entras antes de tiempo verás un 404. Espera, refresca y aparecerá.</p>
+
+                    <table>
+                        <tr><td>URL pública de tu web</td><td><input type="text" placeholder="https://tu-usuario.github.io/"></td></tr>
+                        <tr><td>Tiempo aproximado hasta verla viva</td><td><input type="text" placeholder="ej. 60 s"></td></tr>
+                    </table>
+
+                    <h3>5.3 - Comprobar que sale a internet de verdad</h3>
+
+                    <p>Ver la URL en tu PC del aula no demuestra del todo que esté en internet: si tuvieras un servidor web en local, también responderías. La prueba real es <strong>verla desde una red distinta</strong>.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Coge tu móvil.</li>
+                            <li><strong>Desactiva el WiFi del aula</strong> (si lo tenías conectado) y deja sólo los datos móviles. Así te aseguras de que el tráfico sale por la red de tu operador, no por la del centro.</li>
+                            <li>Abre el navegador del móvil y escribe la URL <code>https://tu-usuario.github.io/</code>.</li>
+                            <li>Tiene que aparecer tu web. Si te sale, hazle una captura: es la entrega de esta parte.</li>
+                            <li>Pásale la URL a un compañero para que la abra también: comprueba que la ve igual.</li>
+                        </ol>
+                    </div>
+
+                    <table>
+                        <tr><td>¿La web carga desde el móvil con datos?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                        <tr><td>¿Un compañero la ve sin problemas?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Lo que acabas de hacer:</strong> tienes una web en producción servida por la CDN de GitHub (es decir, Microsoft), con HTTPS válido y certificado automático, alojada gratis, accesible desde cualquier sitio del mundo. Pon esto en perspectiva: en 2010, montar lo mismo te costaba 50&euro;/año de dominio + 30&euro;/año de hosting + un par de horas de configuración. Hoy lo has hecho en cinco minutos sin sacar la tarjeta.
+                    </div>
+
+                    <h3>5.4 - Inspeccionar el commit en GitHub</h3>
+
+                    <p>Vuelve al repo en GitHub. Haz click en el último commit (arriba a la derecha de la lista de archivos, donde pone el mensaje del último commit + el hash corto). Verás:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Tu <strong>avatar y nombre</strong> al lado (si configuraste el mismo correo en la Parte 1.4). Si en lugar de tu avatar sale un cuadrado de colores genérico, es que tu correo de Git no coincide con el de GitHub: revisa <code>git config --global user.email</code>.</li>
+                        <li>El <strong>diff</strong> del commit: las líneas añadidas en verde, las eliminadas en rojo, igual que <code>git diff</code> en consola.</li>
+                        <li>El <strong>hash completo</strong> del commit. Compáralo con el que viste en <code>git log</code>: tiene que ser idéntico. Es la misma foto, no una copia ni una sincronización rara.</li>
+                    </ul>
+
+                    <table>
+                        <tr><td>¿Aparece tu avatar al lado del commit?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                        <tr><td>Hash completo del primer commit (en GitHub)</td><td><input type="text"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - CLIENTE GRÁFICO                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 - Modificar y publicar con el cliente gráfico (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Ya sabes hacer el ciclo en consola. Ahora vas a hacer lo mismo desde el panel <strong>Source Control</strong> de VS Code, que es el cliente gráfico de Git más usado de la profesión. La idea de esta parte es que veas que <em>"lo gráfico"</em> es exactamente los mismos comandos que ya conoces, sólo con botones por encima.</p>
+
+                    <h3>6.1 - Abrir el panel Source Control</h3>
+
+                    <p>En VS Code, mira la barra de iconos a la izquierda (la <em>activity bar</em>). Hay un icono con forma de rama o tres puntos conectados; es <strong>Source Control</strong>. También se abre con <code>Ctrl + Shift + G</code>.</p>
+
+                    <p>Al abrirlo verás:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Arriba, un campo de texto vacío para el <strong>mensaje del commit</strong>.</li>
+                        <li>Debajo, un botón "Commit" que ahora mismo no hace nada porque no hay cambios pendientes.</li>
+                        <li>Más abajo, dos secciones (<em>Changes</em> y <em>Staged Changes</em>) que también están vacías por el mismo motivo.</li>
+                    </ul>
+
+                    <h3>6.2 - Hacer un cambio en la web</h3>
+
+                    <p>Abre <code>index.html</code> en VS Code. Cambia algo visible. Por ejemplo, modifica el texto del subtítulo bajo tu nombre:</p>
+
+<pre class="codigo">&lt;p&gt;Alumno IFCT0309 - Promocion 2026&lt;/p&gt;</pre>
+
+                    <p>O añade una nueva sección al final del bloque <code>.contenido</code>, antes del <code>&lt;/div&gt;</code> que cierra esa caja, con algún hobby tuyo:</p>
+
+<pre class="codigo">&lt;h2&gt;Aficiones&lt;/h2&gt;
+&lt;p&gt;
+    Cuando no estoy delante del PC, me gusta...
+&lt;/p&gt;</pre>
+
+                    <p>Guarda. Pasa al panel <strong>Source Control</strong>. Ahora:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Aparece <code>index.html</code> bajo <strong>Changes</strong> con una "M" amarilla a la derecha (Modified).</li>
+                        <li>Si haces click en el archivo, VS Code te abre la vista de <strong>diff lado a lado</strong>: a la izquierda la versión del último commit, a la derecha lo que has cambiado. Las líneas nuevas en verde, las quitadas en rojo. Esto es exactamente lo que verías con <code>git diff</code> en consola, presentado en visual.</li>
+                    </ul>
+
+                    <h3>6.3 - Hacer el commit desde la interfaz</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el panel Source Control, pasa el ratón por el archivo <code>index.html</code> y aparece un icono <strong>+</strong> a la derecha. Pulsa el <strong>+</strong>: el archivo pasa de <strong>Changes</strong> a <strong>Staged Changes</strong>. Esto es el equivalente exacto de <code>git add index.html</code>.</li>
+                            <li>Escribe un mensaje en el campo de texto de arriba, por ejemplo: <em>"Actualizar subtitulo y anadir seccion de aficiones"</em>.</li>
+                            <li>Pulsa el botón <strong>Commit</strong>. El archivo desaparece de Staged Changes: el commit está hecho.</li>
+                        </ol>
+                    </div>
+
+                    <p>Comprueba en la terminal de VS Code:</p>
+
+<pre class="codigo">git log --oneline</pre>
+
+                    <p>Aparece tu nuevo commit arriba del todo. Lo has hecho con clicks, pero por debajo VS Code ha ejecutado los mismos <code>git add</code> y <code>git commit</code> que harías a mano.</p>
+
+                    <h3>6.4 - Subir los cambios con un botón</h3>
+
+                    <p>El commit está en local, pero la web pública sigue mostrando la versión anterior porque no has hecho push todavía. En el panel Source Control:</p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Verás que el botón que antes ponía "Commit" ahora pone <strong>"Sync Changes"</strong> con un número (los commits que tienes en local pero no en el remoto: debería ser 1).</li>
+                        <li>Pulsa <strong>Sync Changes</strong>. VS Code hace un <code>git push</code> (y un <code>git pull</code> antes, por si hubiera cambios remotos).</li>
+                        <li>El número desaparece. Tu commit ya está en GitHub.</li>
+                    </ul>
+
+                    <p>Si quieres ver el equivalente puro de push (sin pull previo), abre el menú "..." arriba del panel Source Control y elige <strong>Push</strong>. Hace exactamente <code>git push</code>. Como en consola.</p>
+
+                    <h3>6.5 - Ver el cambio reflejado en la web pública</h3>
+
+                    <p>Vuelve a tu URL pública <code>https://tu-usuario.github.io/</code> en el navegador. <strong>Refresca con Ctrl+F5</strong> para forzar que el navegador no use caché. Pueden pasar dos cosas:</p>
+
+                    <table>
+                        <tr><th>Lo que ves</th><th>Qué pasa</th></tr>
+                        <tr><td>El cambio aparece ya</td><td>Perfecto, GitHub Pages ha procesado el push casi al instante.</td></tr>
+                        <tr><td>Sigues viendo la versión vieja</td><td>Pages tarda. Refresca con Ctrl+F5 cada 20 segundos durante 2-3 minutos. El push está bien (compruébalo en la pestaña Commits del repo); lo que tarda es el redespliegue.</td></tr>
+                    </table>
+
+                    <p>Cuando aparezca, ya tienes el ciclo completo de Git+GitHub+Pages: <strong>editar &rarr; commit gráfico &rarr; sync &rarr; web actualizada</strong>.</p>
+
+                    <table>
+                        <tr><td>Mensaje del último commit visible en la web del repo</td><td><input type="text"></td></tr>
+                        <tr><td>Tiempo aproximado entre el push y ver el cambio en la URL pública</td><td><input type="text" placeholder="ej. 30 s"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Idea clave de esta parte:</strong> ahora ya sabes lo mismo en dos idiomas. Cuando trabajes solo y rápido usarás Source Control (clicks); cuando algo se complique, te conectes por SSH a un servidor, o tengas que automatizar, harás <code>git add</code> y <code>git commit</code> en consola. Son la misma operación. La gente que sólo sabe la interfaz se queda atascada en cuanto se sale del camino feliz; el que entiende la consola siempre puede recuperar.
+                    </div>
+
+                    <h3>6.6 - GitHub Desktop (mención breve)</h3>
+
+                    <p>Si en algún momento prefieres una <em>app dedicada</em> para Git (separada del editor), existe <strong>GitHub Desktop</strong>, gratuito, hecho por GitHub. Misma idea que Source Control pero con su propia ventana. Para esta práctica no hace falta: tienes ya VS Code y va de sobra. Pero conviene saber que está, por si en otro PC no tienes VS Code instalado y quieres apañarte rápido.</p>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - DIAGNÓSTICO DE FALLOS                                -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 7 - Provocar y diagnosticar 5 fallos típicos (40 min)</h2>
+                <div class="seccion-body">
+
+                    <p>La mejor forma de entender una herramienta es ver lo que pasa cuando algo va mal. En esta parte vas a <strong>provocar a propósito</strong> cinco errores muy comunes con Git y GitHub Pages, y vas a aprender a salir de cada uno.</p>
+
+                    <h3>Caso A - "He editado el archivo pero el commit sigue saliendo igual"</h3>
+
+                    <p><strong>Provoca el fallo:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Edita <code>index.html</code> en VS Code. Cambia el footer ("Hecho con HTML, Git..." por otra cosa). Guarda.</li>
+                            <li>En la terminal, ejecuta directamente:
+<pre class="codigo">git commit -m "Cambio en el footer"</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Qué pasa:</strong> Git responde algo como <em>"Changes not staged for commit"</em> o <em>"nothing to commit, working tree clean"</em>, y <strong>no hace el commit</strong>. Sí, tu archivo está modificado. Sí, lo has guardado. Pero Git no se entera de los cambios si no los <em>añades al staging</em> primero.</p>
+
+                    <p><strong>Diagnóstico:</strong> <code>git status</code> te dice claramente <em>"Changes not staged for commit"</em>. Es el síntoma de que olvidaste el <code>git add</code>.</p>
+
+                    <p><strong>Cómo arreglarlo:</strong></p>
+
+<pre class="codigo">git add index.html
+git commit -m "Cambio en el footer"</pre>
+
+                    <p>O directamente, atajo: <code>git commit -am "..."</code> hace <code>add</code> + <code>commit</code> en una sola línea, <em>pero sólo para archivos ya seguidos por Git</em> (no funciona para archivos nuevos).</p>
+
+                    <table>
+                        <tr><td>¿Reconociste el síntoma con <code>git status</code>?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <h3>Caso B - "El push da un error de 'updates were rejected'"</h3>
+
+                    <p>Este lo provocarás a mano simulando que tienes el repo desfasado respecto al remoto.</p>
+
+                    <p><strong>Provoca el fallo:</strong></p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Ve a GitHub, abre tu repo en el navegador.</li>
+                            <li>Abre <code>index.html</code> en GitHub y pulsa el icono del lápiz (Edit this file). Cambia cualquier cosa pequeña (por ejemplo añade un espacio en el footer) y pulsa <strong>Commit changes</strong> abajo. Esto hace un commit <strong>directamente en GitHub</strong>, en el remoto, que tú en local no tienes.</li>
+                            <li>Vuelve a VS Code, edita <code>index.html</code> en tu PC: cambia otra cosa distinta (por ejemplo, el título de la pestaña en la etiqueta <code>&lt;title&gt;</code>).</li>
+                            <li>Haz commit en local:
+<pre class="codigo">git add .
+git commit -m "Cambiar titulo"
+git push</pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <p><strong>Qué pasa:</strong> Git rechaza el push con un mensaje del estilo:</p>
+
+<pre class="codigo">! [rejected]        main -> main (fetch first)
+error: failed to push some refs to '...'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally.</pre>
+
+                    <p><strong>Diagnóstico:</strong> hay un commit en el remoto que tú no tienes en local. Git no quiere sobrescribirlo de un manotazo, te avisa.</p>
+
+                    <p><strong>Cómo arreglarlo:</strong> baja primero los cambios remotos y luego haz push:</p>
+
+<pre class="codigo">git pull --rebase
+git push</pre>
+
+                    <p>El <code>--rebase</code> coge los commits remotos, los pone debajo de los tuyos, y reorganiza la historia para que quede limpia. Comprueba el resultado con <code>git log --oneline</code>: tendrás ambos commits, en orden.</p>
+
+                    <div class="nota">
+                        <strong>Lección:</strong> antes de empezar a trabajar en un repo después de un rato sin tocarlo, haz <code>git pull</code> para sincronizar con el remoto. Es la forma de evitar este conflicto en primer lugar.
+                    </div>
+
+                    <table>
+                        <tr><td>¿Apareció el mensaje "Updates were rejected"?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                        <tr><td>¿Tras <code>git pull --rebase</code> + <code>git push</code> quedaron los dos commits?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <h3>Caso C - "Mi web da 404 aunque la URL parece correcta"</h3>
+
+                    <p><strong>Posibles causas y cómo descartarlas, en orden:</strong></p>
+
+                    <ol style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li><strong>Pages todavía no ha hecho el primer despliegue.</strong> Sólo si acabas de activarlo. Espera 2-3 minutos. En Settings &rarr; Pages tiene que aparecer "Your site is live at..." con un check verde.</li>
+                        <li><strong>El nombre del repo no coincide con <code>tu-usuario.github.io</code>.</strong> Si lo llamaste de otra forma (por ejemplo <code>mi-web</code>), la URL tiene el nombre del repo dentro: <code>https://tu-usuario.github.io/mi-web/</code>. No es 404, es que estás mirando la URL equivocada.</li>
+                        <li><strong>El archivo no se llama <code>index.html</code></strong> exactamente, sino algo como <code>Index.html</code> (mayúscula) o <code>index.htm</code> sin la "l" final. GitHub Pages distingue mayúsculas y minúsculas y sólo sirve por defecto <code>index.html</code>.</li>
+                        <li><strong>El <code>index.html</code> no está en la raíz del repo</strong> sino en una subcarpeta. Pages, configurado con "/ (root)", sólo mira la raíz.</li>
+                        <li><strong>Source no está bien configurada en Settings &rarr; Pages.</strong> Asegúrate de que pone <em>Deploy from a branch &rarr; main &rarr; / (root)</em>.</li>
+                    </ol>
+
+                    <p><strong>Cómo arreglarlo:</strong> identifica el caso y corrige según corresponda. Si el archivo está mal nombrado, renómbralo en VS Code (no basta con copiar uno nuevo: tienes que borrar el viejo del repo) y haz un commit + push. Si el archivo no está en la raíz, muévelo a la raíz y commitea el movimiento.</p>
+
+                    <h3>Caso D - "Hice push pero la web sigue mostrando lo viejo"</h3>
+
+                    <p><strong>Provoca / observa:</strong> tras un push, recarga la URL pública sin Ctrl+F5. Verás todavía el contenido anterior en muchos casos.</p>
+
+                    <p><strong>Diagnóstico:</strong> son dos cachés distintas en cadena. Tu navegador guarda copia local de la página (caché del navegador) y, además, GitHub sirve a través de su propia red CDN, que también cachea durante un rato corto.</p>
+
+                    <p><strong>Cómo verificarlo bien:</strong></p>
+
+                    <ul style="margin-left:20px;line-height:1.8;font-size:13px">
+                        <li>Refresca con <strong>Ctrl + F5</strong> (recarga sin caché del navegador).</li>
+                        <li>Abre la URL en una <strong>ventana de incógnito</strong> (Ctrl + Shift + N en Chrome / Edge). Esa ventana arranca sin caché.</li>
+                        <li>Ábrela en el móvil con datos: caché distinta.</li>
+                        <li>Si aun así no aparece el cambio, comprueba en GitHub (pestaña Actions o Settings &rarr; Pages) que el último despliegue de Pages terminó <em>después</em> del commit que quieres ver. Si pone "deployed 2 minutes ago" y tu commit es de hace 30 segundos, el despliegue siguiente está pendiente: espera otro minuto.</li>
+                    </ul>
+
+                    <table>
+                        <tr><td>¿Cuál fue la solución que funcionó para ti?</td><td><input type="text" placeholder="ej. Ctrl+F5 / incógnito / esperar redespliegue"></td></tr>
+                    </table>
+
+                    <h3>Caso E - "He cambiado código pero no he hecho commit; ¿puedo volver atrás?"</h3>
+
+                    <p><strong>Provoca el fallo:</strong> en VS Code, edita <code>index.html</code> y carga el archivo a saco con texto malo. Por ejemplo, borra todo el contenido del <code>&lt;body&gt;</code>. <strong>No guardes todavía.</strong></p>
+
+                    <p>Si ahora cierras VS Code sin guardar, no pasa nada: el archivo en disco sigue como estaba. Pero supongamos que sí lo guardas (Ctrl+S) por error. Ahora el archivo en disco está roto.</p>
+
+                    <p><strong>Cómo recuperarlo (lo bueno de Git):</strong></p>
+
+<pre class="codigo">git status
+git restore index.html</pre>
+
+                    <p><code>git restore</code> sobrescribe el archivo en tu carpeta de trabajo con la versión del último commit. Como tu último commit estaba bien, la edición desastrosa desaparece. Refresca el navegador o vuelve a abrir el archivo en VS Code: vuelve a estar la versión buena.</p>
+
+                    <div class="aviso">
+                        <strong>Cuidado:</strong> <code>git restore</code> pierde los cambios no comiteados <strong>sin pedirte confirmación</strong>. Si tenías cambios buenos sin commit todavía, también se van. Por eso conviene hacer commits pequeños y frecuentes: cada commit es un punto seguro al que puedes volver gratis.
+                    </div>
+
+                    <table>
+                        <tr><td>¿Recuperaste el archivo con <code>git restore</code>?</td><td><input type="text" placeholder="sí / no"></td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>Lo que enseña esta parte:</strong> casi todos los problemas con Git se diagnostican con dos comandos: <code>git status</code> (qué tengo) y <code>git log --oneline</code> (qué he hecho). Cuando algo falla, no entres en pánico ni borres la carpeta: ejecuta esos dos y casi siempre la respuesta está ahí.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 8 - FICHA Y EVALUACIÓN                                   -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 8 - Ficha técnica y evaluación (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Última parte de la práctica: documentar tu repositorio para que cualquiera pueda encontrarlo y para tener un registro de lo que has hecho.</p>
+
+                    <h3>8.1 - Añadir un README al repositorio</h3>
+
+                    <p>Cuando alguien entra en tu repo en GitHub, lo primero que GitHub le muestra debajo de la lista de archivos es el contenido de un archivo llamado <code>README.md</code> si existe. Es la portada del repo. Vamos a ponerle una.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En VS Code, crea un archivo <code>README.md</code> en la raíz del proyecto.</li>
+                            <li>Pega este contenido y cambia los datos:</li>
+                        </ol>
+                    </div>
+
+<pre class="codigo"># TU NOMBRE - Web personal
+
+Web personal hecha como parte de la **Practica 36** del curso
+IFCT0309 (Montaje y reparacion de sistemas microinformaticos) en CEDECO.
+
+## URL publica
+
+https://tu-usuario.github.io/
+
+## Que aprendi haciendo esto
+
+- Que es Git y como funciona el control de versiones
+- Crear repositorios y hacer commits desde consola
+- Crear y configurar una cuenta en GitHub con 2FA
+- Subir un proyecto a GitHub con `gh repo create`
+- Activar GitHub Pages y servir HTML estatico como web publica
+- Editar y publicar cambios con el panel Source Control de VS Code
+
+## Tecnologias
+
+HTML, CSS, Git, GitHub, GitHub Pages.</pre>
+
+                    <p>Markdown es muy sencillo: <code>#</code> es título principal, <code>##</code> es subtítulo, los guiones son listas, los <code>**asteriscos**</code> son negrita. GitHub lo renderiza solo cuando alguien entra en el repo.</p>
+
+                    <p>Commit + push:</p>
+
+<pre class="codigo">git add README.md
+git commit -m "Anadir README"
+git push</pre>
+
+                    <p>Refresca tu repo en GitHub: debajo de la lista de archivos, ahora aparece la portada con tu nombre y la URL pública.</p>
+
+                    <h3>8.2 - Ficha técnica de la entrega</h3>
+
+                    <div class="ficha">
+                        <h4>Ficha técnica - Práctica 36</h4>
+
+                        <label>Mi usuario de GitHub</label>
+                        <input type="text" placeholder="ej. juan-perez">
+
+                        <label>URL de mi perfil en GitHub</label>
+                        <input type="text" placeholder="https://github.com/tu-usuario">
+
+                        <label>URL del repositorio</label>
+                        <input type="text" placeholder="https://github.com/tu-usuario/tu-usuario.github.io">
+
+                        <label>URL pública de mi web (GitHub Pages)</label>
+                        <input type="text" placeholder="https://tu-usuario.github.io/">
+
+                        <label>Número total de commits que tiene el repo al entregar</label>
+                        <input type="text" placeholder="ej. 7">
+
+                        <label>¿Tengo 2FA activada en GitHub?</label>
+                        <input type="text" placeholder="sí / no">
+
+                        <label>¿Configuré el email correcto en git config (avatar aparece junto a mis commits)?</label>
+                        <input type="text" placeholder="sí / no">
+
+                        <label>¿La web carga desde mi móvil con datos (no WiFi del aula)?</label>
+                        <input type="text" placeholder="sí / no">
+
+                        <label>Cliente Git favorito tras la práctica</label>
+                        <input type="text" placeholder="consola / VS Code / GitHub Desktop">
+
+                        <label>Notas / incidencias / lo que cambiaría</label>
+                        <textarea placeholder="Cualquier cosa que merezca la pena recordar: cambios que hiciste a la plantilla, fallos que no aparecen en la Parte 7, mejoras pendientes..."></textarea>
+                    </div>
+
+                    <h3>8.3 - Preguntas para fijar conceptos</h3>
+
+                    <div class="pregunta">
+                        <p>1. Explica con tus palabras la diferencia entre <strong>Git</strong> y <strong>GitHub</strong>.</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>2. ¿Qué hace exactamente <code>git add</code>? ¿Por qué no se hace el commit con la edición sola?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>3. ¿Qué diferencia hay entre un <strong>commit</strong> y un <strong>push</strong>?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>4. ¿Por qué el repositorio que sirve tu web personal tiene que llamarse exactamente <code>tu-usuario.github.io</code>?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>5. Has activado 2FA. Si mañana pierdes el móvil, ¿cómo entras a la cuenta?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>6. Tu push falla con <em>"Updates were rejected"</em>. ¿Qué pasó y cómo lo solucionas?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>7. ¿Para qué sirve un archivo <code>README.md</code> en un repositorio?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>8. Si pudieras quedarte sólo con tres comandos de Git para el día a día, ¿cuáles serían y para qué los usarías?</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="evaluacion">
+                        <h3>Evaluación final</h3>
+
+                        <table>
+                            <tr><th>Apartado</th><th>Lo conseguí</th></tr>
+                            <tr><td>Git y gh instalados, identidad configurada</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Cuenta GitHub creada con correo verificado y 2FA</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td><code>gh auth login</code> finalizado sin errores</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Hice al menos 6 commits en la carpeta de prueba (Parte 3)</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Tengo una web personal funcionando en local</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>El repo está en GitHub y aparece mi nombre en los commits</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>GitHub Pages activado, URL pública en marcha</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Verifiqué la web desde el móvil con datos</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Hice al menos un commit + push desde Source Control (VS Code)</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Resolví los 5 casos de la Parte 7</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Tengo un README.md con la URL pública</td><td><input type="text" placeholder="sí / no"></td></tr>
+                            <tr><td>Entregué la ficha técnica con todas las URLs</td><td><input type="text" placeholder="sí / no"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-secondary" id="btn-guardar" type="button">Guardar progreso</button>
+            <button class="btn btn-secondary" id="btn-borrar" type="button">Borrar progreso</button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center">Volver al índice</a>
+        </div>
+        <div id="estado-guardado" class="no-print" style="text-align:center;padding:0 32px 20px;font-size:12.5px;color:#4a5568;min-height:20px"></div>
+    </div>
+
+    <script>
+    (function() {
+        var CLAVE = 'practica36-progreso-v1';
+        var estado = document.getElementById('estado-guardado');
+        var btnGuardar = document.getElementById('btn-guardar');
+        var btnBorrar = document.getElementById('btn-borrar');
+
+        function camposGuardables() {
+            return document.querySelectorAll('.container input[type="text"], .container input[type="date"], .container textarea');
+        }
+
+        function clavePara(el, idx) {
+            return el.tagName + ':' + (el.type || '') + ':' + idx;
+        }
+
+        function guardar() {
+            var datos = {};
+            camposGuardables().forEach(function(el, idx) {
+                datos[clavePara(el, idx)] = el.value;
+            });
+            try {
+                localStorage.setItem(CLAVE, JSON.stringify({ guardado: new Date().toISOString(), datos: datos }));
+                mostrarEstado('Progreso guardado: ' + new Date().toLocaleString());
+            } catch (e) {
+                mostrarEstado('Error al guardar: ' + e.message, true);
+            }
+        }
+
+        function cargar(silencioso) {
+            var crudo = localStorage.getItem(CLAVE);
+            if (!crudo) {
+                if (!silencioso) mostrarEstado('No hay progreso guardado.');
+                return;
+            }
+            try {
+                var obj = JSON.parse(crudo);
+                camposGuardables().forEach(function(el, idx) {
+                    var valor = obj.datos[clavePara(el, idx)];
+                    if (valor !== undefined) el.value = valor;
+                });
+                var fecha = obj.guardado ? new Date(obj.guardado).toLocaleString() : '(sin fecha)';
+                mostrarEstado('Progreso cargado (último guardado: ' + fecha + ').');
+            } catch (e) {
+                mostrarEstado('Error al cargar: ' + e.message, true);
+            }
+        }
+
+        function borrar() {
+            if (!confirm('¿Borrar el progreso guardado en este navegador? Los campos del formulario se vaciarán.')) return;
+            localStorage.removeItem(CLAVE);
+            camposGuardables().forEach(function(el) { el.value = ''; });
+            mostrarEstado('Progreso borrado.');
+        }
+
+        function mostrarEstado(mensaje, esError) {
+            estado.textContent = mensaje;
+            estado.style.color = esError ? '#c53030' : '#276749';
+            setTimeout(function() { if (estado.textContent === mensaje) estado.style.color = '#4a5568'; }, 4000);
+        }
+
+        btnGuardar.addEventListener('click', guardar);
+        btnBorrar.addEventListener('click', borrar);
+
+        var temporizador = null;
+        camposGuardables().forEach(function(el) {
+            el.addEventListener('input', function() {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(guardar, 1000);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() { cargar(true); });
+        if (document.readyState !== 'loading') cargar(true);
+    })();
+    </script>
+</body>
+</html>
