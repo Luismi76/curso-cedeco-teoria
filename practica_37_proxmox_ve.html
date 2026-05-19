@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 37: Proxmox VE — tu propio hipervisor tipo 1 en una VM</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        p { margin: 8px 0; line-height: 1.6; }
+        ul, ol { margin: 8px 0 8px 22px; line-height: 1.7; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: top; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 37: Proxmox VE — tu propio hipervisor tipo 1 en una VM</h1>
+            <div class="meta">
+                <strong>Bloque:</strong> Instalación de SO no habituales (sesión 1 de 5)<br>
+                <strong>Duración estimada:</strong> 5 horas (1 sesión completa)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Requisitos previos:</strong> haber hecho la práctica 06 y 07 (saber crear VMs en VirtualBox)<br>
+                <strong>Herramientas:</strong> Windows 11 anfitrión, VirtualBox 7.x (gratis), ISO de Proxmox VE 8.x (gratis), ISO de Alpine Linux Standard (gratis), navegador web, conexión a internet
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo">
+                    <label>Nombre y apellidos</label>
+                    <input type="text" placeholder="Escribe tu nombre completo">
+                </div>
+                <div class="campo">
+                    <label>Fecha de realización</label>
+                    <input type="date">
+                </div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> hasta ahora has usado VirtualBox, que es un <strong>hipervisor de tipo 2</strong> (corre encima de Windows como si fuera un programa más). En esta sesión vas a instalar <strong>Proxmox VE</strong>, que es un <strong>hipervisor de tipo 1</strong> (un sistema operativo completo cuyo único trabajo es ejecutar máquinas virtuales). Lo vas a instalar <em>dentro</em> de VirtualBox usando <strong>virtualización anidada</strong>, y vas a crear VMs y contenedores LXC dentro de Proxmox. Al acabar entenderás la diferencia entre los dos tipos de hipervisor, sabrás manejar la interfaz web de Proxmox y verás cómo trabajan los servidores reales en empresas y datacenters.
+            </div>
+
+            <div class="aviso">
+                <strong>Requisitos del PC del aula:</strong> tu equipo necesita tener <strong>virtualización por hardware</strong> activada en la BIOS/UEFI (Intel VT-x o AMD-V). Casi todos los equipos modernos la tienen, pero en algunos viene desactivada de fábrica. También necesitas <strong>al menos 8 GB de RAM</strong> en el anfitrión (la VM de Proxmox usará 4 GB).
+            </div>
+
+            <div class="truco">
+                <strong>Comprueba la virtualización ANTES de empezar:</strong> abre el Administrador de tareas de Windows (<code>Ctrl+Shift+Esc</code>) → pestaña Rendimiento → CPU. Abajo a la derecha, busca el campo "Virtualización". Si pone <strong>Habilitada</strong>, todo bien. Si pone Deshabilitada, hay que activarla en la BIOS/UEFI antes de seguir (reinicia, pulsa <code>F2</code>/<code>F10</code>/<code>Supr</code> según fabricante y busca "Virtualization Technology" o "SVM" en el menú de CPU). Si saltas este paso, te atascarás en la Parte 4 con el error <em>"KVM virtualisation not available"</em>.
+            </div>
+
+            <div class="nota">
+                <strong>Red del aula:</strong> en esta práctica (y en todo el bloque) las VMs se conectan en <strong>adaptador puente</strong> contra la red <code>192.168.8.0/24</code>. Las IPs las reparte el DHCP del aula. Las VMs que crees <em>dentro</em> de Proxmox también saldrán bridged a esa misma red y recibirán IPs en 192.168.8.x.
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- OBJETIVOS                                                      -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul>
+                        <li>Distinguir con claridad un <strong>hipervisor de tipo 1</strong> (bare-metal) de uno de <strong>tipo 2</strong> (hosted), con ejemplos comerciales y libres de cada categoría.</li>
+                        <li>Entender qué es la <strong>virtualización anidada</strong> (nested virtualization), por qué necesitamos activarla en VirtualBox para que Proxmox pueda crear VMs por dentro, y cuáles son sus limitaciones.</li>
+                        <li>Instalar <strong>Proxmox VE 8.x</strong> desde su ISO oficial en una máquina virtual de VirtualBox correctamente dimensionada.</li>
+                        <li>Acceder a la <strong>interfaz web</strong> de Proxmox (puerto 8006) desde el navegador del anfitrión y conocer sus paneles principales.</li>
+                        <li>Crear una <strong>VM con KVM/QEMU</strong> dentro de Proxmox, instalarle Alpine Linux y comprobar que arranca y tiene red.</li>
+                        <li>Crear un <strong>contenedor LXC</strong> a partir de una plantilla, entender en qué se diferencia de una VM y por qué consume mucho menos recursos.</li>
+                        <li>Hacer <strong>snapshots</strong> y <strong>backups</strong> de la VM creada, y restaurar desde un backup.</li>
+                        <li>Manejar la <strong>consola del nodo Proxmox</strong> (terminal en la web y SSH) y entender los conceptos de <em>nodo</em>, <em>datacenter</em>, <em>storage</em> y <em>pool</em>.</li>
+                        <li>Diagnosticar cinco fallos típicos: virtualización anidada desactivada, RAM insuficiente, ISO no subido al storage, contraseña root olvidada, error del certificado HTTPS.</li>
+                        <li>Documentar tu instalación en una <strong>ficha técnica</strong> con los recursos asignados, las VMs/contenedores creados y las pruebas realizadas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 0 - CONCEPTOS PREVIOS                                    -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 0 — Conceptos previos (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 — ¿Qué es un hipervisor?</h3>
+
+                    <p>Un <strong>hipervisor</strong> (también llamado <em>virtual machine monitor</em> o VMM) es el programa que crea y ejecuta máquinas virtuales. Es la pieza de software que se sitúa entre el hardware real y los sistemas operativos invitados, y que se encarga de:</p>
+
+                    <ul>
+                        <li><strong>Repartir la CPU</strong> real entre todas las VMs (planificación).</li>
+                        <li><strong>Asignar memoria</strong> a cada VM y aislarla del resto.</li>
+                        <li><strong>Virtualizar el hardware</strong>: presentarle a cada VM un disco, una tarjeta de red, una BIOS, una pantalla… que en realidad son simulaciones.</li>
+                        <li><strong>Aislar</strong>: que un fallo o un virus en una VM no afecte ni al anfitrión ni a las otras VMs.</li>
+                    </ul>
+
+                    <p>El nombre viene de "<em>hyper</em>" + "<em>visor</em>" (el "visor" o supervisor era el nombre antiguo del kernel; un hipervisor es algo que vive por encima incluso de los kernels). El concepto es de los años 60 (IBM lo inventó para sus mainframes), pero no llegó al PC de sobremesa hasta finales de los 90.</p>
+
+                    <h3>0.2 — Tipo 1 (bare-metal) vs Tipo 2 (hosted)</h3>
+
+                    <p>Hay dos formas de organizar un hipervisor, y es la diferencia más importante que tienes que entender hoy:</p>
+
+                    <table>
+                        <tr><th></th><th>Tipo 1 (bare-metal)</th><th>Tipo 2 (hosted)</th></tr>
+                        <tr><td><strong>Dónde corre</strong></td><td>Directamente sobre el hardware. Es el sistema operativo del servidor.</td><td>Como un programa más, encima de Windows / Linux / macOS.</td></tr>
+                        <tr><td><strong>¿Necesita SO anfitrión?</strong></td><td>No. El hipervisor <em>es</em> el SO.</td><td>Sí, depende del SO en el que está instalado.</td></tr>
+                        <tr><td><strong>Rendimiento</strong></td><td>Mayor: menos capas entre la VM y el hardware.</td><td>Menor: la VM atraviesa el SO anfitrión.</td></tr>
+                        <tr><td><strong>Aislamiento</strong></td><td>Mejor. El propio hipervisor está pensado solo para virtualizar.</td><td>Peor. Si se cae el anfitrión, se caen todas las VMs.</td></tr>
+                        <tr><td><strong>Uso típico</strong></td><td>Servidores, datacenters, producción.</td><td>Sobremesa, desarrollo, formación, escritorio.</td></tr>
+                        <tr><td><strong>Ejemplos comerciales</strong></td><td>VMware ESXi, Microsoft Hyper-V Server, Citrix XenServer, Nutanix AHV.</td><td>VMware Workstation, Parallels Desktop.</td></tr>
+                        <tr><td><strong>Ejemplos libres</strong></td><td><strong>Proxmox VE</strong>, XCP-ng, oVirt, KVM (desnudo).</td><td><strong>VirtualBox</strong>, QEMU sin KVM, GNOME Boxes.</td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Matiz importante:</strong> la línea entre los dos tipos está cada vez más borrosa. KVM, por ejemplo, técnicamente es un módulo del kernel de Linux (lo que lo haría tipo 2), pero como Linux con KVM se usa <em>como si fuera</em> el SO del servidor, en la práctica se considera tipo 1. Proxmox VE entra aquí: por dentro es Debian + KVM + LXC + una interfaz web, pero su único propósito es ser un hipervisor, así que se etiqueta y se vende como tipo 1.
+                    </div>
+
+                    <h3>0.3 — ¿Qué es Proxmox VE exactamente?</h3>
+
+                    <p><strong>Proxmox Virtual Environment</strong> (Proxmox VE, o simplemente PVE) es una distribución de Linux basada en <strong>Debian</strong>, que viene preconfigurada como un hipervisor de tipo 1 listo para instalar en un servidor. La hace una empresa austriaca (Proxmox Server Solutions) desde 2008, y es de código abierto.</p>
+
+                    <p>Lo que te encuentras dentro cuando lo instalas:</p>
+
+                    <ul>
+                        <li>Un <strong>Debian estable</strong> recortado, con un kernel adaptado.</li>
+                        <li><strong>KVM/QEMU</strong>: el hipervisor real para máquinas virtuales completas (cada VM tiene su propio kernel).</li>
+                        <li><strong>LXC</strong>: un sistema de contenedores Linux (cada contenedor comparte el kernel del anfitrión pero está aislado del resto).</li>
+                        <li><strong>Una web UI</strong> escrita en JavaScript, accesible por el puerto <code>8006</code> con HTTPS, desde la que se hace prácticamente todo.</li>
+                        <li>Una <strong>API REST</strong> y una <strong>CLI</strong> (<code>qm</code>, <code>pct</code>, <code>pvesh</code>) para los que prefieran scripts.</li>
+                        <li>Soporte nativo para <strong>ZFS</strong>, <strong>Ceph</strong> (almacenamiento distribuido) y <strong>backups programados</strong>.</li>
+                        <li>Posibilidad de juntar varios nodos en un <strong>cluster</strong> con migración en vivo de VMs entre ellos.</li>
+                    </ul>
+
+                    <p>Es lo que usan muchísimas pymes y empresas medianas para virtualizar sus servidores en lugar de pagar licencias de VMware. Después de la compra de VMware por Broadcom en 2023 y el aumento de precios que vino detrás, Proxmox ganó una cantidad enorme de usuarios nuevos.</p>
+
+                    <h3>0.4 — ¿Por qué lo instalamos dentro de VirtualBox? (virtualización anidada)</h3>
+
+                    <p>Un hipervisor de tipo 1 está diseñado para instalarse <em>directamente</em> sobre el hardware, no dentro de otro sistema. Sería como instalar Windows dentro de Windows. No tendría sentido en producción.</p>
+
+                    <p>Pero estamos en un aula con un PC normal, y no podemos formatear el equipo para instalar Proxmox y volverlo a formatear al acabar. Para resolver esto usamos <strong>virtualización anidada</strong>: VirtualBox (hipervisor tipo 2) le presenta a Proxmox <em>también</em> las instrucciones de virtualización de la CPU (VT-x/AMD-V), de manera que Proxmox cree que está corriendo sobre hardware real y puede a su vez crear VMs por dentro.</p>
+
+                    <pre class="codigo">+---------------------------+
+| Windows 11 (anfitrión)    |    &lt;-- el PC del aula
+|  +---------------------+  |
+|  | VirtualBox          |  |    &lt;-- hipervisor TIPO 2
+|  |  +---------------+  |  |
+|  |  | Proxmox VE    |  |  |    &lt;-- hipervisor TIPO 1 (en una VM)
+|  |  |  +---------+  |  |  |
+|  |  |  | Alpine  |  |  |  |    &lt;-- VM dentro de Proxmox
+|  |  |  +---------+  |  |  |
+|  |  +---------------+  |  |
+|  +---------------------+  |
++---------------------------+</pre>
+
+                    <div class="aviso">
+                        <strong>Penalización de rendimiento:</strong> esta torre de hipervisores anidados funciona, pero es <em>lentísima</em> comparada con instalar Proxmox en hardware real. Esto es solo para aprender. Una VM dentro de Proxmox dentro de VirtualBox puede tardar varios minutos en arrancar, y eso es normal — no lo tomes como un fallo.
+                    </div>
+
+                    <h3>0.5 — Vocabulario que vas a ver en la web UI</h3>
+
+                    <p>Antes de entrar a la interfaz conviene tener claros los nombres que usa Proxmox:</p>
+
+                    <table>
+                        <tr><th>Término</th><th>Qué es</th></tr>
+                        <tr><td><strong>Datacenter</strong></td><td>El conjunto de todos los nodos. Si solo tienes un servidor, el datacenter contiene solo ese nodo.</td></tr>
+                        <tr><td><strong>Node</strong></td><td>Un servidor físico que ejecuta Proxmox. En esta práctica tendrás un solo nodo (la VM de VirtualBox), llamado por defecto <code>pve</code>.</td></tr>
+                        <tr><td><strong>VM</strong></td><td>Una máquina virtual completa (KVM/QEMU). Se identifica con un número (VMID), por ejemplo 100, 101, 102…</td></tr>
+                        <tr><td><strong>CT (container)</strong></td><td>Un contenedor LXC. Comparte el kernel del nodo. También tiene VMID.</td></tr>
+                        <tr><td><strong>Storage</strong></td><td>Un sitio donde Proxmox guarda imágenes de disco, ISOs, backups, plantillas. Cada uno tiene un nombre (por defecto: <code>local</code>, <code>local-lvm</code>).</td></tr>
+                        <tr><td><strong>Pool</strong></td><td>Agrupación lógica de recursos (VMs + storages) para organizar y dar permisos.</td></tr>
+                        <tr><td><strong>Template</strong></td><td>Una VM o CT convertida en plantilla, que sirve para crear copias rápidas (clones).</td></tr>
+                        <tr><td><strong>Bridge</strong></td><td>Una "switch" virtual a la que se conectan las VMs. Por defecto <code>vmbr0</code>, puenteado a la red real.</td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>¿Qué diferencia esencial hay entre una VM (KVM) y un contenedor (LXC) en Proxmox? Cita la consecuencia práctica más importante.</p>
+                        <textarea placeholder="Tu respuesta..."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 1 - PREPARAR LA VM EN VIRTUALBOX                         -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 1 — Preparar la VM de Proxmox en VirtualBox (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>1.1 — Descargar la ISO oficial de Proxmox VE</h3>
+
+                    <p>Vete a <code>https://www.proxmox.com/en/downloads</code>, sección "Proxmox Virtual Environment" → "Proxmox VE 8.x ISO Installer". Descarga el <code>.iso</code> (aproximadamente 1,5 GB). Guárdalo en <code>D:\ISOs\</code> (o donde guardes habitualmente tus ISOs).</p>
+
+                    <div class="nota">
+                        <strong>Versión:</strong> usa la última 8.x estable. Si en la web aparece ya la 9 cuando hagas esta práctica, también vale, pero los menús pueden estar ligeramente cambiados respecto a las capturas mentales que vas a leer.
+                    </div>
+
+                    <h3>1.2 — Crear la VM en VirtualBox</h3>
+
+                    <p>Abre VirtualBox y pulsa "Nueva". Configura así:</p>
+
+                    <table>
+                        <tr><th>Parámetro</th><th>Valor</th><th>Por qué</th></tr>
+                        <tr><td>Nombre</td><td><code>Proxmox-VE-Lab</code></td><td>Para identificarla luego.</td></tr>
+                        <tr><td>Carpeta</td><td>La que uses para VMs</td><td>—</td></tr>
+                        <tr><td>ISO</td><td>La de Proxmox que acabas de bajar</td><td>Para arrancar la instalación.</td></tr>
+                        <tr><td>Tipo</td><td>Linux</td><td>Proxmox es Debian por dentro.</td></tr>
+                        <tr><td>Versión</td><td>Debian 12 (64-bit)</td><td>Es la base de Proxmox 8.</td></tr>
+                        <tr><td>RAM</td><td><strong>4096 MB</strong> (4 GB)</td><td>Mínimo real para que vaya digno con virtualización anidada.</td></tr>
+                        <tr><td>CPUs</td><td><strong>2 vCPU</strong></td><td>Una sola se queda corta para anidar.</td></tr>
+                        <tr><td>Disco duro</td><td><strong>32 GB VDI dinámico</strong></td><td>Proxmox + 1 VM dentro + 1 LXC entra holgado.</td></tr>
+                    </table>
+
+                    <h3>1.3 — Ajustes avanzados de la VM (críticos)</h3>
+
+                    <p>Cuando esté creada, antes de arrancar, abre "Configuración" de la VM y revisa esto:</p>
+
+                    <h4>Sistema → Procesador</h4>
+                    <ul>
+                        <li>Marca <strong>"Habilitar PAE/NX"</strong> si la opción aparece. En VirtualBox 7 más reciente puede no estar visible porque va implícita; si no la ves, no pasa nada.</li>
+                        <li>Marca <strong>"Habilitar Nested VT-x/AMD-V"</strong>. <em>Este es el punto clave de toda la práctica.</em> Si sale en gris no editable, significa que tu CPU/Windows no soportan virtualización anidada. Comprueba que has activado VT-x/AMD-V en la BIOS y que Hyper-V está apagado en Windows (<code>Activar o desactivar características de Windows</code> → desmarca "Hyper-V" y "Plataforma de máquina virtual" y reinicia).</li>
+                    </ul>
+
+                    <h4>Sistema → Aceleración</h4>
+                    <ul>
+                        <li>Interfaz de paravirtualización: <strong>KVM</strong> (no "Default").</li>
+                    </ul>
+
+                    <h4>Red → Adaptador 1</h4>
+                    <ul>
+                        <li>Habilitado: sí.</li>
+                        <li>Conectado a: <strong>Adaptador puente</strong> (Bridged). Selecciona tu tarjeta de red real.</li>
+                        <li>Tipo de adaptador: <strong>Intel PRO/1000 MT Desktop</strong>.</li>
+                    </ul>
+
+                    <div class="truco">
+                        <strong>¿Por qué adaptador puente y no NAT?</strong> Porque la web UI de Proxmox escucha en el puerto 8006 y va a ser muchísimo más cómodo si tu PC anfitrión la ve directamente en una IP de la red del aula, sin tener que tocar reenvíos de puertos. Tu profesor también podrá conectarse a tu Proxmox para revisar la práctica.
+                    </div>
+
+                    <h4>Pantalla</h4>
+                    <ul>
+                        <li>Memoria de vídeo: 32 MB (la instalación usa modo gráfico).</li>
+                        <li>Controlador gráfico: VMSVGA.</li>
+                    </ul>
+
+                    <div class="aviso">
+                        <strong>Si pasas por alto "Nested VT-x":</strong> Proxmox se instalará bien, pero cuando intentes crear una VM dentro te dirá <em>"KVM virtualisation configured, but not available"</em> y la VM no arrancará. Si te ha pasado, apaga la VM de Proxmox, marca la opción, y vuelve a arrancar.
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 2 - INSTALAR PROXMOX VE                                  -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 2 — Instalar Proxmox VE (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 — Arrancar el instalador</h3>
+
+                    <p>Arranca la VM. Verás el menú morado de Proxmox. Elige <strong>"Install Proxmox VE (Graphical)"</strong>. Si te diera problemas el modo gráfico, prueba "Terminal UI" — la funcionalidad es la misma.</p>
+
+                    <h3>2.2 — Aceptar EULA y elegir disco</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Acepta la licencia (EULA).</li>
+                            <li>En "Target Harddisk" deja el disco virtual que creaste (32 GB) y deja "ext4" como filesystem.</li>
+                            <li><strong>No</strong> toques "Options" salvo que sepas lo que haces. ZFS aquí dentro de una VM anidada no aporta nada.</li>
+                        </ol>
+                    </div>
+
+                    <h3>2.3 — Localización y red</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Country: <strong>Spain</strong>.</li>
+                            <li>Time zone: <strong>Europe/Madrid</strong>.</li>
+                            <li>Keyboard layout: <strong>Spanish</strong> (importante, si dejas "U.S. English" luego la contraseña no se escribirá como tú crees).</li>
+                            <li>Contraseña de root: una que recuerdes y que cumpla los requisitos. <strong>Apúntala ahora mismo</strong> en la ficha del final.</li>
+                            <li>Email: pon un correo cualquiera (no se usa para nada en local, pero el instalador lo exige).</li>
+                            <li>Management Interface: deja la que aparezca (será <code>eth0</code> o similar).</li>
+                            <li><strong>Hostname (FQDN):</strong> <code>pve.lab.local</code> (no le pongas algo sin punto; Proxmox exige FQDN).</li>
+                            <li>IP address (CIDR): déjala como aparezca por DHCP, o ponle una fija si conoces tu red del aula. La <strong>apuntas</strong>.</li>
+                            <li>Gateway y DNS: los que ofrezca el DHCP.</li>
+                        </ol>
+                    </div>
+
+                    <div class="ficha">
+                        <h4>Apunta antes de continuar</h4>
+                        <label>Contraseña root de Proxmox (no la pongas en el documento si lo vas a entregar, anótala aparte):</label>
+                        <input type="text" placeholder="Solo para tu uso personal — no entregues esto al profesor">
+                        <label>IP del nodo Proxmox (la que veas en la pantalla "Summary"):</label>
+                        <input type="text" placeholder="Ej. 192.168.1.45">
+                        <label>FQDN (hostname con dominio):</label>
+                        <input type="text" placeholder="pve.lab.local">
+                    </div>
+
+                    <h3>2.4 — Revisar y dejar que instale</h3>
+
+                    <p>Repasa la pantalla "Summary", pulsa Install y espera unos 5-10 minutos. Cuando termine, reinicia.</p>
+
+                    <h3>2.5 — Primer arranque y URL de gestión</h3>
+
+                    <p>Tras el reinicio, verás una pantalla negra con un mensaje verde grande:</p>
+
+                    <pre class="codigo">Welcome to the Proxmox Virtual Environment. Please use your web browser
+to configure this server - connect to:
+
+  https://192.168.1.45:8006/
+
+pve login: _</pre>
+
+                    <p>Esa es la URL que tienes que abrir <strong>en el navegador de Windows</strong>. Antes prueba un login en local para ver que va: usuario <code>root</code>, contraseña la que pusiste.</p>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 3 - WEB UI                                               -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 3 — Primeros pasos en la web UI (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>3.1 — Acceder desde el navegador</h3>
+
+                    <p>Abre Edge/Chrome/Firefox en Windows y vete a la URL del mensaje verde (por ejemplo <code>https://192.168.1.45:8006</code>).</p>
+
+                    <div class="aviso">
+                        <strong>Aviso de certificado:</strong> el navegador te dirá que la conexión no es segura. Es normal: Proxmox usa un certificado autofirmado que no está en ninguna autoridad de confianza. Pulsa "Avanzado" → "Continuar al sitio". En producción se reemplaza por uno de Let's Encrypt; en aula no hace falta.
+                    </div>
+
+                    <p>Login:</p>
+                    <ul>
+                        <li>User name: <strong>root</strong></li>
+                        <li>Password: la que pusiste</li>
+                        <li>Realm: <strong>Linux PAM standard authentication</strong></li>
+                        <li>Language: Español (si lo prefieres)</li>
+                    </ul>
+
+                    <div class="nota">
+                        <strong>Aviso "No valid subscription":</strong> al entrar te saldrá un cuadro avisando de que no tienes suscripción de pago. Es normal y no afecta a nada en aula — pulsa OK. La suscripción solo aporta acceso al repositorio enterprise (parches estabilizados con un retraso adicional). Para uso doméstico / formación se usa el repositorio "no-subscription".
+                    </div>
+
+                    <h3>3.2 — Tour por los paneles</h3>
+
+                    <p>A la izquierda tienes el árbol con tu Datacenter y dentro el nodo <code>pve</code>. Pincha en cada uno y mira las pestañas. Te encuentras:</p>
+
+                    <table>
+                        <tr><th>Nivel</th><th>Pestañas relevantes</th></tr>
+                        <tr><td>Datacenter</td><td>Summary, Options, Storage, Backup, Users, Permissions, Updates</td></tr>
+                        <tr><td>Node (pve)</td><td>Summary, Shell, System, Network, Disks, Updates, Firewall</td></tr>
+                        <tr><td>Storage local</td><td>Summary, Backups, ISO Images, CT Templates, VZDump backup file</td></tr>
+                        <tr><td>Storage local-lvm</td><td>Summary, VM Disks, CT Volumes</td></tr>
+                    </table>
+
+                    <h3>3.3 — Cambiar al repositorio "no-subscription"</h3>
+
+                    <p>Por defecto Proxmox apunta al repositorio enterprise (de pago) y eso hace que <code>apt update</code> falle. Vamos a corregirlo:</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Pincha en el nodo <code>pve</code> → Updates → <strong>Repositories</strong>.</li>
+                            <li>Selecciona la línea <code>https://enterprise.proxmox.com/debian/pve</code> y pulsa <strong>Disable</strong>.</li>
+                            <li>Pulsa <strong>Add</strong> y elige <code>No-Subscription</code>. OK.</li>
+                            <li>Vete a Updates (sin Repositories) y pulsa <strong>Refresh</strong>. Ahora debería listar paquetes sin error.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Después de cambiar el repositorio, ¿cuántos paquetes aparecen como actualizables? (puede ser 0 si está reciente). Pega la captura más abajo.</p>
+                        <textarea placeholder="Número de paquetes y observaciones..."></textarea>
+                    </div>
+
+                    <h3>3.4 — Verificar que KVM funciona (ANTES de seguir)</h3>
+
+                    <div class="aviso">
+                        <strong>No te saltes este check.</strong> Si KVM no está disponible aquí dentro, todo lo que viene después fallará y habrás perdido la sesión. Mejor descubrirlo ahora que dentro de una hora.
+                    </div>
+
+                    <p>Abre la <strong>Shell</strong> del nodo <code>pve</code> (botón Shell arriba a la derecha al seleccionar el nodo) y ejecuta:</p>
+
+                    <pre class="codigo">kvm-ok 2>/dev/null || egrep -c '(vmx|svm)' /proc/cpuinfo
+ls /dev/kvm</pre>
+
+                    <p>Resultado esperado: un número &gt; 0 (núcleos con virtualización) y que <code>/dev/kvm</code> exista. Si <code>/dev/kvm</code> no está o el contador da 0, vuelve a la Parte 1.3 y revisa "Habilitar Nested VT-x/AMD-V" en VirtualBox. Apaga la VM de Proxmox antes de cambiarlo.</p>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 4 - CREAR UNA VM                                         -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 4 — Crear una VM dentro de Proxmox (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>4.1 — Subir la ISO de Alpine al storage</h3>
+
+                    <p>Vamos a usar Alpine Linux porque arranca con muy poca RAM (perfecto para nuestra cebolla anidada). Bájatelo del sitio oficial <code>https://alpinelinux.org/downloads/</code> — la edición "Standard" en x86_64 (unos 200 MB).</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En la web UI pincha en <strong>local</strong> (el storage) bajo el nodo <code>pve</code>.</li>
+                            <li>Vete a la pestaña <strong>ISO Images</strong>.</li>
+                            <li>Pulsa <strong>Upload</strong>, selecciona la ISO de Alpine y espera a que termine de subir.</li>
+                        </ol>
+                    </div>
+
+                    <div class="truco">
+                        <strong>Alternativa más rápida:</strong> en lugar de subir desde tu PC, puedes pulsar <strong>Download from URL</strong> y pegar el enlace directo a la ISO. Proxmox la descarga desde internet sin pasar por tu disco. Es lo que se hace en servidores de verdad cuando la conexión del servidor es mejor que la del operador.
+                    </div>
+
+                    <h3>4.2 — Crear la VM</h3>
+
+                    <p>Botón "Create VM" arriba a la derecha. Las pestañas:</p>
+
+                    <table>
+                        <tr><th>Pestaña</th><th>Qué poner</th></tr>
+                        <tr><td>General</td><td>VM ID: 100. Name: <code>alpine-test</code>.</td></tr>
+                        <tr><td>OS</td><td>Storage: local. ISO image: la de Alpine. Type: Linux. Version: 6.x - 2.6 Kernel (Alpine va con Linux moderno, vale).</td></tr>
+                        <tr><td>System</td><td>Deja todo por defecto (BIOS SeaBIOS, Machine i440fx, SCSI Controller VirtIO SCSI single, Qemu Agent <strong>marcado</strong>).</td></tr>
+                        <tr><td>Disks</td><td>Bus/Device: SCSI. Storage: local-lvm. Disk size: <strong>4 GB</strong> (Alpine cabe sobradamente).</td></tr>
+                        <tr><td>CPU</td><td>Sockets: 1. Cores: <strong>1</strong>. Type: <strong>host</strong> (importante para que las features de la CPU lleguen a la VM).</td></tr>
+                        <tr><td>Memory</td><td><strong>512 MiB</strong> (Alpine arranca con menos, pero por holgura).</td></tr>
+                        <tr><td>Network</td><td>Bridge: vmbr0. Model: VirtIO (paravirtual).</td></tr>
+                        <tr><td>Confirm</td><td>Revisa y pulsa Finish. <strong>No</strong> marques "Start after created" todavía.</td></tr>
+                    </table>
+
+                    <h3>4.3 — Arrancar e instalar Alpine</h3>
+
+                    <p>Selecciona la VM 100 en el árbol y pulsa <strong>Start</strong>. Después <strong>Console</strong> para ver la pantalla.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Arranca desde la ISO de Alpine. Login: <code>root</code> (sin contraseña).</li>
+                            <li>Ejecuta <code>setup-alpine</code> y responde a las preguntas: keyboard <code>es</code>, hostname libre, network <code>eth0</code> / DHCP, contraseña root, timezone Europe/Madrid, proxy ninguno, NTP <code>chrony</code>, mirror "f" (find fastest), SSH server <code>openssh</code>, disk <code>sda</code> tipo <code>sys</code>.</li>
+                            <li>Cuando acabe, escribe <code>poweroff</code>.</li>
+                            <li>En la web UI, Hardware → CD/DVD Drive → Edit → <strong>Do not use any media</strong> (para que no vuelva a arrancar desde la ISO).</li>
+                            <li>Pulsa Start otra vez. Alpine debe arrancar desde el disco, pedir login y darte un prompt.</li>
+                            <li>Comprueba red: <code>ping -c 3 1.1.1.1</code>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>¿Cuánto tarda Alpine en arrancar dentro de Proxmox-dentro-de-VirtualBox? Comenta el rendimiento percibido y por qué tiene sentido que sea lento.</p>
+                        <textarea></textarea>
+                    </div>
+
+                    <h3>4.4 — Snapshot antes de tocar nada</h3>
+
+                    <p>Selecciona la VM 100 → pestaña <strong>Snapshots</strong> → <strong>Take Snapshot</strong>. Nómbralo <code>recien-instalada</code> y describe "Alpine 3.x recien instalada, sin paquetes extra". Confirma.</p>
+
+                    <p>Ahora entra a la consola y ejecuta:</p>
+
+                    <pre class="codigo">apk update
+apk add htop nano</pre>
+
+                    <p>Una vez instalados, vete a Snapshots y haz <strong>Rollback</strong> a <code>recien-instalada</code>. La VM se reinicia. Vuelve a entrar y comprueba que <code>htop</code> y <code>nano</code> han desaparecido — el snapshot ha funcionado.</p>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 5 - CONTENEDOR LXC                                       -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 5 — Crear un contenedor LXC (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>5.1 — Diferencia VM vs LXC, recordatorio</h3>
+
+                    <table>
+                        <tr><th></th><th>VM (KVM)</th><th>Contenedor (LXC)</th></tr>
+                        <tr><td>Kernel</td><td>Cada VM tiene el suyo</td><td>Comparten el del nodo Proxmox</td></tr>
+                        <tr><td>SO invitado</td><td>Cualquiera (Linux, Windows, BSD…)</td><td>Solo Linux</td></tr>
+                        <tr><td>Arranque</td><td>Pasa por BIOS/UEFI, lento</td><td>Instantáneo, como abrir un proceso</td></tr>
+                        <tr><td>Consumo RAM en reposo</td><td>Toda la RAM asignada</td><td>Solo lo que usan los procesos</td></tr>
+                        <tr><td>Aislamiento</td><td>Muy fuerte (capa de hardware)</td><td>Más débil (capa de namespaces)</td></tr>
+                        <tr><td>Uso típico</td><td>Cuando el SO importa o no es Linux</td><td>Servicios Linux pequeños y muchos en paralelo</td></tr>
+                    </table>
+
+                    <h3>5.2 — Descargar una plantilla</h3>
+
+                    <p>Las plantillas de LXC son imágenes mínimas de SO Linux. No "instalas" un contenedor: lo creas a partir de una plantilla.</p>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>En el árbol pincha en <strong>local</strong> → pestaña <strong>CT Templates</strong>.</li>
+                            <li>Pulsa <strong>Templates</strong> (botón arriba) → lista de plantillas disponibles.</li>
+                            <li>Busca <code>debian-12-standard</code> (o la última Debian). Selecciónala y pulsa Download.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.3 — Crear el contenedor</h3>
+
+                    <p>Botón <strong>"Create CT"</strong> arriba a la derecha:</p>
+
+                    <table>
+                        <tr><th>Pestaña</th><th>Qué poner</th></tr>
+                        <tr><td>General</td><td>CT ID: 200. Hostname: <code>debian-ct</code>. Password: la que quieras (apúntala).</td></tr>
+                        <tr><td>Template</td><td>Storage: local. Template: <code>debian-12-standard-...</code></td></tr>
+                        <tr><td>Disks</td><td>Storage: local-lvm. Disk size: <strong>2 GB</strong>.</td></tr>
+                        <tr><td>CPU</td><td>Cores: <strong>1</strong>.</td></tr>
+                        <tr><td>Memory</td><td>Memory: <strong>256 MiB</strong>. Swap: 256 MiB.</td></tr>
+                        <tr><td>Network</td><td>Name: eth0. Bridge: vmbr0. IPv4: DHCP.</td></tr>
+                        <tr><td>DNS</td><td>Por defecto (hereda del host).</td></tr>
+                        <tr><td>Confirm</td><td>Marca "Start after created". Finish.</td></tr>
+                    </table>
+
+                    <h3>5.4 — Comprobar el contenedor</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciónalo y pulsa Console.</li>
+                            <li>Login: <code>root</code> + la contraseña que pusiste.</li>
+                            <li>Ejecuta <code>cat /etc/os-release</code> — debe decir Debian.</li>
+                            <li>Ejecuta <code>uname -a</code> — fíjate que el kernel es el <strong>mismo</strong> que el del nodo Proxmox (compáralo abriendo la Shell del nodo y haciendo <code>uname -a</code> ahí). Esto demuestra que el contenedor comparte kernel con el anfitrión.</li>
+                            <li>Instala algo: <code>apt update &amp;&amp; apt install -y curl</code>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="pregunta">
+                        <p>Compara el <em>arranque</em> del contenedor con el de la VM Alpine. ¿Cuánto tarda cada uno? ¿Y la diferencia de RAM consumida que ves en el Summary del nodo?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 6 - BACKUPS                                              -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 6 — Snapshots y backups (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>6.1 — Diferencia entre snapshot y backup</h3>
+
+                    <p>Suenan parecidos pero no lo son:</p>
+
+                    <ul>
+                        <li><strong>Snapshot:</strong> una marca dentro del disco actual al que puedes volver. Si pierdes el disco entero (rotura, borrado del storage), pierdes también todos los snapshots.</li>
+                        <li><strong>Backup:</strong> una copia completa de la VM/CT a un archivo independiente, que puedes mover a otro storage, otro servidor o un disco externo. Si pierdes el original, sigues teniendo el backup.</li>
+                    </ul>
+
+                    <div class="aviso">
+                        <strong>Regla en producción:</strong> los snapshots son para experimentos cortos ("voy a probar este cambio, si rompo algo deshago"). Los backups son los que te salvan en un desastre. <strong>Un snapshot no es un backup.</strong>
+                    </div>
+
+                    <h3>6.2 — Hacer un backup manual del contenedor</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciona el CT 200 → pestaña <strong>Backup</strong> → <strong>Backup now</strong>.</li>
+                            <li>Storage: <code>local</code>. Mode: <strong>Snapshot</strong> (rápido, no para el CT). Compression: <strong>ZSTD (fast and good)</strong>.</li>
+                            <li>Pulsa Backup. Mira el log de la tarea.</li>
+                        </ol>
+                    </div>
+
+                    <p>El archivo resultante (<code>.tar.zst</code>) lo ves en <strong>local</strong> → Backups.</p>
+
+                    <h3>6.3 — Restaurar a un CT nuevo</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Pincha en <strong>local</strong> → Backups → selecciona el backup recién hecho → <strong>Restore</strong>.</li>
+                            <li>CT ID: <strong>201</strong> (uno nuevo, para no pisar el original).</li>
+                            <li>Cuando acabe, arranca el 201 y comprueba que tiene los mismos archivos que el 200.</li>
+                        </ol>
+                    </div>
+
+                    <h3>6.4 — Programar un backup automático <span class="badge-opc">opcional</span></h3>
+
+                    <p>Datacenter → Backup → Add. Configura un job a las 23:00 todos los días, storage <code>local</code>, todas las VMs/CTs, mode snapshot. Esto es lo que se hace en producción: backups nocturnos automáticos.</p>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- PARTE 7 - DIAGNOSTICO                                          -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Parte 7 — Diagnóstico y problemas comunes (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Para cada situación, escribe qué harías:</p>
+
+                    <table>
+                        <tr><th>Problema</th><th>Cómo lo diagnosticarías / arreglarías</th></tr>
+                        <tr><td>Al crear una VM dentro de Proxmox sale <em>"KVM virtualization not available"</em>.</td><td><textarea></textarea></td></tr>
+                        <tr><td>El navegador no abre la URL <code>https://IP:8006</code> (timeout).</td><td><textarea></textarea></td></tr>
+                        <tr><td>No ves la ISO de Alpine al crear la VM.</td><td><textarea></textarea></td></tr>
+                        <tr><td><code>apt update</code> falla con <em>"401 Unauthorized"</em> en el repositorio enterprise.</td><td><textarea></textarea></td></tr>
+                        <tr><td>Has olvidado la contraseña de root del nodo Proxmox.</td><td><textarea></textarea></td></tr>
+                    </table>
+
+                    <h3>7.1 — Soluciones de referencia</h3>
+
+                    <div class="nota">
+                        <strong>Pista 1 (KVM not available):</strong> apaga la VM de Proxmox, en VirtualBox marca "Habilitar Nested VT-x/AMD-V" en Sistema → Procesador.<br><br>
+                        <strong>Pista 2 (timeout):</strong> comprueba que el adaptador de la VM está en modo Bridge, no NAT. Mira la IP real del nodo con <code>ip addr</code> en la consola de Proxmox.<br><br>
+                        <strong>Pista 3 (ISO no aparece):</strong> ve a storage <code>local</code> → ISO Images y revisa que esté subida. A veces hay que pulsar el botón "Reload" del navegador.<br><br>
+                        <strong>Pista 4 (401):</strong> cambia al repositorio <em>no-subscription</em> como hiciste en 3.3.<br><br>
+                        <strong>Pista 5 (contraseña olvidada):</strong> arranca la VM con el "Advanced options" de GRUB → "Recovery", entra en modo single-user y ejecuta <code>passwd root</code>.
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- FICHA TECNICA                                                  -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Ficha técnica del despliegue</h2>
+                <div class="seccion-body">
+                    <div class="ficha">
+                        <h4>Datos del nodo</h4>
+                        <label>Hostname:</label><input type="text" placeholder="pve.lab.local">
+                        <label>IP de gestión:</label><input type="text" placeholder="https://___.___.___.___:8006">
+                        <label>Versión de Proxmox VE (pestaña Summary del nodo):</label><input type="text" placeholder="ej. 8.2.4">
+                        <label>Kernel:</label><input type="text" placeholder="ej. 6.8.4-2-pve">
+                        <label>RAM asignada a la VM de Proxmox:</label><input type="text">
+                        <label>CPU virtuales asignadas:</label><input type="text">
+                        <label>Disco asignado:</label><input type="text">
+                    </div>
+                    <div class="ficha">
+                        <h4>Recursos creados dentro</h4>
+                        <label>VM 100 (Alpine):</label><textarea placeholder="Cores, RAM, disco, IP que ha recibido por DHCP, snapshots realizados..."></textarea>
+                        <label>CT 200 (Debian):</label><textarea placeholder="Cores, RAM, disco, IP, paquetes instalados..."></textarea>
+                        <label>CT 201 (restaurado desde backup):</label><textarea placeholder="Pruebas realizadas, igualdad con el 200..."></textarea>
+                    </div>
+                    <div class="ficha">
+                        <h4>Tiempos observados</h4>
+                        <label>Tiempo de arranque de la VM Alpine (segundos):</label><input type="text">
+                        <label>Tiempo de arranque del CT Debian (segundos):</label><input type="text">
+                        <label>Tamaño del backup del CT 200 (MiB):</label><input type="text">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- RETO OPCIONAL                                                  -->
+            <!-- ============================================================ -->
+            <div class="seccion opcional">
+                <h2>Reto opcional — si te sobra tiempo</h2>
+                <div class="seccion-body">
+                    <div class="reto">
+                        <strong>Reto:</strong> instala <strong>Nginx</strong> dentro del CT Debian 200 y publica una página de inicio sencilla con tu nombre. Comprueba que puedes acceder a ella desde el navegador del anfitrión escribiendo <code>http://&lt;IP_del_CT&gt;</code>. Bonus: añade un segundo CT con <strong>Pi-hole</strong> (DNS con bloqueo de anuncios) usando el script de instalación oficial. Ya tienes la base de un mini-servidor real.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- EVALUACION                                                     -->
+            <!-- ============================================================ -->
+            <div class="seccion">
+                <h2>Autoevaluación</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Marca lo que has conseguido</h3>
+                        <table>
+                            <tr><th>Hito</th><th>Hecho</th></tr>
+                            <tr><td>VM de Proxmox creada en VirtualBox con virtualización anidada activa</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Proxmox VE 8 instalado y arrancando</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Accedo a la web UI desde el navegador del anfitrión</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Repositorio cambiado a no-subscription y <code>apt update</code> funciona</td><td><input type="checkbox"></td></tr>
+                            <tr><td>ISO de Alpine subida al storage <code>local</code></td><td><input type="checkbox"></td></tr>
+                            <tr><td>VM 100 con Alpine instalada, arrancada y con red</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Snapshot + rollback probado sobre la VM 100</td><td><input type="checkbox"></td></tr>
+                            <tr><td>CT 200 con Debian creado y arrancado</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Backup del CT 200 hecho y restaurado al CT 201</td><td><input type="checkbox"></td></tr>
+                            <tr><td>He sabido responder a los 5 problemas de la Parte 7</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Ficha técnica completa</td><td><input type="checkbox"></td></tr>
+                            <tr><td><em>Reto opcional</em>: Nginx publicado desde el CT 200</td><td><input type="checkbox"></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta" style="margin-top:18px">
+                        <p>Después de hacer la práctica, ¿en qué escenario reales del mundo laboral te imaginas usando Proxmox VE en lugar de VirtualBox? Cita dos.</p>
+                        <textarea></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Volver al índice</button>
+        </div>
+    </div>
+</body>
+</html>

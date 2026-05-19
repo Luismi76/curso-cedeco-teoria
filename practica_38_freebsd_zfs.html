@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 38: FreeBSD 14 con ZFS y jails — el otro Unix</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        p { margin: 8px 0; line-height: 1.6; }
+        ul, ol { margin: 8px 0 8px 22px; line-height: 1.7; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: top; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 38: FreeBSD 14 con ZFS y jails — el otro Unix</h1>
+            <div class="meta">
+                <strong>Bloque:</strong> Instalación de SO no habituales (sesión 2 de 5)<br>
+                <strong>Duración estimada:</strong> 5 horas (1 sesión completa)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Requisitos previos:</strong> haber hecho las prácticas 07 (Ubuntu) y 11 (consola Ubuntu)<br>
+                <strong>Herramientas:</strong> VirtualBox 7.x, ISO de FreeBSD 14.x <code>disc1.iso</code> (gratis, ~1 GB), conexión a internet
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text" placeholder="Escribe tu nombre completo"></div>
+                <div class="campo"><label>Fecha de realización</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> hasta ahora, cuando hemos dicho "Unix" en realidad estábamos diciendo "Linux". Pero hay otra rama de Unix muchísimo más antigua y, en algunos sitios, más respetada: <strong>BSD</strong> (Berkeley Software Distribution). En esta sesión vas a instalar <strong>FreeBSD 14</strong>, el más popular de los BSDs modernos. Vas a tocar tres cosas que en Linux son rarezas pero en FreeBSD son el día a día: el sistema de archivos <strong>ZFS</strong>, los contenedores <strong>jails</strong> y el sistema de paquetes <strong>pkg/ports</strong>. Al acabar tendrás un punto de comparación real con Linux y entenderás por qué FreeBSD sigue muy vivo en routers, NAS, PlayStations y servidores.
+            </div>
+
+            <div class="nota">
+                <strong>Red del aula:</strong> la VM va en <strong>adaptador puente</strong> contra <code>192.168.8.0/24</code>. La IP la dará el DHCP del aula.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul>
+                        <li>Conocer la <strong>historia y la genealogía</strong> de Unix: System V vs BSD, los "Unix wars", de dónde sale Linux, de dónde sale macOS, y por qué BSD sobrevive.</li>
+                        <li>Distinguir las <strong>cuatro familias BSD activas</strong> (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) y sus diferencias de enfoque.</li>
+                        <li>Entender la diferencia entre <strong>kernel + userland integrados</strong> (BSD) y <strong>kernel separado de las miles de distros</strong> (Linux), y por qué esto afecta a la documentación y a la coherencia del sistema.</li>
+                        <li>Instalar <strong>FreeBSD 14</strong> con el instalador <code>bsdinstall</code> y el filesystem raíz sobre <strong>ZFS</strong>.</li>
+                        <li>Configurar el sistema desde <code>/etc/rc.conf</code> usando <code>sysrc</code>, y entender el modelo de servicios de FreeBSD.</li>
+                        <li>Manejar <strong>pkg</strong> (paquetes binarios) y conocer los <strong>ports</strong> (compilación desde fuentes).</li>
+                        <li>Crear <strong>pools y datasets ZFS</strong>, hacer <strong>snapshots</strong> y comprobar copy-on-write en directo.</li>
+                        <li>Crear una <strong>jail</strong> (contenedor nativo BSD) con <code>bastille</code> e instalar un servicio dentro.</li>
+                        <li>Diagnosticar problemas típicos: la VM no arranca en EFI, red sin DHCP, pkg sin certificados, jails que no tienen red.</li>
+                        <li>Documentar todo en una <strong>ficha técnica</strong> con la versión, el pool ZFS, las jails y los servicios.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 0 — Conceptos previos (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 — La familia Unix de un vistazo</h3>
+
+                    <p>Unix nació en los <strong>Bell Labs</strong> (AT&amp;T) a finales de los 60. Como AT&amp;T tenía prohibido comercializarlo, lo distribuyó casi gratis a universidades. La <strong>Universidad de Berkeley</strong> lo modificó tanto que su versión empezó a vivir aparte: era <strong>BSD</strong>. De ahí salieron dos genealogías:</p>
+
+                    <ul>
+                        <li><strong>Rama System V (AT&amp;T):</strong> Solaris, AIX, HP-UX, SCO… casi todas comerciales. Hoy moribundas o nicho.</li>
+                        <li><strong>Rama BSD (Berkeley):</strong> 4.4BSD-Lite → FreeBSD, NetBSD, OpenBSD, DragonFly BSD. Libres. <strong>macOS</strong> y <strong>iOS</strong> tienen su núcleo (XNU) directamente derivado de FreeBSD/Mach. <strong>PlayStation</strong> (3, 4, 5) y <strong>Nintendo Switch</strong> usan FreeBSD por dentro.</li>
+                    </ul>
+
+                    <p>Linux es un caso aparte: Linus Torvalds escribió su propio kernel en 1991 desde cero, inspirándose en Unix pero sin código BSD ni AT&amp;T. Por eso Linux <strong>no es Unix</strong> en sentido genealógico, aunque sea Unix-like en comportamiento.</p>
+
+                    <h3>0.2 — Las cuatro BSD libres y para qué se usa cada una</h3>
+
+                    <table>
+                        <tr><th>BSD</th><th>Filosofía</th><th>Dónde la verás</th></tr>
+                        <tr><td><strong>FreeBSD</strong></td><td>General-purpose, performance, ZFS de serie</td><td>Netflix CDN, WhatsApp en su día, NAS (TrueNAS), PlayStation</td></tr>
+                        <tr><td><strong>OpenBSD</strong></td><td>Seguridad por defecto, código auditado, "secure out of the box"</td><td>Routers, firewalls (PF nació aquí), servidores que no se deben tocar nunca</td></tr>
+                        <tr><td><strong>NetBSD</strong></td><td>Portabilidad extrema (más de 50 arquitecturas)</td><td>Equipos raros, embebidos, mainframes IBM</td></tr>
+                        <tr><td><strong>DragonFly BSD</strong></td><td>Fork de FreeBSD 4 con SMP propio (HAMMER FS)</td><td>Muy nicho, casi solo entusiastas</td></tr>
+                    </table>
+
+                    <h3>0.3 — Diferencias clave con Linux</h3>
+
+                    <table>
+                        <tr><th></th><th>Linux</th><th>FreeBSD</th></tr>
+                        <tr><td>Modelo de desarrollo</td><td>Kernel separado; cada distro junta el kernel con su userland</td><td>Kernel + userland desarrollados juntos como un único sistema (base system)</td></tr>
+                        <tr><td>Licencia</td><td>GPL (copyleft, obliga a publicar cambios)</td><td>BSD (permite cerrar el código, p.ej. la usan Apple, Sony)</td></tr>
+                        <tr><td>Init</td><td>systemd (mayoritario), OpenRC, sysvinit, runit…</td><td>rc.d scripts (estilo BSD), siempre el mismo</td></tr>
+                        <tr><td>Paquetes</td><td>apt / dnf / pacman / apk / zypper (uno por distro)</td><td><code>pkg</code> (binarios) + <code>ports</code> (fuente). Unificado.</td></tr>
+                        <tr><td>Filesystem por defecto</td><td>ext4 / btrfs / xfs / zfs (depende de distro)</td><td><strong>ZFS</strong> o UFS2. ZFS recomendado.</td></tr>
+                        <tr><td>Contenedores</td><td>cgroups + namespaces (Docker, Podman, LXC)</td><td><strong>Jails</strong> desde 1999, mucho antes que Docker</td></tr>
+                        <tr><td>Firewall</td><td>iptables / nftables</td><td>PF (heredado de OpenBSD), ipfw</td></tr>
+                        <tr><td>Documentación oficial</td><td>Cada distro la suya</td><td>El <a href="https://docs.freebsd.org/en/books/handbook/">FreeBSD Handbook</a>, único, profundo y mantenido desde 1995</td></tr>
+                    </table>
+
+                    <div class="truco">
+                        <strong>La frase que se oye en el mundo BSD:</strong> "Linux is a kernel, FreeBSD is an OS." No es del todo justa con Linux, pero captura una verdad: en FreeBSD el kernel, las utilidades de sistema (<code>ls</code>, <code>ps</code>, <code>vi</code>…), la documentación y el instalador los hace el mismo equipo y vienen juntos. En Linux son piezas separadas que cada distro ensambla a su gusto.
+                    </div>
+
+                    <h3>0.4 — ¿Qué es ZFS y por qué es tan especial?</h3>
+
+                    <p><strong>ZFS</strong> es un filesystem creado por Sun Microsystems para Solaris (2005). Es <strong>copy-on-write</strong>, integra RAID software, hace checksums de cada bloque para detectar corrupción silenciosa, y permite snapshots instantáneos del filesystem entero. Vocabulario:</p>
+
+                    <ul>
+                        <li><strong>vdev</strong>: una unidad de almacenamiento (un disco, un RAID, un mirror).</li>
+                        <li><strong>zpool</strong>: una agrupación de vdevs. Es donde se almacenan los datos.</li>
+                        <li><strong>dataset</strong>: una partición lógica dentro del pool. Se comporta como un filesystem montado, pero crecen y se encogen dinámicamente.</li>
+                        <li><strong>snapshot</strong>: una foto del dataset en un instante. No ocupa nada hasta que algo cambia.</li>
+                        <li><strong>clone</strong>: un snapshot convertido en dataset escribible.</li>
+                    </ul>
+
+                    <p>FreeBSD adoptó ZFS pronto, y desde entonces es el filesystem recomendado para todo lo que no sea estrictamente embebido.</p>
+
+                    <h3>0.5 — ¿Qué son las jails?</h3>
+
+                    <p>Las <strong>jails</strong> son contenedores. Aíslan procesos en su propia "jaula" con su filesystem, su red, su hostname y sus usuarios, pero comparten el kernel del anfitrión. Es el mismo concepto que LXC en Linux o que los chroots de Solaris (zones), pero <strong>FreeBSD las tiene desde 1999</strong>, mucho antes de que la palabra "contenedor" estuviera de moda. Para gestionarlas hay varias herramientas; vamos a usar <strong>bastille</strong>, que es la más cómoda.</p>
+
+                    <div class="pregunta">
+                        <p>Resume con tus palabras la diferencia entre Linux y FreeBSD. ¿Qué te parece más limpio del modelo BSD?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 1 — Preparar la VM en VirtualBox (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>1.1 — Descargar la ISO</h3>
+
+                    <p>Vete a <code>https://www.freebsd.org/where/</code>. Descarga la <strong>amd64 → disc1.iso</strong> de la última versión 14.x estable (~1 GB). <strong>No</strong> descargues la <code>dvd1.iso</code> (4 GB): trae paquetes extra que no necesitamos. Guarda el ISO en <code>D:\ISOs\</code>.</p>
+
+                    <h3>1.2 — Crear la VM</h3>
+
+                    <table>
+                        <tr><th>Parámetro</th><th>Valor</th></tr>
+                        <tr><td>Nombre</td><td><code>FreeBSD-14-Lab</code></td></tr>
+                        <tr><td>Tipo</td><td>BSD</td></tr>
+                        <tr><td>Versión</td><td>FreeBSD (64-bit)</td></tr>
+                        <tr><td>RAM</td><td>2048 MB</td></tr>
+                        <tr><td>CPUs</td><td>2 vCPU</td></tr>
+                        <tr><td>Disco principal</td><td>20 GB VDI dinámico (para ZFS root)</td></tr>
+                    </table>
+
+                    <h3>1.3 — Añadir un segundo disco (para el zpool de prácticas)</h3>
+
+                    <p>Antes de arrancar, en Configuración → Almacenamiento, añade <strong>otro disco virtual</strong> SATA de <strong>8 GB</strong>. Lo usaremos en la Parte 4 para crear un zpool aparte y trastear con datasets sin tocar el root.</p>
+
+                    <h3>1.4 — Otros ajustes</h3>
+
+                    <ul>
+                        <li>Sistema → Habilitar <strong>EFI</strong> (FreeBSD 14 se instala mejor en UEFI).</li>
+                        <li>Red → Adaptador 1: <strong>Adaptador puente</strong> (Bridged). Tipo Intel PRO/1000 MT.</li>
+                        <li>Audio: deshabilitar (no nos sirve aquí y FreeBSD a veces se queja).</li>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 2 — Instalar FreeBSD (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 — Arrancar el instalador</h3>
+
+                    <p>Arranca la VM con la ISO. Verás el logo rojo de Beastie (el demonio mascota de BSD) y un menú. Espera a que entre solo o pulsa Enter.</p>
+
+                    <h3>2.2 — bsdinstall</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Pantalla "Welcome": elige <strong>Install</strong>.</li>
+                            <li>Keymap: <strong>Spanish (accent keys)</strong>.</li>
+                            <li>Hostname: <code>freebsd-lab</code>.</li>
+                            <li>Distribution Select: marca <strong>lib32</strong> y <strong>ports</strong> con espacio. Deja kernel-dbg y src desmarcados (ahorras GB).</li>
+                            <li>Partitioning: <strong>Auto (ZFS)</strong>.</li>
+                            <li>ZFS Configuration: deja "stripe" (estamos en una VM con un solo disco). Selecciona el disco <code>ada0</code> (20 GB). <strong>Importante:</strong> NO marques el <code>ada1</code> de 8 GB todavía, ese lo dejamos virgen.</li>
+                            <li>Confirma el aviso de borrado del disco (es virtual, no pasa nada).</li>
+                            <li>Espera a que copie los archivos (5-10 min).</li>
+                            <li>Contraseña de root: pónla y apúntala.</li>
+                            <li>Network configuration: selecciona la interfaz que aparezca (<code>em0</code> o <code>vtnet0</code>). IPv4: Yes. DHCP: Yes. IPv6: No.</li>
+                            <li>DNS: deja lo que ofrezca el DHCP.</li>
+                            <li>Time Zone: Europe → Spain → mainland.</li>
+                            <li>Date/Time: confirma.</li>
+                            <li>Services: marca <code>sshd</code> y <code>ntpd</code>, deja el resto desmarcado.</li>
+                            <li>System Hardening: marca <code>hide_uids</code>, <code>hide_gids</code>, <code>hide_jail</code>, <code>random_pid</code>. No es obligatorio pero es buena costumbre.</li>
+                            <li>Users: <strong>añade un usuario</strong>. Nombre <code>alumno</code>, grupo principal por defecto (el del usuario), <strong>invite to other groups: <code>wheel</code></strong> (sin esto no podrás luego usar <code>su</code>). Shell <code>sh</code> está bien.</li>
+                            <li>Final Configuration: <strong>Exit</strong>. <strong>No</strong> abras shell para manual modification.</li>
+                            <li>Reboot.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Al reiniciar:</strong> <em>antes</em> de que arranque, ve a Almacenamiento en VirtualBox y desconecta la ISO. Si no, volverá a arrancar el instalador.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 3 — Primeros pasos en FreeBSD (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>3.1 — Login y mirada al sistema</h3>
+
+                    <p>Login como <code>alumno</code>. Ejecuta:</p>
+
+                    <pre class="codigo">uname -a            # versión del kernel
+freebsd-version -k  # solo la del kernel
+ls /                # mira la jerarquía: bin, boot, etc, usr, var, ...
+ls /etc/rc.d        # los scripts de arranque
+df -h               # filesystems montados, fíjate en zroot/*
+zpool status        # estado del pool ZFS
+zfs list            # datasets dentro del pool</pre>
+
+                    <p>Compara mentalmente: tienes un único pool <code>zroot</code> con muchos datasets (uno por <code>/var</code>, <code>/tmp</code>, <code>/usr/home</code>…). Esto es típico de FreeBSD con ZFS.</p>
+
+                    <h3>3.2 — sudo no, su sí (o instala sudo)</h3>
+
+                    <p>FreeBSD no trae <code>sudo</code> por defecto. Para ser root usas <code>su</code> (de ahí la importancia de meter al usuario en <code>wheel</code>):</p>
+
+                    <pre class="codigo">su -
+# te pide la contraseña de root</pre>
+
+                    <p>Si quieres sudo al estilo Linux, lo instalas con el gestor de paquetes (siguiente paso).</p>
+
+                    <h3>3.3 — pkg, el gestor de paquetes binarios</h3>
+
+                    <p>La primera vez que uses <code>pkg</code> te pedirá bootstrappear el cliente:</p>
+
+                    <pre class="codigo">pkg
+# escribe Y, se descarga el gestor
+
+pkg update
+pkg search htop
+pkg install -y htop nano sudo bastille</pre>
+
+                    <p>Es el equivalente de <code>apt</code>. Los paquetes están precompilados en los servidores de FreeBSD y se actualizan dos veces por semana.</p>
+
+                    <h3>3.4 — sysrc y rc.conf</h3>
+
+                    <p>En FreeBSD, los servicios persistentes se activan editando <code>/etc/rc.conf</code> y reiniciando el servicio. La forma cómoda es con <code>sysrc</code>:</p>
+
+                    <pre class="codigo">sysrc sshd_enable=YES     # ya estaba, solo a modo de ejemplo
+service sshd status
+service sshd restart</pre>
+
+                    <p>Mira <code>cat /etc/rc.conf</code> para ver tu configuración actual. Apunta: en Linux equivalente serían los <code>systemctl enable</code>. Aquí todo en un solo archivo de texto plano.</p>
+
+                    <h3>3.5 — Actualizar el sistema base</h3>
+
+                    <pre class="codigo">freebsd-update fetch
+freebsd-update install
+# parches de seguridad del propio sistema base, no de paquetes
+pkg upgrade
+# actualización de paquetes</pre>
+
+                    <div class="pregunta">
+                        <p>¿Qué te parece tener un único archivo (<code>rc.conf</code>) que define la configuración del sistema, frente al modelo de systemd con cientos de unit files? Pros y contras.</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 4 — ZFS hands-on (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>4.1 — Crear un pool en el disco extra</h3>
+
+                    <p>Como root:</p>
+
+                    <pre class="codigo">zpool list
+zpool create tank /dev/ada1
+zpool status
+zpool list
+df -h | grep tank</pre>
+
+                    <p>Acabas de crear un pool ZFS llamado <code>tank</code> sobre tu segundo disco. Ya está montado en <code>/tank</code>.</p>
+
+                    <h3>4.2 — Datasets</h3>
+
+                    <pre class="codigo">zfs create tank/datos
+zfs create tank/proyectos
+zfs create tank/proyectos/web
+zfs list
+df -h | grep tank</pre>
+
+                    <p>Cada dataset es como una partición separada, pero su tamaño crece dinámicamente y se comparte del pool. No hay que pre-asignar tamaños.</p>
+
+                    <h3>4.3 — Snapshots y copy-on-write</h3>
+
+                    <pre class="codigo">echo "version A" > /tank/datos/archivo.txt
+cat /tank/datos/archivo.txt
+
+zfs snapshot tank/datos@v1
+zfs list -t snapshot
+
+echo "version B" > /tank/datos/archivo.txt
+cat /tank/datos/archivo.txt    # ves "version B"
+
+# rollback al snapshot
+zfs rollback tank/datos@v1
+cat /tank/datos/archivo.txt    # vuelves a ver "version A"</pre>
+
+                    <h3>4.4 — Cuotas y reservas</h3>
+
+                    <pre class="codigo">zfs set quota=1G tank/proyectos
+zfs set reservation=200M tank/proyectos
+zfs get quota,reservation tank/proyectos</pre>
+
+                    <h3>4.5 — Compresión transparente</h3>
+
+                    <pre class="codigo">zfs set compression=lz4 tank/datos
+# crea un archivo grande de texto repetitivo
+yes "FreeBSD rocks" | head -n 100000 > /tank/datos/grande.txt
+zfs get compressratio tank/datos</pre>
+
+                    <p>Verás una compressratio &gt; 1.00, lo que indica que ZFS comprime los datos al vuelo sin que tú hagas nada.</p>
+
+                    <div class="pregunta">
+                        <p>Apunta el resultado de <code>zfs get compressratio tank/datos</code> y el tamaño del archivo según <code>ls -lh</code> y según <code>du -h</code>. Explica la diferencia.</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 5 — Jails con bastille (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>5.1 — Configurar bastille</h3>
+
+                    <p>Como root:</p>
+
+                    <pre class="codigo">sysrc bastille_enable=YES
+sysrc cloned_interfaces+="lo1"
+sysrc ifconfig_lo1="inet 10.17.89.1/24"
+service netif cloneup
+
+# Detecta tu versión exacta de FreeBSD automáticamente:
+RELEASE=$(freebsd-version -r | cut -d'-' -f1-2)
+echo "Tu release es: $RELEASE"
+bastille bootstrap $RELEASE update</pre>
+
+                    <p>(El bootstrap descarga la base del sistema para tu versión exacta de FreeBSD. La variable <code>$RELEASE</code> evita errores si tu FreeBSD es 14.1, 14.2 o cualquier punto menor.)</p>
+
+                    <div class="nota">
+                        Si el bootstrap se cuelga descargando, comprueba <code>ping pkg.freebsd.org</code>. Si responde, espera: la primera descarga puede tardar 5-10 minutos. El servidor a veces va lento.
+                    </div>
+
+                    <h3>5.2 — Crear la primera jail</h3>
+
+                    <pre class="codigo">bastille create web $RELEASE 10.17.89.10
+bastille list
+bastille console web</pre>
+
+                    <p>Estás dentro de la jail. Es un FreeBSD entero con su propio <code>/etc</code>, sus procesos, su red. <code>exit</code> para volver al host.</p>
+
+                    <h3>5.3 — Instalar un servicio dentro</h3>
+
+                    <pre class="codigo">bastille pkg web install -y nginx
+bastille service web nginx enable
+bastille service web nginx start</pre>
+
+                    <p>Y desde el host:</p>
+
+                    <pre class="codigo">fetch -qo - http://10.17.89.10/ | head</pre>
+
+                    <p>Debes ver la página de bienvenida de Nginx. Tu jail está sirviendo HTTP.</p>
+
+                    <h3>5.4 — Snapshot de la jail <span class="badge-opc">opcional</span></h3>
+
+                    <p>Como las jails viven en datasets ZFS, puedes snapshotear su estado entero:</p>
+
+                    <pre class="codigo">zfs list | grep web
+zfs snapshot zroot/bastille/jails/web@antes-de-cambios</pre>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 6 — Diagnóstico (30 min)</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr><th>Problema</th><th>Diagnóstico / solución</th></tr>
+                        <tr><td>La VM no arranca tras instalar (pantalla negra de EFI).</td><td><textarea></textarea></td></tr>
+                        <tr><td><code>pkg update</code> da "SSL certificate problem".</td><td><textarea></textarea></td></tr>
+                        <tr><td>La jail no tiene red (ping falla).</td><td><textarea></textarea></td></tr>
+                        <tr><td><code>su -</code> dice "you don't belong to the wheel group".</td><td><textarea></textarea></td></tr>
+                        <tr><td>El disco <code>/dev/ada1</code> no aparece al crear el pool.</td><td><textarea></textarea></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Pistas:</strong>
+                        <ol>
+                            <li>Comprueba que VirtualBox arranca en EFI (no BIOS). En Configuración → Sistema → Habilitar EFI.</li>
+                            <li>Ajusta la fecha del sistema con <code>date</code>: los certificados pueden parecer caducados si la VM tiene la fecha mal.</li>
+                            <li>Revisa que <code>cloned_interfaces</code> en <code>rc.conf</code> incluya <code>lo1</code> y que <code>service netif cloneup</code> se haya ejecutado.</li>
+                            <li>Añade el usuario al grupo: <code>pw groupmod wheel -m alumno</code> y vuelve a iniciar sesión.</li>
+                            <li>Confirma que en VirtualBox añadiste el segundo disco. Mira con <code>geom disk list</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Ficha técnica</h2>
+                <div class="seccion-body">
+                    <div class="ficha">
+                        <h4>Datos del sistema</h4>
+                        <label>Versión de FreeBSD (<code>freebsd-version</code>):</label><input type="text">
+                        <label>Hostname:</label><input type="text">
+                        <label>IP por DHCP:</label><input type="text">
+                        <label>Usuario creado:</label><input type="text">
+                        <label>Pool ZFS adicional:</label><input type="text" placeholder="ej. tank — 8 GB sobre /dev/ada1">
+                        <label>Datasets creados (lista):</label><textarea></textarea>
+                        <label>Snapshots realizados:</label><textarea></textarea>
+                    </div>
+                    <div class="ficha">
+                        <h4>Jails</h4>
+                        <label>Nombre de la jail creada:</label><input type="text">
+                        <label>IP de la jail:</label><input type="text">
+                        <label>Servicio instalado dentro:</label><input type="text">
+                        <label>URL desde la que comprobaste que respondía:</label><input type="text">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion opcional">
+                <h2>Reto opcional</h2>
+                <div class="seccion-body">
+                    <div class="reto">
+                        Configura el firewall <strong>PF</strong> en el host para permitir solo SSH desde tu red y filtrar el resto. PF se configura en <code>/etc/pf.conf</code> y se activa con <code>sysrc pf_enable=YES &amp;&amp; service pf start</code>. Este es el firewall que da fama a OpenBSD/FreeBSD por su elegancia de sintaxis.
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Autoevaluación</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Marca lo conseguido</h3>
+                        <table>
+                            <tr><th>Hito</th><th>Hecho</th></tr>
+                            <tr><td>VM creada con disco secundario y EFI activo</td><td><input type="checkbox"></td></tr>
+                            <tr><td>FreeBSD 14 instalado con ZFS root</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Usuario en wheel, su funciona</td><td><input type="checkbox"></td></tr>
+                            <tr><td>pkg actualizado, htop/nano/sudo/bastille instalados</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Pool <code>tank</code> creado en /dev/ada1</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Datasets, snapshot y rollback probados</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Compresión LZ4 activa con ratio &gt; 1</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Jail <code>web</code> creada con bastille</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Nginx respondiendo desde dentro de la jail</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Ficha técnica completa</td><td><input type="checkbox"></td></tr>
+                            <tr><td><em>Reto</em>: PF configurado</td><td><input type="checkbox"></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta" style="margin-top:18px">
+                        <p>Cierra la sesión: si tuvieses que recomendar FreeBSD para un proyecto, ¿para cuál? ¿Y por qué seguirías eligiendo Linux para casi todo lo demás?</p>
+                        <textarea></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Volver al índice</button>
+        </div>
+    </div>
+</body>
+</html>

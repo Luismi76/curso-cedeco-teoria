@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 40: Android-x86 — un sistema operativo móvil en tu VirtualBox</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        p { margin: 8px 0; line-height: 1.6; }
+        ul, ol { margin: 8px 0 8px 22px; line-height: 1.7; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: top; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 40: Android-x86 — un sistema operativo móvil en tu VirtualBox</h1>
+            <div class="meta">
+                <strong>Bloque:</strong> Instalación de SO no habituales (sesión 4 de 4)<br>
+                <strong>Duración estimada:</strong> 5 horas (1 sesión completa)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Requisitos previos:</strong> prácticas 06 y 07 (saber crear VMs)<br>
+                <strong>Herramientas:</strong> VirtualBox 7.x, ISO de Android-x86 9.0-r2 64-bit (gratis, ~900 MB), Android Platform Tools (gratis, ~10 MB), conexión a internet
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text" placeholder="Escribe tu nombre completo"></div>
+                <div class="campo"><label>Fecha de realización</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> Android es el sistema operativo más usado del mundo. Lo llevas en el bolsillo, está en miles de millones de móviles, en muchas TVs, en relojes, en coches y hasta en cajeros. Pero <strong>es Linux por dentro</strong>. En esta sesión vas a instalar <strong>Android-x86</strong>, una versión adaptada para arquitectura PC, en una VM de VirtualBox. Lo vas a configurar, le vas a instalar aplicaciones, lo vas a conectar a tu Windows anfitrión por <strong>ADB</strong> (Android Debug Bridge, la herramienta que usan los técnicos para depurar móviles) y lo vas a comparar con un SO de escritorio para entender qué hace especial a un sistema operativo móvil.
+            </div>
+
+            <div class="nota">
+                <strong>Red del aula:</strong> la VM va en <strong>adaptador puente</strong> contra <code>192.168.8.0/24</code>. Android cogerá IP por DHCP del aula. Esa IP es la que usarás luego desde Windows para conectarte por ADB.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul>
+                        <li>Conocer la <strong>arquitectura interna</strong> de Android: kernel Linux + librerías + AOSP + capa de apps Java/Kotlin.</li>
+                        <li>Entender la diferencia entre <strong>AOSP</strong> (Android Open Source Project, lo que cualquiera puede usar) y <strong>GMS</strong> (Google Mobile Services: Play Store, Maps, etc., que Google licencia).</li>
+                        <li>Distinguir las distintas formas de <strong>ejecutar Android sin un móvil</strong>: Android-x86 nativo, Bliss/Prime OS, AVD del SDK, Genymotion, Waydroid.</li>
+                        <li>Configurar correctamente una VM de VirtualBox para Android-x86 (controlador SATA, hardware acelerado, audio, USB, red).</li>
+                        <li>Instalar Android-x86 en disco virtual con GRUB.</li>
+                        <li>Hacer el <strong>primer arranque</strong>: idioma, omitir cuenta de Google, ver el launcher.</li>
+                        <li>Cargar e instalar un <strong>APK</strong> sin Play Store usando F-Droid.</li>
+                        <li>Activar las <strong>opciones de desarrollador</strong> y la <strong>depuración USB sobre red</strong>.</li>
+                        <li>Conectar <code>adb</code> desde tu Windows a la VM y manejar Android por línea de comandos (paquetes, logs, sistema de archivos).</li>
+                        <li>Comparar Android con Windows/Linux: filosofía, modelo de permisos, multitarea, ciclo de vida de apps.</li>
+                        <li>Diagnosticar problemas típicos: pantalla negra al arrancar, sin internet, ratón pegado, no se ven los APKs cargados.</li>
+                        <li>Documentar todo en una ficha técnica.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 0 — Conceptos previos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 — Qué es Android exactamente</h3>
+
+                    <p>Android es un <strong>sistema operativo móvil</strong> construido sobre un kernel Linux modificado. Lo creó Andy Rubin en una startup llamada Android Inc. en 2003. Google la compró en 2005, y en 2008 salió el primer móvil con Android (HTC Dream). Hoy lo desarrolla Google bajo el paraguas de la <strong>Open Handset Alliance</strong>.</p>
+
+                    <p>Aunque cuando dices "Android" piensas en el móvil de Samsung, Xiaomi o Google, lo cierto es que Android se usa en:</p>
+
+                    <ul>
+                        <li>Smartphones y tablets (lo evidente).</li>
+                        <li><strong>Wear OS</strong>: relojes inteligentes.</li>
+                        <li><strong>Android TV / Google TV</strong>: televisores y reproductores.</li>
+                        <li><strong>Android Automotive</strong>: salpicaderos (Volvo, Polestar, Renault).</li>
+                        <li><strong>Android Things</strong> (descontinuado, pero existió): IoT.</li>
+                        <li><strong>Kindle Fire</strong> de Amazon: Android sin GMS.</li>
+                    </ul>
+
+                    <h3>0.2 — La pila de capas de Android</h3>
+
+                    <p>De abajo arriba:</p>
+
+                    <pre class="codigo">+---------------------------------------+
+|  Apps (Java/Kotlin, lo que tú ves)    |
++---------------------------------------+
+|  Java API Framework                   |    activity, location, sensores, UI...
++---------------------------------------+
+|  Librerías nativas + ART runtime      |    SQLite, OpenGL, Vulkan, ART (la JVM)
++---------------------------------------+
+|  Hardware Abstraction Layer (HAL)     |    cámara, audio, bluetooth, GPS
++---------------------------------------+
+|  Kernel Linux modificado              |    drivers + binder + wakelocks
++---------------------------------------+</pre>
+
+                    <p>El <strong>kernel</strong> es Linux, sí, pero con parches específicos de Android (el más famoso: <strong>Binder</strong>, el mecanismo de IPC, y los <strong>wakelocks</strong> para gestión de energía). Eso significa que <em>no puedes</em> coger un kernel Linux genérico y usarlo tal cual en un Android (aunque hoy día muchos parches ya están aguas arriba en el kernel mainline).</p>
+
+                    <h3>0.3 — AOSP vs GMS</h3>
+
+                    <table>
+                        <tr><th></th><th>AOSP</th><th>GMS (Google Mobile Services)</th></tr>
+                        <tr><td>Qué es</td><td>El SO base: kernel, framework, apps mínimas</td><td>Capa de servicios y apps de Google encima</td></tr>
+                        <tr><td>Licencia</td><td>Open source (Apache 2)</td><td>Propietaria, Google la licencia a fabricantes</td></tr>
+                        <tr><td>Incluye</td><td>Phone, Messages, Calculator, settings</td><td>Play Store, Maps, Gmail, Chrome, push notifications, geolocalización A-GPS, Play Services</td></tr>
+                        <tr><td>Ejemplos</td><td>LineageOS, /e/OS, Kindle Fire, Huawei post-2019</td><td>Móviles "normales" de Samsung, Xiaomi, Google Pixel</td></tr>
+                    </table>
+
+                    <div class="nota">
+                        Cuando Huawei se quedó sin GMS por las sanciones de EE.UU. en 2019, sus móviles se quedaron sin Play Store y sin Maps de la noche a la mañana. Eso te da una pista de cuánto depende el Android "normal" de GMS, aunque AOSP en sí siga siendo libre.
+                    </div>
+
+                    <p>Android-x86 es <strong>AOSP puro</strong>: <em>no</em> trae Play Store. Lo veremos.</p>
+
+                    <h3>0.4 — Formas de ejecutar Android sin un móvil físico</h3>
+
+                    <table>
+                        <tr><th>Opción</th><th>Cómo</th><th>Cuándo usarla</th></tr>
+                        <tr><td><strong>Android-x86</strong></td><td>SO completo instalado en disco, arranca como un PC normal</td><td>Curiosidad, revivir un netbook, esta práctica</td></tr>
+                        <tr><td>Bliss OS / Prime OS</td><td>Forks modernos de Android-x86</td><td>Si quieres una versión Android más reciente</td></tr>
+                        <tr><td>AVD (Android Virtual Device)</td><td>Emulador oficial del SDK de Android</td><td>Desarrollo de apps, pruebas en distintas versiones de Android sin cambiar de móvil</td></tr>
+                        <tr><td>Genymotion</td><td>Emulador comercial basado en VirtualBox</td><td>Empresas que necesitan automatización de tests</td></tr>
+                        <tr><td>Waydroid</td><td>Android corriendo como contenedor en un Linux anfitrión</td><td>Tener apps Android en un Linux de escritorio</td></tr>
+                        <tr><td>Windows Subsystem for Android</td><td>Microsoft empaquetó AOSP para Windows 11 (descontinuado en 2025)</td><td>Histórico</td></tr>
+                    </table>
+
+                    <h3>0.5 — Qué es ADB y por qué lo vas a usar</h3>
+
+                    <p><strong>ADB (Android Debug Bridge)</strong> es la herramienta que usan los desarrolladores y técnicos para comunicarse con un dispositivo Android desde un PC. Permite, entre otras cosas:</p>
+
+                    <ul>
+                        <li>Instalar APKs sin pasar por el móvil (<code>adb install</code>).</li>
+                        <li>Ver los logs del sistema en vivo (<code>adb logcat</code>).</li>
+                        <li>Lanzar una shell remota en el dispositivo (<code>adb shell</code>).</li>
+                        <li>Copiar archivos en los dos sentidos (<code>adb push / pull</code>).</li>
+                        <li>Reiniciar al modo recovery (<code>adb reboot recovery</code>).</li>
+                    </ul>
+
+                    <p>Cualquier técnico de móvil lo usa todos los días. Vamos a manejarlo contra una VM en vez de contra un móvil real, pero la mecánica es idéntica.</p>
+
+                    <div class="pregunta">
+                        <p>¿Por qué dirías que Android, siendo Linux por dentro, no se considera "una distro Linux más" sino un mundo aparte?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 1 — Preparar la VM (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>1.1 — Descargar Android-x86</h3>
+
+                    <p>Vete a <code>https://www.android-x86.org/download</code>. Elige:</p>
+                    <ul>
+                        <li><strong>android-x86_64-9.0-r2.iso</strong> (recomendado) o la versión 9.0-r2 más reciente. ~900 MB.</li>
+                        <li>Espejo: FOSSHUB o OSDN.</li>
+                    </ul>
+
+                    <div class="nota">
+                        Existe la 8.1, la 9.0 y un release-candidate más nuevo. La 9.0-r2 es <em>la</em> versión estable y la que usan casi todos los tutoriales. Lo más nuevo (Bliss OS, Android 11/12) suele dar problemas de gráficos en VirtualBox.
+                    </div>
+
+                    <h3>1.2 — Descargar Platform Tools (ADB) en Windows</h3>
+
+                    <p>Desde Windows, vete a <code>https://developer.android.com/tools/releases/platform-tools</code> y descarga el ZIP "SDK Platform Tools for Windows". Descomprímelo en <code>C:\platform-tools\</code>. Dentro están <code>adb.exe</code> y <code>fastboot.exe</code>. Para tenerlo a mano:</p>
+
+                    <pre class="codigo">setx PATH "%PATH%;C:\platform-tools"</pre>
+
+                    <p>Cierra y abre una nueva PowerShell. Comprueba:</p>
+
+                    <pre class="codigo">adb version</pre>
+
+                    <h3>1.3 — Crear la VM en VirtualBox</h3>
+
+                    <table>
+                        <tr><th>Parámetro</th><th>Valor</th></tr>
+                        <tr><td>Nombre</td><td><code>Android-x86-Lab</code></td></tr>
+                        <tr><td>Tipo</td><td>Linux</td></tr>
+                        <tr><td>Versión</td><td><strong>Other Linux (64-bit)</strong></td></tr>
+                        <tr><td>RAM</td><td>2048 MB</td></tr>
+                        <tr><td>CPUs</td><td>2 vCPU</td></tr>
+                        <tr><td>Disco</td><td>8 GB VDI dinámico</td></tr>
+                    </table>
+
+                    <h3>1.4 — Ajustes críticos antes de arrancar</h3>
+
+                    <h4>Sistema → Procesador</h4>
+                    <ul>
+                        <li>Marca <strong>Habilitar PAE/NX</strong>.</li>
+                    </ul>
+
+                    <h4>Pantalla</h4>
+                    <ul>
+                        <li>Memoria de vídeo: <strong>128 MB</strong>.</li>
+                        <li>Controlador gráfico: <strong>VBoxSVGA</strong> (o VBoxVGA si SVGA falla; <strong>NO</strong> uses VMSVGA con Android-x86).</li>
+                        <li><strong>NO</strong> marques aceleración 3D si tu PC del aula no tiene GPU dedicada — Android se quedará en pantalla negra.</li>
+                    </ul>
+
+                    <h4>Almacenamiento</h4>
+                    <ul>
+                        <li>Asegúrate de que el controlador del disco duro es <strong>SATA</strong>, no IDE.</li>
+                        <li>Añade la ISO de Android-x86 en el lector de DVD.</li>
+                    </ul>
+
+                    <h4>Audio</h4>
+                    <ul>
+                        <li>Controlador: <strong>Intel HD Audio</strong>.</li>
+                    </ul>
+
+                    <h4>Red</h4>
+                    <ul>
+                        <li>Adaptador 1: <strong>Adaptador puente</strong> (Bridged), seleccionando tu tarjeta de red del aula.</li>
+                        <li>Tipo: <strong>PCnet-FAST III</strong>. Es el que mejor reconoce Android-x86 9.0-r2.</li>
+                    </ul>
+
+                    <div class="nota">
+                        Android-x86 pedirá IP por DHCP al arrancar y recibirá una IP del aula en <code>192.168.8.x</code>. La vas a necesitar más tarde para conectarte con ADB desde Windows.
+                    </div>
+
+                    <h4>USB</h4>
+                    <ul>
+                        <li>Marcar Habilitar controlador USB → USB 1.1 (Android-x86 9 no maneja bien USB 3.0).</li>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 2 — Instalar Android-x86 (45 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 — Arrancar y elegir Installation</h3>
+
+                    <p>Arranca la VM con la ISO. En el menú azul de GRUB, baja a <strong>"Installation - Install Android-x86 to harddisk"</strong> y pulsa Enter.</p>
+
+                    <h3>2.2 — Particionar con cfdisk</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>"Choose Partition" → <strong>Create/Modify partitions</strong>.</li>
+                            <li>Pregunta "Do you want to use GPT?" → <strong>No</strong> (más simple con MBR clásico).</li>
+                            <li>Entras en cfdisk. <strong>New</strong> → Primary → tamaño total → <strong>Bootable</strong> → <strong>Write</strong> → escribe "yes" → <strong>Quit</strong>.</li>
+                            <li>Vuelves al instalador. Selecciona <code>sda1</code>.</li>
+                            <li>Filesystem: <strong>ext4</strong> → Yes (format) → Yes (install GRUB) → <strong>No</strong> a EFI GRUB2 → <strong>Yes</strong> a "Install /system directory as read-write" (importante para poder modificar el sistema).</li>
+                            <li>Espera la copia (5-10 min).</li>
+                            <li>Cuando termine: <strong>Reboot</strong>. <em>Antes</em>, en VirtualBox quita la ISO del lector de DVD.</li>
+                        </ol>
+                    </div>
+
+                    <div class="aviso">
+                        Si te equivocas y marcas "system as read-only", luego no podrás instalar root apps. No es crítico para esta práctica pero conviene marcarlo como read-write.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 3 — Primer arranque y configuración (30 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>3.1 — Arrancar Android instalado</h3>
+
+                    <p>En el GRUB elige la primera opción ("Android-x86 9.0-r2"). Tarda <em>bastante</em>: ten paciencia, sobre todo en el splash con la palabra ANDROID.</p>
+
+                    <h3>3.2 — Setup inicial</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Idioma: Español.</li>
+                            <li>Red WiFi: pulsa "Use cellular network for setup" o "Skip" (estás en NAT, ya hay internet pero no WiFi).</li>
+                            <li>Verifica que internet funciona: si tarda mucho en "Comprobando conexión", paciencia.</li>
+                            <li>Servicios de Google: <strong>NO</strong> tienes Google Apps; usa "Skip". Si te ofrece "Set up for personal use", elige eso.</li>
+                            <li>Cuenta Google: <strong>Skip</strong>. Android-x86 viene sin Play Store.</li>
+                            <li>Bloqueo de pantalla: elige "Skip" → "Skip anyway" (no necesitamos PIN en una VM).</li>
+                            <li>Acepta términos y entra al launcher.</li>
+                        </ol>
+                    </div>
+
+                    <h3>3.3 — Acostumbrarse al control de ratón</h3>
+
+                    <p>Android-x86 traduce los clicks del ratón a "toques en la pantalla". Cosas a tener en cuenta:</p>
+
+                    <ul>
+                        <li>Click izquierdo = tap.</li>
+                        <li>Click izquierdo mantenido y arrastrar = long-press / swipe.</li>
+                        <li>Rueda del ratón = scroll.</li>
+                        <li>Click derecho = botón "atrás" físico (muy útil — equivale al botón de retroceso).</li>
+                        <li>Tecla <strong>Esc</strong> = botón <strong>atrás</strong>.</li>
+                        <li>Tecla <strong>Windows/Super</strong> = botón <strong>inicio</strong> (Home).</li>
+                        <li>Tecla <strong>Tab</strong> = cambia de app entre las recientes.</li>
+                    </ul>
+
+                    <div class="truco">
+                        Para abrir el menú de opciones de una app (los tres puntitos), usa <strong>long-press con click izquierdo</strong>. No hay una tecla universal.
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 4 — Instalar APKs sin Play Store (45 min)</h2>
+
+                <div class="seccion-body">
+
+                    <h3>4.1 — F-Droid (alternativa libre a Play Store)</h3>
+
+                    <p>Abre el navegador (Chromium viene preinstalado) y entra a <code>https://f-droid.org</code>. Descarga el APK del F-Droid client.</p>
+
+                    <h3>4.2 — Permitir orígenes desconocidos</h3>
+
+                    <p>La primera vez que intentes instalar un APK descargado, Android te dirá que no se permiten. Vete a <strong>Ajustes → Aplicaciones y notificaciones → Avanzado → Acceso especial a apps → Instalar apps desconocidas → Chromium → Permitir</strong>.</p>
+
+                    <p>Vuelve a la descarga y abre el .apk. Instalar → Abrir.</p>
+
+                    <h3>4.3 — Instalar dos apps desde F-Droid</h3>
+
+                    <p>Desde F-Droid descarga e instala:</p>
+                    <ul>
+                        <li><strong>Aurora Store</strong> (un cliente alternativo a la Play Store, sin necesidad de cuenta Google).</li>
+                        <li><strong>VLC</strong> (reproductor multimedia).</li>
+                    </ul>
+
+                    <p>Comprueba que ambas abren.</p>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 5 — ADB desde Windows hacia la VM (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>5.1 — Activar opciones de desarrollador</h3>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Ajustes → Sistema → Acerca del teléfono.</li>
+                            <li>Pulsa <strong>7 veces</strong> en "Número de compilación". Te aparece "Ya eres desarrollador".</li>
+                            <li>Vuelve atrás → ahora hay un nuevo menú "Opciones para desarrolladores".</li>
+                            <li>Entra y activa: <strong>Depuración USB</strong>.</li>
+                            <li>Busca "Depuración inalámbrica" o "ADB sobre red". Si no aparece (depende de la versión), continúa al paso siguiente.</li>
+                        </ol>
+                    </div>
+
+                    <h3>5.2 — Activar ADB sobre TCP/IP</h3>
+
+                    <p>En Android-x86 hay una shell que se llama <code>terminal emulator</code> en algunas builds, o bien hay que activar TCP por adb desde un shell con permisos:</p>
+
+                    <p>Lo más sencillo: <strong>desde el GRUB</strong> arranca "Android-x86 9.0-r2 (Debug nocheck)" o desde el menú de arranque elige <em>Debug mode</em>. Te deja en una shell de root antes de iniciar Android. Ejecuta:</p>
+
+                    <pre class="codigo">setprop service.adb.tcp.port 5555
+stop adbd
+start adbd
+exit</pre>
+
+                    <p>Android arranca como siempre y ahora el demonio ADB escucha en el puerto 5555 de la VM. <strong>Apunta la IP que tiene Android</strong> dentro del aula: en el propio Android, abre Ajustes → Red e internet → WiFi/Ethernet → propiedades, o consulta el router del aula. Estará en <code>192.168.8.x</code>.</p>
+
+                    <p>Desde una PowerShell de Windows:</p>
+
+                    <pre class="codigo">adb connect 192.168.8.XX:5555
+adb devices</pre>
+
+                    <p>(Sustituye <code>192.168.8.XX</code> por la IP real de tu Android.) Debes ver tu dispositivo listado como <code>192.168.8.XX:5555    device</code>.</p>
+
+                    <div class="truco">
+                        ¿Cómo saber la IP del Android desde el propio Android? Ajustes → Sistema → Acerca del teléfono → Estado → Dirección IP. O abre el navegador y busca "cuál es mi IP" — verás la pública, no te sirve. Lo más fiable: <strong>desde el GRUB</strong> arranca en modo Debug y haz <code>netcfg</code> o <code>ip a</code> antes de iniciar Android.
+                    </div>
+
+                    <h3>5.3 — Comandos ADB que tienes que probar</h3>
+
+                    <p>Desde una PowerShell del anfitrión Windows:</p>
+
+                    <pre class="codigo">adb devices                          # confirma la conexión
+adb shell                            # entras en una shell del Android
+# dentro de la shell
+ls /                                 # mira la jerarquía
+ls /system/app                       # apps de sistema
+ls /data/app                         # apps de usuario instaladas
+cat /proc/cpuinfo                    # confirmas que el kernel es Linux
+exit
+
+adb shell pm list packages | head    # paquetes instalados
+adb shell getprop ro.build.version.release    # versión Android
+adb shell screencap -p /sdcard/captura.png    # captura
+adb pull /sdcard/captura.png .                # te la traes a Windows
+
+adb logcat | findstr /i error        # ver errores en vivo</pre>
+
+                    <h3>5.4 — Instalar un APK por ADB</h3>
+
+                    <p>Descarga un APK pequeño en tu Windows (por ejemplo, alguno de F-Droid descargado desde su web a tu PC) y desde la PowerShell:</p>
+
+                    <pre class="codigo">adb install C:\Downloads\miapp.apk</pre>
+
+                    <p>Te aparece instalada en el Android.</p>
+
+                    <div class="pregunta">
+                        <p>¿En qué situaciones del trabajo de un técnico de soporte sería útil tener ADB para conectar con un móvil de un usuario?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 6 — Comparativa con SO de escritorio (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Reflexiona y rellena:</p>
+
+                    <table>
+                        <tr><th>Aspecto</th><th>Windows / Linux escritorio</th><th>Android</th></tr>
+                        <tr><td>Cómo se cierra una aplicación</td><td>Botón X, Alt+F4, mato proceso</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Modelo de permisos</td><td>Una app puede leer casi todo tu disco</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Instalar software</td><td>.exe / .msi / apt / dnf / pacman</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Multitarea real</td><td>Sí, todas las apps siguen corriendo</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Acceso a hardware</td><td>Directo, con permisos de SO</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Cómo se actualiza el SO</td><td>Windows Update / apt upgrade</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                        <tr><td>Sistema de archivos visible al usuario</td><td>Sí, Explorador de archivos</td><td><textarea style="min-height:50px"></textarea></td></tr>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 7 — Diagnóstico (30 min)</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr><th>Problema</th><th>Diagnóstico / solución</th></tr>
+                        <tr><td>La VM arranca pero solo veo el logo ANDROID y nunca llega al setup.</td><td><textarea></textarea></td></tr>
+                        <tr><td>Pantalla negra completa al iniciar.</td><td><textarea></textarea></td></tr>
+                        <tr><td>Android arranca pero no tiene internet.</td><td><textarea></textarea></td></tr>
+                        <tr><td>El ratón no responde dentro de Android.</td><td><textarea></textarea></td></tr>
+                        <tr><td><code>adb connect 192.168.8.XX:5555</code> da "cannot connect".</td><td><textarea></textarea></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Pistas:</strong>
+                        <ol>
+                            <li>Probablemente Android está intentando llegar a Google Servers y se queda esperando timeout. Espera 5-10 min, o si no, reinicia con la opción "Debug mode" del GRUB y mira los logs.</li>
+                            <li>Has activado aceleración 3D sin GPU dedicada, o el controlador gráfico es VMSVGA. Cambia a VBoxSVGA y desmarca 3D.</li>
+                            <li>El tipo de adaptador es Intel y Android-x86 no lo detecta bien. Cámbialo a PCnet-FAST III.</li>
+                            <li>El controlador de ratón a veces se queda enganchado. Pulsa el botón Host (Ctrl derecho por defecto) y vuelve a hacer click dentro.</li>
+                            <li>Confirma la IP exacta del Android (no des por hecho la .XX). Desde el propio Android: Ajustes → Estado → Dirección IP. Y comprueba que Android está arrancado del todo (la pantalla del launcher) antes de hacer <code>adb connect</code>. Si te ha cambiado la IP entre sesiones, vuelve a ejecutar los <code>setprop</code> / <code>stop adbd</code> / <code>start adbd</code> en Debug mode.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Ficha técnica</h2>
+                <div class="seccion-body">
+                    <div class="ficha">
+                        <h4>VM</h4>
+                        <label>Versión de Android-x86 instalada:</label><input type="text" placeholder="ej. 9.0-r2 64-bit">
+                        <label>Versión Android (<code>ro.build.version.release</code>):</label><input type="text">
+                        <label>Disco:</label><input type="text">
+                        <label>RAM:</label><input type="text">
+                        <label>Controlador gráfico:</label><input type="text">
+                        <label>Tipo de adaptador de red:</label><input type="text">
+                    </div>
+                    <div class="ficha">
+                        <h4>Apps instaladas (a través de F-Droid, Aurora, o ADB)</h4>
+                        <label>Lista de apps:</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="ficha">
+                        <h4>ADB</h4>
+                        <label>Comando completo que usaste para conectar:</label><input type="text">
+                        <label>Salida de <code>adb devices</code>:</label><input type="text">
+                        <label>Salida de <code>adb shell getprop ro.product.model</code>:</label><input type="text">
+                        <label>Pega el nombre del archivo de captura que te trajiste con <code>adb pull</code>:</label><input type="text">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion opcional">
+                <h2>Reto opcional</h2>
+                <div class="seccion-body">
+                    <div class="reto">
+                        Instala <strong>Termux</strong> desde F-Droid. Termux es un emulador de terminal con un mini-Linux (paquetes como apt, ssh, python, vim) corriendo dentro de Android. Es una de las apps más impresionantes del ecosistema: literalmente tienes un Linux funcional sobre Android. Instala <code>openssh</code> en Termux (<code>pkg install openssh</code>) y conéctate por SSH desde Windows con: <code>ssh -p 8022 usuario@192.168.8.XX</code> (la IP de tu Android en la red bridged del aula). Como estás en bridged, no necesitas redirigir puertos.
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Autoevaluación</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Marca lo conseguido</h3>
+                        <table>
+                            <tr><th>Hito</th><th>Hecho</th></tr>
+                            <tr><td>VM creada con todos los ajustes específicos para Android-x86</td><td><input type="checkbox"></td></tr>
+                            <tr><td>ISO arrancando y modo "Installation" elegido</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Disco particionado y formateado ext4, GRUB instalado</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Android arranca desde disco (sin ISO)</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Setup inicial completado (saltando cuenta Google)</td><td><input type="checkbox"></td></tr>
+                            <tr><td>F-Droid descargado e instalado</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Al menos 2 apps instaladas desde F-Droid / Aurora</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Opciones de desarrollador activadas</td><td><input type="checkbox"></td></tr>
+                            <tr><td>ADB conecta desde Windows a la VM por TCP</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Captura de pantalla traída con <code>adb pull</code></td><td><input type="checkbox"></td></tr>
+                            <tr><td>APK instalado por <code>adb install</code></td><td><input type="checkbox"></td></tr>
+                            <tr><td>Tabla comparativa con Windows/Linux rellena</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Ficha técnica completa</td><td><input type="checkbox"></td></tr>
+                            <tr><td><em>Reto</em>: Termux + SSH conectados</td><td><input type="checkbox"></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta" style="margin-top:18px">
+                        <p>Después de toda la sesión: cita una cosa que te ha sorprendido positivamente de Android visto "por dentro" y una limitación que ahora entiendes mejor.</p>
+                        <textarea></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Volver al índice</button>
+        </div>
+    </div>
+</body>
+</html>

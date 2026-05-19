@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica 39: NixOS — el sistema operativo declarativo</title>
+    <style>
+        :root { --azul:#1a365d; --azul-claro:#2b6cb0; --gris-fondo:#f7fafc; --gris-borde:#cbd5e0; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --morado:#553c9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #2d3748; background: #e2e8f0; padding: 20px; }
+        .container { max-width: 940px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.1); overflow: hidden; }
+        header { background: var(--azul); color: white; padding: 24px 32px; }
+        header h1 { font-size: 22px; margin-bottom: 8px; }
+        header .meta { font-size: 13px; opacity: .85; line-height: 1.6; }
+        .content { padding: 28px 32px; }
+        .alumno-box { background: var(--gris-fondo); border: 2px solid var(--azul-claro); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .alumno-box label { font-weight: 600; font-size: 13px; color: var(--azul); }
+        .alumno-box input { width: 100%; padding: 6px 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-size: 14px; }
+        .alumno-box .campo { display: flex; flex-direction: column; gap: 4px; }
+        .seccion { margin-bottom: 28px; page-break-inside: avoid; }
+        .seccion h2 { background: var(--azul); color: white; padding: 10px 16px; font-size: 16px; border-radius: 4px 4px 0 0; }
+        .seccion.opcional h2 { background: var(--morado); }
+        .seccion-body { border: 1px solid var(--gris-borde); border-top: none; border-radius: 0 0 4px 4px; padding: 16px; }
+        .seccion h3 { color: var(--azul-claro); font-size: 14px; margin: 16px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        .seccion h3:first-child { margin-top: 0; }
+        .seccion h4 { color: var(--azul); font-size: 13.5px; margin: 12px 0 6px 0; }
+        p { margin: 8px 0; line-height: 1.6; }
+        ul, ol { margin: 8px 0 8px 22px; line-height: 1.7; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        th { background: #edf2f7; color: var(--azul); padding: 8px 10px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border: 1px solid var(--gris-borde); }
+        td { padding: 6px 10px; border: 1px solid var(--gris-borde); vertical-align: top; }
+        td input[type="text"], td select { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 3px; font-size: 13px; background: #fafafa; }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--gris-borde); border-radius: 4px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 80px; background: #fafafa; }
+        .pasos { background: #f7fafc; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        .pasos ol { margin-left: 20px; line-height: 1.9; font-size: 13px; }
+        .pasos strong { color: var(--azul); }
+        .nota { background: #ebf8ff; border-left: 4px solid var(--azul-claro); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .aviso { background: #fff5f5; border-left: 4px solid var(--rojo); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .truco { background: #f0fff4; border-left: 4px solid var(--verde); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .reto { background: #faf5ff; border-left: 4px solid var(--morado); padding: 10px 14px; font-size: 13px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        .pregunta { margin: 14px 0; }
+        .pregunta > p { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--azul); }
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; }
+        pre.codigo { background: #2d3748; color: #f7fafc; padding: 12px 16px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; margin: 10px 0; }
+        .ficha { background: #fffbea; border: 1px solid #fbd38d; border-radius: 6px; padding: 16px; margin: 14px 0; font-size: 13px; }
+        .ficha h4 { color: #975a16; margin-bottom: 10px; font-size: 14px; }
+        .ficha label { display: block; font-weight: 600; font-size: 12px; color: #744210; margin-top: 8px; }
+        .ficha input[type="text"], .ficha textarea { width: 100%; margin-top: 4px; }
+        .badge-opc { display: inline-block; background: var(--morado); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; letter-spacing: .5px; }
+        .evaluacion { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 6px; padding: 16px; margin-top: 20px; }
+        .evaluacion h3 { color: var(--verde) !important; border: none !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
+        .evaluacion th { background: #c6f6d5; color: var(--verde); }
+        .botones { display: flex; gap: 12px; justify-content: center; padding: 24px 32px; background: #f7fafc; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--azul-claro); color: white; }
+        .btn-secondary { background: #edf2f7; color: var(--azul); border: 1px solid var(--gris-borde); }
+        @media print {
+            body { background: white; padding: 0; font-size: 12px; }
+            .container { box-shadow: none; border-radius: 0; }
+            .botones, .no-print { display: none !important; }
+            .seccion { page-break-inside: avoid; }
+            header, .seccion h2 { background: var(--azul) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .seccion.opcional h2 { background: var(--morado) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background: #edf2f7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input[type="text"], select, textarea { border: none !important; background: transparent !important; box-shadow: none !important; padding: 2px !important; }
+            textarea { min-height: auto !important; overflow: visible; height: auto; }
+            pre.codigo { background: #f7fafc !important; color: #2d3748 !important; border: 1px solid #cbd5e0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;background:#1a365d;color:#fff;text-decoration:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);font-family:system-ui,-apple-system,sans-serif">&larr; Teoría</a>
+    <div class="container">
+        <header>
+            <h1>Práctica 39: NixOS — el sistema operativo declarativo</h1>
+            <div class="meta">
+                <strong>Bloque:</strong> Instalación de SO no habituales (sesión 3 de 5)<br>
+                <strong>Duración estimada:</strong> 5 horas (1 sesión completa)<br>
+                <strong>Modalidad:</strong> trabajo individual<br>
+                <strong>Requisitos previos:</strong> haber hecho la 07 (Ubuntu) y la 11 (consola Ubuntu)<br>
+                <strong>Herramientas:</strong> VirtualBox 7.x, ISO <strong>minimal</strong> de la última NixOS estable (gratis, ~1 GB), conexión a internet
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div class="alumno-box">
+                <div class="campo"><label>Nombre y apellidos</label><input type="text" placeholder="Escribe tu nombre completo"></div>
+                <div class="campo"><label>Fecha de realización</label><input type="date"></div>
+            </div>
+
+            <div class="nota">
+                <strong>De qué va esta práctica:</strong> todos los sistemas operativos que conoces son <strong>imperativos</strong>: tú vas dando órdenes (<em>"instala esto", "configura aquello", "edita este archivo"</em>) y el sistema cambia poco a poco, paso a paso. <strong>NixOS</strong> es radicalmente distinto: tú escribes un único archivo de texto que describe <em>cómo quieres que sea el sistema</em> (qué paquetes, qué usuarios, qué servicios) y luego le dices "constrúyete así". Si te equivocas, puedes <strong>volver atrás en un segundo</strong> al estado anterior. Si pides al sistema que sea idéntico al de tu compañero, sale idéntico. Este paradigma se llama <strong>declarativo</strong> y es la idea más rompedora en sistemas operativos de la última década.
+            </div>
+
+            <div class="aviso">
+                <strong>Aviso franco:</strong> NixOS no es fácil. La curva es empinada y el lenguaje Nix es raro. Pero el "wow" que vas a vivir cuando rompas el sistema a propósito y vuelvas atrás con un comando vale la sesión entera.
+            </div>
+
+            <div class="nota">
+                <strong>Red del aula:</strong> la VM va en <strong>adaptador puente</strong> contra <code>192.168.8.0/24</code>. La IP la dará el DHCP del aula. NetworkManager se encarga al arrancar.
+            </div>
+
+            <div class="seccion">
+                <h2>Objetivos de la práctica</h2>
+                <div class="seccion-body">
+                    <ul>
+                        <li>Entender la diferencia entre <strong>configuración imperativa</strong> (Ubuntu, Windows) y <strong>declarativa</strong> (NixOS, Terraform, Kubernetes).</li>
+                        <li>Conocer las <strong>tres ideas centrales</strong> de Nix: store inmutable, derivación reproducible, generaciones con rollback atómico.</li>
+                        <li>Instalar <strong>NixOS</strong> desde la ISO minimal usando particionado manual y <code>nixos-install</code>.</li>
+                        <li>Leer y editar <code>/etc/nixos/configuration.nix</code> para añadir paquetes, usuarios y servicios.</li>
+                        <li>Aplicar cambios con <code>nixos-rebuild switch</code> y observar cómo el sistema entero se construye otra vez.</li>
+                        <li>Romper la configuración a propósito y <strong>volver atrás</strong> con <code>nixos-rebuild switch --rollback</code> o desde GRUB.</li>
+                        <li>Usar <code>nix-shell</code> para crear <strong>entornos efímeros</strong> con herramientas que no quieres instalar de forma permanente.</li>
+                        <li>Comparar con Ubuntu: qué te cuesta más, qué te cuesta menos, qué problemas desaparecen.</li>
+                        <li>Diagnosticar tres fallos típicos: error de sintaxis en configuration.nix, paquete que no existe, sin red durante el rebuild.</li>
+                        <li>Documentar tu configuración final y entregarla como parte de la ficha técnica.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 0 — Conceptos previos (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>0.1 — El problema que NixOS quiere resolver</h3>
+
+                    <p>Imagina la siguiente escena, que pasa todos los días en oficinas de todo el mundo:</p>
+
+                    <ul>
+                        <li>El servidor de producción lleva tres años funcionando.</li>
+                        <li>Nadie recuerda exactamente qué cambios se le han hecho.</li>
+                        <li>Hay que <em>"replicarlo"</em> en otro servidor.</li>
+                        <li>Resultado: tres semanas de prueba/error, y el nuevo servidor <strong>casi</strong> es igual al viejo. Casi.</li>
+                    </ul>
+
+                    <p>Este problema se llama <strong>configuration drift</strong>: el estado real del sistema se va alejando con el tiempo de cualquier documentación que tuvieras. Lo causan tres prácticas:</p>
+
+                    <ol>
+                        <li>Hacer cambios con <code>apt install</code> sin apuntarlo.</li>
+                        <li>Editar archivos a mano sin control de versiones.</li>
+                        <li>Aplicar parches manuales que el siguiente <code>apt upgrade</code> sobrescribe.</li>
+                    </ol>
+
+                    <p>Las soluciones <em>parcheadas</em> al problema son Ansible, Puppet, Chef, Docker… Todas son capas <em>encima</em> de un SO imperativo. NixOS le da la vuelta: el SO entero <strong>es</strong> el resultado de un archivo declarativo. Si dos máquinas tienen el mismo <code>configuration.nix</code> y la misma versión de Nix, son <strong>bit a bit idénticas</strong>.</p>
+
+                    <h3>0.2 — Las tres ideas de Nix</h3>
+
+                    <h4>1. Store inmutable</h4>
+
+                    <p>Todos los paquetes se instalan en <code>/nix/store/</code> bajo una ruta que incluye un hash criptográfico. Por ejemplo:</p>
+
+                    <pre class="codigo">/nix/store/abc123...-firefox-115.0.2/
+/nix/store/def456...-firefox-116.0.0/</pre>
+
+                    <p>Los dos Firefox conviven sin pisarse. Nadie sobrescribe nada nunca. Para "actualizar" lo que se hace es <em>cambiar a qué hash apunta</em> el enlace <code>/run/current-system</code>.</p>
+
+                    <h4>2. Derivación reproducible</h4>
+
+                    <p>El hash de cada paquete se calcula a partir de <em>todas</em> sus entradas: fuente, compilador, flags, dependencias, sistema operativo. Si tú y otra persona compiláis el mismo paquete con los mismos parámetros, sale exactamente el mismo hash y los mismos bytes. Esto se llama <strong>build reproducible</strong>.</p>
+
+                    <h4>3. Generaciones con rollback</h4>
+
+                    <p>Cada vez que aplicas un cambio (<code>nixos-rebuild switch</code>) NixOS crea una nueva <strong>generación</strong> del sistema. La generación anterior sigue en disco. Si la nueva no arranca o tiene un fallo, eliges la anterior en el GRUB y estás otra vez en el estado de antes. <strong>El rollback es atómico:</strong> o estás en la generación nueva entera, o en la vieja entera, no en mitad de un upgrade roto.</p>
+
+                    <h3>0.3 — Imperativo vs declarativo, con un ejemplo</h3>
+
+                    <table>
+                        <tr><th>Ubuntu (imperativo)</th><th>NixOS (declarativo)</th></tr>
+                        <tr><td>
+                            <pre class="codigo">apt install nginx
+systemctl enable nginx
+sed -i 's/.../.../g' /etc/nginx/nginx.conf
+systemctl restart nginx
+ufw allow 80</pre>
+                            5 pasos en orden. Si te saltas uno, queda a medias.
+                        </td><td>
+                            <pre class="codigo">services.nginx.enable = true;
+services.nginx.virtualHosts."example" = {
+  root = "/var/www";
+};
+networking.firewall.allowedTCPPorts = [ 80 ];</pre>
+                            Describes el final. Nix se encarga de cómo.
+                        </td></tr>
+                    </table>
+
+                    <h3>0.4 — Vocabulario mínimo del mundo Nix</h3>
+
+                    <table>
+                        <tr><th>Término</th><th>Qué es</th></tr>
+                        <tr><td><strong>Nix (el lenguaje)</strong></td><td>Lenguaje funcional puro, parecido a JSON con funciones, diseñado solo para describir paquetes y configs.</td></tr>
+                        <tr><td><strong>Nix (el gestor)</strong></td><td>El programa que evalúa el lenguaje y construye paquetes. Puede instalarse en cualquier Linux/macOS sin NixOS.</td></tr>
+                        <tr><td><strong>NixOS</strong></td><td>Una distro Linux donde <em>todo</em> el sistema se describe en Nix.</td></tr>
+                        <tr><td><strong>nixpkgs</strong></td><td>El repositorio gigante de paquetes (~100.000) escritos en Nix. Equivalente a "Debian main".</td></tr>
+                        <tr><td><strong>Channel</strong></td><td>Una versión de nixpkgs (por ejemplo "nixos-24.05" o "nixos-unstable").</td></tr>
+                        <tr><td><strong>Generation</strong></td><td>Una versión congelada del sistema, identificable por número.</td></tr>
+                        <tr><td><strong>Flake</strong></td><td>Formato moderno (aún opcional) para hacer las builds reproducibles al 100% pinneando dependencias. <em>No lo usaremos hoy.</em></td></tr>
+                    </table>
+
+                    <div class="pregunta">
+                        <p>Con tus palabras: ¿qué problema soluciona NixOS que apt/dnf/pacman no solucionan, y a qué precio?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 1 — Preparar la VM (15 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>1.1 — Descargar la ISO</h3>
+
+                    <p>Desde <code>https://nixos.org/download</code>, sección "NixOS: the Linux distribution" → ISO image → <strong>Minimal ISO image (64-bit Intel/AMD)</strong>. Aproximadamente 1 GB.</p>
+
+                    <div class="nota">
+                        Hay también una ISO gráfica con KDE/GNOME. Usaremos la minimal porque queremos manejar el sistema desde la consola y centrar el aprendizaje en la configuración declarativa.
+                    </div>
+
+                    <div class="aviso">
+                        <strong>Apunta la versión exacta</strong> que estás descargando (por ejemplo <code>25.11</code>, <code>26.05</code>, etc). La vas a necesitar más tarde para rellenar <code>system.stateVersion</code> en tu <code>configuration.nix</code>: ese campo debe coincidir con la versión que usaste al instalar.
+                    </div>
+
+                    <h3>1.2 — Crear la VM</h3>
+
+                    <table>
+                        <tr><th>Parámetro</th><th>Valor</th></tr>
+                        <tr><td>Nombre</td><td><code>NixOS-Lab</code></td></tr>
+                        <tr><td>Tipo</td><td>Linux</td></tr>
+                        <tr><td>Versión</td><td>Linux 5.x or later (64-bit)</td></tr>
+                        <tr><td>RAM</td><td>2048 MB (Nix necesita memoria para evaluar)</td></tr>
+                        <tr><td>CPUs</td><td>2 vCPU</td></tr>
+                        <tr><td>Disco</td><td>20 GB VDI dinámico</td></tr>
+                        <tr><td>Sistema</td><td>Habilitar <strong>EFI</strong></td></tr>
+                        <tr><td>Red</td><td>Adaptador puente (Intel)</td></tr>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 2 — Instalar NixOS (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>2.1 — Arrancar y entrar como root</h3>
+
+                    <p>Arranca la VM. Tras el menú, aparece un prompt como <code>[nixos@nixos:~]$</code>. Estás en un Live ISO. Pasa a root:</p>
+
+                    <pre class="codigo">sudo -i</pre>
+
+                    <h3>2.2 — Particionar (UEFI + GPT)</h3>
+
+                    <pre class="codigo">parted /dev/sda -- mklabel gpt
+parted /dev/sda -- mkpart ESP fat32 1MB 512MB
+parted /dev/sda -- set 1 esp on
+parted /dev/sda -- mkpart primary 512MB 100%</pre>
+
+                    <p>Resultado: <code>/dev/sda1</code> (EFI) y <code>/dev/sda2</code> (root).</p>
+
+                    <h3>2.3 — Formatear y montar</h3>
+
+                    <pre class="codigo">mkfs.fat -F32 -n boot /dev/sda1
+mkfs.ext4 -L nixos /dev/sda2
+
+mount /dev/disk/by-label/nixos /mnt
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/boot /mnt/boot</pre>
+
+                    <h3>2.4 — Generar la configuración inicial</h3>
+
+                    <pre class="codigo">nixos-generate-config --root /mnt
+ls /mnt/etc/nixos/
+# verás: configuration.nix  hardware-configuration.nix</pre>
+
+                    <p>Nix ha detectado tu hardware y ha escrito un esqueleto. Vamos a tocarlo:</p>
+
+                    <pre class="codigo">nano /mnt/etc/nixos/configuration.nix</pre>
+
+                    <h3>2.5 — Editar configuration.nix mínimo</h3>
+
+                    <p>Descomenta o añade estas líneas (déjalas similares a esto, dentro del bloque grande):</p>
+
+                    <pre class="codigo">{
+  imports = [ ./hardware-configuration.nix ];
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nixos-lab";
+  networking.networkmanager.enable = true;
+
+  time.timeZone = "Europe/Madrid";
+  i18n.defaultLocale = "es_ES.UTF-8";
+  console.keyMap = "es";
+
+  users.users.alumno = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "alumno123";
+  };
+
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+    htop
+  ];
+
+  services.openssh.enable = true;
+
+  # Pon aquí la versión que apuntaste al descargar la ISO.
+  # Ejemplo: "25.11", "26.05"... Mírala con `nixos-version` antes de instalar.
+  system.stateVersion = "25.11";
+}</pre>
+
+                    <div class="aviso">
+                        <strong>Cambia el valor de <code>system.stateVersion</code></strong> por la versión que tú descargaste. Si la dejas en una versión distinta a la del ISO, no es un error fatal pero puede activar lógica de migración inadecuada.
+                    </div>
+
+                    <div class="truco">
+                        Esta sintaxis es <strong>Nix language</strong>. Los <code>{ ... }</code> son atajos, los <code>=</code> son asignaciones, y <code>[ a b c ]</code> son listas (separadas por espacios, no comas). Verlo asusta al principio; en 10 minutos te resulta cómodo.
+                    </div>
+
+                    <h3>2.6 — Instalar</h3>
+
+                    <pre class="codigo">nixos-install
+# pedirá contraseña de root para el sistema instalado
+reboot</pre>
+
+                    <p>(Antes de que arranque el sistema, retira la ISO del slot del DVD en VirtualBox.)</p>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 3 — Primer arranque y entender lo que has hecho (30 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Login con el usuario <code>alumno</code> y la contraseña <code>alumno123</code>. Ejecuta:</p>
+
+                    <pre class="codigo">cat /etc/os-release
+nixos-version
+ls -l /run/current-system
+# es un symlink a /nix/store/HASH-nixos-system-...
+
+readlink /run/current-system
+nix-store -q --references /run/current-system | head
+ls /nix/store | wc -l</pre>
+
+                    <p>El último número probablemente sea ya 5.000+ entradas. Cada una es un paquete o una "derivación" en el store inmutable.</p>
+
+                    <h3>3.1 — Generaciones</h3>
+
+                    <pre class="codigo">sudo nix-env --list-generations -p /nix/var/nix/profiles/system</pre>
+
+                    <p>Solo deberías ver una, la 1. Vamos a hacer que aparezca la 2.</p>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 4 — Cambiar el sistema, declarativamente (60 min)</h2>
+                <div class="seccion-body">
+
+                    <h3>4.1 — Añadir paquetes</h3>
+
+                    <p>Edita <code>/etc/nixos/configuration.nix</code> y en <code>environment.systemPackages</code> añade <code>tree</code>, <code>tmux</code> y <code>firefox</code>:</p>
+
+                    <pre class="codigo">environment.systemPackages = with pkgs; [
+  vim
+  git
+  htop
+  tree
+  tmux
+  firefox
+];</pre>
+
+                    <p>Aplica:</p>
+
+                    <pre class="codigo">sudo nixos-rebuild switch</pre>
+
+                    <p>Esto descarga paquetes, los une en una nueva generación y la activa. Comprueba:</p>
+
+                    <pre class="codigo">which tree
+sudo nix-env --list-generations -p /nix/var/nix/profiles/system
+# ahora hay 2 generaciones</pre>
+
+                    <h3>4.2 — Habilitar un servicio</h3>
+
+                    <p>Añade Nginx con una página de prueba. En <code>configuration.nix</code>:</p>
+
+                    <pre class="codigo">services.nginx = {
+  enable = true;
+  virtualHosts."hello" = {
+    default = true;
+    root = "/var/www";
+  };
+};
+
+networking.firewall.allowedTCPPorts = [ 80 ];
+
+system.activationScripts.miweb = ''
+  mkdir -p /var/www
+  echo "&lt;h1&gt;Hola desde NixOS&lt;/h1&gt;" > /var/www/index.html
+'';</pre>
+
+                    <p>Reaplica:</p>
+
+                    <pre class="codigo">sudo nixos-rebuild switch
+curl http://localhost/
+# debe responder "Hola desde NixOS"</pre>
+
+                    <h3>4.3 — Romper algo a propósito</h3>
+
+                    <p>Edita <code>configuration.nix</code> y cambia <code>services.nginx.enable = true;</code> por <code>services.nginx.enable = "si";</code> (mal tipo).</p>
+
+                    <pre class="codigo">sudo nixos-rebuild switch</pre>
+
+                    <p>Nix se queja con un error de tipo y <strong>no aplica nada</strong>. Tu sistema sigue funcionando con la generación anterior intacta. Esto es lo que distingue a un sistema declarativo: errores en la config no rompen el sistema en marcha.</p>
+
+                    <h3>4.4 — Rollback de verdad</h3>
+
+                    <p>Deja Nginx bien otra vez. Aplica. Ahora simula un cambio "malo": quita Nginx, aplica, y luego decide que querías volver atrás:</p>
+
+                    <pre class="codigo">sudo nixos-rebuild switch --rollback
+# vuelves a la generación anterior con un comando</pre>
+
+                    <p>Comprueba con <code>nix-env --list-generations</code> y con un <code>curl localhost/</code>: Nginx vuelve a estar.</p>
+
+                    <div class="pregunta">
+                        <p>¿Qué garantía te da el modelo de generaciones cuando aplicas una actualización del sistema en producción?</p>
+                        <textarea></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 5 — nix-shell: entornos efímeros (45 min)</h2>
+                <div class="seccion-body">
+
+                    <p>Una cosa muy potente de Nix es lanzar una <strong>shell con paquetes</strong> sin instalarlos en el sistema:</p>
+
+                    <pre class="codigo">nix-shell -p cowsay
+cowsay "Hola"
+exit
+# fuera de la shell, cowsay no existe</pre>
+
+                    <p>Útil para probar herramientas. Y se puede combinar:</p>
+
+                    <pre class="codigo">nix-shell -p nodejs python3 sqlite
+# tienes los tres juntos en una sub-shell</pre>
+
+                    <p>Cuando sales, no queda nada instalado. Cuando vuelves a entrar, sale de la caché.</p>
+
+                    <h3>5.1 — Reproducible: un shell.nix</h3>
+
+                    <p>Crea un archivo <code>shell.nix</code> en tu home:</p>
+
+                    <pre class="codigo">{ pkgs ? import &lt;nixpkgs&gt; {} }:
+pkgs.mkShell {
+  buildInputs = [ pkgs.nodejs pkgs.python3 ];
+}</pre>
+
+                    <p>Y desde el mismo directorio:</p>
+
+                    <pre class="codigo">nix-shell</pre>
+
+                    <p>Cualquiera que clone esa carpeta y tenga Nix tendrá <em>exactamente</em> los mismos node y python. Esto es lo que en Python se intenta con venv, en JS con nvm… aquí es nativo.</p>
+
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Parte 6 — Diagnóstico (30 min)</h2>
+                <div class="seccion-body">
+                    <table>
+                        <tr><th>Problema</th><th>Tu diagnóstico</th></tr>
+                        <tr><td><code>nixos-rebuild switch</code> dice "error: undefined variable 'firefoxx'".</td><td><textarea></textarea></td></tr>
+                        <tr><td>El rebuild se queda colgado en "fetching ...".</td><td><textarea></textarea></td></tr>
+                        <tr><td>Has reiniciado y el sistema arranca en una generación antigua sin querer.</td><td><textarea></textarea></td></tr>
+                        <tr><td>El disco se llena de paquetes viejos en /nix/store.</td><td><textarea></textarea></td></tr>
+                        <tr><td>Has añadido un servicio pero no escucha en el puerto.</td><td><textarea></textarea></td></tr>
+                    </table>
+
+                    <div class="nota">
+                        <strong>Pistas:</strong>
+                        <ol>
+                            <li>Has hecho un typo en el nombre del paquete. Búscalo con <code>nix-env -qaP firefox</code> (siempre funciona) o, si tienes flakes activos, <code>nix search nixpkgs firefox</code>.</li>
+                            <li>Sin red. Comprueba <code>ip a</code> y <code>ping 1.1.1.1</code>. Si NetworkManager no está activo, edita configuration.nix y rebuild.</li>
+                            <li>En GRUB elige siempre la generación más reciente (la más arriba). Si quieres marcarla como default, vuelves a hacer <code>nixos-rebuild switch</code> desde ella.</li>
+                            <li><code>sudo nix-collect-garbage --delete-older-than 7d</code>.</li>
+                            <li>Mira <code>journalctl -u nombre.service</code> y revisa <code>networking.firewall.allowedTCPPorts</code> en la config.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Ficha técnica</h2>
+                <div class="seccion-body">
+                    <div class="ficha">
+                        <h4>Datos del sistema</h4>
+                        <label>Versión de NixOS:</label><input type="text">
+                        <label>Channel activo:</label><input type="text" placeholder="nixos-24.05">
+                        <label>Hostname:</label><input type="text">
+                        <label>Usuario creado:</label><input type="text">
+                        <label>Número de paquetes en /nix/store al acabar la práctica:</label><input type="text">
+                        <label>Número de generaciones finales:</label><input type="text">
+                    </div>
+                    <div class="ficha">
+                        <h4>Tu configuration.nix final (pega lo más relevante)</h4>
+                        <textarea style="min-height:200px" placeholder="Pega aquí el contenido final de tu /etc/nixos/configuration.nix..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion opcional">
+                <h2>Reto opcional</h2>
+                <div class="seccion-body">
+                    <div class="reto">
+                        <strong>Reto:</strong> instala <strong>el escritorio GNOME</strong> añadiendo <code>services.xserver.enable = true;</code> y <code>services.xserver.desktopManager.gnome.enable = true;</code> a tu <code>configuration.nix</code>. Reaplica con <code>nixos-rebuild switch</code> y reinicia. Al volver tendrás un sistema con escritorio gráfico completo. <em>Tarda lo suyo en descargar — déjalo correr.</em>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>Autoevaluación</h2>
+                <div class="seccion-body">
+                    <div class="evaluacion">
+                        <h3>Marca lo conseguido</h3>
+                        <table>
+                            <tr><th>Hito</th><th>Hecho</th></tr>
+                            <tr><td>VM con UEFI, NixOS minimal arrancado en live</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Particionado manual con parted</td><td><input type="checkbox"></td></tr>
+                            <tr><td>configuration.nix inicial editado y nixos-install completado</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Primer arranque del sistema instalado, login OK</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Paquetes añadidos al systemPackages y aplicados</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Nginx levantado con página propia en /var/www</td><td><input type="checkbox"></td></tr>
+                            <tr><td>He provocado un error de sintaxis y comprobado que NO rompe el sistema</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Rollback con --rollback y comprobado vuelta al estado previo</td><td><input type="checkbox"></td></tr>
+                            <tr><td>nix-shell probado con paquetes ad hoc</td><td><input type="checkbox"></td></tr>
+                            <tr><td>shell.nix propio creado</td><td><input type="checkbox"></td></tr>
+                            <tr><td>Ficha técnica completa con tu configuration.nix</td><td><input type="checkbox"></td></tr>
+                            <tr><td><em>Reto</em>: GNOME instalado declarativamente</td><td><input type="checkbox"></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="pregunta" style="margin-top:18px">
+                        <p>¿En qué tipo de equipo o servidor te imaginas usando NixOS en serio? ¿Y dónde claramente lo descartarías?</p>
+                        <textarea></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Volver al índice</button>
+        </div>
+    </div>
+</body>
+</html>
