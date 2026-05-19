@@ -100,11 +100,11 @@
             </div>
 
             <div class="aviso">
-                <strong>Requisitos del PC del aula:</strong> tu equipo necesita tener <strong>virtualización por hardware</strong> activada en la BIOS/UEFI (Intel VT-x o AMD-V). Casi todos los equipos modernos la tienen, pero en algunos viene desactivada de fábrica. También necesitas <strong>al menos 8 GB de RAM</strong> en el anfitrión (la VM de Proxmox usará 4 GB).
+                <strong>Requisitos del PC del aula:</strong> tu equipo necesita tener <strong>virtualización por hardware</strong> activada en la BIOS/UEFI (Intel VT-x o AMD-V) — sin esto VirtualBox no podrá ejecutar Proxmox a una velocidad razonable. También necesitas <strong>al menos 8 GB de RAM</strong> en el anfitrión (la VM de Proxmox usará 4 GB). <em>No</em> hace falta virtualización anidada en Windows 11: verás en la Parte 0.4 por qué la evitamos a propósito.
             </div>
 
             <div class="truco">
-                <strong>Comprueba la virtualización ANTES de empezar:</strong> abre el Administrador de tareas de Windows (<code>Ctrl+Shift+Esc</code>) → pestaña Rendimiento → CPU. Abajo a la derecha, busca el campo "Virtualización". Si pone <strong>Habilitada</strong>, todo bien. Si pone Deshabilitada, hay que activarla en la BIOS/UEFI antes de seguir (reinicia, pulsa <code>F2</code>/<code>F10</code>/<code>Supr</code> según fabricante y busca "Virtualization Technology" o "SVM" en el menú de CPU). Si saltas este paso, te atascarás en la Parte 4 con el error <em>"KVM virtualisation not available"</em>.
+                <strong>Comprueba la virtualización ANTES de empezar:</strong> abre el Administrador de tareas de Windows (<code>Ctrl+Shift+Esc</code>) → pestaña Rendimiento → CPU. Abajo a la derecha, busca el campo "Virtualización". Si pone <strong>Habilitada</strong>, todo bien. Si pone Deshabilitada, hay que activarla en la BIOS/UEFI antes de seguir (reinicia, pulsa <code>F2</code>/<code>F10</code>/<code>Supr</code> según fabricante y busca "Virtualization Technology" o "SVM" en el menú de CPU). Sin esto, VirtualBox arrancará Proxmox pero a velocidad de tortuga.
             </div>
 
             <div class="nota">
@@ -119,14 +119,14 @@
                 <div class="seccion-body">
                     <ul>
                         <li>Distinguir con claridad un <strong>hipervisor de tipo 1</strong> (bare-metal) de uno de <strong>tipo 2</strong> (hosted), con ejemplos comerciales y libres de cada categoría.</li>
-                        <li>Entender qué es la <strong>virtualización anidada</strong> (nested virtualization), por qué necesitamos activarla en VirtualBox para que Proxmox pueda crear VMs por dentro, y cuáles son sus limitaciones.</li>
+                        <li>Entender qué es la <strong>virtualización anidada</strong> (nested virtualization), por qué en Windows 11 + VirtualBox suele estar bloqueada, y cómo <strong>evitarla</strong> usando emulación software (TCG) en la VM interior.</li>
                         <li>Instalar <strong>Proxmox VE 8.x</strong> desde su ISO oficial en una máquina virtual de VirtualBox correctamente dimensionada.</li>
                         <li>Acceder a la <strong>interfaz web</strong> de Proxmox (puerto 8006) desde el navegador del anfitrión y conocer sus paneles principales.</li>
                         <li>Crear una <strong>VM con KVM/QEMU</strong> dentro de Proxmox, instalarle Alpine Linux y comprobar que arranca y tiene red.</li>
                         <li>Crear un <strong>contenedor LXC</strong> a partir de una plantilla, entender en qué se diferencia de una VM y por qué consume mucho menos recursos.</li>
                         <li>Hacer <strong>snapshots</strong> y <strong>backups</strong> de la VM creada, y restaurar desde un backup.</li>
                         <li>Manejar la <strong>consola del nodo Proxmox</strong> (terminal en la web y SSH) y entender los conceptos de <em>nodo</em>, <em>datacenter</em>, <em>storage</em> y <em>pool</em>.</li>
-                        <li>Diagnosticar cinco fallos típicos: virtualización anidada desactivada, RAM insuficiente, ISO no subido al storage, contraseña root olvidada, error del certificado HTTPS.</li>
+                        <li>Diagnosticar cinco fallos típicos: VM interior que no arranca por falta de KVM (y aplicar el flag <code>kvm:0</code>), RAM insuficiente, ISO no subido al storage, contraseña root olvidada, error del certificado HTTPS.</li>
                         <li>Documentar tu instalación en una <strong>ficha técnica</strong> con los recursos asignados, las VMs/contenedores creados y las pruebas realizadas.</li>
                     </ul>
                 </div>
@@ -189,11 +189,11 @@
 
                     <p>Es lo que usan muchísimas pymes y empresas medianas para virtualizar sus servidores en lugar de pagar licencias de VMware. Después de la compra de VMware por Broadcom en 2023 y el aumento de precios que vino detrás, Proxmox ganó una cantidad enorme de usuarios nuevos.</p>
 
-                    <h3>0.4 — ¿Por qué lo instalamos dentro de VirtualBox? (virtualización anidada)</h3>
+                    <h3>0.4 — ¿Por qué lo instalamos dentro de VirtualBox? (y por qué evitamos la virtualización anidada)</h3>
 
                     <p>Un hipervisor de tipo 1 está diseñado para instalarse <em>directamente</em> sobre el hardware, no dentro de otro sistema. Sería como instalar Windows dentro de Windows. No tendría sentido en producción.</p>
 
-                    <p>Pero estamos en un aula con un PC normal, y no podemos formatear el equipo para instalar Proxmox y volverlo a formatear al acabar. Para resolver esto usamos <strong>virtualización anidada</strong>: VirtualBox (hipervisor tipo 2) le presenta a Proxmox <em>también</em> las instrucciones de virtualización de la CPU (VT-x/AMD-V), de manera que Proxmox cree que está corriendo sobre hardware real y puede a su vez crear VMs por dentro.</p>
+                    <p>Pero estamos en un aula con un PC normal, y no podemos formatear el equipo para instalar Proxmox y volverlo a formatear al acabar. La solución teórica sería <strong>virtualización anidada</strong>: VirtualBox le presentaría a Proxmox las instrucciones VT-x/AMD-V de la CPU, y Proxmox podría usar KVM dentro para crear VMs reales.</p>
 
                     <pre class="codigo">+---------------------------+
 | Windows 11 (anfitrión)    |    &lt;-- el PC del aula
@@ -202,14 +202,29 @@
 |  |  +---------------+  |  |
 |  |  | Proxmox VE    |  |  |    &lt;-- hipervisor TIPO 1 (en una VM)
 |  |  |  +---------+  |  |  |
-|  |  |  | Alpine  |  |  |  |    &lt;-- VM dentro de Proxmox
+|  |  |  | Alpine  |  |  |  |    &lt;-- VM dentro de Proxmox (TCG)
 |  |  |  +---------+  |  |  |
 |  |  +---------------+  |  |
 |  +---------------------+  |
 +---------------------------+</pre>
 
                     <div class="aviso">
-                        <strong>Penalización de rendimiento:</strong> esta torre de hipervisores anidados funciona, pero es <em>lentísima</em> comparada con instalar Proxmox en hardware real. Esto es solo para aprender. Una VM dentro de Proxmox dentro de VirtualBox puede tardar varios minutos en arrancar, y eso es normal — no lo tomes como un fallo.
+                        <strong>Problema real en Windows 11:</strong> la virtualización anidada de VirtualBox sobre Windows 11 + CPU Intel es notoriamente inestable. Aunque desactives Hyper-V y "Plataforma de máquina virtual" en características de Windows, siguen bloqueándola Memory Integrity (HVCI), Virtualization-Based Security (VBS), WSL2, Windows Sandbox o el propio arranque con <code>hypervisorlaunchtype=auto</code>. En muchos PCs no hay forma humana de que funcione. Por eso esta práctica <strong>no depende</strong> de virtualización anidada.
+                    </div>
+
+                    <h4>Nuestro plan: TCG en lugar de KVM para la VM interior</h4>
+
+                    <p>QEMU (el motor que usa Proxmox para las VMs) tiene dos modos de emular CPU:</p>
+
+                    <ul>
+                        <li><strong>KVM</strong>: usa las instrucciones VT-x/AMD-V del procesador real. Rápido (la VM va casi como en hardware nativo). Requiere que el procesador presente esas instrucciones — y aquí, dentro de VirtualBox sin nested virt, no las va a tener.</li>
+                        <li><strong>TCG</strong> (<em>Tiny Code Generator</em>): emulación software pura. Traduce instrucciones x86 al vuelo, sin necesidad de VT-x. <strong>Lento</strong> (5-10× más que KVM) pero funciona en cualquier hardware, en cualquier capa, sin tocar BIOS ni características de Windows.</li>
+                    </ul>
+
+                    <p>Plan: instalamos Proxmox normalmente, y a la VM Alpine de dentro le diremos que use TCG en vez de KVM (un único flag). Los contenedores LXC de la Parte 5 no se ven afectados — comparten el kernel del nodo y no necesitan emulación de CPU.</p>
+
+                    <div class="nota">
+                        <strong>Penalización de rendimiento que vas a notar:</strong> Alpine dentro de Proxmox (TCG) dentro de VirtualBox tardará entre 1 y 3 minutos en arrancar hasta el prompt de login, y el <code>setup-alpine</code> también irá lento en algunos pasos. Es <em>normal</em>, no es un fallo. La ventaja es que funciona en cualquier PC del aula sin pelearse con BIOS, Windows Features ni HVCI. En producción real Proxmox va en hardware desnudo y la VM Alpine arrancaría en 5 segundos.
                     </div>
 
                     <h3>0.5 — Vocabulario que vas a ver en la web UI</h3>
@@ -262,7 +277,7 @@
                         <tr><td>ISO</td><td>La de Proxmox que acabas de bajar</td><td>Para arrancar la instalación.</td></tr>
                         <tr><td>Tipo</td><td>Linux</td><td>Proxmox es Debian por dentro.</td></tr>
                         <tr><td>Versión</td><td>Debian 12 (64-bit)</td><td>Es la base de Proxmox 8.</td></tr>
-                        <tr><td>RAM</td><td><strong>4096 MB</strong> (4 GB)</td><td>Mínimo real para que vaya digno con virtualización anidada.</td></tr>
+                        <tr><td>RAM</td><td><strong>4096 MB</strong> (4 GB)</td><td>Holgura para Proxmox + la VM Alpine en TCG + un LXC sin agobios.</td></tr>
                         <tr><td>CPUs</td><td><strong>2 vCPU</strong></td><td>Una sola se queda corta para anidar.</td></tr>
                         <tr><td>Disco duro</td><td><strong>32 GB VDI dinámico</strong></td><td>Proxmox + 1 VM dentro + 1 LXC entra holgado.</td></tr>
                     </table>
@@ -274,7 +289,7 @@
                     <h4>Sistema → Procesador</h4>
                     <ul>
                         <li>Marca <strong>"Habilitar PAE/NX"</strong> si la opción aparece. En VirtualBox 7 más reciente puede no estar visible porque va implícita; si no la ves, no pasa nada.</li>
-                        <li>Marca <strong>"Habilitar Nested VT-x/AMD-V"</strong>. <em>Este es el punto clave de toda la práctica.</em> Si sale en gris no editable, significa que tu CPU/Windows no soportan virtualización anidada. Comprueba que has activado VT-x/AMD-V en la BIOS y que Hyper-V está apagado en Windows (<code>Activar o desactivar características de Windows</code> → desmarca "Hyper-V" y "Plataforma de máquina virtual" y reinicia).</li>
+                        <li><strong>"Habilitar Nested VT-x/AMD-V": déjala desmarcada.</strong> En Windows 11 esta opción falla casi siempre por culpa de Hyper-V, HVCI o VBS, y no la vamos a necesitar — la VM interior usará TCG (emulación software), no KVM. Si tu equipo es de los raros que sí la soporta y quieres probar a marcarla, no rompe nada: la VM interior podrá usar KVM y arrancará mucho más rápido. Pero <strong>no inviertas tiempo en pelearte con esta casilla</strong> si te da error: la práctica entera está diseñada para funcionar sin ella.</li>
                     </ul>
 
                     <h4>Sistema → Aceleración</h4>
@@ -299,8 +314,8 @@
                         <li>Controlador gráfico: VMSVGA.</li>
                     </ul>
 
-                    <div class="aviso">
-                        <strong>Si pasas por alto "Nested VT-x":</strong> Proxmox se instalará bien, pero cuando intentes crear una VM dentro te dirá <em>"KVM virtualisation configured, but not available"</em> y la VM no arrancará. Si te ha pasado, apaga la VM de Proxmox, marca la opción, y vuelve a arrancar.
+                    <div class="nota">
+                        <strong>El error "KVM virtualisation configured, but not available":</strong> es el mensaje que vas a ver si dejas la VM Alpine con KVM activado por defecto (lo trae así de fábrica). En esta práctica es <em>esperado</em>, no es un fallo de tu parte: significa que Proxmox no tiene acceso a VT-x desde dentro de VirtualBox. La solución (que harás en la Parte 4.2bis) es decirle a Proxmox que use TCG en vez de KVM para esa VM concreta. Los contenedores LXC no se ven afectados.
                     </div>
 
                 </div>
@@ -430,18 +445,23 @@ pve login: _</pre>
                         <textarea placeholder="Número de paquetes y observaciones..."></textarea>
                     </div>
 
-                    <h3>3.4 — Verificar que KVM funciona (ANTES de seguir)</h3>
+                    <h3>3.4 — Comprobar el modo de aceleración disponible</h3>
 
-                    <div class="aviso">
-                        <strong>No te saltes este check.</strong> Si KVM no está disponible aquí dentro, todo lo que viene después fallará y habrás perdido la sesión. Mejor descubrirlo ahora que dentro de una hora.
+                    <p>Antes de seguir conviene saber si vas a poder usar KVM (rápido) o vas a tener que tirar de TCG (lento pero infalible) en la VM de la Parte 4. Abre la <strong>Shell</strong> del nodo <code>pve</code> (botón Shell arriba a la derecha al seleccionar el nodo) y ejecuta:</p>
+
+                    <pre class="codigo">egrep -c '(vmx|svm)' /proc/cpuinfo
+ls /dev/kvm 2>/dev/null && echo "KVM disponible" || echo "KVM NO disponible - usaremos TCG"</pre>
+
+                    <p>Dos escenarios posibles:</p>
+
+                    <ul>
+                        <li><strong>"KVM disponible"</strong> y el contador &gt; 0: enhorabuena, has tenido suerte y la virtualización anidada de VirtualBox sí ha funcionado en tu PC. La VM Alpine podrá usar KVM directamente. Cuando llegues a la Parte 4.2bis, <em>sáltala</em>.</li>
+                        <li><strong>"KVM NO disponible"</strong> y/o el contador da 0: caso normal en Windows 11. No es un fallo, es lo esperado. Sigue la práctica tal cual y en 4.2bis desactivarás KVM para esa VM y pasará a usar TCG.</li>
+                    </ul>
+
+                    <div class="nota">
+                        <strong>Importante:</strong> los <strong>contenedores LXC</strong> (Parte 5) funcionan igual en los dos escenarios — no usan KVM, comparten el kernel del nodo Proxmox directamente. La Parte 5 va a ir rápida en cualquier caso.
                     </div>
-
-                    <p>Abre la <strong>Shell</strong> del nodo <code>pve</code> (botón Shell arriba a la derecha al seleccionar el nodo) y ejecuta:</p>
-
-                    <pre class="codigo">kvm-ok 2>/dev/null || egrep -c '(vmx|svm)' /proc/cpuinfo
-ls /dev/kvm</pre>
-
-                    <p>Resultado esperado: un número &gt; 0 (núcleos con virtualización) y que <code>/dev/kvm</code> exista. Si <code>/dev/kvm</code> no está o el contador da 0, vuelve a la Parte 1.3 y revisa "Habilitar Nested VT-x/AMD-V" en VirtualBox. Apaga la VM de Proxmox antes de cambiarlo.</p>
 
                 </div>
             </div>
@@ -479,11 +499,47 @@ ls /dev/kvm</pre>
                         <tr><td>OS</td><td>Storage: local. ISO image: la de Alpine. Type: Linux. Version: 6.x - 2.6 Kernel (Alpine va con Linux moderno, vale).</td></tr>
                         <tr><td>System</td><td>Deja todo por defecto (BIOS SeaBIOS, Machine i440fx, SCSI Controller VirtIO SCSI single, Qemu Agent <strong>marcado</strong>).</td></tr>
                         <tr><td>Disks</td><td>Bus/Device: SCSI. Storage: local-lvm. Disk size: <strong>4 GB</strong> (Alpine cabe sobradamente).</td></tr>
-                        <tr><td>CPU</td><td>Sockets: 1. Cores: <strong>1</strong>. Type: <strong>host</strong> (importante para que las features de la CPU lleguen a la VM).</td></tr>
+                        <tr><td>CPU</td><td>Sockets: 1. Cores: <strong>1</strong>. Type: <strong>kvm64</strong> (perfil genérico compatible con KVM y con TCG; si te aparece "host" por defecto, cámbialo a kvm64 para evitar sorpresas en modo TCG).</td></tr>
                         <tr><td>Memory</td><td><strong>512 MiB</strong> (Alpine arranca con menos, pero por holgura).</td></tr>
                         <tr><td>Network</td><td>Bridge: vmbr0. Model: VirtIO (paravirtual).</td></tr>
                         <tr><td>Confirm</td><td>Revisa y pulsa Finish. <strong>No</strong> marques "Start after created" todavía.</td></tr>
                     </table>
+
+                    <h3>4.2bis — Desactivar KVM para esta VM (caso normal en Windows 11)</h3>
+
+                    <p>Si en la comprobación de 3.4 te salió <strong>"KVM disponible"</strong>, <em>sáltate este apartado entero</em> y vete directo a la 4.3.</p>
+
+                    <p>En el caso normal (KVM no disponible dentro de VirtualBox), hay que decirle a Proxmox que esta VM concreta use TCG (emulación software) en lugar de KVM. Si no lo haces, al pulsar Start verás el famoso error <em>"KVM virtualisation configured, but not available"</em> y la VM no arrancará. Tienes dos formas de hacerlo, elige la que prefieras:</p>
+
+                    <h4>Opción A — Desde la web UI</h4>
+
+                    <div class="pasos">
+                        <ol>
+                            <li>Selecciona la VM 100 en el árbol de la izquierda.</li>
+                            <li>Pestaña <strong>Options</strong>.</li>
+                            <li>Busca la fila <strong>"KVM hardware virtualization"</strong> (valor por defecto: Yes).</li>
+                            <li>Doble click → desmarca la casilla → OK.</li>
+                            <li>El valor pasa a <strong>No</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <h4>Opción B — Desde la Shell del nodo</h4>
+
+                    <p>Abre Shell en el nodo <code>pve</code> y ejecuta:</p>
+
+                    <pre class="codigo">qm set 100 --kvm 0</pre>
+
+                    <p>Esto añade la línea <code>kvm: 0</code> al fichero <code>/etc/pve/qemu-server/100.conf</code>. Puedes verificarlo con:</p>
+
+                    <pre class="codigo">grep kvm /etc/pve/qemu-server/100.conf</pre>
+
+                    <div class="aviso">
+                        <strong>Qué esperar:</strong> la VM Alpine arrancará en modo TCG (software). Tiempos típicos: 1-3 minutos hasta el prompt de login, y algunos pasos del <code>setup-alpine</code> pueden tardar 1-2 minutos en lugar de segundos. Es <em>normal</em>, no es un fallo. Ten paciencia y no canceles aunque parezca colgada — fíjate en si el cursor parpadea o si hay actividad de disco en VirtualBox.
+                    </div>
+
+                    <div class="truco">
+                        <strong>Truco de rendimiento en TCG:</strong> mantén la VM con <strong>1 core</strong> (más cores en TCG <em>ralentizan</em> en vez de acelerar, porque la sincronización software es cara). Si te apetece reducir overhead gráfico, en Options puedes bajar "Display" a <em>Standard VGA</em> (más simple que VirtIO-GPU para TCG).
+                    </div>
 
                     <h3>4.3 — Arrancar e instalar Alpine</h3>
 
@@ -501,7 +557,7 @@ ls /dev/kvm</pre>
                     </div>
 
                     <div class="pregunta">
-                        <p>¿Cuánto tarda Alpine en arrancar dentro de Proxmox-dentro-de-VirtualBox? Comenta el rendimiento percibido y por qué tiene sentido que sea lento.</p>
+                        <p>¿Cuánto tarda Alpine en arrancar dentro de Proxmox-dentro-de-VirtualBox? ¿Has usado KVM (suerte) o TCG (caso normal)? Comenta el rendimiento percibido y por qué tiene sentido que sea lento, especialmente con TCG.</p>
                         <textarea></textarea>
                     </div>
 
@@ -646,7 +702,7 @@ apk add htop nano</pre>
 
                     <table>
                         <tr><th>Problema</th><th>Cómo lo diagnosticarías / arreglarías</th></tr>
-                        <tr><td>Al crear una VM dentro de Proxmox sale <em>"KVM virtualization not available"</em>.</td><td><textarea></textarea></td></tr>
+                        <tr><td>Al arrancar la VM dentro de Proxmox sale <em>"KVM virtualisation configured, but not available"</em> y la VM no inicia.</td><td><textarea></textarea></td></tr>
                         <tr><td>El navegador no abre la URL <code>https://IP:8006</code> (timeout).</td><td><textarea></textarea></td></tr>
                         <tr><td>No ves la ISO de Alpine al crear la VM.</td><td><textarea></textarea></td></tr>
                         <tr><td><code>apt update</code> falla con <em>"401 Unauthorized"</em> en el repositorio enterprise.</td><td><textarea></textarea></td></tr>
@@ -656,7 +712,7 @@ apk add htop nano</pre>
                     <h3>7.1 — Soluciones de referencia</h3>
 
                     <div class="nota">
-                        <strong>Pista 1 (KVM not available):</strong> apaga la VM de Proxmox, en VirtualBox marca "Habilitar Nested VT-x/AMD-V" en Sistema → Procesador.<br><br>
+                        <strong>Pista 1 (KVM not available):</strong> es el caso normal en Windows 11 (no es culpa tuya, la virtualización anidada de VirtualBox suele estar bloqueada por Hyper-V/HVCI/VBS). Desactiva KVM para esa VM concreta: en la web UI, Options → "KVM hardware virtualization" → No; o desde la Shell del nodo, <code>qm set 100 --kvm 0</code>. La VM pasará a TCG (software): más lenta, pero arrancará. No pierdas tiempo peleándote con "Nested VT-x" en VirtualBox — rara vez funciona en Win 11.<br><br>
                         <strong>Pista 2 (timeout):</strong> comprueba que el adaptador de la VM está en modo Bridge, no NAT. Mira la IP real del nodo con <code>ip addr</code> en la consola de Proxmox.<br><br>
                         <strong>Pista 3 (ISO no aparece):</strong> ve a storage <code>local</code> → ISO Images y revisa que esté subida. A veces hay que pulsar el botón "Reload" del navegador.<br><br>
                         <strong>Pista 4 (401):</strong> cambia al repositorio <em>no-subscription</em> como hiciste en 3.3.<br><br>
@@ -719,7 +775,7 @@ apk add htop nano</pre>
                         <h3>Marca lo que has conseguido</h3>
                         <table>
                             <tr><th>Hito</th><th>Hecho</th></tr>
-                            <tr><td>VM de Proxmox creada en VirtualBox con virtualización anidada activa</td><td><input type="checkbox"></td></tr>
+                            <tr><td>VM de Proxmox creada en VirtualBox (con TCG en la VM interior, o con KVM si tu equipo tuvo suerte con nested virt)</td><td><input type="checkbox"></td></tr>
                             <tr><td>Proxmox VE 8 instalado y arrancando</td><td><input type="checkbox"></td></tr>
                             <tr><td>Accedo a la web UI desde el navegador del anfitrión</td><td><input type="checkbox"></td></tr>
                             <tr><td>Repositorio cambiado a no-subscription y <code>apt update</code> funciona</td><td><input type="checkbox"></td></tr>
