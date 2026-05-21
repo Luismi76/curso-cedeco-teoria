@@ -76,6 +76,20 @@
         .big-card .arrow { color: #cbd5e0; font-size: 18px; }
         .big-card:hover .arrow { color: var(--ac); }
 
+        /* Tarjeta destacada */
+        .big-card.featured { background: linear-gradient(135deg, var(--verde) 0%, var(--teal) 100%); border: none; color: #fff; position: relative; overflow: hidden; box-shadow: 0 10px 28px rgba(36,78,82,.28); animation: featGlow 2.8s ease-in-out infinite; }
+        .big-card.featured::after { content: ''; position: absolute; top: -45px; right: -35px; width: 140px; height: 140px; background: rgba(255,255,255,.08); border-radius: 50%; }
+        .big-card.featured::before { content: ''; position: absolute; bottom: -52px; left: -28px; width: 110px; height: 110px; background: rgba(255,255,255,.05); border-radius: 50%; }
+        .big-card.featured:hover { animation: none; transform: translateY(-3px); box-shadow: 0 16px 38px rgba(36,78,82,.42); }
+        .big-card.featured h3 { color: #fff; position: relative; }
+        .big-card.featured p { color: rgba(255,255,255,.92); position: relative; }
+        .big-card.featured .icon-box { background: rgba(255,255,255,.18); position: relative; }
+        .big-card.featured .arrow { color: rgba(255,255,255,.85); position: relative; }
+        .big-card.featured:hover .arrow { color: #fff; }
+        .feat-badge { display: inline-block; background: #fff; color: var(--verde); font-size: 10.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; position: relative; }
+        @keyframes featGlow { 0%, 100% { box-shadow: 0 10px 28px rgba(36,78,82,.28); } 50% { box-shadow: 0 14px 32px rgba(39,103,73,.5); } }
+        @media (prefers-reduced-motion: reduce) { .big-card.featured { animation: none; } }
+
         .c1 { background: var(--rojo); }
         .c2 { background: var(--naranja); }
         .c3 { background: var(--ac); }
@@ -307,9 +321,10 @@
             <span class="arrow">&#8594;</span>
         </a>
 
-        <a href="guia_examen_perifericos_so.html" class="big-card">
+        <a href="guia_examen_perifericos_so.html" class="big-card featured">
             <div class="icon-box c5">&#128203;</div>
             <div class="body">
+                <span class="feat-badge">&#9733; Nuevo &middot; Guía completa</span>
                 <h3>Guía del examen: periféricos + instalación de SO</h3>
                 <p>Guía de estudio completa del examen tipo test (20 preguntas). Une las dos partes: periféricos (UF0862) e instalación de sistemas operativos en VM (virtualización, Windows y Linux). Mucho más amplia que el solucionario.</p>
             </div>
