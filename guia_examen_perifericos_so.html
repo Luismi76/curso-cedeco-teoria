@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Guía de estudio - Examen de periféricos e instalación de SO</title>
+    <style>
+        :root {
+            --azul: #1a365d;
+            --ac: #2b6cb0;
+            --verde: #276749;
+            --naranja: #c05621;
+            --rojo: #c53030;
+            --morado: #553c9a;
+            --teal: #234e52;
+            --rosa: #b83280;
+            --ocre: #975a16;
+            --indigo: #434190;
+            --gb: #e2e8f0;
+            --tx: #2d3748;
+            --bg: #f7fafc;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; color: var(--tx); background: var(--bg); line-height: 1.7; }
+
+        #progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #fbd38d, #d69e2e, #b7791f); z-index: 200; transition: width .1s; width: 0; }
+
+        .topnav { position: sticky; top: 0; z-index: 100; background: var(--azul); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .topnav h1 { font-size: 15px; font-weight: 600; flex: 1; }
+        .topnav .badge { background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
+        #btn-idx { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        #btn-idx:active { background: rgba(255,255,255,.15); }
+        .back-home { color: #fff; text-decoration: none; font-size: 18px; padding: 4px 8px; opacity: .85; }
+        .back-home:active { opacity: 1; }
+
+        .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 150; display: none; opacity: 0; transition: opacity .25s; }
+        .drawer-bg.show { display: block; opacity: 1; }
+        .drawer { position: fixed; bottom: 0; left: 0; right: 0; max-height: 76vh; background: #fff; border-radius: 16px 16px 0 0; z-index: 160; transform: translateY(100%); transition: transform .3s ease; padding: 0 0 env(safe-area-inset-bottom); overflow-y: auto; }
+        .drawer.show { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: #cbd5e0; border-radius: 2px; margin: 10px auto 6px; }
+        .drawer h2 { font-size: 15px; color: var(--azul); padding: 8px 20px 12px; border-bottom: 1px solid var(--gb); }
+        .drawer .grp { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: #718096; padding: 14px 20px 4px; }
+        .drawer a { display: flex; align-items: center; gap: 12px; padding: 13px 20px; color: var(--tx); text-decoration: none; font-size: 15px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+        .drawer a:active { background: #ebf8ff; }
+        .drawer .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
+
+        .hero { background: linear-gradient(135deg, var(--azul) 0%, var(--naranja) 100%); color: #fff; padding: 28px 24px; border-radius: var(--radius); margin-bottom: 22px; position: relative; overflow: hidden; }
+        .hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; }
+        .hero::before { content: ''; position: absolute; bottom: -40px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,.04); border-radius: 50%; }
+        .hero h1 { font-size: 22px; line-height: 1.3; margin-bottom: 14px; position: relative; }
+        .hero .meta { font-size: 13px; opacity: .85; line-height: 1.6; position: relative; }
+        .hero .meta strong { color: #fff; opacity: 1; }
+
+        .lead { background: #fff; border: 1px solid var(--gb); border-left: 4px solid var(--ac); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; font-size: 14.5px; line-height: 1.65; }
+        .lead strong { color: var(--azul); }
+
+        .part-divider { display: flex; align-items: center; gap: 12px; margin: 28px 2px 14px; }
+        .part-divider .pbadge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #fff; padding: 6px 14px; border-radius: 20px; white-space: nowrap; }
+        .part-divider .line { flex: 1; height: 2px; background: var(--gb); border-radius: 2px; }
+
+        .topic { background: #fff; border-radius: var(--radius); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; border: 1px solid var(--gb); }
+        .topic-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .topic-header:active { background: #f7fafc; }
+        .topic-num { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .topic-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--azul); }
+        .topic-arrow { font-size: 12px; color: #a0aec0; transition: transform .25s; }
+        .topic.open .topic-arrow { transform: rotate(180deg); }
+        .topic-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .topic.open .topic-body { max-height: none; }
+        .topic-content { padding: 0 18px 20px; }
+
+        .c1 { background: var(--rojo); }
+        .c2 { background: var(--naranja); }
+        .c3 { background: var(--ac); }
+        .c4 { background: var(--morado); }
+        .c5 { background: var(--verde); }
+        .c6 { background: var(--teal); }
+        .c7 { background: var(--rosa); }
+        .c8 { background: var(--ocre); }
+        .c9 { background: var(--indigo); }
+        .c10 { background: #718096; }
+
+        .topic-content h3 { font-size: 15px; color: var(--ac); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gb); }
+        .topic-content h3:first-child { margin-top: 4px; }
+        .topic-content h4 { font-size: 14px; color: var(--azul); margin: 16px 0 6px; font-weight: 700; }
+        .topic-content p { margin: 6px 0; font-size: 15px; }
+        .topic-content strong { color: #1a202c; }
+
+        .table-wrap { overflow-x: auto; margin: 12px -18px; padding: 0 18px; -webkit-overflow-scrolling: touch; }
+        .topic-content table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 400px; }
+        .topic-content th { background: #edf2f7; color: var(--azul); padding: 10px 10px; text-align: left; font-size: 12px; font-weight: 700; border: 1px solid var(--gb); white-space: nowrap; }
+        .topic-content td { padding: 8px 10px; border: 1px solid var(--gb); vertical-align: top; }
+        .topic-content tr:nth-child(even) { background: #f7fafc; }
+
+        .topic-content ul, .topic-content ol { margin: 8px 0 8px 20px; font-size: 15px; }
+        .topic-content li { margin: 6px 0; }
+        .topic-content li li { margin: 3px 0; font-size: 14px; }
+        .topic-content ul ul { margin: 4px 0 4px 16px; }
+
+        .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,.2); vertical-align: middle; margin-right: 5px; }
+
+        .info { border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; line-height: 1.6; }
+        .info p { margin: 3px 0; }
+        .info-blue { background: #ebf8ff; border-left: 4px solid var(--ac); }
+        .info-yellow { background: #fffff0; border-left: 4px solid #d69e2e; }
+        .info-red { background: #fff5f5; border-left: 4px solid var(--rojo); }
+        .info-green { background: #f0fff4; border-left: 4px solid var(--verde); }
+        .info-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .info-blue .info-title { color: var(--ac); }
+        .info-yellow .info-title { color: #975a16; }
+        .info-red .info-title { color: var(--rojo); }
+        .info-green .info-title { color: var(--verde); }
+
+        code { background: #2d3748; color: #f7fafc; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+
+        #bt { position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--naranja); color: #fff; border: none; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,.2); z-index: 90; -webkit-tap-highlight-color: transparent; }
+        #bt:active { background: #9c4221; }
+
+        @media (min-width: 768px) {
+            .container { padding: 24px 24px 80px; }
+            .hero { padding: 36px 32px; }
+            .hero h1 { font-size: 28px; }
+            .topic-content { padding: 0 24px 24px; }
+            .topic-header { padding: 18px 24px; }
+            .table-wrap { margin: 12px 0; padding: 0; }
+        }
+
+        @media print {
+            .topnav, #bt, .drawer, .drawer-bg, #progress { display: none !important; }
+            .topic-body { max-height: none !important; }
+            .topic { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <div class="topnav">
+        <a href="index.html" class="back-home" aria-label="Inicio">&#8592;</a>
+        <h1>Examen periféricos + SO</h1>
+        <span class="badge">MF0953_2</span>
+        <button id="btn-idx" onclick="toggleDrawer()">Índice</button>
+    </div>
+
+    <div class="drawer-bg" id="drawer-bg" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-handle"></div>
+        <h2>Índice de temas</h2>
+        <div class="grp">Parte A · Periféricos (UF0862)</div>
+        <a href="#s1" onclick="toggleDrawer()"><span class="dot c1"></span>1. Clasificación de periféricos</a>
+        <a href="#s2" onclick="toggleDrawer()"><span class="dot c2"></span>2. Teclados y ratones</a>
+        <a href="#s3" onclick="toggleDrawer()"><span class="dot c3"></span>3. Monitores y conectores de vídeo</a>
+        <a href="#s4" onclick="toggleDrawer()"><span class="dot c4"></span>4. Impresoras</a>
+        <a href="#s5" onclick="toggleDrawer()"><span class="dot c5"></span>5. Audio</a>
+        <a href="#s6" onclick="toggleDrawer()"><span class="dot c6"></span>6. USB y almacenamiento externo</a>
+        <a href="#s7" onclick="toggleDrawer()"><span class="dot c7"></span>7. Drivers y diagnóstico</a>
+        <div class="grp">Parte B · Instalación de SO (UF0852)</div>
+        <a href="#s8" onclick="toggleDrawer()"><span class="dot c8"></span>8. Virtualización: hipervisor, host y guest</a>
+        <a href="#s9" onclick="toggleDrawer()"><span class="dot c9"></span>9. Crear la máquina virtual</a>
+        <a href="#s10" onclick="toggleDrawer()"><span class="dot c10"></span>10. Instalación de Windows</a>
+        <a href="#s11" onclick="toggleDrawer()"><span class="dot c1"></span>11. Instalación de Linux / Ubuntu</a>
+        <a href="#s12" onclick="toggleDrawer()"><span class="dot c3"></span>12. Guest Additions y comparativa</a>
+        <div class="grp">Repaso</div>
+        <a href="#consejos" onclick="toggleDrawer()"><span class="dot c10"></span>Consejos para el examen</a>
+        <a href="#mapa" onclick="toggleDrawer()"><span class="dot c5"></span>Qué se pregunta de cada tema</a>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>Guía de estudio<br>Periféricos e instalación de SO</h1>
+            <div class="meta">
+                <strong>Certificado:</strong> IFCT0309 - Montaje y Reparación de Sistemas Microinformáticos<br>
+                <strong>Módulo:</strong> MF0953_2 (UF0852 · Instalación de SO / UF0862 · Periféricos)<br>
+                <strong>Examen:</strong> 20 preguntas tipo test · 4 opciones · 1 correcta · 30 minutos<br>
+                <strong>Corrección:</strong> 0,5 puntos por acierto · aprobado con 10 aciertos · los fallos no restan
+            </div>
+        </div>
+
+        <div class="lead">
+            <p>Esta guía cubre <strong>toda la materia que entra en el examen</strong>, no solo las respuestas. Está dividida en dos partes: <strong>A) periféricos</strong> (entrada, salida, monitores, impresoras, audio, USB y diagnóstico) y <strong>B) instalación de sistemas operativos</strong> en máquina virtual (virtualización, Windows y Linux). Cada tema termina con un recuadro <em>«Para el examen»</em> con lo esencial. Si quieres comprobar respuestas concretas, usa el solucionario; si quieres <em>entender</em> la materia, estudia esta guía.</p>
+        </div>
+
+        <!-- ==================== PARTE A ==================== -->
+        <div class="part-divider">
+            <span class="pbadge c2">Parte A · Periféricos</span>
+            <span class="line"></span>
+        </div>
+
+        <!-- ==================== TEMA 1 ==================== -->
+        <div class="topic open" id="s1">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">1</div>
+                <div class="topic-title">Clasificación de periféricos</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <p>Un <strong>periférico</strong> es cualquier dispositivo que se conecta al ordenador para comunicarse con el usuario o con otros sistemas. Se clasifican según la <strong>dirección</strong> en la que viaja la información respecto a la CPU.</p>
+
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Función</th><th>Ejemplos</th></tr>
+                        <tr><td><strong>Entrada</strong></td><td>Envían información <em>al</em> PC</td><td>Teclado, ratón, escáner, micrófono, webcam, lector de huella</td></tr>
+                        <tr><td><strong>Salida</strong></td><td>Reciben información <em>del</em> PC</td><td>Monitor, impresora, altavoces, proyector, auriculares</td></tr>
+                        <tr><td><strong>Entrada/Salida (E/S)</strong></td><td>Hacen las dos cosas</td><td>Pantalla táctil, impresora multifunción, auriculares con micro, módem</td></tr>
+                        <tr><td><strong>Almacenamiento</strong></td><td>Guardan datos fuera del PC</td><td>Pendrive, disco externo, tarjeta SD, grabadora óptica</td></tr>
+                        <tr><td><strong>Comunicaciones</strong></td><td>Conectan con redes</td><td>Adaptador Wi-Fi, router, switch, módem</td></tr>
+                    </table>
+                    </div>
+
+                    <h4>Otra forma de clasificarlos</h4>
+                    <ul>
+                        <li><strong>Internos vs externos:</strong> internos van dentro de la caja (tarjeta de sonido, grabadora interna); externos se conectan por fuera (teclado USB, monitor).</li>
+                        <li><strong>Por la conexión:</strong> con cable (USB, HDMI, jack) o inalámbricos (Bluetooth, Wi-Fi, radiofrecuencia con dongle).</li>
+                    </ul>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Trampa típica</div>
+                        <p>La <strong>impresora multifunción</strong> es E/S porque imprime (salida) <em>y</em> escanea (entrada). La <strong>pantalla táctil</strong> también es E/S (muestra y recibe toques). En cambio el <strong>escáner</strong> es solo entrada, y <strong>monitor y altavoces</strong> son solo salida.</p>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>Memoriza los tres ejemplos clave de <strong>E/S</strong>: multifunción, pantalla táctil y auriculares con micrófono. Son la pregunta más repetida de este tema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 2 ==================== -->
+        <div class="topic" id="s2">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c2">2</div>
+                <div class="topic-title">Teclados y ratones</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Teclados</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Cómo funciona</th><th>Ventajas</th><th>Inconvenientes</th></tr>
+                        <tr><td><strong>Membrana</strong></td><td>Dos capas de plástico hacen contacto al pulsar</td><td>Barato, silencioso, ligero</td><td>Tacto blando, menos duradero, sin precisión</td></tr>
+                        <tr><td><strong>Mecánico</strong></td><td>Cada tecla tiene un switch (interruptor) independiente</td><td>Tacto preciso, muy duradero (50M pulsaciones)</td><td>Más caro, suele ser más ruidoso</td></tr>
+                    </table>
+                    </div>
+
+                    <h4>Switches mecánicos Cherry MX (clásico de examen)</h4>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Color</th><th>Tipo</th><th>Clic audible</th><th>Ideal para</th></tr>
+                        <tr><td><strong>Azul</strong></td><td>Táctil</td><td>Sí, marcado</td><td>Escribir mucho (mecanografía)</td></tr>
+                        <tr><td><strong>Marrón</strong></td><td>Táctil</td><td>No</td><td>Uso mixto (equilibrio)</td></tr>
+                        <tr><td><strong>Rojo</strong></td><td>Lineal (suave)</td><td>No, silencioso</td><td>Gaming, pulsación rápida</td></tr>
+                        <tr><td><strong>Negro</strong></td><td>Lineal (duro)</td><td>No</td><td>Quien pulsa con fuerza</td></tr>
+                    </table>
+                    </div>
+                    <p><strong>Táctil</strong> = notas un «escalón» al pulsar. <strong>Lineal</strong> = bajada suave sin escalón. La <em>membrana</em> no es un switch mecánico: es la tecnología «barata» alternativa.</p>
+
+                    <h3>Ratones</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Sensor</th><th>Cuándo usarlo</th></tr>
+                        <tr><td><strong>Óptico</strong></td><td>LED (normalmente rojo)</td><td>Uso general, casi cualquier superficie opaca</td></tr>
+                        <tr><td><strong>Láser</strong></td><td>Láser infrarrojo</td><td>Más preciso; funciona en cristal y superficies brillantes</td></tr>
+                    </table>
+                    </div>
+
+                    <h4>Conceptos clave del ratón</h4>
+                    <ul>
+                        <li><strong>DPI / CPI</strong> (puntos por pulgada): es la <strong>sensibilidad</strong>. A más DPI, el cursor recorre más pantalla con el mismo movimiento de mano. <em>No</em> mide la calidad ni el número de botones.</li>
+                        <li><strong>Polling rate</strong> (Hz): cuántas veces por segundo el ratón informa de su posición. 1000 Hz = 1000 veces/seg (más fluido).</li>
+                        <li><strong>Conexión:</strong> USB con cable, USB inalámbrico (dongle/receptor), o Bluetooth.</li>
+                    </ul>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>Cherry MX azul</strong> = táctil con <em>clic audible</em> (escribir mucho). <strong>Rojo</strong> = lineal y silencioso (gaming). <strong>DPI</strong> = sensibilidad del ratón, no calidad. «Membrana» no es un switch mecánico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 3 ==================== -->
+        <div class="topic" id="s3">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">3</div>
+                <div class="topic-title">Monitores y conectores de vídeo</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Tecnologías de panel</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Panel</th><th>Color</th><th>Ángulos</th><th>Contraste</th><th>Respuesta</th><th>Uso ideal</th></tr>
+                        <tr><td><strong>TN</strong></td><td>Pobre</td><td>Malos</td><td>Bajo</td><td>Muy rápida</td><td>Gaming barato (poco color)</td></tr>
+                        <tr><td><strong>VA</strong></td><td>Medio</td><td>Medios</td><td><strong>Alto</strong></td><td>Media</td><td>Multimedia, negros profundos</td></tr>
+                        <tr><td><strong>IPS</strong></td><td><strong>Excelente</strong></td><td><strong>Muy buenos</strong></td><td>Medio</td><td>Buena</td><td>Diseño gráfico, fotografía</td></tr>
+                        <tr><td><strong>OLED</strong></td><td>El mejor</td><td>Los mejores</td><td>Infinito</td><td>La mejor</td><td>Gama alta (caro, riesgo de quemado)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Características que se miden</h3>
+                    <ul>
+                        <li><strong>Resolución:</strong> nº de píxeles. HD (1280×720), Full HD (1920×1080), 2K/QHD (2560×1440), 4K/UHD (3840×2160).</li>
+                        <li><strong>Tasa de refresco</strong> (Hz): imágenes por segundo. 60 Hz normal; 120/144/240 Hz para gaming (más fluidez).</li>
+                        <li><strong>Tiempo de respuesta</strong> (ms): lo que tarda un píxel en cambiar de color. Cuanto <em>menor</em>, menos estela.</li>
+                        <li><strong>Brillo</strong> (nits/cd&sup2;) y <strong>relación de contraste</strong>.</li>
+                    </ul>
+
+                    <h3>Conectores de vídeo</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Conector</th><th>Señal</th><th>Audio</th><th>Notas</th></tr>
+                        <tr><td><strong>VGA</strong></td><td>Analógica</td><td>No</td><td>Antiguo, azul, 15 pines. En desuso</td></tr>
+                        <tr><td><strong>DVI</strong></td><td>Digital (o mixta)</td><td>No</td><td>Antiguo, sustituyó a VGA</td></tr>
+                        <tr><td><strong>HDMI</strong></td><td>Digital</td><td><strong>Sí</strong></td><td>El más común en TV y monitores</td></tr>
+                        <tr><td><strong>DisplayPort</strong></td><td>Digital</td><td><strong>Sí</strong></td><td><strong>Mejor para alta frecuencia</strong> (144 Hz+) y varios monitores</td></tr>
+                        <tr><td><strong>USB-C / Thunderbolt</strong></td><td>Digital</td><td>Sí</td><td>Vídeo + datos + carga por un solo cable</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Trampa típica</div>
+                        <p><strong>USB-A no transmite vídeo.</strong> Si en una pregunta de «conectar un monitor» aparece USB-A, es la opción falsa. VGA y DVI sí dan vídeo pero son antiguos.</p>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>IPS</strong> = mejor color y ángulos (diseño gráfico). <strong>VA</strong> = contraste. <strong>TN</strong> = rápido pero color pobre. Para <strong>144 Hz</strong> elige <strong>DisplayPort</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 4 ==================== -->
+        <div class="topic" id="s4">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c4">4</div>
+                <div class="topic-title">Impresoras</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Tipos de impresora</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Tecnología</th><th>Coste/página</th><th>Uso ideal</th></tr>
+                        <tr><td><strong>Inyección de tinta</strong></td><td>Lanza gotas de tinta líquida</td><td>Alto</td><td>Fotos y color en casa, poco volumen</td></tr>
+                        <tr><td><strong>Láser</strong></td><td>Tóner (polvo) fijado con calor</td><td><strong>Bajo</strong></td><td>Oficina, mucho texto, alta velocidad</td></tr>
+                        <tr><td><strong>Térmica</strong></td><td>Calor sobre papel especial</td><td>Muy bajo</td><td>Tickets, etiquetas, recibos</td></tr>
+                        <tr><td><strong>Matricial (impacto)</strong></td><td>Agujas golpean una cinta</td><td>Bajo</td><td>Facturas con copias (papel autocopiativo)</td></tr>
+                        <tr><td><strong>Plóter</strong></td><td>Gran formato</td><td>Variable</td><td>Planos, carteles, fotografía profesional</td></tr>
+                        <tr><td><strong>Impresora 3D</strong></td><td>Deposita material por capas</td><td>—</td><td>Prototipos y piezas físicas</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Conceptos clave</h3>
+                    <ul>
+                        <li><strong>Coste por página:</strong> lo decisivo en oficina. La <strong>láser</strong> imprime texto barato; la <strong>inyección</strong> sale cara por cartucho.</li>
+                        <li><strong>ppm</strong> (páginas por minuto): velocidad.</li>
+                        <li><strong>Resolución</strong> (dpi/ppp): nitidez del impreso.</li>
+                        <li><strong>Dúplex:</strong> imprime por las dos caras automáticamente.</li>
+                    </ul>
+
+                    <h3>La cola de impresión (spooler)</h3>
+                    <p>Los trabajos se acumulan en una <strong>cola</strong> gestionada por el servicio de impresión (<em>spooler</em>). Si un trabajo se <strong>atasca</strong>, bloquea a todos los que van detrás: la impresora «no imprime» aunque esté encendida y con papel.</p>
+                    <div class="info info-green">
+                        <div class="info-title">Cómo desatascar</div>
+                        <ol style="margin-left:16px;font-size:14px">
+                            <li>Abrir la cola de impresión y <strong>cancelar</strong> el trabajo atascado.</li>
+                            <li>Si no se borra, reiniciar el servicio <strong>Cola de impresión</strong> (spooler).</li>
+                            <li>Comprobar papel, tinta/tóner y cable/red.</li>
+                            <li>Reiniciar la impresora.</li>
+                        </ol>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>Láser</strong> = oficina, mucho texto, menor coste por página. <strong>Inyección</strong> = foto/color, cara por página. <strong>Térmica</strong> = tickets. Ante «la impresora no imprime y se acumulan trabajos», lo primero es <strong>revisar la cola</strong> (no cambiar el tóner ni reinstalar Windows).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 5 ==================== -->
+        <div class="topic" id="s5">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">5</div>
+                <div class="topic-title">Audio</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Colores de los jacks de la placa base (HD Audio)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Color</th><th>Función</th><th>Dirección</th></tr>
+                        <tr><td><span class="swatch" style="background:#48bb78"></span><strong>Verde</strong></td><td>Salida de altavoces frontales / auriculares</td><td>Salida</td></tr>
+                        <tr><td><span class="swatch" style="background:#f687b3"></span><strong>Rosa</strong></td><td>Micrófono</td><td>Entrada</td></tr>
+                        <tr><td><span class="swatch" style="background:#4299e1"></span><strong>Azul</strong></td><td>Entrada de línea (line-in)</td><td>Entrada</td></tr>
+                        <tr><td><span class="swatch" style="background:#ed8936"></span><strong>Naranja</strong></td><td>Central + subwoofer</td><td>Salida</td></tr>
+                        <tr><td><span class="swatch" style="background:#1a202c"></span><strong>Negro</strong></td><td>Altavoces traseros (surround)</td><td>Salida</td></tr>
+                        <tr><td><span class="swatch" style="background:#a0aec0"></span><strong>Gris</strong></td><td>Altavoces laterales</td><td>Salida</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Configuraciones de altavoces</h3>
+                    <ul>
+                        <li><strong>2.0</strong>: dos altavoces. <strong>2.1</strong>: dos + subwoofer.</li>
+                        <li><strong>5.1</strong>: 5 altavoces + subwoofer (sonido envolvente).</li>
+                        <li><strong>7.1</strong>: 7 altavoces + subwoofer.</li>
+                    </ul>
+
+                    <h3>Conexiones de audio</h3>
+                    <ul>
+                        <li><strong>Jack 3,5 mm</strong> (minijack) analógico, el de toda la vida.</li>
+                        <li><strong>Óptico (S/PDIF / TOSLINK)</strong> digital.</li>
+                        <li><strong>HDMI / DisplayPort</strong> llevan audio digital junto al vídeo.</li>
+                        <li><strong>USB</strong> y <strong>Bluetooth</strong> para auriculares/altavoces modernos.</li>
+                    </ul>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>Verde</strong> = salida de altavoces frontales. <strong>Rosa</strong> = micrófono (entrada). <strong>Azul</strong> = entrada de línea. <strong>Naranja</strong> = central + subwoofer. Si no suena, comprueba que esté seleccionada la <em>salida correcta</em> en la configuración de sonido.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 6 ==================== -->
+        <div class="topic" id="s6">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c6">6</div>
+                <div class="topic-title">USB y almacenamiento externo</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Colores y versiones de USB</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Color</th><th>Versión</th><th>Velocidad aprox.</th></tr>
+                        <tr><td><span class="swatch" style="background:#1a202c"></span><strong>Negro / blanco</strong></td><td>USB 2.0</td><td>480 Mbps</td></tr>
+                        <tr><td><span class="swatch" style="background:#4299e1"></span><strong>Azul</strong></td><td>USB 3.0 / 3.1 Gen 1</td><td>5 Gbps</td></tr>
+                        <tr><td><span class="swatch" style="background:#38b2ac"></span><strong>Verde azulado (teal)</strong></td><td>USB 3.1 Gen 2</td><td>10 Gbps</td></tr>
+                        <tr><td><span class="swatch" style="background:#e53e3e"></span><strong>Rojo / amarillo</strong></td><td>Puerto siempre activo</td><td>Carga aunque el PC esté apagado</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Tipos de conector USB</h3>
+                    <ul>
+                        <li><strong>Tipo-A:</strong> el rectangular clásico del PC.</li>
+                        <li><strong>Tipo-B:</strong> cuadrado, para impresoras y escáneres.</li>
+                        <li><strong>Mini / Micro USB:</strong> dispositivos antiguos y móviles viejos.</li>
+                        <li><strong>Tipo-C:</strong> pequeño y <strong>reversible</strong> (entra por los dos lados); estándar actual.</li>
+                    </ul>
+
+                    <h3>Almacenamiento externo</h3>
+                    <ul>
+                        <li><strong>Pendrive</strong> (memoria flash USB), <strong>disco externo</strong> (HDD o SSD), <strong>tarjetas SD/microSD</strong>.</li>
+                    </ul>
+                    <h4>Sistemas de archivos en memorias y discos externos</h4>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Sistema</th><th>Compatibilidad</th><th>Límite por archivo</th><th>Cuándo usarlo</th></tr>
+                        <tr><td><strong>FAT32</strong></td><td>Todos (Win, Mac, Linux, TV…)</td><td><strong>4 GB</strong></td><td>Pendrives pequeños, máxima compatibilidad</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>Win, Mac, Linux</td><td>Sin límite práctico</td><td>Archivos grandes multiplataforma (vídeo, ISO)</td></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Windows (lectura en Mac/Linux)</td><td>Enorme</td><td>Discos para usar sobre todo en Windows</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>Enorme</td><td>Discos para usar en Linux</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>Puerto USB <strong>azul</strong> = <strong>USB 3.0/3.1</strong>; negro = 2.0; rojo/amarillo = siempre activo (carga). <strong>FAT32</strong> no admite archivos de más de <strong>4 GB</strong>: si necesitas copiar un archivo grande y compatible, usa <strong>exFAT</strong>. <strong>Tipo-C</strong> es reversible.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 7 ==================== -->
+        <div class="topic" id="s7">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c7">7</div>
+                <div class="topic-title">Drivers, Administrador de dispositivos y diagnóstico</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>¿Qué es un driver?</h3>
+                    <p>Un <strong>driver</strong> (controlador) es un programa que le dice al sistema operativo cómo comunicarse con un dispositivo concreto. <strong>Sin driver, el PC no sabe «hablar» con el periférico</strong> (o lo usa a medias con uno genérico).</p>
+
+                    <h3>De dónde se obtienen</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Fuente</th><th>Fiabilidad</th><th>Cuándo usarla</th></tr>
+                        <tr><td>Windows Update</td><td>Alta</td><td>La mayoría de dispositivos básicos</td></tr>
+                        <tr><td>Web del fabricante</td><td>Alta</td><td>Drivers actualizados y funciones avanzadas</td></tr>
+                        <tr><td>CD/DVD del dispositivo</td><td>Media</td><td>Solo sin internet; luego actualizar</td></tr>
+                        <tr><td>Webs de terceros</td><td><strong>Peligroso</strong></td><td>Nunca: riesgo de malware</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Administrador de dispositivos (Windows)</h3>
+                    <ul>
+                        <li>Abrir: clic derecho en Inicio &rarr; <strong>Administrador de dispositivos</strong>.</li>
+                        <li><strong>Triángulo amarillo &#9888;</strong>: hay un <strong>problema con el driver</strong> de ese dispositivo.</li>
+                        <li><strong>Dispositivo desconocido</strong>: Windows no tiene driver para él.</li>
+                        <li>Para arreglarlo: clic derecho &rarr; <strong>Actualizar controlador</strong> &rarr; buscar automáticamente o desde un archivo.</li>
+                    </ul>
+
+                    <h3>Metodología de diagnóstico (en orden)</h3>
+                    <div class="info info-green">
+                        <div class="info-title">Pasos</div>
+                        <ol style="margin-left:16px;font-size:14px">
+                            <li>¿Está <strong>conectado</strong>? (parece broma, pero es la causa nº 1).</li>
+                            <li>¿Está <strong>encendido</strong>? (interruptor, pilas, batería).</li>
+                            <li>¿Lo <strong>detecta</strong> Windows? (Administrador de dispositivos).</li>
+                            <li>¿Tiene <strong>driver</strong> correcto?</li>
+                            <li>Probar <strong>otro puerto / otro cable</strong>.</li>
+                            <li>Probar el periférico en <strong>otro PC</strong>.</li>
+                            <li>Probar otro periférico del mismo tipo en este PC.</li>
+                            <li>Si nada funciona: el periférico está averiado.</li>
+                        </ol>
+                    </div>
+
+                    <h3>Problemas frecuentes</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Problema</th><th>Causa habitual</th><th>Solución</th></tr>
+                        <tr><td>Monitor «Sin señal»</td><td>Cable suelto o puerto equivocado</td><td>Si hay tarjeta gráfica, conectar a la GPU (no a la placa)</td></tr>
+                        <tr><td>Impresora no imprime</td><td>Cola atascada o desconectada</td><td>Revisar la cola y reiniciar la impresora</td></tr>
+                        <tr><td>Teclado/ratón USB no responde</td><td>Puerto USB defectuoso</td><td>Probar en otro puerto</td></tr>
+                        <tr><td>No suena el audio</td><td>Salida de sonido incorrecta</td><td>Cambiar el dispositivo de salida en Configuración de sonido</td></tr>
+                        <tr><td>Periférico «a medias»</td><td>Driver genérico en vez del específico</td><td>Instalar el driver del fabricante</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p><strong>Triángulo amarillo</strong> en el Administrador de dispositivos = <strong>problema de driver</strong> (se soluciona actualizando/reinstalando el controlador). Los drivers se bajan de <strong>Windows Update o la web del fabricante</strong>, nunca de webs de terceros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PARTE B ==================== -->
+        <div class="part-divider">
+            <span class="pbadge c4">Parte B · Instalación de SO</span>
+            <span class="line"></span>
+        </div>
+
+        <!-- ==================== TEMA 8 ==================== -->
+        <div class="topic" id="s8">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c8">8</div>
+                <div class="topic-title">Virtualización: hipervisor, host y guest</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>¿Qué es virtualizar?</h3>
+                    <p>Virtualizar es <strong>ejecutar un ordenador «de mentira» (máquina virtual) dentro de uno real</strong>. La VM cree que es un PC normal, pero su hardware (CPU, RAM, disco, red) es <em>simulado</em> por software. Sirve para probar sistemas operativos, aislar pruebas peligrosas y aprovechar un mismo equipo para varios entornos, sin tocar tu instalación real.</p>
+
+                    <h3>Vocabulario imprescindible</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Término</th><th>Qué es</th></tr>
+                        <tr><td><strong>Hipervisor</strong></td><td>El programa que <strong>crea y gestiona</strong> las máquinas virtuales. En el curso: <strong>Oracle VirtualBox</strong>.</td></tr>
+                        <tr><td><strong>Anfitrión (host)</strong></td><td>El SO <strong>real</strong> del equipo físico, sobre el que se ejecuta el hipervisor.</td></tr>
+                        <tr><td><strong>Invitado (guest)</strong></td><td>El SO que se instala <strong>dentro</strong> de la máquina virtual.</td></tr>
+                        <tr><td><strong>Máquina virtual (VM)</strong></td><td>El «ordenador simulado» con su disco, RAM y configuración.</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Tipos de hipervisor</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo</th><th>Dónde se ejecuta</th><th>Ejemplos</th></tr>
+                        <tr><td><strong>Tipo 1 (bare-metal)</strong></td><td>Directo sobre el hardware, sin SO debajo</td><td>Proxmox VE, VMware ESXi, Hyper-V, Xen</td></tr>
+                        <tr><td><strong>Tipo 2 (hosted)</strong></td><td>Como un programa más dentro de un SO</td><td><strong>VirtualBox</strong>, VMware Workstation/Player</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Virtualización por hardware: VT-x / AMD-V</h3>
+                    <p>Para virtualizar sistemas de <strong>64 bits</strong> (y obtener buen rendimiento) la CPU debe tener activada la <strong>virtualización por hardware</strong>: se llama <strong>VT-x</strong> en Intel y <strong>AMD-V</strong> en AMD. Se habilita en la <strong>BIOS/UEFI</strong> del equipo anfitrión. Si está desactivada, la instalación de 64 bits no arranca o da error.</p>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>El <strong>hipervisor</strong> crea/gestiona las VMs (VirtualBox). El <strong>host/anfitrión</strong> es tu SO físico real; el <strong>guest/invitado</strong> es el que va dentro de la VM. Si una VM de 64 bits no arranca, habilita <strong>VT-x / AMD-V</strong> en la BIOS/UEFI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 9 ==================== -->
+        <div class="topic" id="s9">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c9">9</div>
+                <div class="topic-title">Crear la máquina virtual (disco, RAM, ISO)</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Recursos que se asignan a la VM</h3>
+                    <ul>
+                        <li><strong>Memoria RAM:</strong> se reparte con el host. No asignes más de la mitad de la RAM real (si no, el anfitrión se ahoga).</li>
+                        <li><strong>Procesadores (núcleos):</strong> cuántos núcleos puede usar la VM.</li>
+                        <li><strong>Memoria de vídeo:</strong> RAM gráfica simulada para la pantalla de la VM.</li>
+                    </ul>
+
+                    <h3>El disco virtual</h3>
+                    <p>El disco de la VM es en realidad <strong>un archivo</strong> en el disco real del host (formatos <code>.vdi</code> en VirtualBox, también <code>.vhd</code>, <code>.vmdk</code>).</p>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tipo de disco</th><th>Cómo ocupa</th><th>Ventaja</th></tr>
+                        <tr><td><strong>Reservado dinámicamente</strong></td><td>Empieza pequeño y <strong>crece según se va usando</strong> (hasta el máximo)</td><td>Ahorra espacio real en el host</td></tr>
+                        <tr><td><strong>Tamaño fijo</strong></td><td>Reserva <strong>todo el tamaño máximo de golpe</strong></td><td>Algo más rápido</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>La imagen ISO: sin ella no hay nada que instalar</h3>
+                    <p>Una <strong>ISO</strong> es la imagen de un DVD de instalación. Para instalar el SO hay que <strong>montar la ISO en la unidad óptica virtual</strong> de la VM. Si arrancas la VM sin ISO (y con el disco vacío), no hay nada desde lo que arrancar y pedirá un «disco de arranque».</p>
+
+                    <div class="info info-yellow">
+                        <div class="info-title">Errores típicos al crear la VM</div>
+                        <ul style="margin-left:16px">
+                            <li>«No arranca, pide disco de arranque» &rarr; falta <strong>montar la ISO</strong>.</li>
+                            <li>«No deja elegir 64 bits» &rarr; falta <strong>VT-x/AMD-V</strong> en la BIOS.</li>
+                            <li>El host va lentísimo &rarr; le has dado <strong>demasiada RAM</strong> a la VM.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>Disco <strong>dinámico</strong> = el archivo crece según se necesita espacio (ahorra disco). Disco <strong>fijo</strong> = reserva todo de golpe (algo más rápido). Si la VM no arranca y pide disco de arranque, falta <strong>cargar la ISO en la unidad óptica</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 10 ==================== -->
+        <div class="topic" id="s10">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">10</div>
+                <div class="topic-title">Instalación de Windows</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Tipo de instalación</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Opción</th><th>Qué hace</th><th>Cuándo</th></tr>
+                        <tr><td><strong>Actualización</strong></td><td>Conserva archivos, programas y configuración de una instalación anterior</td><td>Pasar a una versión nueva sin perder datos</td></tr>
+                        <tr><td><strong>Personalizada (avanzada)</strong></td><td>Instala <strong>desde cero</strong>; permite elegir y <strong>formatear</strong> la partición</td><td>Disco limpio o instalación nueva</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Particiones que crea Windows (en UEFI/GPT)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Partición</th><th>Función</th></tr>
+                        <tr><td><strong>EFI (ESP)</strong></td><td><strong>Contiene los archivos de arranque</strong> del sistema (gestor de arranque)</td></tr>
+                        <tr><td><strong>MSR</strong></td><td>Reservada para Microsoft (gestión del disco)</td></tr>
+                        <tr><td><strong>Principal (C:)</strong></td><td>Windows y los datos del usuario. Formateada en <strong>NTFS</strong></td></tr>
+                        <tr><td><strong>Recuperación</strong></td><td>Herramientas de reparación del sistema</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>NTFS, el sistema de archivos de Windows</h3>
+                    <p>Windows instala el sistema en <strong>NTFS</strong> (permisos, cifrado, archivos grandes, journaling). FAT32/exFAT se reservan para memorias externas.</p>
+
+                    <h4>Pasos generales</h4>
+                    <ol style="margin-left:16px">
+                        <li>Arrancar desde la ISO &rarr; idioma y teclado.</li>
+                        <li>«Instalar ahora» &rarr; clave de producto (o «no tengo clave»).</li>
+                        <li>Aceptar licencia &rarr; <strong>Personalizada</strong>.</li>
+                        <li>Elegir/crear la partición &rarr; instala y reinicia.</li>
+                        <li>Configurar región, cuenta y privacidad.</li>
+                    </ol>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>Para instalar en un disco limpio, elige <strong>Personalizada (avanzada)</strong> (la <em>Actualización</em> conserva lo anterior). La partición <strong>EFI</strong> guarda los <strong>archivos de arranque</strong>. Windows usa <strong>NTFS</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 11 ==================== -->
+        <div class="topic" id="s11">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c1">11</div>
+                <div class="topic-title">Instalación de Linux / Ubuntu</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Ubuntu, una distribución de Linux</h3>
+                    <p>Ubuntu es una <strong>distribución</strong> (distro) de GNU/Linux. Se distribuye con <strong>licencia libre (GPL) y de forma gratuita</strong>: puedes usarla, copiarla y modificarla. Es lo contrario de Windows, que es <strong>propietario y de pago</strong>.</p>
+
+                    <h3>Live USB / ISO: «Probar» o «Instalar»</h3>
+                    <p>Al arrancar desde la ISO de Ubuntu puedes <strong>probarlo sin instalar</strong> (modo «live») o lanzar el <strong>instalador</strong>. El instalador puede borrar el disco entero o hacer particionado manual.</p>
+
+                    <h3>Particionado típico en Linux</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Punto de montaje</th><th>Sistema de archivos</th><th>Función</th></tr>
+                        <tr><td><strong>/</strong> (raíz)</td><td><strong>ext4</strong></td><td>El sistema y los programas. <em>El habitual en Linux</em></td></tr>
+                        <tr><td><strong>swap</strong></td><td>Área de intercambio</td><td>Memoria de apoyo cuando se llena la RAM / hibernación</td></tr>
+                        <tr><td><strong>/home</strong></td><td>ext4</td><td>(Opcional) datos de los usuarios, separados del sistema</td></tr>
+                        <tr><td><strong>/boot/efi</strong></td><td>FAT32</td><td>Partición EFI de arranque (en equipos UEFI)</td></tr>
+                    </table>
+                    </div>
+
+                    <h3>Gestores de paquetes</h3>
+                    <p>En Linux el software se instala con un <strong>gestor de paquetes</strong>: en Ubuntu, <code>apt</code> y <code>snap</code>. (En Windows no existe <code>apt</code>; el software se instala con instaladores <code>.exe</code>/<code>.msi</code> o la Microsoft Store.)</p>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>La raíz de Linux se instala en <strong>ext4</strong> (NTFS es de Windows; FAT32/exFAT, de pendrives). <strong>Ubuntu</strong> es <strong>libre (GPL) y gratuito</strong>; Windows es propietario y de pago. <code>apt</code> es de Linux, no de Windows. Linux <em>sí</em> tiene gestor de paquetes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TEMA 12 ==================== -->
+        <div class="topic" id="s12">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c3">12</div>
+                <div class="topic-title">Guest Additions y comparativa Windows vs Linux</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <h3>Guest Additions (Complementos de invitado)</h3>
+                    <p>Son un paquete que se instala <strong>dentro del SO invitado</strong>, una vez instalado, para integrarlo con el anfitrión. Sin ellas, la VM funciona pero «incómoda».</p>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Síntoma sin Guest Additions</th><th>Lo arregla Guest Additions</th></tr>
+                        <tr><td>La pantalla se ve pequeña / resolución fija</td><td>Ajuste automático de resolución</td></tr>
+                        <tr><td>El ratón queda «capturado» en la VM</td><td>Integración del puntero (entra y sale solo)</td></tr>
+                        <tr><td>No puedes copiar/pegar con el host</td><td>Portapapeles compartido</td></tr>
+                        <tr><td>No ves archivos del host</td><td>Carpetas compartidas</td></tr>
+                        <tr><td>Gráficos lentos</td><td>Aceleración de vídeo</td></tr>
+                    </table>
+                    </div>
+                    <div class="info info-yellow">
+                        <div class="info-title">Ojo al orden</div>
+                        <p>Las Guest Additions se instalan <strong>después</strong> de tener el SO invitado funcionando, no antes. No se confunden con la ISO del sistema ni con un antivirus.</p>
+                    </div>
+
+                    <h3>Windows vs Linux (Ubuntu)</h3>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Aspecto</th><th>Windows</th><th>Linux / Ubuntu</th></tr>
+                        <tr><td>Licencia</td><td>Propietaria, de pago</td><td>Libre (GPL), gratuita</td></tr>
+                        <tr><td>Código</td><td>Cerrado</td><td>Abierto</td></tr>
+                        <tr><td>Sistema de archivos</td><td>NTFS</td><td>ext4</td></tr>
+                        <tr><td>Instalar software</td><td>.exe/.msi, Microsoft Store</td><td>apt, snap (gestor de paquetes)</td></tr>
+                        <tr><td>Consola</td><td>CMD / PowerShell</td><td>Terminal (bash)</td></tr>
+                    </table>
+                    </div>
+
+                    <div class="info info-blue">
+                        <div class="info-title">Para el examen</div>
+                        <p>Si tras instalar el SO la pantalla se ve pequeña, el ratón se queda capturado y no puedes copiar/pegar &rarr; instala las <strong>Guest Additions</strong>. Aportan resolución automática, integración del ratón, portapapeles y carpetas compartidas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CONSEJOS ==================== -->
+        <div class="topic" id="consejos">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c10">&#9733;</div>
+                <div class="topic-title">Consejos para el examen</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <div class="info info-green">
+                        <div class="info-title">Reglas del examen</div>
+                        <p>20 preguntas tipo test, 4 opciones, 1 correcta. <strong>Los fallos no restan</strong> &rarr; no dejes ninguna en blanco. 10 aciertos = aprobado.</p>
+                    </div>
+                    <h4>Parte A · Periféricos</h4>
+                    <ul>
+                        <li><strong>Multifunción</strong> y <strong>pantalla táctil</strong> = E/S.</li>
+                        <li><strong>Cherry MX azul</strong> = clic audible; <strong>rojo</strong> = lineal silencioso. <strong>DPI</strong> = sensibilidad.</li>
+                        <li><strong>IPS</strong> = color/ángulos; <strong>VA</strong> = contraste; <strong>DisplayPort</strong> para 144 Hz; <strong>USB-A no da vídeo</strong>.</li>
+                        <li><strong>Láser</strong> = oficina barata por página; <strong>cola atascada</strong> = causa nº 1 de «no imprime».</li>
+                        <li>Audio: <strong>verde</strong> salida, <strong>rosa</strong> micro, <strong>azul</strong> line-in, <strong>naranja</strong> central+subwoofer.</li>
+                        <li>USB <strong>azul</strong> = 3.0; <strong>FAT32</strong> limita a 4 GB por archivo (usa exFAT).</li>
+                        <li><strong>Triángulo amarillo</strong> = problema de driver.</li>
+                    </ul>
+                    <h4>Parte B · Instalación de SO</h4>
+                    <ul>
+                        <li><strong>Hipervisor</strong> crea VMs; <strong>host</strong> = SO físico, <strong>guest</strong> = dentro de la VM.</li>
+                        <li>VM de 64 bits no arranca &rarr; <strong>VT-x/AMD-V</strong> en la BIOS.</li>
+                        <li>Disco <strong>dinámico</strong> crece bajo demanda; sin <strong>ISO</strong> no arranca.</li>
+                        <li>Windows desde cero = <strong>Personalizada</strong>; <strong>EFI</strong> = arranque; <strong>NTFS</strong> Windows / <strong>ext4</strong> Linux.</li>
+                        <li>Ubuntu = <strong>GPL gratuito</strong>; <code>apt</code> es de Linux.</li>
+                        <li>Pantalla pequeña + ratón capturado + sin copiar/pegar &rarr; <strong>Guest Additions</strong>.</li>
+                    </ul>
+                    <div class="info info-yellow">
+                        <div class="info-title">Técnica de test</div>
+                        <p>Lee el enunciado completo (busca «desde cero», «primera comprobación», «lo más probable»). Descarta primero las opciones absurdas; suele quedar entre dos. Si dudas, marca y sigue: contesta todas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MAPA ==================== -->
+        <div class="topic" id="mapa">
+            <div class="topic-header" onclick="toggle(this)">
+                <div class="topic-num c5">&#128269;</div>
+                <div class="topic-title">Qué se pregunta de cada tema</div>
+                <span class="topic-arrow">&#9660;</span>
+            </div>
+            <div class="topic-body">
+                <div class="topic-content">
+                    <p>Relación entre cada tema de esta guía y el tipo de pregunta que aparece en el examen (para orientar el repaso, no son las respuestas).</p>
+                    <div class="table-wrap">
+                    <table>
+                        <tr><th>Tema</th><th>Qué te pueden preguntar</th></tr>
+                        <tr><td>1. Clasificación</td><td>Identificar un dispositivo de E/S entre varios</td></tr>
+                        <tr><td>2. Teclados/ratones</td><td>Recomendar un switch Cherry MX; qué mide el DPI</td></tr>
+                        <tr><td>3. Monitores</td><td>Panel para diseño gráfico; conector para 144 Hz</td></tr>
+                        <tr><td>4. Impresoras</td><td>Impresora para oficina/coste; primera comprobación si no imprime</td></tr>
+                        <tr><td>5. Audio</td><td>Color del jack de salida de altavoces</td></tr>
+                        <tr><td>6. USB/almacenamiento</td><td>Qué indica un puerto USB azul; sistemas de archivos</td></tr>
+                        <tr><td>7. Drivers/diagnóstico</td><td>Significado del triángulo amarillo</td></tr>
+                        <tr><td>8. Virtualización</td><td>Qué es el hipervisor; host vs guest; VT-x/AMD-V</td></tr>
+                        <tr><td>9. Crear la VM</td><td>Disco dinámico vs fijo; falta la ISO</td></tr>
+                        <tr><td>10. Windows</td><td>Tipo de instalación; función de la partición EFI</td></tr>
+                        <tr><td>11. Linux/Ubuntu</td><td>Sistema de archivos raíz (ext4); licencia GPL; apt</td></tr>
+                        <tr><td>12. Guest Additions</td><td>Síntomas que se resuelven instalándolas</td></tr>
+                    </table>
+                    </div>
+                    <div class="info info-green">
+                        <div class="info-title">Material relacionado</div>
+                        <p>Para profundizar: <a href="uf0862.html">Guía UF0862 (periféricos)</a> · <a href="practica_06_instalacion_windows.html">Práctica 06 (Windows)</a> · <a href="practica_07_instalacion_linux.html">Práctica 07 (Linux)</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="bt" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+    <script>
+    function toggle(header) {
+        header.closest('.topic').classList.toggle('open');
+    }
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('show');
+        document.getElementById('drawer-bg').classList.toggle('show');
+    }
+    window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('bt').style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    </script>
+</body>
+</html>
