@@ -309,7 +309,13 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 <h2><span class="n">4</span> Inventario por consola (CMD y PowerShell)</h2>
 <div class="sb">
 
-<h3>WMIC y CIM en Windows</h3>
+<h3>WMIC (clásico) y CIM (moderno) en Windows</h3>
+<p>Windows tiene una base de datos interna llamada <strong>WMI</strong> donde guarda toda la información del hardware y el sistema. Hay dos formas de consultarla:</p>
+<ul>
+<li><strong>WMIC</strong> (Windows Management Instrumentation Command-line): la herramienta clásica de CMD. Microsoft la ha marcado como obsoleta pero sigue funcionando.</li>
+<li><strong>Get-CimInstance</strong> en PowerShell: la versión moderna, más potente. Es la que usarás en equipos nuevos.</li>
+</ul>
+<p>Empezamos por WMIC (abre CMD elevado):</p>
 <pre class="code"><span class="cm">REM CPU</span>
 wmic cpu get name,numberofcores,maxclockspeed
 <span class="cm">REM RAM</span>
@@ -321,7 +327,7 @@ wmic bios get manufacturer,smbiosbiosversion,releasedate
 <span class="cm">REM Placa base</span>
 wmic baseboard get product,manufacturer,serialnumber</pre>
 
-<p>WMIC está deprecado. La versión moderna en PowerShell:</p>
+<p>Ahora lo mismo con la sintaxis moderna en PowerShell. <span class="k">Get-CimInstance</span> consulta una «clase» de WMI (por ejemplo <span class="k">Win32_Processor</span>) y <span class="k">Select-Object</span> elige qué propiedades mostrar:</p>
 <pre class="code">Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,MaxClockSpeed
 Get-CimInstance Win32_PhysicalMemory | Select-Object Capacity,Speed,Manufacturer
 Get-CimInstance Win32_DiskDrive | Select-Object Model,Size,InterfaceType
@@ -337,26 +343,32 @@ Get-ComputerInfo | Format-List CsManufacturer,CsModel,OsName,OsVersion,CsProcess
 </div>
 
 <h3>Inventario en Linux</h3>
-<pre class="code"><span class="cm"># Información del sistema completa</span>
+<p>En Linux hay varios comandos especializados, uno por categoría de hardware. La familia <span class="k">ls*</span> son atajos: <span class="k">lspci</span> lista dispositivos PCI (tarjeta gráfica, red, sonido…), <span class="k">lsusb</span> los USB conectados, <span class="k">lsblk</span> los discos y particiones, <span class="k">lscpu</span> la CPU. Para tener una visión global muy bonita en una sola pantalla, instala primero <span class="k">inxi</span>.</p>
+<pre class="code"><span class="cm"># Instalar herramientas (la primera vez)</span>
 sudo apt install -y hwinfo lshw inxi
 
-inxi -F                  <span class="cm"># resumen amigable</span>
-sudo lshw -short         <span class="cm"># vista resumida</span>
+<span class="cm"># --- Visión global ---</span>
+inxi -F                  <span class="cm"># resumen muy amigable y coloreado</span>
+sudo lshw -short         <span class="cm"># vista resumida en tabla</span>
+
+<span class="cm"># --- Filtrando por tipo ---</span>
 sudo lshw -class disk    <span class="cm"># solo discos</span>
-sudo lshw -class network <span class="cm"># solo red</span>
+sudo lshw -class network <span class="cm"># solo tarjetas de red</span>
 
-<span class="cm"># PCI y USB</span>
+<span class="cm"># --- Por bus ---</span>
+<span class="cm"># grep -i sirve para buscar "vga", "network" o "audio" sin distinguir mayúsculas</span>
+<span class="cm"># El \| dentro de las comillas es un OR ("o esto, o esto")</span>
 lspci | grep -i "vga\|network\|audio"
-lsusb
-lsblk
+lsusb            <span class="cm"># dispositivos USB</span>
+lsblk            <span class="cm"># discos y particiones</span>
 
-<span class="cm"># CPU y memoria</span>
+<span class="cm"># --- CPU y memoria ---</span>
 lscpu
-free -h
-cat /proc/cpuinfo | grep "model name" | head -1
-cat /proc/meminfo | head -3
+free -h          <span class="cm"># RAM con tamaños humanos (-h)</span>
 
-<span class="cm"># Resumen DMI (placa base, BIOS)</span>
+<span class="cm"># --- DMI: información de la placa base y BIOS ---</span>
+<span class="cm"># DMI (Desktop Management Interface) es una tabla que la BIOS deja al SO</span>
+<span class="cm"># con los datos de fabricación del equipo</span>
 sudo dmidecode -t system
 sudo dmidecode -t baseboard
 sudo dmidecode -t bios</pre>

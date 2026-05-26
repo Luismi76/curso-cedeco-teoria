@@ -331,22 +331,45 @@ sudo rsync -avh --delete ~/DatosCliente/ /mnt/datos_linux/backup_diario/
 </div>
 
 <h3>Backup rotatorio diario (7 días)</h3>
+<p>Idea: cada día se hace backup en una carpeta distinta llamada <span class="k">diario_0</span>, <span class="k">diario_1</span>... <span class="k">diario_6</span>. El truco es usar <span class="k">date +%w</span> que devuelve el día de la semana (0=domingo, 6=sábado). Cada semana se sobreescribe el mismo día, así siempre tienes los últimos 7 días disponibles sin que crezca infinito.</p>
 <div class="pasos">
+<strong>Paso 1 · Crear el script</strong>
 <pre class="code">cat &lt;&lt;'EOF' &gt; ~/backup_diario.sh
 #!/bin/bash
+<span class="cm"># Carpeta a respaldar</span>
 SRC="$HOME/DatosCliente/"
-DEST="/mnt/datos_linux/diario_$(date +%w)"   # 0=domingo, 6=sábado
+
+<span class="cm"># Carpeta destino: cambia cada día (0=domingo... 6=sábado)</span>
+DEST="/mnt/datos_linux/diario_$(date +%w)"
+
+<span class="cm"># Crear la carpeta si no existe</span>
 mkdir -p "$DEST"
+
+<span class="cm"># Sincronizar (espejo) y guardar log en ~/backup.log</span>
 rsync -avh --delete "$SRC" "$DEST/" &gt;&gt; ~/backup.log 2&gt;&amp;1
 EOF
-chmod +x ~/backup_diario.sh
 
-<span class="cm"># Programar en cron, cada noche a las 02:00</span>
-(crontab -l 2&gt;/dev/null; echo "0 2 * * * /home/$USER/backup_diario.sh") | crontab -
+<span class="cm"># Darle permiso de ejecución</span>
+chmod +x ~/backup_diario.sh</pre>
 
-<span class="cm"># Probar manualmente</span>
-~/backup_diario.sh
-ls /mnt/datos_linux/</pre>
+<strong>Paso 2 · Programarlo en cron a las 02:00 cada día</strong>
+<p>Como queremos AÑADIR una línea sin perder lo que ya tengas en tu crontab, este comando combinado:</p>
+<ol>
+<li><span class="k">crontab -l</span> muestra el crontab actual (puede estar vacío; <span class="k">2&gt;/dev/null</span> oculta el aviso si lo está).</li>
+<li>Con <span class="k">;</span> añadimos un <span class="k">echo</span> con la nueva línea.</li>
+<li>Todo eso se pasa por una tubería <span class="k">|</span> a <span class="k">crontab -</span>, que lee de la entrada estándar y reemplaza el crontab.</li>
+</ol>
+<pre class="code">(crontab -l 2&gt;/dev/null; echo "0 2 * * * /home/$USER/backup_diario.sh") | crontab -
+
+<span class="cm"># Verificar que se ha añadido</span>
+crontab -l</pre>
+
+<strong>Paso 3 · Probarlo manualmente (sin esperar a las 02:00)</strong>
+<pre class="code">~/backup_diario.sh
+ls /mnt/datos_linux/
+<span class="cm"># Verás una carpeta diario_X donde X es el día de la semana actual</span>
+cat ~/backup.log
+<span class="cm"># Ver qué hizo</span></pre>
 </div>
 
 <h3>Backup por SSH (¡la magia!)</h3>

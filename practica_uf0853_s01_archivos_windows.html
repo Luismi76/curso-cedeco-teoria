@@ -497,11 +497,17 @@ attrib -H -S secreto.txt</pre>
 
 <div class="pasos">
 <strong>Paso 1 · Generar los 100 archivos con un bucle FOR en CMD</strong>
+<p>En CMD existe el comando <span class="k">for /L</span> que repite una acción dentro de un rango numérico. La sintaxis es <span class="k">for /L %i in (inicio,paso,fin) do COMANDO</span>. Aquí:</p>
+<ul>
+<li><span class="k">(1,1,100)</span> — empieza en 1, salta de 1 en 1, llega a 100.</li>
+<li><span class="k">%i</span> — la variable de cada vuelta (1, 2, 3... hasta 100). Si lo escribes en un archivo .bat tendrías que poner <span class="k">%%i</span>; en CMD directo, solo un <span class="k">%</span>.</li>
+<li><span class="k">type nul &gt; informe_%i.txt</span> — crea un archivo vacío. <span class="k">type nul</span> devuelve «nada», y <span class="k">&gt; archivo</span> redirige esa «nada» creando el archivo. Es la forma rápida en Windows de crear un fichero vacío.</li>
+</ul>
 <pre class="code">cd %USERPROFILE%\Desktop
 mkdir Reto_Acme
 cd Reto_Acme
 for /L %i in (1,1,100) do type nul &gt; informe_%i.txt</pre>
-<p>(En un .bat sería <span class="k">%%i</span>, en CMD directo es <span class="k">%i</span>.)</p>
+<p>Al terminar tendrás 100 archivos vacíos llamados <span class="k">informe_1.txt</span>, <span class="k">informe_2.txt</span>, ... <span class="k">informe_100.txt</span>. Verifícalo con <span class="k">dir</span>.</p>
 </div>
 
 <div class="pasos">
@@ -544,8 +550,10 @@ Compress-Archive -Path .\Reto_Acme\* -DestinationPath .\Reto_Acme.zip</pre>
 </div>
 
 <div class="q">
-<label>7.4 · ¿Cómo borrarías un archivo de solo lectura sin quitarle antes el atributo? (pista: una opción del propio <span class="k">del</span>)</label>
-<input type="text" data-k="q_7_4" class="inline" placeholder="el comando completo">
+<label>7.4 · Cómo borrar un archivo de solo lectura sin quitarle antes el atributo</label>
+<p>El comando <span class="k">del</span> tiene una opción <span class="k">/F</span> que significa «forzar el borrado, ignorando el atributo de solo lectura». La forma de verla es ejecutar <span class="k">del /?</span> y leer la ayuda.</p>
+<p>Construye el comando completo para borrar <span class="k">informe_10.txt</span> aunque tenga el atributo +R:</p>
+<input type="text" data-k="q_7_4" class="inline" placeholder="ej. del /F informe_10.txt">
 </div>
 </div>
 </div>

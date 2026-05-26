@@ -176,7 +176,7 @@ uname -a     <span class="cm"># kernel y arquitectura</span></pre>
 </table>
 
 <div class="shot-wrap">
-<label>📷 1.2 · Captura de la terminal con la salida de los 6 comandos anteriores <span style="color:#c53030">*</span></label>
+<label>📷 1.2 · Captura de la terminal con la salida de los 7 comandos anteriores <span style="color:#c53030">*</span></label>
 <div class="shot" data-k="s1_orient"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
 </div>
 
@@ -190,8 +190,11 @@ cd ../..            <span class="cm"># sube dos niveles</span>
 cd ~juan            <span class="cm"># va a la home de otro usuario (si existe)</span></pre>
 
 <div class="q">
-<label>1.3 · Ejecuta <span class="k">cd /etc &amp;&amp; ls | wc -l</span>. ¿Cuántos archivos/carpetas hay en /etc?</label>
-<input type="text" data-k="q_1_3" class="inline" placeholder="número">
+<label>1.3 · Cuántos archivos/carpetas hay en <span class="k">/etc</span></label>
+<p>Vas a usar dos comandos encadenados con <span class="k">&amp;&amp;</span> (significa «si el primero funciona, ejecuta el segundo»). El primero cambia de carpeta a <span class="k">/etc</span>. El segundo lista lo que hay (<span class="k">ls</span>) y pasa esa lista por una «tubería» <span class="k">|</span> al comando <span class="k">wc -l</span>, que cuenta líneas.</p>
+<pre class="code">cd /etc &amp;&amp; ls | wc -l</pre>
+<p>El número que te devuelve es la cantidad de archivos y carpetas que hay directamente dentro de <span class="k">/etc</span>. Anótalo:</p>
+<input type="text" data-k="q_1_3" class="inline" placeholder="ej. 178">
 </div>
 </div>
 </div>
@@ -211,8 +214,21 @@ ls -lhrt            <span class="cm"># más reciente al final (r reverse, t time
 ls -laR /etc/network <span class="cm"># recursivo</span></pre>
 
 <div class="q">
-<label>2.1 · En tu home (<span class="k">cd ~</span>), ¿cuántos archivos ocultos hay? (<span class="k">ls -la | wc -l</span> menos 3 — punto, doblepunto y total)</label>
-<input type="text" data-k="q_2_1" class="inline">
+<label>2.1 · Cuántos archivos ocultos hay en tu carpeta personal</label>
+<p>Tu carpeta personal es <span class="k">/home/tu_usuario</span>. Para ir ahí: <span class="k">cd ~</span> (la virgulilla es un atajo de tu home).</p>
+<p>Ahora lista todo lo que hay, <strong>incluidos los ocultos</strong> (los que empiezan por punto). Para eso usa <span class="k">ls -la</span>. Verás algo así:</p>
+<pre class="code">total 124
+drwxr-x---  18 juan juan  4096 may 26 10:00 .
+drwxr-xr-x   3 root root  4096 may 20 09:00 ..
+-rw-------   1 juan juan   220 may 20 09:00 .bash_history
+-rw-r--r--   1 juan juan  3771 may 20 09:00 .bashrc
+drwx------   3 juan juan  4096 may 21 11:00 .cache
+...</pre>
+<p>Fíjate en 3 líneas «especiales» que NO son archivos tuyos: la primera (<span class="k">total 124</span>) es solo un resumen, y las entradas <span class="k">.</span> y <span class="k">..</span> son atajos al directorio actual y al padre (no son archivos reales).</p>
+<p>Para contarlos de forma rápida:</p>
+<pre class="code">ls -la ~ | wc -l</pre>
+<p><span class="k">wc -l</span> cuenta cuántas líneas tiene la salida. <strong>Réstale 3</strong> (las 3 líneas especiales de arriba) y tendrás cuántos archivos/carpetas ocultos tienes realmente.</p>
+<input type="text" data-k="q_2_1" class="inline" placeholder="ej. 21">
 </div>
 
 <h3>Reto de creación</h3>
@@ -383,7 +399,15 @@ find / -name "*.conf" 2&gt; /dev/null | head</pre>
 </div>
 
 <div class="q">
-<label>4.2 · Compón un pipeline que muestre las 10 carpetas más grandes en tu home. (Pista: <span class="k">du -sh ~/*/ | sort -hr | head</span>)</label>
+<label>4.2 · Las 10 carpetas más grandes de tu home</label>
+<p>Vas a encadenar 3 comandos con tuberías:</p>
+<ul>
+<li><span class="k">du -sh ~/*/</span> mide el tamaño de cada carpeta de tu home (la <span class="k">s</span> es «summary» y la <span class="k">h</span> es «human» — tamaños en K/M/G).</li>
+<li><span class="k">sort -hr</span> ordena por tamaño humano (<span class="k">h</span>), de mayor a menor (<span class="k">r</span>=reverse).</li>
+<li><span class="k">head</span> se queda con las 10 primeras líneas.</li>
+</ul>
+<pre class="code">du -sh ~/*/ | sort -hr | head</pre>
+<p>Ejecútalo y pega la salida (o anota las 3 más grandes):</p>
 <textarea data-k="q_4_2"></textarea>
 </div>
 
@@ -418,13 +442,19 @@ find /tmp -name "*.tmp" -delete
 find ~/Reto_Linux/logs -name "*.log" -exec wc -l {} \;</pre>
 
 <div class="q">
-<label>5.1 · ¿Cuántos archivos <span class="k">.conf</span> hay en todo <span class="k">/etc</span> (recursivo)?</label>
-<input type="text" data-k="q_5_1" class="inline" placeholder="find /etc -name '*.conf' | wc -l">
+<label>5.1 · Cuántos archivos <span class="k">.conf</span> hay en todo <span class="k">/etc</span> (contando subcarpetas)</label>
+<p>Combina <span class="k">find</span> (busca por nombre en todas las subcarpetas) con <span class="k">wc -l</span> (cuenta líneas):</p>
+<pre class="code">find /etc -name "*.conf" | wc -l</pre>
+<p>Anota el número:</p>
+<input type="text" data-k="q_5_1" class="inline" placeholder="ej. 240">
 </div>
 
 <div class="q">
-<label>5.2 · Encuentra todos los archivos de tu home modificados en las últimas 24 horas. Comando exacto y número de resultados.</label>
-<input type="text" data-k="q_5_2" placeholder="el comando">
+<label>5.2 · Encuentra los archivos de tu home modificados en las últimas 24 horas</label>
+<p>La opción <span class="k">-mtime -1</span> de <span class="k">find</span> significa «modificado hace MENOS de 1 día». El signo menos es importante (sin él busca exactamente hace 1 día).</p>
+<pre class="code">find ~ -mtime -1 -type f</pre>
+<p>Para contar cuántos son, añade <span class="k">| wc -l</span> al final. Anota el comando exacto que usaste y el número:</p>
+<input type="text" data-k="q_5_2" placeholder="comando + número de resultados">
 </div>
 
 <h3>grep: buscar dentro de archivos</h3>
@@ -437,13 +467,20 @@ grep -r "ubuntu" /etc 2&gt;/dev/null         <span class="cm"># recursivo</span>
 grep -E "^(root|nobody):" /etc/passwd     <span class="cm"># regex extendida</span></pre>
 
 <div class="q">
-<label>5.3 · ¿Cuántos usuarios tienen <span class="k">/bin/bash</span> como shell por defecto en tu sistema? (<span class="k">grep -c bash /etc/passwd</span>)</label>
-<input type="text" data-k="q_5_3" class="inline">
+<label>5.3 · Cuántos usuarios tienen <span class="k">/bin/bash</span> como shell por defecto</label>
+<p>El archivo <span class="k">/etc/passwd</span> tiene una línea por cada usuario del sistema. La última columna (separada por <span class="k">:</span>) es el shell que se abre al iniciar sesión. Si pone <span class="k">/bin/bash</span>, es un usuario «normal» que puede usar la terminal. Si pone <span class="k">/usr/sbin/nologin</span> o <span class="k">/bin/false</span>, es una cuenta de sistema que no se usa para login.</p>
+<p>Cuenta las líneas que contienen «bash»:</p>
+<pre class="code">grep -c bash /etc/passwd</pre>
+<p>(La <span class="k">-c</span> es «count», cuenta coincidencias.) Anota el número:</p>
+<input type="text" data-k="q_5_3" class="inline" placeholder="ej. 2">
 </div>
 
 <div class="q">
-<label>5.4 · Lista los usuarios que NO tienen shell de login (busca <span class="k">nologin</span> o <span class="k">false</span>)</label>
-<input type="text" data-k="q_5_4" placeholder="grep -E ...">
+<label>5.4 · Usuarios que NO pueden iniciar sesión (cuentas de sistema)</label>
+<p>Son los que tienen <span class="k">/usr/sbin/nologin</span> o <span class="k">/bin/false</span> como shell. Para listarlos puedes usar <span class="k">grep</span> con la opción <span class="k">-E</span> (regex extendida) y el operador <span class="k">|</span> dentro de las comillas (que aquí significa «o»):</p>
+<pre class="code">grep -E "nologin|false" /etc/passwd</pre>
+<p>Pega aquí 3 ejemplos de cuentas de sistema que veas (la primera columna es el nombre):</p>
+<input type="text" data-k="q_5_4" placeholder="ej. www-data, sshd, nobody...">
 </div>
 
 <div class="shot-wrap">

@@ -306,20 +306,27 @@ sudo chown -R $USER:$USER ~/Equipo</pre>
 
 <div class="pasos">
 <strong>Probar como alumno2</strong>
-<pre class="code">su alumno2
-<span class="cm"># Te pide contraseña: alumno2.</span>
+<p>Vamos a cambiarnos a alumno2 y comprobar qué puede y qué no. <strong>Ojo</strong>: por defecto Ubuntu crea las carpetas personales con permisos <span class="k">750</span>, lo que significa que <em>otros usuarios no pueden entrar</em>. Antes de la prueba abrimos el «paso» a tu home (solo el bit <span class="k">x</span> = poder atravesar la carpeta, sin permitir leer su listado).</p>
+<pre class="code"><span class="cm"># 1) Sustituye TU_USUARIO por tu nombre de usuario real en los comandos</span>
+<span class="cm">#    (averígualo con: whoami)</span>
 
-cd /home/&lt;TU_USUARIO&gt;/Equipo 2&gt;/dev/null
-<span class="cm"># Probablemente no entres porque /home/&lt;tu&gt; tiene 750 o 700</span>
-
-<span class="cm"># Para que pueda probar, vamos a abrir tu home con +x para otros</span>
-exit
+<span class="cm"># 2) Abre el bit x en tu home para que alumno2 pueda atravesarla</span>
 chmod o+x ~
 
+<span class="cm"># 3) Cámbiate a alumno2 (te pide su contraseña: alumno2.)</span>
 su alumno2
-ls ~/../&lt;tu_usuario&gt;/Equipo/publico/ 2&gt;&amp;1
-cat ~/../&lt;tu_usuario&gt;/Equipo/privado/secreto.txt 2&gt;&amp;1
+
+<span class="cm"># 4) Ya eres alumno2. Comprueba con:</span>
+whoami
+
+<span class="cm"># 5) Intenta leer los archivos de TU_USUARIO</span>
+<span class="cm">#    Sustituye TU_USUARIO por el tuyo real:</span>
+ls /home/TU_USUARIO/Equipo/publico/
+cat /home/TU_USUARIO/Equipo/privado/secreto.txt
+
+<span class="cm"># 6) Sal de la sesión de alumno2 y vuelve a la tuya</span>
 exit</pre>
+<p>Si <span class="k">secreto.txt</span> tiene permisos <span class="k">600</span> (solo dueño), el <span class="k">cat</span> del paso 5 debe FALLAR con un mensaje del tipo «Permission denied».</p>
 </div>
 
 <div class="q">
@@ -357,17 +364,24 @@ mount | grep acl   <span class="cm"># verifica que el FS soporta ACL (ext4 sí p
 </div>
 
 <div class="pasos">
-<strong>Escenario:</strong> quiero que <span class="k">secreto.txt</span> lo lea solo alumno2, además del dueño.
+<strong>Escenario:</strong> quiero que <span class="k">secreto.txt</span> lo pueda leer solo alumno2, además del dueño.
+<p>Sintaxis de <span class="k">setfacl</span>:</p>
+<ul>
+<li><span class="k">-m</span> = «modificar» (añadir o cambiar).</li>
+<li><span class="k">u:alumno2:r</span> = al USUARIO «alumno2», dale permiso «r» (lectura).</li>
+<li>(También existe <span class="k">g:grupo:rw</span> para grupos.)</li>
+</ul>
 <pre class="code">cd ~/Equipo/privado
 
-<span class="cm"># Sin ACL: para dar lectura a otro usuario tendrías que ampliar a "otros"</span>
-ls -la secreto.txt
-
-<span class="cm"># Con ACL: doy lectura solo a alumno2</span>
+<span class="cm"># Sin ACL no podrías dar lectura solo a un usuario extra</span>
+<span class="cm"># sin tener que abrirla a "otros". Con ACL sí:</span>
 sudo setfacl -m u:alumno2:r secreto.txt
 
-<span class="cm"># Verifica</span>
-ls -la secreto.txt    <span class="cm"># aparece un + al final de los permisos</span>
+<span class="cm"># Comprueba: ls -la te muestra un + al final de los permisos</span>
+<span class="cm"># indicando que ese archivo tiene ACL extendidas</span>
+ls -la secreto.txt
+
+<span class="cm"># Para ver la ACL completa:</span>
 getfacl secreto.txt</pre>
 </div>
 

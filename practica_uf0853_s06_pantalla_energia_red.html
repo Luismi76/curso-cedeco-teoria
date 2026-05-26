@@ -286,15 +286,22 @@ systemctl hibernate</pre>
 </div>
 
 <h3>VM Ubuntu · IP estática (con nmcli)</h3>
-<pre class="code"><span class="cm"># Identifica el nombre de la interfaz</span>
-ip -br a
-
-<span class="cm"># Crea una conexión estática (sustituye enp0s8 por el nombre real)</span>
+<p><span class="k">nmcli</span> es el cliente de línea de comandos de <strong>NetworkManager</strong>, el servicio que gestiona la red en Ubuntu (lo mismo que hace el icono de la barra superior, pero por consola).</p>
+<p>Primero identifica el nombre que Linux le ha dado a la nueva tarjeta (en VirtualBox suele ser <span class="k">enp0s8</span>, pero puede variar):</p>
+<pre class="code">ip -br a</pre>
+<p>La salida tiene 3 columnas: nombre de interfaz, estado (UP/DOWN) e IPs. Busca la que NO tiene IP todavía (la del adaptador 2). Si se llama distinto a <span class="k">enp0s8</span>, sustitúyelo en el siguiente comando.</p>
+<pre class="code"><span class="cm"># Crear una conexión nueva con IP estática.</span>
+<span class="cm"># La barra invertida \ al final solo sirve para partir el comando en varias líneas;</span>
+<span class="cm"># si lo escribes todo en una, no hace falta.</span>
 sudo nmcli con add type ethernet ifname enp0s8 con-name redaula \
   ipv4.method manual ipv4.addresses 10.10.10.20/24
 
+<span class="cm"># El /24 al final de la IP es la notación CIDR para la máscara 255.255.255.0</span>
+
+<span class="cm"># Activar la conexión</span>
 sudo nmcli con up redaula
 
+<span class="cm"># Comprobar que ya tiene IP</span>
 ip -br a</pre>
 
 <div class="q">
@@ -416,20 +423,28 @@ netstat -ano | findstr LISTENING   <span class="cm"># Windows</span></pre>
 <p>Bonus para futuros administradores de red. Vas a ver el tráfico real entre tus dos VMs.</p>
 
 <div class="pasos">
-<pre class="code">sudo apt install -y tcpdump
+<p><span class="k">tcpdump</span> es el «sniffer» de la línea de comandos: captura paquetes de red que pasan por una interfaz y los muestra al instante.</p>
+<pre class="code"><span class="cm"># Instalación</span>
+sudo apt install -y tcpdump
 
-<span class="cm"># Ver interfaces disponibles</span>
+<span class="cm"># 1) Listar las interfaces que puede capturar</span>
 sudo tcpdump -D
 
-<span class="cm"># Capturar ICMP (ping) en la interfaz de la red interna</span>
+<span class="cm"># 2) Capturar solo ping (paquetes ICMP) en la red interna,</span>
+<span class="cm">#    -i enp0s8 = en la interfaz enp0s8 (cambia si la tuya se llama distinto)</span>
+<span class="cm">#    icmp     = filtro: solo paquetes de tipo ICMP</span>
+<span class="cm">#    -c 10    = parar tras 10 paquetes</span>
 sudo tcpdump -i enp0s8 icmp -c 10
 
-<span class="cm"># Mientras tcpdump está esperando, lanza un ping desde la VM Windows hacia esta Ubuntu:</span>
-<span class="cm">#   (en CMD Windows)   ping 10.10.10.20 -n 5</span>
+<span class="cm"># Mientras tcpdump está esperando paquetes, abre CMD en la VM Windows</span>
+<span class="cm"># y lanza 5 pings hacia esta Ubuntu:</span>
+<span class="cm">#     ping 10.10.10.20 -n 5</span>
 
-<span class="cm"># Verás cada paquete ICMP echo request y reply</span>
+<span class="cm"># Verás cómo aparecen las líneas en tcpdump: cada ping son 2 paquetes,</span>
+<span class="cm"># "echo request" (la ida) y "echo reply" (la vuelta).</span>
 
-<span class="cm"># Guardar a un .pcap (se abre con Wireshark luego)</span>
+<span class="cm"># 3) Guardar la captura a un archivo .pcap para abrirlo después con</span>
+<span class="cm">#    Wireshark (la versión gráfica). -w = write to file.</span>
 sudo tcpdump -i enp0s8 -w /tmp/ping_capture.pcap icmp -c 20</pre>
 </div>
 

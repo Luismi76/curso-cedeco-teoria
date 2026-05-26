@@ -513,9 +513,17 @@ cat /lib/systemd/system/fstrim.timer</pre>
 </div>
 
 <div class="pasos">
+<strong>Paso 1 · Crear el script</strong>
+<p>Vamos a escribir el script en <span class="k">/usr/local/bin/mantenimiento.sh</span> (la carpeta estándar para scripts propios del administrador). Usaremos un truco llamado <strong>here-document</strong>: el bloque <span class="k">cat &lt;&lt;'EOF' ... EOF</span> envía todo el texto entre las dos «EOF» como entrada a <span class="k">tee</span>, que lo guarda en el archivo destino. Las comillas en <span class="k">'EOF'</span> hacen que las variables como <span class="k">$(date)</span> NO se expandan ahora, sino cuando se ejecute el script.</p>
 <pre class="code">cat &lt;&lt;'EOF' | sudo tee /usr/local/bin/mantenimiento.sh
 #!/bin/bash
+<span class="cm"># La línea anterior se llama "shebang" y le dice al SO que use bash</span>
+
+<span class="cm"># Construimos el nombre del archivo de log con la fecha actual</span>
 LOG="/var/log/mantenimiento_$(date +%Y%m%d).log"
+
+<span class="cm"># Las llaves { ... } agrupan varios comandos; al final, > LOG 2>&1</span>
+<span class="cm"># redirige TODA la salida (stdout y errores 2>) al archivo de log</span>
 {
   echo "=== MANTENIMIENTO $(date) ==="
   echo "--- apt update ---"
@@ -534,16 +542,21 @@ LOG="/var/log/mantenimiento_$(date +%Y%m%d).log"
 } &gt;&gt; "$LOG" 2&gt;&amp;1
 EOF
 
-sudo chmod +x /usr/local/bin/mantenimiento.sh
+<span class="cm"># Dar permiso de ejecución al script (sin esto no se puede ejecutar)</span>
+sudo chmod +x /usr/local/bin/mantenimiento.sh</pre>
 
-<span class="cm"># Probar ejecutándolo manualmente</span>
-sudo /usr/local/bin/mantenimiento.sh
-cat /var/log/mantenimiento_*.log
+<strong>Paso 2 · Probarlo manualmente</strong>
+<pre class="code">sudo /usr/local/bin/mantenimiento.sh
+<span class="cm"># Tarda unos minutos. No muestra nada por pantalla porque</span>
+<span class="cm"># lo está escribiendo todo en el log. Cuando termine:</span>
+cat /var/log/mantenimiento_*.log</pre>
 
-<span class="cm"># Programarlo en cron de root: todos los domingos 23:00</span>
-sudo crontab -e
-<span class="cm"># Añade:</span>
-0 23 * * 0 /usr/local/bin/mantenimiento.sh</pre>
+<strong>Paso 3 · Programarlo con cron</strong>
+<p>Lo añadimos al cron del usuario root (no a tu cron personal, porque el script necesita privilegios):</p>
+<pre class="code">sudo crontab -e</pre>
+<p>Te abre el editor. Añade esta línea al final y guarda:</p>
+<pre class="code">0 23 * * 0 /usr/local/bin/mantenimiento.sh</pre>
+<p>Recordatorio de la sintaxis cron: minuto, hora, día-del-mes, mes, día-de-la-semana. <span class="k">0 23 * * 0</span> = a las 23:00 (minuto 0, hora 23) cualquier día del mes, cualquier mes, día de la semana 0 (= domingo).</p>
 </div>
 
 <div class="shot-wrap">

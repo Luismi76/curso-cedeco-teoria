@@ -273,18 +273,21 @@ sudo fdisk -l 2&gt;/dev/null | grep -E "Disk /dev/sd|Disk model"</pre>
 
 <div class="pasos">
 <strong>Crear 3 particiones con cfdisk (interfaz visual de consola)</strong>
+<p><span class="k">cfdisk</span> es una herramienta de particionado con menús que se manejan por teclado: <strong>flechas izq/dcha</strong> para elegir acción (New, Delete, Write, Quit…), <strong>flechas arr/abj</strong> para elegir partición, <strong>Enter</strong> para confirmar.</p>
 <pre class="code">sudo cfdisk /dev/sdb</pre>
 <ol>
-<li>Selecciona <strong>gpt</strong> como tipo de tabla.</li>
-<li><strong>New</strong> → 700M → primary → Type Linux filesystem.</li>
-<li>Otra <strong>New</strong> → 700M → primary → Type Microsoft basic data.</li>
-<li>Otra <strong>New</strong> → resto → primary → Type Microsoft basic data.</li>
-<li><strong>Write</strong> → escribe «yes».</li>
-<li><strong>Quit</strong>.</li>
+<li>La primera vez que abres un disco vacío te pregunta el tipo de tabla. Selecciona <strong>gpt</strong> (es el moderno; MBR es el antiguo). Enter.</li>
+<li>Verás «Free space». Con flechas izq/dcha elige <strong>New</strong> → Enter. Tamaño: escribe <span class="k">700M</span> → Enter.</li>
+<li>Te ofrece tipo: elige <strong>primary</strong> → Enter. Por defecto el tipo de partición ya es «Linux filesystem», que es lo que queremos para la primera.</li>
+<li>Mueve la selección al «Free space» que ha quedado. Repite <strong>New</strong> → <span class="k">700M</span> → primary. Esta vez, en el menú elige <strong>Type</strong> y selecciona <strong>Microsoft basic data</strong> (para exFAT).</li>
+<li>Repite con el resto del espacio libre: <strong>New</strong> → acepta el tamaño que queda → primary → <strong>Type</strong> → <strong>Microsoft basic data</strong>.</li>
+<li>Ya tienes las 3 particiones. Elige <strong>Write</strong> y cuando te pida confirmación escribe <strong>yes</strong> (literalmente, con todas las letras).</li>
+<li>Elige <strong>Quit</strong> para salir.</li>
 </ol>
-<p>Verifica:</p>
+<p>Comprueba que se han creado:</p>
 <pre class="code">lsblk /dev/sdb
 sudo fdisk -l /dev/sdb 2&gt;/dev/null</pre>
+<p>Debes ver <span class="k">sdb1</span>, <span class="k">sdb2</span> y <span class="k">sdb3</span> con sus tamaños. (El <span class="k">2&gt;/dev/null</span> es para ocultar avisos de error irrelevantes.)</p>
 </div>
 
 <div class="shot-wrap">
@@ -320,22 +323,26 @@ df -h | grep sdb</pre>
 
 <div class="pasos">
 <strong>Escribir archivos en cada una</strong>
+<p>Las particiones están montadas dentro de <span class="k">/mnt</span>, que pertenece a root. Para escribir ahí necesitas privilegios. El truco habitual es <span class="k">echo "texto" | sudo tee archivo</span>: <span class="k">tee</span> lee de la tubería y guarda en el archivo con permisos de root (a diferencia de <span class="k">sudo echo &gt; archivo</span>, que no funciona porque la redirección <span class="k">&gt;</span> la hace tu shell, no sudo).</p>
 <pre class="code">echo "Soy una partición ext4 de Linux" | sudo tee /mnt/datos_linux/hola.txt
 echo "Soy exFAT, compatible Win/Mac" | sudo tee /mnt/usb_grande/hola.txt
 echo "Soy FAT32, compatible con todo (4 GB max)" | sudo tee /mnt/fat32_compat/hola.txt
 
 ls -la /mnt/datos_linux /mnt/usb_grande /mnt/fat32_compat</pre>
+<p>Cada <span class="k">tee</span> imprime también por pantalla lo que ha escrito, así que verás el texto repetido. Es normal.</p>
 </div>
 
 <div class="pasos">
 <strong>Probar el límite de 4 GB de FAT32</strong>
-<pre class="code"><span class="cm"># Intenta crear un archivo de 5 GB en FAT32</span>
+<p>El comando <span class="k">fallocate -l TAMAÑO archivo</span> crea un archivo de ese tamaño sin escribirlo realmente (reserva el espacio en disco al instante, no tarda nada). Lo usamos para hacer la prueba sin esperar.</p>
+<pre class="code"><span class="cm"># 1) Intentar crear un archivo de 5 GB en FAT32 → debe FALLAR</span>
 sudo fallocate -l 5G /mnt/fat32_compat/grande.bin
-<span class="cm"># Falla — máximo 4 GB</span>
+<span class="cm">#    Saldrá un error parecido a "File too large"</span>
 
-<span class="cm"># El mismo intento en exFAT funciona</span>
+<span class="cm"># 2) Mismo intento en exFAT → DEBE FUNCIONAR</span>
 sudo fallocate -l 5G /mnt/usb_grande/grande.bin
 ls -lh /mnt/usb_grande/grande.bin</pre>
+<p>Esto demuestra de forma muy gráfica el famoso límite de 4 GB por archivo de FAT32: por eso para USB modernos se usa exFAT.</p>
 </div>
 
 <div class="q">
@@ -369,8 +376,9 @@ ls -lh /mnt/usb_grande/grande.bin</pre>
 
 <div class="pasos">
 <strong>Paso 1 · Conseguir los UUID</strong>
+<p>Cada partición formateada tiene un <strong>UUID</strong> (identificador único universal), una cadena hexadecimal que no cambia aunque cambies el orden de los discos. Por eso en <span class="k">/etc/fstab</span> es preferible usar UUID en vez de <span class="k">/dev/sdb1</span>: si mañana enchufas otro disco, sdb1 podría pasar a llamarse sdc1 y el sistema se rompería; el UUID no cambia nunca.</p>
 <pre class="code">sudo blkid /dev/sdb1 /dev/sdb2 /dev/sdb3</pre>
-<p>Anota los UUID en la tabla:</p>
+<p>Cada línea de la salida tiene el formato <span class="k">/dev/sdb1: UUID="xxxx-yyyy" TYPE="ext4" ...</span>. Anota los 3 UUID en la tabla:</p>
 </div>
 
 <table>

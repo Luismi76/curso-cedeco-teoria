@@ -399,17 +399,32 @@ getent group soporte</pre>
 </div>
 
 <h3>Carpeta compartida con SGID</h3>
-<p>El bit <strong>SGID</strong> en una carpeta hace que los archivos nuevos hereden el grupo de la carpeta (no del usuario que crea). Útil para colaboración.</p>
+<p>Aquí viene un detalle importante de Linux: <strong>cuando un usuario crea un archivo, el grupo del archivo es el grupo principal del usuario</strong>. Por ejemplo, si tecnico1 crea un archivo, el grupo será «tecnico1» (no «soporte»). Eso rompe la colaboración: aunque todos los técnicos estén en el grupo «soporte», cada archivo nuevo pertenece a un grupo personal distinto y los demás no pueden modificarlo.</p>
+<p>La solución es el bit <strong>SGID</strong> (Set Group ID) en la carpeta: cuando una carpeta tiene SGID, los archivos que se creen dentro <strong>heredan el grupo de la carpeta</strong> en lugar del usuario que los crea. Así todos los archivos de la carpeta «soporte» pertenecen al grupo «soporte», independientemente de quién los cree.</p>
 
-<pre class="code">sudo mkdir -p /srv/departamentos/soporte
+<pre class="code"><span class="cm"># 1) Crear la carpeta compartida</span>
+sudo mkdir -p /srv/departamentos/soporte
+
+<span class="cm"># 2) Asignar el grupo "soporte" a la carpeta</span>
+<span class="cm">#    chown :GRUPO ruta = cambiar solo el grupo (el "user:" se omite)</span>
 sudo chown :soporte /srv/departamentos/soporte
-sudo chmod 2770 /srv/departamentos/soporte   <span class="cm"># 2 = SGID</span>
 
-ls -ld /srv/departamentos/soporte           <span class="cm"># verás drwxrws---</span>
+<span class="cm"># 3) Permisos: 2770</span>
+<span class="cm">#    El 2 inicial es el bit SGID.</span>
+<span class="cm">#    7 (dueño)=rwx, 7 (grupo)=rwx, 0 (otros)=nada</span>
+sudo chmod 2770 /srv/departamentos/soporte
 
-<span class="cm"># Prueba</span>
+<span class="cm"># Comprobar: en ls -ld debe aparecer "drwxrws---"</span>
+<span class="cm"># La "s" minúscula en lugar de la "x" del grupo = SGID activo</span>
+ls -ld /srv/departamentos/soporte
+
+<span class="cm"># 4) Probar: que cada técnico cree un archivo</span>
+<span class="cm">#    sudo -u USUARIO COMANDO ejecuta COMANDO como ese USUARIO</span>
 sudo -u tecnico1 touch /srv/departamentos/soporte/notas_t1.txt
 sudo -u tecnico2 touch /srv/departamentos/soporte/notas_t2.txt
+
+<span class="cm"># Mira los archivos: el grupo debería ser "soporte" para los dos,</span>
+<span class="cm"># NO "tecnico1" ni "tecnico2"</span>
 ls -la /srv/departamentos/soporte/</pre>
 
 <div class="q">
@@ -436,18 +451,17 @@ ls -la /srv/departamentos/soporte/</pre>
 </div>
 
 <div class="pasos">
-<strong>Dar sudo a tecnico1 de forma limpia</strong>
-<pre class="code"><span class="cm"># Forma 1: añadirlo al grupo sudo (la limpia)</span>
-sudo usermod -aG sudo tecnico1
-
-<span class="cm"># Forma 2: regla individual (más quirúrgica)</span>
-sudo visudo
-<span class="cm"># Añade al final:</span>
-<span class="cm"># tecnico1 ALL=(ALL:ALL) ALL</span>
-
-<span class="cm"># Forma 3: regla limitada (mejor)</span>
-<span class="cm"># tecnico2 ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade</span>
-<span class="cm"># tecnico2 puede actualizar paquetes sin contraseña, nada más</span></pre>
+<strong>Tres formas de dar sudo, de la más cómoda a la más restrictiva</strong>
+<p><strong>Forma 1 · Añadir al grupo sudo.</strong> Es la habitual. Cualquiera de ese grupo puede ejecutar cualquier comando como root con su propia contraseña.</p>
+<pre class="code">sudo usermod -aG sudo tecnico1</pre>
+<p><strong>Forma 2 · Una regla individual en sudoers.</strong> Editas el archivo y añades una línea solo para ese usuario.</p>
+<pre class="code">sudo visudo</pre>
+<p>Te abre <span class="k">/etc/sudoers</span> en el editor por defecto (nano). Baja al final del archivo y añade <strong>exactamente</strong> esta línea:</p>
+<pre class="code">tecnico1 ALL=(ALL:ALL) ALL</pre>
+<p>Significado: el usuario tecnico1 puede ejecutar todos los comandos (último ALL) como cualquier usuario (ALL:ALL) desde cualquier máquina (primer ALL). Guarda con Ctrl+O, Enter, Ctrl+X. <span class="k">visudo</span> valida la sintaxis antes de guardar; si te equivocas, te avisa y te deja corregir.</p>
+<p><strong>Forma 3 · Regla limitada (lo más seguro).</strong> En lugar de dar sudo total, solo permitir comandos concretos. Misma técnica con <span class="k">visudo</span>, pero añade una línea como esta:</p>
+<pre class="code">tecnico2 ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade</pre>
+<p>Significado: tecnico2 puede ejecutar SOLO «apt update» y «apt upgrade» como root, y además sin contraseña (NOPASSWD). Para cualquier otra cosa, sudo le dirá que no. Es el principio de mínimo privilegio.</p>
 </div>
 
 <div class="pasos">
