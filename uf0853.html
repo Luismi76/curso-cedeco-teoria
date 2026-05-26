@@ -409,8 +409,8 @@
 
                     <h3>Editores de texto en consola</h3>
                     <ul>
-                        <li><strong>nano</strong> — fácil. <code>nano archivo.txt</code>. <strong>Ctrl+O</strong> guarda, <strong>Ctrl+X</strong> sale.</li>
-                        <li><strong>vim</strong> — potente pero curva de aprendizaje. Modos «normal» e «insertar».</li>
+                        <li><strong>nano</strong> — el editor fácil. Lo abres con <code>nano archivo.txt</code>, escribes con el teclado como en cualquier editor. <strong>Ctrl+O</strong> guarda (writeOut), <strong>Ctrl+X</strong> sale.</li>
+                        <li><strong>vim</strong> — el editor de los expertos. Lo desconcertante es que tiene <strong>dos modos</strong>: al entrar estás en <em>modo normal</em> (las teclas son comandos, no escribes texto); pulsando <strong>i</strong> pasas a <em>modo insertar</em> (ya escribes); con <strong>Esc</strong> vuelves al normal; <strong>:wq</strong> guarda y sale; <strong>:q!</strong> sale sin guardar. Aprende al menos esto: en muchos servidores remotos solo tendrás vim.</li>
                     </ul>
 
                     <div class="info info-blue">
@@ -439,7 +439,7 @@
                     <table>
                         <tr><th>Carpeta</th><th>Para qué</th></tr>
                         <tr><td><code>C:\Windows</code></td><td>Archivos del sistema operativo. <strong>No tocar</strong>.</td></tr>
-                        <tr><td><code>C:\Windows\System32</code></td><td>DLLs y ejecutables core del SO.</td></tr>
+                        <tr><td><code>C:\Windows\System32</code></td><td>Las piezas internas de Windows: DLLs (librerías compartidas que usan los programas) y ejecutables clave del sistema.</td></tr>
                         <tr><td><code>C:\Program Files</code></td><td>Programas de 64 bits.</td></tr>
                         <tr><td><code>C:\Program Files (x86)</code></td><td>Programas de 32 bits.</td></tr>
                         <tr><td><code>C:\Users\&lt;tú&gt;</code></td><td>Tu carpeta personal: Documentos, Escritorio, Descargas...</td></tr>
@@ -464,7 +464,7 @@
                         <tr><td><code>/var</code></td><td>Datos variables: logs (<code>/var/log</code>), colas de impresión, BBDD...</td></tr>
                         <tr><td><code>/tmp</code></td><td>Temporales (se borran al reiniciar).</td></tr>
                         <tr><td><code>/dev</code></td><td>Dispositivos: cada hardware se ve como un archivo (<code>/dev/sda</code>).</td></tr>
-                        <tr><td><code>/proc</code>, <code>/sys</code></td><td>Sistemas de archivos virtuales: kernel y procesos en vivo.</td></tr>
+                        <tr><td><code>/proc</code>, <code>/sys</code></td><td>Carpetas «mágicas» que no están en disco: el kernel (el núcleo del SO) las rellena al vuelo con información sobre procesos en marcha y hardware.</td></tr>
                         <tr><td><code>/mnt</code>, <code>/media</code></td><td>Puntos de montaje (USB, particiones extra...).</td></tr>
                         <tr><td><code>/opt</code></td><td>Software opcional o de terceros (instalado al margen del gestor de paquetes).</td></tr>
                         <tr><td><code>/boot</code></td><td>Kernel y cargador de arranque (GRUB).</td></tr>
@@ -481,13 +481,13 @@
                     <div class="table-wrap">
                     <table>
                         <tr><th>SF</th><th>SO</th><th>Tamaño máx. archivo</th><th>Uso típico</th></tr>
-                        <tr><td><strong>NTFS</strong></td><td>Windows</td><td>16 TB</td><td>Disco principal de Windows. Permisos, journaling, cifrado EFS.</td></tr>
-                        <tr><td><strong>FAT32</strong></td><td>Todos</td><td><strong>4 GB</strong></td><td>USB pequeños, SD, ESP. Compatible universal.</td></tr>
-                        <tr><td><strong>exFAT</strong></td><td>Todos</td><td>16 EB</td><td>USB grandes y discos externos. Sin límite de 4 GB.</td></tr>
-                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>16 TB</td><td>Disco principal de Ubuntu / Debian. Journaling.</td></tr>
-                        <tr><td><strong>Btrfs / ZFS</strong></td><td>Linux / BSD</td><td>16 EB</td><td>Snapshots, compresión y RAID nativo.</td></tr>
-                        <tr><td><strong>swap</strong></td><td>Linux</td><td>—</td><td>Memoria virtual. Equivalente al pagefile de Windows.</td></tr>
-                        <tr><td>APFS</td><td>macOS</td><td>—</td><td>Nativo de Mac.</td></tr>
+                        <tr><td><strong>NTFS</strong></td><td>Windows</td><td>16 TB</td><td>Disco principal de Windows. Soporta permisos, journaling y cifrado EFS.</td></tr>
+                        <tr><td><strong>FAT32</strong></td><td>Todos</td><td><strong>4 GB</strong></td><td>USB pequeños, tarjetas SD y la partición ESP de arranque UEFI. Lo lee cualquier sistema.</td></tr>
+                        <tr><td><strong>exFAT</strong></td><td>Todos</td><td>16 EB</td><td>USB grandes y discos externos. Como FAT32 pero sin el límite de 4 GB.</td></tr>
+                        <tr><td><strong>ext4</strong></td><td>Linux</td><td>16 TB</td><td>Disco principal de Ubuntu / Debian. Con journaling.</td></tr>
+                        <tr><td><strong>Btrfs / ZFS</strong></td><td>Linux / BSD</td><td>16 EB</td><td>Modernos. Hacen snapshots (fotos instantáneas del disco), compresión transparente y RAID (combinar varios discos) sin software extra.</td></tr>
+                        <tr><td><strong>swap</strong></td><td>Linux</td><td>—</td><td>Espacio en disco que Linux usa cuando se queda sin RAM. Equivalente al «archivo de paginación» (pagefile.sys) de Windows.</td></tr>
+                        <tr><td>APFS</td><td>macOS</td><td>—</td><td>El sistema de archivos nativo de Mac.</td></tr>
                     </table>
                     </div>
 
@@ -520,7 +520,15 @@ sudo umount /media/pendrive</pre>
                     <p>Ubuntu monta automáticamente los USB al insertarlos en <code>/media/&lt;usuario&gt;/&lt;etiqueta&gt;</code>. Para automontar al arranque se usa el archivo <code>/etc/fstab</code>.</p>
 
                     <h4>El archivo /etc/fstab</h4>
-                    <p>Cada línea define una partición a montar: dispositivo, punto de montaje, sistema de archivos, opciones, dump y orden de <code>fsck</code>. Ejemplo:</p>
+                    <p>Es la «lista de la compra» de discos a montar al arrancar. Cada línea tiene 6 campos separados por espacios:</p>
+                    <ol>
+                        <li><strong>Dispositivo</strong>: la partición a montar. Mejor usar <code>UUID=...</code> (identificador único de la partición, que no cambia aunque la enchufes a otro puerto) que <code>/dev/sda1</code>.</li>
+                        <li><strong>Punto de montaje</strong>: en qué carpeta aparecerá su contenido (<code>/</code>, <code>/home</code>...).</li>
+                        <li><strong>Tipo</strong>: el sistema de archivos (<code>ext4</code>, <code>vfat</code>, <code>swap</code>...).</li>
+                        <li><strong>Opciones</strong>: lo más habitual es <code>defaults</code>.</li>
+                        <li><strong>Dump</strong>: si la utilidad antigua <code>dump</code> debe hacer copia de esta partición. Hoy en día se pone <code>0</code> casi siempre.</li>
+                        <li><strong>Orden de <code>fsck</code></strong>: en qué orden se comprueban las particiones al arrancar. <code>1</code> para la raíz, <code>2</code> para las demás, <code>0</code> = no comprobar.</li>
+                    </ol>
                     <pre class="cmd-block">UUID=abc-123  /         ext4    defaults  0 1
 UUID=def-456  /home     ext4    defaults  0 2
 UUID=xyz-789  none      swap    sw        0 0</pre>
@@ -627,7 +635,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                     <div class="table-wrap">
                     <table>
                         <tr><th>Herramienta</th><th>Plataforma</th><th>Qué cifra</th><th>Nota</th></tr>
-                        <tr><td><strong>BitLocker</strong></td><td>Windows Pro/Enterprise</td><td>Unidades completas (C:, pendrive...)</td><td>Necesita TPM o contraseña al arranque.</td></tr>
+                        <tr><td><strong>BitLocker</strong></td><td>Windows Pro/Enterprise</td><td>Unidades completas (C:, pendrive...)</td><td>Necesita un chip <strong>TPM</strong> en la placa (un microchip de seguridad presente en equipos modernos) o, si no lo hay, una contraseña que pides al arranque.</td></tr>
                         <tr><td>EFS</td><td>Windows Pro</td><td>Archivos/carpetas concretas</td><td>Vinculado a la cuenta del usuario.</td></tr>
                         <tr><td><strong>LUKS</strong></td><td>Linux</td><td>Particiones enteras</td><td>Estándar de facto en Ubuntu (opción «Cifrar la nueva instalación»).</td></tr>
                         <tr><td>VeraCrypt</td><td>Multiplataforma</td><td>Contenedores cifrados (archivos)</td><td>Sucesor del difunto TrueCrypt.</td></tr>
@@ -709,7 +717,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                         <li><strong>Desinstalar dispositivo:</strong> elimina el driver. Si marcas «Eliminar software», borra los archivos; si no, queda en caché. Al reiniciar suele reinstalarse solo.</li>
                         <li><strong>Deshabilitar:</strong> mantiene el driver pero desactiva el dispositivo. Útil para diagnóstico.</li>
                         <li><strong>Propiedades → Controlador:</strong> ver versión, fecha y <em>revertir</em> a la versión anterior si la actualización ha roto algo.</li>
-                        <li><strong>Propiedades → Recursos:</strong> ver IRQ, DMA y direcciones de memoria que usa.</li>
+                        <li><strong>Propiedades → Recursos:</strong> ver los recursos físicos que usa el dispositivo: IRQ (línea de interrupción para avisar a la CPU), DMA (canal de acceso directo a memoria) y direcciones de memoria reservadas. En equipos modernos esto se gestiona solo y casi nunca se toca.</li>
                         <li><strong>Propiedades → Eventos:</strong> historial de instalación y errores.</li>
                     </ul>
 
@@ -717,14 +725,14 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                     <p>Un <strong>controlador</strong> o <em>driver</em> es un programa que traduce las órdenes genéricas del SO al lenguaje específico del hardware. Sin driver, el SO ve el dispositivo pero no sabe «hablar» con él.</p>
 
                     <h3>Plug and Play (PnP)</h3>
-                    <p>El sistema operativo detecta automáticamente el hardware nuevo al conectarlo y carga el driver adecuado si lo tiene. Casi todo lo USB es PnP. En equipos modernos los conflictos de IRQ son <strong>muy raros</strong> porque el sistema los gestiona él solo.</p>
+                    <p>El sistema operativo detecta automáticamente el hardware nuevo al conectarlo y carga el driver adecuado si lo tiene. Casi todo lo USB es PnP. En equipos modernos los conflictos de recursos (IRQ, DMA) son <strong>muy raros</strong> porque el sistema los gestiona él solo.</p>
 
                     <h3>Drivers en Linux</h3>
                     <ul>
-                        <li>La mayoría vienen <strong>en el kernel</strong> o como módulos. Por eso Linux suele detectar el hardware al instante.</li>
-                        <li>Drivers privativos (Nvidia, algunas Wi-Fi) se gestionan desde <em>Software y actualizaciones → Controladores adicionales</em>.</li>
-                        <li>Ver módulos cargados: <code>lsmod</code>. Cargar/descargar: <code>modprobe</code> / <code>rmmod</code>.</li>
-                        <li>Ver hardware: <code>lspci</code>, <code>lsusb</code>, <code>lshw</code>.</li>
+                        <li>La mayoría de drivers vienen <strong>dentro del propio kernel</strong> (el núcleo del SO) o como <strong>módulos</strong> (piezas que se cargan y descargan en caliente). Por eso Linux suele detectar el hardware al instante, sin instalar nada.</li>
+                        <li>Los drivers <strong>privativos</strong> (no libres, propiedad del fabricante: Nvidia, algunas Wi-Fi) Ubuntu no los puede incluir por defecto. Se instalan desde <em>Software y actualizaciones → Controladores adicionales</em>.</li>
+                        <li>Ver módulos cargados ahora mismo: <code>lsmod</code>. Cargar uno: <code>sudo modprobe nombre</code>. Descargarlo: <code>sudo modprobe -r nombre</code> (o <code>rmmod</code>).</li>
+                        <li>Para ver el hardware del equipo: <code>lspci</code> (dispositivos PCI: gráfica, red, audio), <code>lsusb</code> (USB conectados), <code>lshw</code> (inventario completo).</li>
                     </ul>
 
                     <h3>Resolver conflictos típicos</h3>
@@ -827,7 +835,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                     <table>
                         <tr><th>Concepto</th><th>Qué es</th><th>Ejemplo</th></tr>
                         <tr><td><strong>Dirección IP</strong></td><td>Identifica el equipo en la red.</td><td>192.168.1.45</td></tr>
-                        <tr><td><strong>Máscara de subred</strong></td><td>Divide la IP en parte de red y parte de host.</td><td>255.255.255.0 (= /24)</td></tr>
+                        <tr><td><strong>Máscara de subred</strong></td><td>Indica qué parte de la IP es la «red» y qué parte el «host» (equipo concreto dentro de la red).</td><td>255.255.255.0, también escrita como <code>/24</code> en notación CIDR (los 24 primeros bits son la red)</td></tr>
                         <tr><td><strong>Puerta de enlace</strong></td><td>El router. Salida hacia internet.</td><td>192.168.1.1</td></tr>
                         <tr><td><strong>DNS</strong></td><td>Traduce nombres a IPs.</td><td>8.8.8.8 (Google), 1.1.1.1 (Cloudflare)</td></tr>
                         <tr><td><strong>DHCP</strong></td><td>Protocolo: el router te da IP automática al conectar.</td><td>—</td></tr>
@@ -837,15 +845,15 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
 
                     <h4>IPv4 vs IPv6</h4>
                     <ul>
-                        <li><strong>IPv4:</strong> 4 números 0-255 separados por puntos. 4 mil millones de direcciones, ya agotadas a nivel global.</li>
-                        <li><strong>IPv6:</strong> 8 grupos hex separados por «:». Suficiente para muchas vidas. Cada vez más extendido.</li>
+                        <li><strong>IPv4:</strong> 4 números entre 0 y 255 separados por puntos (ej. <code>192.168.1.45</code>). Da unos 4 mil millones de direcciones, agotadas a nivel mundial.</li>
+                        <li><strong>IPv6:</strong> 8 grupos de 4 cifras hexadecimales separados por «:» (ej. <code>2001:db8::1</code>). Hay tantas que no se acabarán en lo que llevamos de civilización. Va sustituyendo poco a poco a IPv4.</li>
                     </ul>
 
                     <h4>IP pública vs privada</h4>
                     <ul>
-                        <li><strong>Privada:</strong> la que tienes en tu casa u oficina. Solo válida dentro de tu red. Rangos: <code>10.x.x.x</code>, <code>172.16-31.x.x</code>, <code>192.168.x.x</code>.</li>
-                        <li><strong>Pública:</strong> la que tu operadora asigna al router. Visible desde internet. Una por router.</li>
-                        <li><strong>NAT</strong> hace la traducción entre tu IP privada y la pública del router.</li>
+                        <li><strong>Privada:</strong> la que tienes en tu casa u oficina. Solo es válida dentro de tu red local. Los rangos privados reservados son <code>10.x.x.x</code>, <code>172.16-31.x.x</code> y <code>192.168.x.x</code>.</li>
+                        <li><strong>Pública:</strong> la que tu operadora asigna al router. Es la que se ve desde internet. Solo una por router.</li>
+                        <li><strong>NAT</strong> (Network Address Translation): cuando tu PC envía algo a internet, el router cambia tu IP privada por la pública «al vuelo»; cuando llega la respuesta, hace la traducción inversa. Por eso varios equipos pueden compartir una sola IP pública.</li>
                     </ul>
 
                     <h3>IP estática vs dinámica</h3>
@@ -859,7 +867,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
 
                     <h3>Configurar la red</h3>
                     <p><strong>Windows:</strong> Win+I → Red e internet → Propiedades del adaptador → Asignación IP → Editar → Manual / IPv4. Indicar IP, máscara, puerta y DNS.</p>
-                    <p><strong>Linux / Ubuntu:</strong> en el menú GNOME → Configuración → Red → engranaje → IPv4. O <code>nmtui</code> en consola.</p>
+                    <p><strong>Linux / Ubuntu:</strong> en el menú GNOME → Configuración → Red → engranaje → IPv4. O en consola con <code>nmtui</code>, una herramienta de NetworkManager con menús que se manejan con flechas (la «t» es de «text user interface»).</p>
 
                     <h3>Comandos útiles</h3>
                     <div class="table-wrap">
@@ -929,10 +937,11 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                     </ul>
 
                     <h3>Usuarios en Linux</h3>
+                    <p>Cada usuario tiene un número (UID = User ID) que es lo que el sistema realmente usa internamente. El nombre es solo para nosotros.</p>
                     <ul>
-                        <li><strong>root</strong> — el administrador. UID = 0. Lo puede todo. Por defecto su login está deshabilitado en Ubuntu; se usa <code>sudo</code>.</li>
-                        <li><strong>Usuarios normales</strong> — UID ≥ 1000. Solo tocan su carpeta <code>/home/&lt;usuario&gt;</code>.</li>
-                        <li><strong>Cuentas de sistema</strong> — UID 1-999. Las usa el SO para correr servicios (www-data, mysql, sshd). No se usan para login.</li>
+                        <li><strong>root</strong> — el administrador. UID = 0. Lo puede todo. En Ubuntu, por defecto, no se puede iniciar sesión directamente como root; en su lugar usas <code>sudo</code>.</li>
+                        <li><strong>Usuarios normales</strong> — UID ≥ 1000. Son las cuentas de personas. Solo pueden tocar su propia carpeta <code>/home/&lt;usuario&gt;</code>.</li>
+                        <li><strong>Cuentas de sistema</strong> — UID entre 1 y 999. No son personas, son cuentas que el SO usa para que cada servicio corra «como un usuario propio» con privilegios limitados (por ejemplo, el servidor web Apache corre como <code>www-data</code>; MySQL como <code>mysql</code>; el servidor SSH como <code>sshd</code>). No tienen contraseña para iniciar sesión.</li>
                     </ul>
 
                     <h4>Archivos clave</h4>
@@ -946,14 +955,15 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                     </table>
                     </div>
 
-                    <p>Ejemplo de línea en <code>/etc/passwd</code>:</p>
+                    <p>Ejemplo de línea en <code>/etc/passwd</code> (siete campos separados por dos puntos):</p>
                     <pre class="cmd-block">juan:x:1000:1000:Juan Perez,,,:/home/juan:/bin/bash
  │   │   │    │    │            │           │
- │   │   │    │    └── GECOS    │           └── shell
- │   │   │    └── GID           └── carpeta home
- │   │   └── UID
- │   └── la x indica que la contraseña está en /etc/shadow
+ │   │   │    │    └── GECOS    │           └── shell (programa que se abre al iniciar sesión)
+ │   │   │    └── GID           └── carpeta home (carpeta personal del usuario)
+ │   │   └── UID (User ID)
+ │   └── la x indica que la contraseña real está en /etc/shadow
  └── nombre de usuario</pre>
+                    <p>El campo <strong>GECOS</strong> es el nombre completo del usuario (y opcionalmente despacho, teléfono...). Las comas son separadores: «Juan Perez,,,» significa nombre Juan Perez y los otros 3 datos vacíos.</p>
 
                     <h3>Comandos de gestión (Linux)</h3>
                     <div class="table-wrap">
@@ -962,7 +972,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                         <tr><td><code>sudo</code></td><td>Ejecuta el siguiente comando como root.</td></tr>
                         <tr><td><code>su -</code></td><td>Cambia de usuario (sin argumento, a root si está habilitado).</td></tr>
                         <tr><td><code>adduser nombre</code></td><td>Crear un usuario (forma amigable). Crea home y pide contraseña.</td></tr>
-                        <tr><td><code>useradd nombre</code></td><td>Crear usuario (forma low-level). Hay que añadir <code>-m</code> para home.</td></tr>
+                        <tr><td><code>useradd nombre</code></td><td>Crear usuario al estilo crudo (sin las preguntas amigables de <code>adduser</code>). Hace falta añadir <code>-m</code> para que cree también la carpeta home.</td></tr>
                         <tr><td><code>passwd nombre</code></td><td>Cambiar contraseña.</td></tr>
                         <tr><td><code>usermod -aG grupo usuario</code></td><td>Añadir usuario a un grupo (la <code>a</code> es importante para no borrar los grupos previos).</td></tr>
                         <tr><td><code>deluser nombre</code></td><td>Borrar usuario. <code>deluser --remove-home</code> también borra <code>/home</code>.</td></tr>
@@ -990,7 +1000,7 @@ sudo chown -R juan:juan /var/www/sitio/    <span class="c"># recursivo</span></p
                         <li><strong>Historial:</strong> no repetir las N últimas.</li>
                         <li><strong>Bloqueo</strong> tras X intentos fallidos.</li>
                     </ul>
-                    <p>En Linux las directivas se configuran con PAM (<code>/etc/pam.d/common-password</code>) y <code>/etc/login.defs</code>.</p>
+                    <p>En Linux las directivas se configuran con <strong>PAM</strong> (Pluggable Authentication Modules: el sistema modular de autenticación de Linux), editando <code>/etc/pam.d/common-password</code> y <code>/etc/login.defs</code>.</p>
 
                     <div class="info info-red">
                         <div class="info-title">Concepto clave</div>
@@ -1067,7 +1077,7 @@ sudo apt clean              <span class="c"># vacía la caché de .deb descargad
                         <tr><td>Errores lógicos</td><td><code>chkdsk C: /F</code></td><td><code>sudo fsck /dev/sda1</code> (desmontada)</td></tr>
                         <tr><td>Sectores defectuosos</td><td><code>chkdsk C: /R</code></td><td><code>badblocks /dev/sda</code></td></tr>
                         <tr><td>SMART (salud del disco)</td><td><code>wmic diskdrive get model,status</code> · CrystalDiskInfo</td><td><code>sudo smartctl -a /dev/sda</code></td></tr>
-                        <tr><td>Verificar archivos del sistema</td><td><code>sfc /scannow</code> · <code>DISM /Online /Cleanup-Image /RestoreHealth</code></td><td><code>debsums</code></td></tr>
+                        <tr><td>Verificar archivos del sistema</td><td><code>sfc /scannow</code> repara archivos del SO corruptos. Si falla, primero <code>DISM /Online /Cleanup-Image /RestoreHealth</code>, que repara la imagen base que usa sfc.</td><td><code>debsums</code> comprueba que los archivos instalados por paquetes coinciden con los originales.</td></tr>
                     </table>
                     </div>
 
@@ -1076,7 +1086,7 @@ sudo apt clean              <span class="c"># vacía la caché de .deb descargad
                     <div class="table-wrap">
                     <table>
                         <tr><th></th><th>HDD (mecánico)</th><th>SSD (estado sólido)</th></tr>
-                        <tr><td>Cómo guarda</td><td>Por sectores físicos en platos giratorios. Con el tiempo se fragmenta.</td><td>En celdas NAND. No importa dónde estén físicamente.</td></tr>
+                        <tr><td>Cómo guarda</td><td>En sectores físicos sobre platos magnéticos que giran. Con el tiempo los archivos quedan «troceados» (fragmentados) y el cabezal tarda más en juntarlos al leer.</td><td>En celdas de memoria NAND (sin partes móviles). Da igual dónde esté cada trozo: el acceso es igual de rápido.</td></tr>
                         <tr><td>Operación de mantenimiento</td><td><strong>Desfragmentar</strong> (reordena bloques contiguos)</td><td><strong>TRIM</strong> (avisa al SSD de qué bloques ya no se usan para que los borre)</td></tr>
                         <tr><td>Frecuencia</td><td>Mensual / cuando supere el 10 %</td><td>Automático en segundo plano</td></tr>
                         <tr><td>Herramienta Windows</td><td>Optimizar unidades (lo detecta automáticamente)</td><td>Lo mismo: ejecuta TRIM si es SSD</td></tr>
@@ -1182,8 +1192,8 @@ sudo apt clean              <span class="c"># vacía la caché de .deb descargad
                         <tr><td><code>ps aux | grep firefox</code></td><td>Filtra los que contienen «firefox».</td></tr>
                         <tr><td><code>top</code></td><td>Monitor en tiempo real (q para salir).</td></tr>
                         <tr><td><code>htop</code></td><td>Versión mejorada (instalar con <code>sudo apt install htop</code>).</td></tr>
-                        <tr><td><code>kill PID</code></td><td>Pide al proceso que termine (SIGTERM).</td></tr>
-                        <tr><td><code>kill -9 PID</code></td><td>Forzar terminación (SIGKILL) si no responde.</td></tr>
+                        <tr><td><code>kill PID</code></td><td>Le manda al proceso una señal SIGTERM («termina, por favor»). El programa puede cerrar limpiamente sus archivos antes de irse.</td></tr>
+                        <tr><td><code>kill -9 PID</code></td><td>Le manda SIGKILL («muere ya»). El kernel lo mata sin contemplaciones. Úsalo solo si el anterior no responde, porque puede dejar archivos a medio escribir.</td></tr>
                         <tr><td><code>killall nombre</code></td><td>Termina todos los procesos con ese nombre.</td></tr>
                         <tr><td><code>nice</code> / <code>renice</code></td><td>Cambiar prioridad de un proceso.</td></tr>
                         <tr><td><code>free -h</code></td><td>Memoria libre / usada / swap.</td></tr>
@@ -1192,7 +1202,7 @@ sudo apt clean              <span class="c"># vacía la caché de .deb descargad
                     </div>
 
                     <h4>Demonios y systemd</h4>
-                    <p>El equivalente de los servicios de Windows en Linux se llama <strong>demonio</strong>. Los nombres suelen acabar en <code>d</code>: <code>sshd</code>, <code>cupsd</code>, <code>cron</code>. Hoy en día casi todas las distros usan <strong>systemd</strong> para gestionarlos:</p>
+                    <p>El equivalente de los servicios de Windows en Linux se llama <strong>demonio</strong>. Los nombres suelen acabar en «d»: <code>sshd</code> (SSH daemon), <code>cupsd</code> (impresión), <code>cron</code> (tareas programadas). Hoy en día casi todas las distros usan <strong>systemd</strong>, el sistema de arranque e iniciador de servicios moderno (el PID 1, el primer proceso del sistema). Para hablar con systemd se usa el comando <code>systemctl</code>:</p>
                     <pre class="cmd-block">systemctl status ssh         <span class="c"># estado</span>
 sudo systemctl start ssh     <span class="c"># arrancar</span>
 sudo systemctl stop ssh      <span class="c"># parar</span>
@@ -1239,7 +1249,7 @@ systemctl list-units --type=service   <span class="c"># todos los servicios</spa
                         <li><strong>Análisis programado:</strong> escaneo completo semanal.</li>
                         <li><strong>Firewall:</strong> filtra el tráfico de red entrante/saliente. Windows Defender Firewall por defecto.</li>
                         <li><strong>SmartScreen:</strong> bloquea ejecutables descargados desconocidos.</li>
-                        <li><strong>Controlled folder access:</strong> protección anti-ransomware (impide a apps desconocidas escribir en tus carpetas).</li>
+                        <li><strong>Acceso controlado a carpetas</strong> (Controlled folder access): protección anti-ransomware. Impide a aplicaciones no autorizadas escribir en tus carpetas (Documentos, Imágenes...), así un ransomware no puede cifrarlas.</li>
                         <li>En Linux: <code>clamav</code>, <code>rkhunter</code>, <code>chkrootkit</code>. Los antivirus son menos críticos pero útiles si compartes archivos con Windows.</li>
                     </ul>
 
@@ -1313,7 +1323,7 @@ systemctl list-units --type=service   <span class="c"># todos los servicios</spa
                     <div class="table-wrap">
                     <table>
                         <tr><th>Herramienta</th><th>Plataforma</th><th>Notas</th></tr>
-                        <tr><td><strong>Duplicati</strong></td><td>Win / Linux / Mac</td><td>Software libre. Copias <strong>cifradas, comprimidas, deduplicadas</strong> e incrementales a disco local, NAS o nube (S3, Google Drive, OneDrive, FTP, SSH...). Interfaz web. La hemos visto en la práctica 21.</td></tr>
+                        <tr><td><strong>Duplicati</strong></td><td>Win / Linux / Mac</td><td>Software libre. Copias <strong>cifradas</strong> (con contraseña, ni el proveedor de la nube puede leerlas), <strong>comprimidas</strong>, <strong>deduplicadas</strong> (si el mismo bloque de datos aparece en varios archivos solo lo guarda una vez) e incrementales. Destinos: disco local, NAS, o nube como Amazon S3, Google Drive, OneDrive, FTP, SSH... Interfaz web. La hemos visto en la práctica 21.</td></tr>
                         <tr><td><strong>rsync</strong></td><td>Linux / macOS</td><td>Comando para sincronizar carpetas de forma muy eficiente (solo copia los cambios). Base de muchos scripts.</td></tr>
                         <tr><td><strong>Timeshift</strong></td><td>Linux</td><td>Equivalente a «Restaurar sistema» de Windows. Snapshots del SO.</td></tr>
                         <tr><td>Borg / restic</td><td>Linux</td><td>Backup deduplicado y cifrado, orientado a CLI y scripts.</td></tr>
@@ -1335,14 +1345,14 @@ systemctl list-units --type=service   <span class="c"># todos los servicios</spa
                     <h3>Validación de las copias</h3>
                     <p>Una copia que <strong>no se restaura</strong> no es una copia. Buenas prácticas:</p>
                     <ul>
-                        <li>Probar restauración al menos una vez al trimestre.</li>
-                        <li>Verificar sumas/checksums.</li>
-                        <li>Comprobar logs del backup tras cada ejecución.</li>
-                        <li>Si es cifrado, no perder la contraseña (sin ella, las copias son inútiles).</li>
+                        <li>Probar la restauración al menos una vez al trimestre. <em>Lo único que prueba que el backup funciona es restaurarlo de verdad.</em></li>
+                        <li>Verificar el <strong>checksum</strong> (suma de comprobación): un número que el software calcula sobre los datos. Si al recuperar la copia el número coincide, los datos están íntegros.</li>
+                        <li>Comprobar los logs del backup tras cada ejecución para detectar errores.</li>
+                        <li>Si es cifrado, no perder NUNCA la contraseña: sin ella, las copias son ilegibles. Pásatela a un gestor de contraseñas y/o anótala en sitio seguro.</li>
                     </ul>
 
-                    <h3>Restauración bare-metal</h3>
-                    <p>«Bare-metal» = restaurar el sistema entero sobre un disco vacío. Pasos típicos:</p>
+                    <h3>Restauración «bare-metal»</h3>
+                    <p>«Bare-metal» significa «metal desnudo»: restaurar el sistema entero sobre un disco completamente vacío (un PC nuevo, o uno cuyo disco se ha estropeado y reemplazado). Pasos típicos:</p>
                     <ol>
                         <li>Arrancar desde el medio de recuperación del software (USB) o desde el USB de instalación de Windows → «Reparar el equipo».</li>
                         <li>Seleccionar «Recuperación de imagen del sistema».</li>
