@@ -98,7 +98,6 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 
 <div class="alumno">
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
-  <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
 </div>
 
@@ -134,7 +133,7 @@ wmic qfe list brief /format:table</pre>
 
 <div class="q">
 <label>1.2 · Fecha de la última actualización aplicada y su KB</label>
-<input type="text" data-k="q_1_2" placeholder="ej. KB5028185 el 11/07/2026">
+<input type="text" data-k="q_1_2" placeholder="KB y fecha">
 </div>
 
 <div class="pasos">
@@ -198,7 +197,7 @@ sudo unattended-upgrade --dry-run --debug 2&gt;&amp;1 | head -30</pre>
 
 <div class="q">
 <label>2.1 · Espacio liberado por <span class="k">cleanmgr</span> (incluido «Limpiar archivos del sistema»)</label>
-<input type="text" data-k="q_2_1" class="inline" placeholder="ej. 4.2 GB">
+<input type="text" data-k="q_2_1" class="inline" placeholder="espacio liberado">
 </div>
 
 <h3>Storage Sense (moderno)</h3>

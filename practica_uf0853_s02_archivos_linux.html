@@ -119,7 +119,6 @@ textarea{min-height:auto!important;overflow:visible;height:auto}
 
 <div class="alumno">
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre" placeholder="Tu nombre completo"></div>
-  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
 </div>
 
@@ -153,7 +152,7 @@ textarea{min-height:auto!important;overflow:visible;height:auto}
 
 <div class="q">
 <label>1.1 · Anota el prompt completo que ves en tu VM (copia tal cual)</label>
-<input type="text" data-k="q_1_1" placeholder="ej. alumno@ubuntu:~$ ">
+<input type="text" data-k="q_1_1" placeholder="copia tu prompt">
 </div>
 
 <div class="pasos">
@@ -194,7 +193,7 @@ cd ~juan            <span class="cm"># va a la home de otro usuario (si existe)<
 <p>Vas a usar dos comandos encadenados con <span class="k">&amp;&amp;</span> (significa «si el primero funciona, ejecuta el segundo»). El primero cambia de carpeta a <span class="k">/etc</span>. El segundo lista lo que hay (<span class="k">ls</span>) y pasa esa lista por una «tubería» <span class="k">|</span> al comando <span class="k">wc -l</span>, que cuenta líneas.</p>
 <pre class="code">cd /etc &amp;&amp; ls | wc -l</pre>
 <p>El número que te devuelve es la cantidad de archivos y carpetas que hay directamente dentro de <span class="k">/etc</span>. Anótalo:</p>
-<input type="text" data-k="q_1_3" class="inline" placeholder="ej. 178">
+<input type="text" data-k="q_1_3" class="inline" placeholder="numero">
 </div>
 </div>
 </div>
@@ -228,7 +227,7 @@ drwx------   3 juan juan  4096 may 21 11:00 .cache
 <p>Para contarlos de forma rápida:</p>
 <pre class="code">ls -la ~ | wc -l</pre>
 <p><span class="k">wc -l</span> cuenta cuántas líneas tiene la salida. <strong>Réstale 3</strong> (las 3 líneas especiales de arriba) y tendrás cuántos archivos/carpetas ocultos tienes realmente.</p>
-<input type="text" data-k="q_2_1" class="inline" placeholder="ej. 21">
+<input type="text" data-k="q_2_1" class="inline" placeholder="numero">
 </div>
 
 <h3>Reto de creación</h3>
@@ -446,7 +445,7 @@ find ~/Reto_Linux/logs -name "*.log" -exec wc -l {} \;</pre>
 <p>Combina <span class="k">find</span> (busca por nombre en todas las subcarpetas) con <span class="k">wc -l</span> (cuenta líneas):</p>
 <pre class="code">find /etc -name "*.conf" | wc -l</pre>
 <p>Anota el número:</p>
-<input type="text" data-k="q_5_1" class="inline" placeholder="ej. 240">
+<input type="text" data-k="q_5_1" class="inline" placeholder="numero">
 </div>
 
 <div class="q">
@@ -472,7 +471,7 @@ grep -E "^(root|nobody):" /etc/passwd     <span class="cm"># regex extendida</sp
 <p>Cuenta las líneas que contienen «bash»:</p>
 <pre class="code">grep -c bash /etc/passwd</pre>
 <p>(La <span class="k">-c</span> es «count», cuenta coincidencias.) Anota el número:</p>
-<input type="text" data-k="q_5_3" class="inline" placeholder="ej. 2">
+<input type="text" data-k="q_5_3" class="inline" placeholder="numero">
 </div>
 
 <div class="q">
@@ -480,7 +479,7 @@ grep -E "^(root|nobody):" /etc/passwd     <span class="cm"># regex extendida</sp
 <p>Son los que tienen <span class="k">/usr/sbin/nologin</span> o <span class="k">/bin/false</span> como shell. Para listarlos puedes usar <span class="k">grep</span> con la opción <span class="k">-E</span> (regex extendida) y el operador <span class="k">|</span> dentro de las comillas (que aquí significa «o»):</p>
 <pre class="code">grep -E "nologin|false" /etc/passwd</pre>
 <p>Pega aquí 3 ejemplos de cuentas de sistema que veas (la primera columna es el nombre):</p>
-<input type="text" data-k="q_5_4" placeholder="ej. www-data, sshd, nobody...">
+<input type="text" data-k="q_5_4" placeholder="3 nombres de cuenta de sistema">
 </div>
 
 <div class="shot-wrap">
@@ -735,7 +734,7 @@ ls -lh entrega_*.tar.gz</pre>
 
 <div class="q">
 <label>Nota que te pondrías (0–10) y por qué</label>
-<input type="text" data-k="ev_nota" class="inline" placeholder="ej. 8 — porque...">
+<input type="text" data-k="ev_nota" class="inline" placeholder="nota + justificacion">
 </div>
 </div>
 
