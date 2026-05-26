@@ -109,7 +109,7 @@ textarea{min-height:auto!important;overflow:visible;height:auto}
 <header class="head">
 <h1>Práctica 2 · Gestión de archivos en Linux</h1>
 <div class="meta">
-<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 2 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 2 / 10 · <strong>Modalidad:</strong> individual<br>
 <strong>Entorno:</strong> VM Ubuntu (práctica 07) · <strong>No requiere</strong> hardware externo<br>
 <strong>Entregable:</strong> este archivo con capturas y respuestas, exportado como JSON o impreso a PDF
 </div>
@@ -121,11 +121,10 @@ textarea{min-height:auto!important;overflow:visible;height:auto}
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre" placeholder="Tu nombre completo"></div>
   <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
-  <div><label>Horas reales</label><input type="text" data-k="alumno_horas" placeholder="ej. 4h"></div>
 </div>
 
 <div class="intro">
-<p><strong>De qué va.</strong> La terminal de Linux es la herramienta más potente que vas a usar en tu carrera. Si dominas estos comandos, dominas el sistema. En esta sesión vas a manejar la terminal de Ubuntu durante 4 horas: navegación, manipulación de archivos, comodines, redirección, tuberías, búsquedas con <span class="k">find</span> y <span class="k">grep</span>, compresión y edición.</p>
+<p><strong>De qué va.</strong> La terminal de Linux es la herramienta más potente que vas a usar en tu carrera. Si dominas estos comandos, dominas el sistema. En esta sesión vas a manejar la terminal de Ubuntu: navegación, manipulación de archivos, comodines, redirección, tuberías, búsquedas con <span class="k">find</span> y <span class="k">grep</span>, compresión y edición.</p>
 <p><strong>Por qué importa.</strong> En un servidor real (web, base de datos, red) <em>no hay escritorio gráfico</em>. Solo terminal por SSH. Si no sabes moverte ahí, no puedes administrar nada.</p>
 <p><strong>Cómo se entrega.</strong> Pega capturas con <kbd>Ctrl+V</kbd>, arrastra o selecciona. Autosave en este navegador. <strong>⬇ Exportar</strong> al terminar.</p>
 </div>
@@ -136,7 +135,7 @@ textarea{min-height:auto!important;overflow:visible;height:auto}
 
 <!-- ============= SECCIÓN 1 ============= -->
 <div class="section">
-<h2><span class="n">1</span> Anatomía del prompt y navegación <span class="dur">25 min</span></h2>
+<h2><span class="n">1</span> Anatomía del prompt y navegación</h2>
 <div class="sb">
 
 <h3>Diseccionar el prompt</h3>
@@ -199,7 +198,7 @@ cd ~juan            <span class="cm"># va a la home de otro usuario (si existe)<
 
 <!-- ============= SECCIÓN 2 ============= -->
 <div class="section">
-<h2><span class="n">2</span> Listado, creación y manipulación <span class="dur">35 min</span></h2>
+<h2><span class="n">2</span> Listado, creación y manipulación</h2>
 <div class="sb">
 
 <h3>Variantes de ls</h3>
@@ -297,7 +296,7 @@ rm -i scripts/activos/hola_copia.sh</pre>
 
 <!-- ============= SECCIÓN 3 ============= -->
 <div class="section">
-<h2><span class="n">3</span> Comodines y expansión <span class="dur">25 min</span></h2>
+<h2><span class="n">3</span> Comodines y expansión</h2>
 <div class="sb">
 
 <table>
@@ -338,7 +337,7 @@ ls /etc/{passwd,group,shadow}  <span class="cm"># archivos concretos</span></pre
 
 <!-- ============= SECCIÓN 4 ============= -->
 <div class="section">
-<h2><span class="n">4</span> Redirección y tuberías <span class="dur">30 min</span></h2>
+<h2><span class="n">4</span> Redirección y tuberías</h2>
 <div class="sb">
 
 <table>
@@ -397,7 +396,7 @@ find / -name "*.conf" 2&gt; /dev/null | head</pre>
 
 <!-- ============= SECCIÓN 5 ============= -->
 <div class="section">
-<h2><span class="n">5</span> Buscar archivos con find y texto con grep <span class="dur">35 min</span></h2>
+<h2><span class="n">5</span> Buscar archivos con find y texto con grep</h2>
 <div class="sb">
 
 <h3>find: el buscador todoterreno</h3>
@@ -456,7 +455,7 @@ grep -E "^(root|nobody):" /etc/passwd     <span class="cm"># regex extendida</sp
 
 <!-- ============= SECCIÓN 6 ============= -->
 <div class="section">
-<h2><span class="n">6</span> Compresión: tar, gzip, zip <span class="dur">30 min</span></h2>
+<h2><span class="n">6</span> Compresión: tar, gzip, zip</h2>
 <div class="sb">
 
 <h3>tar — el estándar en Linux</h3>
@@ -527,7 +526,7 @@ unzip reto.zip -d ~/Destino_zip/</pre>
 
 <!-- ============= SECCIÓN 7 ============= -->
 <div class="section">
-<h2><span class="n">7</span> Editores en consola: nano y vim básico <span class="dur">25 min</span></h2>
+<h2><span class="n">7</span> Editores en consola: nano y vim básico</h2>
 <div class="sb">
 
 <h3>nano — fácil</h3>
@@ -579,7 +578,7 @@ unzip reto.zip -d ~/Destino_zip/</pre>
 
 <!-- ============= SECCIÓN 8 ============= -->
 <div class="section">
-<h2><span class="n">8</span> Reto final · Pipeline real <span class="dur">35 min</span></h2>
+<h2><span class="n">8</span> Reto final · Pipeline real</h2>
 <div class="sb">
 
 <div class="aviso">

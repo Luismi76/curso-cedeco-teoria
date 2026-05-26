@@ -88,7 +88,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 <header class="head">
 <h1>Práctica 6 · Pantalla, energía y red</h1>
 <div class="meta">
-<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 6 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 6 / 10 · <strong>Modalidad:</strong> individual<br>
 <strong>Entorno:</strong> VM Windows + VM Ubuntu (modo «Solo anfitrión» configurado para red interna)<br>
 <strong>Entregable:</strong> este archivo con capturas y respuestas
 </div>
@@ -100,7 +100,6 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
   <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
-  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
 </div>
 
 <div class="intro">
@@ -110,7 +109,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 
 <!-- ============= SECCIÓN 1 ============= -->
 <div class="section">
-<h2><span class="n">1</span> Configuración de pantalla en la VM <span class="dur">30 min</span></h2>
+<h2><span class="n">1</span> Configuración de pantalla en la VM</h2>
 <div class="sb">
 
 <h3>Resolución y escala (Windows)</h3>
@@ -170,7 +169,7 @@ xrandr --output Virtual1 --mode 1920x1080  <span class="cm"># volver</span></pre
 
 <!-- ============= SECCIÓN 2 ============= -->
 <div class="section">
-<h2><span class="n">2</span> Energía en Windows <span class="dur">30 min</span></h2>
+<h2><span class="n">2</span> Energía en Windows</h2>
 <div class="sb">
 
 <div class="pasos">
@@ -236,7 +235,7 @@ systemctl hibernate</pre>
 
 <!-- ============= SECCIÓN 3 ============= -->
 <div class="section">
-<h2><span class="n">3</span> Configurar una red interna entre las VMs <span class="dur">30 min</span></h2>
+<h2><span class="n">3</span> Configurar una red interna entre las VMs</h2>
 <div class="sb">
 
 <p>Necesitas que la VM Windows y la VM Ubuntu se vean entre ellas. Vamos a usar el adaptador <strong>«Red interna»</strong> de VirtualBox: solo conecta las VMs entre sí, sin internet de momento.</p>
@@ -265,7 +264,7 @@ systemctl hibernate</pre>
 
 <!-- ============= SECCIÓN 4 ============= -->
 <div class="section">
-<h2><span class="n">4</span> IP estática y comunicación entre VMs <span class="dur">45 min</span></h2>
+<h2><span class="n">4</span> IP estática y comunicación entre VMs</h2>
 <div class="sb">
 
 <p>Sin DHCP en una red interna, las VMs <strong>no tienen IP</strong> en el adaptador 2. Hay que ponérsela a mano.</p>
@@ -340,7 +339,7 @@ ip neigh</pre>
 
 <!-- ============= SECCIÓN 5 ============= -->
 <div class="section">
-<h2><span class="n">5</span> DNS y diagnóstico de red <span class="dur">40 min</span></h2>
+<h2><span class="n">5</span> DNS y diagnóstico de red</h2>
 <div class="sb">
 
 <p>Esta sección usa el adaptador NAT (con internet). Vuelve a la VM con conexión a internet.</p>
@@ -411,7 +410,7 @@ netstat -ano | findstr LISTENING   <span class="cm"># Windows</span></pre>
 
 <!-- ============= SECCIÓN 6 ============= -->
 <div class="section">
-<h2><span class="n">6</span> Capturar tráfico con tcpdump <span class="dur">25 min</span></h2>
+<h2><span class="n">6</span> Capturar tráfico con tcpdump</h2>
 <div class="sb">
 
 <p>Bonus para futuros administradores de red. Vas a ver el tráfico real entre tus dos VMs.</p>
@@ -452,7 +451,7 @@ sudo tcpdump -i enp0s8 -w /tmp/ping_capture.pcap icmp -c 20</pre>
 
 <!-- ============= SECCIÓN 7 ============= -->
 <div class="section">
-<h2><span class="n">7</span> Reto final · Diagnóstico real <span class="dur">10 min</span></h2>
+<h2><span class="n">7</span> Reto final · Diagnóstico real</h2>
 <div class="sb">
 
 <div class="aviso">

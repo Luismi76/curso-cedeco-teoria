@@ -94,7 +94,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 <header class="head">
 <h1>Práctica 3 · Estructura de directorios y sistemas de archivos</h1>
 <div class="meta">
-<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 3 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 3 / 10 · <strong>Modalidad:</strong> individual<br>
 <strong>Entorno:</strong> VM Windows + VM Ubuntu (VirtualBox) · <strong>No requiere</strong> pendrives ni discos reales<br>
 <strong>Entregable:</strong> este archivo con capturas y respuestas
 </div>
@@ -106,7 +106,6 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
   <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
-  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
 </div>
 
 <div class="intro">
@@ -120,7 +119,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 
 <!-- ============= SECCIÓN 1 ============= -->
 <div class="section">
-<h2><span class="n">1</span> Safari por el árbol de Windows <span class="dur">25 min</span></h2>
+<h2><span class="n">1</span> Safari por el árbol de Windows</h2>
 <div class="sb">
 
 <p>Arranca la VM Windows. Vas a explorar las carpetas y rellenar la tabla con tus hallazgos reales (no copies del libro).</p>
@@ -170,7 +169,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 
 <!-- ============= SECCIÓN 2 ============= -->
 <div class="section">
-<h2><span class="n">2</span> Safari por el FHS de Linux <span class="dur">25 min</span></h2>
+<h2><span class="n">2</span> Safari por el FHS de Linux</h2>
 <div class="sb">
 
 <p>Arranca la VM Ubuntu. Igual que en la sección 1, explora y rellena la tabla.</p>
@@ -221,7 +220,7 @@ ls /proc/self/    <span class="cm"># tu propio proceso shell</span></pre>
 
 <!-- ============= SECCIÓN 3 ============= -->
 <div class="section">
-<h2><span class="n">3</span> Añadir un disco virtual extra <span class="dur">35 min</span></h2>
+<h2><span class="n">3</span> Añadir un disco virtual extra</h2>
 <div class="sb">
 
 <p>Vas a simular un USB / disco externo creando un <strong>disco virtual nuevo</strong> en VirtualBox y conectándolo a cada VM. Esto es 100% reproducible y no necesita hardware.</p>
@@ -263,7 +262,7 @@ sudo fdisk -l 2&gt;/dev/null | grep -E "Disk /dev/sd|Disk model"</pre>
 
 <!-- ============= SECCIÓN 4 ============= -->
 <div class="section">
-<h2><span class="n">4</span> Particionar y formatear (Linux) <span class="dur">40 min</span></h2>
+<h2><span class="n">4</span> Particionar y formatear (Linux)</h2>
 <div class="sb">
 
 <p>Vas a crear 3 particiones en <span class="k">/dev/sdb</span> con sistemas de archivos diferentes para comparar.</p>
@@ -353,7 +352,7 @@ ls -lh /mnt/usb_grande/grande.bin</pre>
 
 <!-- ============= SECCIÓN 5 ============= -->
 <div class="section">
-<h2><span class="n">5</span> /etc/fstab: montaje automático <span class="dur">25 min</span></h2>
+<h2><span class="n">5</span> /etc/fstab: montaje automático</h2>
 <div class="sb">
 
 <p>Si reinicias la VM ahora mismo, las particiones <strong>se desmontan</strong>. Para que se monten solas al arrancar hay que añadirlas a <span class="k">/etc/fstab</span>.</p>
@@ -428,7 +427,7 @@ df -h | grep mnt   <span class="cm"># vuelven a estar</span></pre>
 
 <!-- ============= SECCIÓN 6 ============= -->
 <div class="section">
-<h2><span class="n">6</span> Lo mismo en Windows · Administración de discos <span class="dur">35 min</span></h2>
+<h2><span class="n">6</span> Lo mismo en Windows · Administración de discos</h2>
 <div class="sb">
 
 <div class="pasos">
@@ -495,7 +494,7 @@ df -h | grep mnt   <span class="cm"># vuelven a estar</span></pre>
 
 <!-- ============= SECCIÓN 7 ============= -->
 <div class="section">
-<h2><span class="n">7</span> Compatibilidad cruzada Windows ↔ Linux <span class="dur">25 min</span></h2>
+<h2><span class="n">7</span> Compatibilidad cruzada Windows ↔ Linux</h2>
 <div class="sb">
 
 <p>Resumen visual: qué FS lee qué SO de forma nativa.</p>

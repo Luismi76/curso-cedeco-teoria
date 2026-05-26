@@ -88,7 +88,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 <header class="head">
 <h1>Práctica 8 · Mantenimiento del sistema</h1>
 <div class="meta">
-<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 8 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 8 / 10 · <strong>Modalidad:</strong> individual<br>
 <strong>Entorno:</strong> VM Windows + VM Ubuntu<br>
 <strong>Entregable:</strong> este archivo con capturas y respuestas
 </div>
@@ -100,7 +100,6 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
   <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
   <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
   <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
-  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
 </div>
 
 <div class="intro">
@@ -110,7 +109,7 @@ input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1
 
 <!-- ============= SECCIÓN 1 ============= -->
 <div class="section">
-<h2><span class="n">1</span> Actualizaciones del sistema <span class="dur">30 min</span></h2>
+<h2><span class="n">1</span> Actualizaciones del sistema</h2>
 <div class="sb">
 
 <h3>Windows Update</h3>
@@ -183,7 +182,7 @@ sudo unattended-upgrade --dry-run --debug 2&gt;&amp;1 | head -30</pre>
 
 <!-- ============= SECCIÓN 2 ============= -->
 <div class="section">
-<h2><span class="n">2</span> Liberar espacio en disco <span class="dur">35 min</span></h2>
+<h2><span class="n">2</span> Liberar espacio en disco</h2>
 <div class="sb">
 
 <h3>Windows · Liberador clásico + Storage Sense</h3>
@@ -256,7 +255,7 @@ done</pre>
 
 <!-- ============= SECCIÓN 3 ============= -->
 <div class="section">
-<h2><span class="n">3</span> Comprobación de discos <span class="dur">35 min</span></h2>
+<h2><span class="n">3</span> Comprobación de discos</h2>
 <div class="sb">
 
 <h3>Windows · chkdsk, sfc y DISM</h3>
@@ -345,7 +344,7 @@ sudo smartctl -l selftest /dev/sda  <span class="cm"># resultado del test</span>
 
 <!-- ============= SECCIÓN 4 ============= -->
 <div class="section">
-<h2><span class="n">4</span> Desfragmentación vs TRIM <span class="dur">15 min</span></h2>
+<h2><span class="n">4</span> Desfragmentación vs TRIM</h2>
 <div class="sb">
 
 <p><strong>Lo más importante:</strong> nunca desfragmentes un SSD. Windows lo sabe y, si detecta SSD, ejecuta TRIM en lugar de desfragmentar. Esta sección es corta porque casi no hay nada que hacer salvo confirmar.</p>
@@ -386,7 +385,7 @@ sudo fstrim -av</pre>
 
 <!-- ============= SECCIÓN 5 ============= -->
 <div class="section">
-<h2><span class="n">5</span> Tareas programadas (Windows) <span class="dur">35 min</span></h2>
+<h2><span class="n">5</span> Tareas programadas (Windows)</h2>
 <div class="sb">
 
 <p>Vas a crear una tarea que <strong>realmente se ejecuta</strong> y comprobarás el resultado.</p>
@@ -441,7 +440,7 @@ schtasks /Delete /TN "Prueba_Bloc" /F</pre>
 
 <!-- ============= SECCIÓN 6 ============= -->
 <div class="section">
-<h2><span class="n">6</span> Tareas programadas (Linux) · cron y systemd-timer <span class="dur">30 min</span></h2>
+<h2><span class="n">6</span> Tareas programadas (Linux) · cron y systemd-timer</h2>
 <div class="sb">
 
 <h3>cron</h3>
@@ -506,7 +505,7 @@ cat /lib/systemd/system/fstrim.timer</pre>
 
 <!-- ============= SECCIÓN 7 ============= -->
 <div class="section">
-<h2><span class="n">7</span> Reto final · Script de mantenimiento <span class="dur">15 min</span></h2>
+<h2><span class="n">7</span> Reto final · Script de mantenimiento</h2>
 <div class="sb">
 
 <div class="aviso">
