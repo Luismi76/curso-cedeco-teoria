@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P10 · UF0853 · Copias de seguridad</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#718096; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P10 · UF0853 · Copias de seguridad</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 10 · Copias de seguridad y restauración</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 10 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu · necesitas el <strong>disco virtual extra</strong> de la P3<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Última sesión. Vas a montar la estrategia <strong>3-2-1</strong> completa en un escenario realista: punto de restauración + historial de archivos + imagen del sistema en Windows, y Timeshift + rsync + Duplicati en Linux. Termina restaurando archivos «borrados a propósito» para probar que las copias funcionan. <strong>Una copia que nunca se ha probado, no es una copia.</strong></p>
+</div>
+
+<div class="aviso">
+<strong>Antes de empezar:</strong> necesitas el disco extra de la P3. Si lo eliminaste, créalo de nuevo y dale 4 GB (más espacio que en P3, vas a meter backups). En Windows, asegúrate de que <strong>E:</strong> existe y tiene espacio.
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Estrategia 3-2-1 en papel <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<p>Antes de configurar nada, diseña tu estrategia para esta práctica:</p>
+
+<div class="q">
+<label>1.1 · Aplica 3-2-1 a tu VM. ¿Qué 3 copias tendrás? ¿En qué 2 medios? ¿Cuál es la «offsite» en tu caso?</label>
+<textarea data-k="q_1_1" style="min-height:130px" placeholder="Copia 1 (original): ...
+Copia 2: ... en ...
+Copia 3 (offsite): ... en ..."></textarea>
+</div>
+
+<div class="q">
+<label>1.2 · Para un cliente con servidor de archivos y 10 PCs ¿qué cambiarías en la estrategia?</label>
+<textarea data-k="q_1_2"></textarea>
+</div>
+
+<h3>Datos «de oro» para esta práctica</h3>
+<p>Crea estos archivos en Windows (los usarás como datos a respaldar y restaurar):</p>
+<pre class="code">mkdir C:\DatosCliente
+echo "Contrato firmado 2026" &gt; C:\DatosCliente\contrato.txt
+echo "Lista de clientes confidencial" &gt; C:\DatosCliente\clientes.txt
+echo "Plan estratégico 2026-2030" &gt; C:\DatosCliente\estrategia.txt
+mkdir C:\DatosCliente\Facturas
+for /L %i in (1,1,20) do echo "Factura %i" &gt; C:\DatosCliente\Facturas\F-%i.txt
+dir C:\DatosCliente /S</pre>
+
+<p>Y en Ubuntu:</p>
+<pre class="code">mkdir -p ~/DatosCliente/{Documentos,Fotos,Facturas}
+echo "Contrato firmado 2026" &gt; ~/DatosCliente/Documentos/contrato.txt
+echo "Lista de clientes" &gt; ~/DatosCliente/Documentos/clientes.txt
+for i in {1..20}; do echo "Factura $i" &gt; ~/DatosCliente/Facturas/F-$i.txt; done
+echo "Foto vacaciones" &gt; ~/DatosCliente/Fotos/playa.txt
+tree ~/DatosCliente</pre>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Punto de restauración (Windows) <span class="dur">20 min</span></h2>
+<div class="sb">
+
+<p><strong>Recuerda:</strong> un punto de restauración guarda <em>solo</em> el estado del sistema (registro, drivers, programas), NO tus archivos personales. Útil para deshacer una actualización mala o un driver problemático.</p>
+
+<div class="pasos">
+<strong>Activar y crear</strong>
+<ol>
+<li>Buscar «Crear un punto de restauración» (panel Propiedades del sistema).</li>
+<li>Selecciona la unidad C: → <strong>Configurar</strong>.</li>
+<li>Habilitar protección del sistema. Espacio máximo: <strong>5 %</strong>.</li>
+<li>Aceptar. Ahora botón <strong>Crear</strong>: nombre <span class="k">Antes_practica_P10</span>.</li>
+<li>Espera a que termine.</li>
+</ol>
+</div>
+
+<pre class="code">REM Desde PowerShell elevado
+Enable-ComputerRestore -Drive "C:\"
+Checkpoint-Computer -Description "Pre_P10_PS" -RestorePointType "MODIFY_SETTINGS"
+
+REM Listar puntos existentes
+Get-ComputerRestorePoint
+
+REM Restaurar (NO ejecutar a menos que quieras de verdad)
+REM Restore-Computer -RestorePoint 1</pre>
+
+<div class="shot-wrap">
+<label>📷 2.1 · Captura de <span class="k">Get-ComputerRestorePoint</span> con al menos 2 puntos creados <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_restore"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>2.2 · ¿En qué situaciones reales pasarías de un punto de restauración? (no te recupera fotos borradas)</label>
+<textarea data-k="q_2_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Historial de archivos (Windows) <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Backup automatizado de tus carpetas personales a otra unidad (la E: o un disco externo). Útil para versiones anteriores de archivos.</p>
+
+<div class="pasos">
+<ol>
+<li>Buscar «Historial de archivos» (panel clásico). En Windows 11 está medio escondido.</li>
+<li><strong>Seleccionar unidad</strong> → E: (la del P3).</li>
+<li><strong>Activar</strong>.</li>
+<li>Configuración avanzada: frecuencia → cada 1 hora. Conservar versiones: 1 año.</li>
+<li>Configurar inclusiones: por defecto incluye Bibliotecas, Escritorio, Contactos y Favoritos.</li>
+<li><strong>Excluir carpetas</strong>: añade Música (suele ser grande y prescindible).</li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>Forzar una copia inicial</strong>
+<ol>
+<li>«Ejecutar ahora» (botón).</li>
+<li>Espera unos minutos.</li>
+<li>Abre E: → carpeta <span class="k">FileHistory\&lt;usuario&gt;\</span> → verás los archivos respaldados con timestamps en el nombre.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.1 · Captura del Historial de archivos activo con la unidad E: y la última copia exitosa <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_history"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Restauración (lo importante)</strong>
+<ol>
+<li>Modifica <span class="k">C:\Users\&lt;tú&gt;\Documents\un_archivo_existente.txt</span>: cambia su contenido y guarda.</li>
+<li>Espera unos minutos (o fuerza otra copia con «Ejecutar ahora»).</li>
+<li>Clic derecho en el archivo → <strong>Restaurar versiones anteriores</strong>.</li>
+<li>Verás un listado con timestamps. Selecciona una versión anterior.</li>
+<li>Restaura → confirma si quieres sustituir o conservar ambos.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>3.2 · ¿Has conseguido recuperar la versión anterior? Pega el texto antiguo</label>
+<textarea data-k="q_3_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Imagen del sistema (Windows) <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<p>Copia exacta de todo el disco. Si el disco muere, restauras la imagen en otro y arranca tal cual estaba. La función oficial sigue llamándose «Copia de seguridad y restauración (Windows 7)» aunque sigue funcionando en Win 10/11.</p>
+
+<div class="pasos">
+<ol>
+<li>Panel de control → Sistema y seguridad → <strong>Copia de seguridad y restauración (Windows 7)</strong>.</li>
+<li>Panel izquierdo: <strong>Crear una imagen del sistema</strong>.</li>
+<li>Destino: <strong>En un disco duro</strong> → selecciona E:.</li>
+<li>Confirma qué unidades respaldar: C: (sistema). No añadas E: misma.</li>
+<li><strong>Iniciar la copia de seguridad</strong>. Tarda 10-20 min en una VM pequeña.</li>
+</ol>
+</div>
+
+<div class="nota">
+<strong>Aviso de tamaño.</strong> Una imagen del sistema de una VM Windows ronda los 8-12 GB. Si tu E: es de 2 GB, no cabe. Sube E: a 20 GB redimensionando el VDI desde VirtualBox y la partición desde diskmgmt antes de continuar. O, alternativa, salta a la Sección 5 y haz solo Linux.
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.1 · Captura del proceso de creación de imagen del sistema (o del resultado final) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_imagen"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>4.2 · Tamaño final de la imagen del sistema generada</label>
+<input type="text" data-k="q_4_2" class="inline">
+</div>
+
+<div class="q">
+<label>4.3 · ¿Cuál es la única forma de restaurar una imagen del sistema? (no se hace desde el Windows que ya funciona)</label>
+<textarea data-k="q_4_3"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> rsync · backup eficiente en Linux <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>rsync es la herramienta más usada de la historia de los backups en Linux. Solo copia los cambios, preserva permisos, comprime al vuelo y trabaja por red si quieres.</p>
+
+<div class="pasos">
+<strong>Backup local básico</strong>
+<pre class="code"><span class="cm"># Asegúrate de que /mnt/datos_linux (P3) está montado</span>
+df -h | grep datos_linux
+
+<span class="cm"># Backup espejo: sincroniza, borra en destino lo que ya no está en origen</span>
+sudo rsync -avh --delete ~/DatosCliente/ /mnt/datos_linux/backup_diario/
+
+<span class="cm"># Sin --delete: solo añade y actualiza, nunca borra</span>
+sudo rsync -avh ~/DatosCliente/ /mnt/datos_linux/backup_acumulativo/
+
+ls -la /mnt/datos_linux/</pre>
+</div>
+
+<p>Opciones que vas a usar siempre:</p>
+<table>
+<tr><th>Flag</th><th>Significa</th></tr>
+<tr><td><span class="k">-a</span></td><td>Archive: recursivo, preserva permisos, propietario, links, fechas</td></tr>
+<tr><td><span class="k">-v</span></td><td>Verbose: muestra qué hace</td></tr>
+<tr><td><span class="k">-h</span></td><td>Human-readable: tamaños legibles</td></tr>
+<tr><td><span class="k">-z</span></td><td>Comprimir al vuelo (útil por red)</td></tr>
+<tr><td><span class="k">--delete</span></td><td>Borrar en destino lo que no está en origen (modo espejo)</td></tr>
+<tr><td><span class="k">--dry-run</span></td><td>Simular sin hacer nada (PROBAR siempre antes de --delete)</td></tr>
+<tr><td><span class="k">-P</span></td><td>Progreso + reanudable</td></tr>
+<tr><td><span class="k">--exclude=PAT</span></td><td>Excluir patrones</td></tr>
+</table>
+
+<div class="pasos">
+<strong>Probar la eficiencia incremental</strong>
+<pre class="code"><span class="cm"># Primera vez: copia todo (lento)</span>
+time sudo rsync -avh ~/DatosCliente/ /mnt/datos_linux/backup_diario/
+
+<span class="cm"># Segunda vez sin cambios: instantáneo</span>
+time sudo rsync -avh ~/DatosCliente/ /mnt/datos_linux/backup_diario/
+
+<span class="cm"># Cambia algo y vuelve a correr</span>
+echo "modificado" &gt;&gt; ~/DatosCliente/Documentos/contrato.txt
+sudo rsync -avh --delete ~/DatosCliente/ /mnt/datos_linux/backup_diario/
+<span class="cm"># Solo copia el archivo modificado</span></pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.1 · Captura mostrando las 3 ejecuciones de rsync (primera, segunda, tras cambio) y los tiempos <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_rsync"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Backup rotatorio diario (7 días)</h3>
+<div class="pasos">
+<pre class="code">cat &lt;&lt;'EOF' &gt; ~/backup_diario.sh
+#!/bin/bash
+SRC="$HOME/DatosCliente/"
+DEST="/mnt/datos_linux/diario_$(date +%w)"   # 0=domingo, 6=sábado
+mkdir -p "$DEST"
+rsync -avh --delete "$SRC" "$DEST/" &gt;&gt; ~/backup.log 2&gt;&amp;1
+EOF
+chmod +x ~/backup_diario.sh
+
+<span class="cm"># Programar en cron, cada noche a las 02:00</span>
+(crontab -l 2&gt;/dev/null; echo "0 2 * * * /home/$USER/backup_diario.sh") | crontab -
+
+<span class="cm"># Probar manualmente</span>
+~/backup_diario.sh
+ls /mnt/datos_linux/</pre>
+</div>
+
+<h3>Backup por SSH (¡la magia!)</h3>
+<pre class="code"><span class="cm"># Backup desde tu VM Ubuntu a la otra VM (también Ubuntu o cualquier servidor SSH)</span>
+<span class="cm"># Requiere ssh server en el destino</span>
+rsync -avhz -e ssh ~/DatosCliente/ usuario@10.10.10.20:/home/usuario/backup_remoto/
+
+<span class="cm"># Backup TIRANDO desde un servidor remoto a tu PC local</span>
+rsync -avhz usuario@10.10.10.20:/home/usuario/datos/ ~/copia_de_servidor/</pre>
+
+<div class="q">
+<label>5.2 · ¿Cuánto tiempo tardaron las 3 ejecuciones de rsync? ¿Qué te dice eso?</label>
+<textarea data-k="q_5_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Timeshift · snapshots del sistema (Linux) <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Timeshift es a Linux lo que «Restaurar sistema» es a Windows: hace snapshots de archivos del SO (no de tus datos personales) que puedes restaurar.</p>
+
+<div class="pasos">
+<pre class="code">sudo apt install -y timeshift
+sudo timeshift --list
+sudo timeshift --create --comments "Antes de la P10"
+
+<span class="cm"># Si te pregunta tipo: RSYNC (más sencillo y compatible)</span>
+
+sudo timeshift --list</pre>
+</div>
+
+<p>O por GUI: busca «Timeshift» en el menú de aplicaciones. Es más cómodo configurar la frecuencia.</p>
+
+<div class="pasos">
+<strong>Probar restauración con cambio reversible</strong>
+<pre class="code"><span class="cm"># Cambiar el hostname del sistema</span>
+sudo hostnamectl set-hostname pruebatimeshift
+cat /etc/hostname
+
+<span class="cm"># Restaurar al snapshot anterior</span>
+sudo timeshift --list
+sudo timeshift --restore --snapshot '&lt;ID-DEL-SNAPSHOT&gt;' --yes
+<span class="cm"># Te avisa que va a reiniciar</span>
+
+<span class="cm"># Tras reiniciar, comprobar</span>
+cat /etc/hostname    <span class="cm"># vuelve al original</span></pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura de <span class="k">timeshift --list</span> mostrando tu snapshot <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_timeshift"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>6.2 · Diferencia clave entre Timeshift y rsync</label>
+<textarea data-k="q_6_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Duplicati · backup cifrado, incremental y multidestino <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>Duplicati es lo más cercano a una solución «de empresa» gratuita. Hace backup <strong>cifrado (AES-256), incremental, deduplicado y comprimido</strong>. Puede subir a S3, Google Drive, OneDrive, FTP, SSH, WebDAV, etc.</p>
+
+<div class="nota">
+<strong>Si ya hiciste la práctica 21:</strong> Duplicati ya lo conoces. Esta sección es la versión multiplataforma y avanzada con varios backups.
+</div>
+
+<div class="pasos">
+<strong>Instalación (Linux)</strong>
+<pre class="code"><span class="cm"># Descargar el .deb más reciente desde duplicati.com</span>
+<span class="cm"># O usar Mono</span>
+sudo apt install -y mono-runtime libmono-system-data4.0-cil
+<span class="cm"># Después: descarga el .deb e instala con sudo dpkg -i duplicati_*.deb</span>
+sudo apt --fix-broken install -y
+
+<span class="cm"># Arrancar la interfaz web</span>
+duplicati-server &amp;
+
+<span class="cm"># Abrir en navegador</span>
+xdg-open http://localhost:8200</pre>
+</div>
+
+<div class="pasos">
+<strong>Crear el backup desde la UI web</strong>
+<ol>
+<li>Add backup → Configure a new backup.</li>
+<li>Nombre: <span class="k">Backup_DatosCliente</span>. Cifrado: <strong>AES-256</strong>. Frase: <span class="k">Duplicati_P10_2026!</span> (apúntala, sin ella no podrás restaurar).</li>
+<li>Destination: <strong>Local folder</strong> → <span class="k">/mnt/datos_linux/duplicati/</span>.</li>
+<li>Source data: <span class="k">~/DatosCliente</span>.</li>
+<li>Schedule: cada día a las 02:30.</li>
+<li>Options: retención «smart» (conserva diarios 7 días, semanales 4, mensuales 12).</li>
+<li>Save → Run now.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 7.1 · Captura de Duplicati mostrando el backup completado <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s7_duplicati"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Restauración real</strong>
+<ol>
+<li>Borra a propósito un archivo: <span class="k">rm ~/DatosCliente/Documentos/contrato.txt</span>.</li>
+<li>En Duplicati: Restore → selecciona el backup → Next → elige fecha → marca el archivo → restaurar a la ubicación original.</li>
+<li>Verifica: <span class="k">cat ~/DatosCliente/Documentos/contrato.txt</span>.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>7.2 · ¿Pudiste restaurar el archivo? ¿Cuánto tardó?</label>
+<input type="text" data-k="q_7_2">
+</div>
+
+<div class="tip">
+<strong>Por qué Duplicati es brutal en producción:</strong> con la misma config puedes apuntar a Backblaze B2, S3, Google Drive, OneDrive... La nube actúa de «1» en tu 3-2-1, cifrada de extremo a extremo (Duplicati cifra ANTES de subir, así que ni el proveedor puede ver los datos).
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 8 ============= -->
+<div class="section">
+<h2><span class="n">8</span> Examen del disco · prueba real de restauración <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<p>Final: vamos a simular un desastre y restaurar desde cero.</p>
+
+<div class="aviso">
+<strong>Escenario.</strong> Tu cliente abre el equipo el lunes y la carpeta DatosCliente está vacía (un becario la borró). Tienes que restaurarla con la versión del último backup.
+</div>
+
+<div class="pasos">
+<strong>Simular el desastre</strong>
+<pre class="code">rm -rf ~/DatosCliente
+ls ~/DatosCliente 2&gt;&amp;1     <span class="cm"># confirma que no está</span></pre>
+</div>
+
+<div class="pasos">
+<strong>Restaurar (elige tu método preferido)</strong>
+<p><strong>Opción A · rsync (rápido):</strong></p>
+<pre class="code">rsync -avh /mnt/datos_linux/backup_diario/ ~/DatosCliente/
+ls ~/DatosCliente</pre>
+<p><strong>Opción B · Duplicati (granular, con versiones):</strong></p>
+<p>Usa la UI web → Restore → último backup → Restaurar a ubicación original.</p>
+</div>
+
+<div class="q">
+<label>8.1 · ¿Qué opción has usado y por qué?</label>
+<textarea data-k="q_8_1"></textarea>
+</div>
+
+<div class="shot-wrap">
+<label>📷 8.2 · Captura mostrando la carpeta restaurada y un <span class="k">tree ~/DatosCliente</span> con todos los archivos de vuelta <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s8_restaurado"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>8.3 · ¿Cuánto ha tardado la restauración completa?</label>
+<input type="text" data-k="q_8_3">
+</div>
+
+<div class="q">
+<label>8.4 · La gran pregunta: ¿se ha restaurado <strong>exactamente</strong> todo o falta algo?</label>
+<textarea data-k="q_8_4"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 9 ============= -->
+<div class="section">
+<h2><span class="n">9</span> Síntesis · documenta tu política de backup <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<p>Como técnico, vas a entregar a tu cliente <strong>un documento</strong> con la política de backups que has configurado. Rellénalo.</p>
+
+<div class="q">
+<label><strong>Datos protegidos</strong> (qué se respalda)</label>
+<textarea data-k="q_9_1"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Ubicación de las copias</strong> (medios y dónde físicamente)</label>
+<textarea data-k="q_9_2"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Frecuencia</strong> (diaria, semanal, mensual)</label>
+<textarea data-k="q_9_3"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Retención</strong> (cuánto se guarda cada copia)</label>
+<textarea data-k="q_9_4"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Cifrado y contraseñas</strong> (dónde se custodian)</label>
+<textarea data-k="q_9_5"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Procedimiento de restauración</strong> (paso a paso)</label>
+<textarea data-k="q_9_6" style="min-height:130px"></textarea>
+</div>
+
+<div class="q">
+<label><strong>Verificación</strong> (cada cuánto se prueba la restauración)</label>
+<textarea data-k="q_9_7"></textarea>
+</div>
+
+<div class="tip">
+<strong>RTO y RPO.</strong> Dos métricas que cualquier técnico debe saber:
+<ul>
+<li><strong>RTO (Recovery Time Objective):</strong> cuánto puede estar el sistema caído. Si es 1h, necesitas restaurar en menos de 1h.</li>
+<li><strong>RPO (Recovery Point Objective):</strong> cuántos datos puedes permitirte perder. Si es 24h, basta con un backup diario. Si es 1h, necesitas hacer copia cada hora.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final · UF0853 completada</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He diseñado mi estrategia 3-2-1 sobre papel.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He creado puntos de restauración por GUI y PowerShell.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · Historial de archivos activo + restauración de versión anterior probada.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He generado una imagen del sistema de la VM Windows.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · Domino rsync con sus 8 flags clave y he probado la eficiencia incremental.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He hecho un snapshot con Timeshift.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · He configurado Duplicati con cifrado AES-256 y restaurado un archivo.</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> S8 · He simulado el desastre y restaurado todos los datos.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> S9 · He documentado la política de backups completa.</label>
+<label class="check"><input type="checkbox" data-k="ev_10"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_11"> He exportado el progreso final como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>Reflexión final del curso UF0853: ¿qué te llevas?</label>
+<textarea data-k="ev_reflexion" style="min-height:130px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota final que te pondrías para todo el curso UF0853 (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+
+<div class="tip" style="margin-top:20px">
+<strong>🎓 Has completado las 10 prácticas de la UF0853.</strong><br>
+Sabes administrar archivos, permisos, usuarios, red, mantenimiento, malware y backups. En un equipo de helpdesk o soporte técnico de pyme, ya eres competente. <em>Y ahora a buscar trabajo o seguir formándote: redes, servidores Linux, ciberseguridad, cloud...</em>
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 10 de 10 · FIN del curso</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s10_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

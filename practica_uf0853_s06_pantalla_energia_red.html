@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P6 · UF0853 · Pantalla, energía y red</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#234e52; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P6 · UF0853 · Pantalla, energía y red</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 6 · Pantalla, energía y red</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 6 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu (modo «Solo anfitrión» configurado para red interna)<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Configurarás resolución y multimonitor en VirtualBox, planes de energía en Windows y TLP en Linux, y montarás <strong>una pequeña red interna entre las dos VMs</strong> para hacer ping, asignar IP estática, configurar DNS y trazar rutas. Acabas con una captura de tráfico con tcpdump.</p>
+<p><strong>Por qué importa.</strong> Diagnóstico de red es la habilidad más demandada en helpdesk. Si dominas <span class="k">ping</span>, <span class="k">tracert</span> y <span class="k">nslookup</span>, resuelves el 90% de los tickets de «no me funciona internet».</p>
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Configuración de pantalla en la VM <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<h3>Resolución y escala (Windows)</h3>
+<div class="pasos">
+<ol>
+<li>Win+I → Sistema → Pantalla.</li>
+<li>Cambia la <strong>Resolución</strong> a varios valores y observa: 800×600, 1024×768, 1280×720, 1920×1080. Aplica cada uno y mira cómo se reordenan los iconos.</li>
+<li>Cambia la <strong>Escala</strong> a 125%, 150%, 175% (puede que cierre sesión).</li>
+<li>Vuelve a la nativa de la VM (la que pone «recomendada»).</li>
+</ol>
+</div>
+
+<div class="q">
+<label>1.1 · Resolución máxima recomendada de tu VM Windows</label>
+<input type="text" data-k="q_1_1" class="inline" placeholder="ej. 1920x1080">
+</div>
+
+<div class="q">
+<label>1.2 · ¿Qué pasa con los iconos del escritorio cuando pasas de 1920×1080 a 1024×768? ¿Y al volver?</label>
+<textarea data-k="q_1_2"></textarea>
+</div>
+
+<h3>Multimonitor virtual</h3>
+<p>VirtualBox permite simular un segundo monitor. Es útil aunque sea un solo escritorio anfitrión.</p>
+
+<div class="pasos">
+<strong>Activar segundo monitor en la VM</strong>
+<ol>
+<li>Apaga la VM Windows.</li>
+<li>Configuración → Pantalla → pestaña <strong>Pantalla</strong>.</li>
+<li>«Cantidad de pantallas» → <strong>2</strong>. Memoria de vídeo: súbela a <strong>32 MB</strong> mínimo.</li>
+<li>Arranca la VM. En la barra de VirtualBox: Ver → <strong>Pantallas virtuales</strong> → Pantalla 2 → Activar.</li>
+<li>En Windows: Win+P → <strong>Extender</strong>. Win+I → Pantalla → arrastra los monitores para reordenarlos.</li>
+<li>Win+Mayús+flecha izquierda/derecha mueve la ventana activa entre monitores.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 1.3 · Captura mostrando los 2 monitores de la VM con ventanas en cada uno <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_multi"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Configuración de pantalla en Ubuntu</h3>
+<pre class="code"><span class="cm"># Ver y cambiar resolución desde consola con xrandr</span>
+xrandr             <span class="cm"># lista resoluciones disponibles</span>
+xrandr --current   <span class="cm"># la actual</span>
+xrandr --output Virtual1 --mode 1280x720   <span class="cm"># cambiar (nombre puede variar)</span>
+xrandr --output Virtual1 --mode 1920x1080  <span class="cm"># volver</span></pre>
+<p>O gráficamente: Configuración → Pantallas.</p>
+
+<div class="q">
+<label>1.4 · Nombre del «output» de tu pantalla virtual según xrandr</label>
+<input type="text" data-k="q_1_4" class="inline" placeholder="ej. Virtual1, VGA-1...">
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Energía en Windows <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Comparar planes</strong>
+<ol>
+<li>Win+I → Sistema → Energía y batería. (En desktop verás «Energía».)</li>
+<li>Modo de energía: prueba <strong>Mayor eficiencia energética</strong>, <strong>Equilibrado</strong> y <strong>Mejor rendimiento</strong>.</li>
+<li>Apagado y suspensión: define qué pasa tras X minutos sin actividad.</li>
+</ol>
+</div>
+
+<h3>Vista clásica (Panel de control)</h3>
+<pre class="code">powercfg.cpl</pre>
+<p>Aquí ves los planes clásicos: Equilibrado, Alto rendimiento, Economizador. Puedes editar cada uno con detalle (suspensión, disco, USB, PCI Express, procesador).</p>
+
+<div class="pasos">
+<strong>Comandos potentes de powercfg</strong>
+<pre class="code">powercfg /list                       REM ver todos los planes
+powercfg /getactivescheme            REM el activo
+powercfg /setactive SCHEME_MAX       REM activar Alto rendimiento
+powercfg /energy /duration 30        REM informe energético (30 s)
+powercfg /batteryreport /output bat.html   REM informe de batería completo
+powercfg /sleepstudy /output sleep.html    REM estudio de suspensión
+powercfg /waketimers                 REM qué dispositivos pueden despertar el equipo
+powercfg /lastwake                   REM ¿quién despertó el equipo la última vez?</pre>
+</div>
+
+<div class="q">
+<label>2.1 · GUID del plan de energía activo en tu VM</label>
+<input type="text" data-k="q_2_1" placeholder="lo da powercfg /getactivescheme">
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.2 · Captura del Informe energético abierto en el navegador (powercfg /energy) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_energy"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Suspender vs Hibernar</h3>
+<pre class="code">powercfg /availablesleepstates       REM qué estados soporta
+powercfg /hibernate on                REM activar hibernación
+powercfg /hibernate off               REM desactivar</pre>
+
+<div class="q">
+<label>2.3 · ¿Qué estados de suspensión soporta tu VM? (S1, S2, S3, S4, Modern Standby)</label>
+<input type="text" data-k="q_2_3">
+</div>
+
+<h3>Energía en Linux</h3>
+<pre class="code"><span class="cm"># TLP es la herramienta estándar para gestión de energía en portátiles Linux</span>
+sudo apt install -y tlp tlp-rdw
+
+sudo systemctl enable tlp
+sudo systemctl start tlp
+sudo tlp-stat -s         <span class="cm"># estado general</span>
+sudo tlp-stat -b         <span class="cm"># batería (si la VM la simula)</span>
+sudo tlp-stat -c         <span class="cm"># configuración cargada</span>
+
+<span class="cm"># Suspender / hibernar manualmente</span>
+systemctl suspend        <span class="cm"># cuidado: te cierra la VM</span>
+systemctl hibernate</pre>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Configurar una red interna entre las VMs <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<p>Necesitas que la VM Windows y la VM Ubuntu se vean entre ellas. Vamos a usar el adaptador <strong>«Red interna»</strong> de VirtualBox: solo conecta las VMs entre sí, sin internet de momento.</p>
+
+<div class="pasos">
+<strong>Configurar VirtualBox (con las VMs apagadas)</strong>
+<ol>
+<li>En la VM Windows: Configuración → Red → <strong>Adaptador 2</strong>.
+<ul>
+<li>Habilitar adaptador.</li>
+<li>Conectado a: <strong>Red interna</strong>.</li>
+<li>Nombre: <span class="k">RedAula</span>.</li>
+</ul></li>
+<li>Lo mismo en la VM Ubuntu: Adaptador 2 → Red interna → nombre <span class="k">RedAula</span>.</li>
+<li>Deja el Adaptador 1 como NAT (te da internet).</li>
+<li>Arranca ambas VMs.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.1 · Captura de Configuración → Red de una de las VMs con los 2 adaptadores (NAT + Red interna) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_redvb"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> IP estática y comunicación entre VMs <span class="dur">45 min</span></h2>
+<div class="sb">
+
+<p>Sin DHCP en una red interna, las VMs <strong>no tienen IP</strong> en el adaptador 2. Hay que ponérsela a mano.</p>
+
+<h3>VM Windows · IP estática</h3>
+<div class="pasos">
+<ol>
+<li>Win+I → Red e internet → Configuración de red avanzada → Ethernet 2 (el adaptador nuevo) → Propiedades de IP.</li>
+<li>Asignación de IP → Editar → <strong>Manual</strong> → IPv4 activado:
+<ul>
+<li>IP: <span class="k">10.10.10.10</span></li>
+<li>Máscara: <span class="k">255.255.255.0</span></li>
+<li>(Sin puerta de enlace, dejas vacío)</li>
+</ul></li>
+<li>Guarda.</li>
+<li>Verifica en CMD:</li>
+</ol>
+<pre class="code">ipconfig | findstr /C:"10.10"</pre>
+</div>
+
+<h3>VM Ubuntu · IP estática (con nmcli)</h3>
+<pre class="code"><span class="cm"># Identifica el nombre de la interfaz</span>
+ip -br a
+
+<span class="cm"># Crea una conexión estática (sustituye enp0s8 por el nombre real)</span>
+sudo nmcli con add type ethernet ifname enp0s8 con-name redaula \
+  ipv4.method manual ipv4.addresses 10.10.10.20/24
+
+sudo nmcli con up redaula
+
+ip -br a</pre>
+
+<div class="q">
+<label>4.1 · IPs que aparecen en cada VM en el adaptador de Red interna</label>
+<table>
+<tr><th>VM</th><th>Interfaz</th><th>IP</th></tr>
+<tr><td>Windows</td><td><input type="text" data-k="q_4_1a" placeholder="Ethernet 2"></td><td><input type="text" data-k="q_4_1b" placeholder="10.10.10.10"></td></tr>
+<tr><td>Ubuntu</td><td><input type="text" data-k="q_4_1c" placeholder="enp0s8"></td><td><input type="text" data-k="q_4_1d" placeholder="10.10.10.20"></td></tr>
+</table>
+</div>
+
+<h3>Ping entre VMs</h3>
+<p>Desde Ubuntu:</p>
+<pre class="code">ping -c 4 10.10.10.10</pre>
+<p>Desde Windows:</p>
+<pre class="code">ping 10.10.10.20</pre>
+
+<div class="aviso">
+<strong>Si no responde:</strong> el firewall de Windows bloquea ICMP por defecto en redes públicas. En CMD elevado:
+<pre class="code">netsh advfirewall firewall add rule name="ICMPv4-In" protocol=icmpv4:8,any dir=in action=allow</pre>
+O cambia la red a «Privada» (lo más limpio).
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.2 · Captura mostrando ping exitoso en ambos sentidos (Win→Linux y Linux→Win) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_ping"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>arp · descubrir vecinos</h3>
+<pre class="code"><span class="cm"># Windows</span>
+arp -a
+
+<span class="cm"># Linux</span>
+ip neigh</pre>
+
+<div class="q">
+<label>4.3 · MAC de la otra VM detectada por ARP en tu equipo</label>
+<input type="text" data-k="q_4_3">
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> DNS y diagnóstico de red <span class="dur">40 min</span></h2>
+<div class="sb">
+
+<p>Esta sección usa el adaptador NAT (con internet). Vuelve a la VM con conexión a internet.</p>
+
+<h3>Comandos esenciales</h3>
+<table>
+<tr><th>Función</th><th>Windows</th><th>Linux</th></tr>
+<tr><td>Ver IP propia</td><td><span class="k">ipconfig</span></td><td><span class="k">ip a</span></td></tr>
+<tr><td>Ver IP completa</td><td><span class="k">ipconfig /all</span></td><td><span class="k">ip a; ip route</span></td></tr>
+<tr><td>Renovar DHCP</td><td><span class="k">ipconfig /release &amp;&amp; ipconfig /renew</span></td><td><span class="k">sudo dhclient -r &amp;&amp; sudo dhclient</span></td></tr>
+<tr><td>Flush DNS</td><td><span class="k">ipconfig /flushdns</span></td><td><span class="k">sudo systemd-resolve --flush-caches</span></td></tr>
+<tr><td>Probar conectividad</td><td><span class="k">ping host</span></td><td><span class="k">ping host</span></td></tr>
+<tr><td>Trazar ruta</td><td><span class="k">tracert host</span></td><td><span class="k">traceroute host</span> (o <span class="k">mtr</span>)</td></tr>
+<tr><td>Resolución DNS</td><td><span class="k">nslookup host</span></td><td><span class="k">dig host</span> / <span class="k">host host</span></td></tr>
+<tr><td>Puertos en escucha</td><td><span class="k">netstat -ano</span></td><td><span class="k">ss -tunlp</span></td></tr>
+<tr><td>Test puerto remoto</td><td><span class="k">Test-NetConnection host -Port 443</span></td><td><span class="k">nc -zv host 443</span></td></tr>
+</table>
+
+<div class="pasos">
+<strong>Ejercicios</strong>
+<pre class="code"><span class="cm"># 1. Resolver google.com</span>
+nslookup google.com
+dig google.com +short
+
+<span class="cm"># 2. ¿Qué servidor DNS usa tu sistema?</span>
+<span class="cm"># Windows:</span>
+ipconfig /all | findstr /I "DNS"
+<span class="cm"># Linux:</span>
+resolvectl status | grep "DNS Server"
+cat /etc/resolv.conf
+
+<span class="cm"># 3. Cambiar DNS a Cloudflare (1.1.1.1)</span>
+<span class="cm"># Windows GUI: Configuración → Red → adaptador → DNS → Manual → 1.1.1.1</span>
+<span class="cm"># Linux:</span>
+sudo nmcli con mod &lt;tu-conexion&gt; ipv4.dns "1.1.1.1 1.0.0.1"
+sudo nmcli con up &lt;tu-conexion&gt;
+
+<span class="cm"># 4. Trazar ruta hasta un servidor de Google</span>
+tracert 8.8.8.8        <span class="cm"># Windows</span>
+mtr -r -c 5 8.8.8.8    <span class="cm"># Linux (más bonito)</span>
+
+<span class="cm"># 5. ¿Qué procesos están escuchando en puertos?</span>
+sudo ss -tunlp | head      <span class="cm"># Linux</span>
+netstat -ano | findstr LISTENING   <span class="cm"># Windows</span></pre>
+</div>
+
+<div class="q">
+<label>5.1 · IP a la que resuelve <span class="k">google.com</span> ahora mismo</label>
+<input type="text" data-k="q_5_1" class="inline">
+</div>
+
+<div class="q">
+<label>5.2 · ¿Cuántos saltos hay desde tu VM hasta 8.8.8.8?</label>
+<input type="text" data-k="q_5_2" class="inline">
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.3 · Captura de un <span class="k">traceroute / tracert</span> hasta google.com <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_trace"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>5.4 · Lista 3 puertos en escucha de tu VM Linux y qué proceso los abre</label>
+<textarea data-k="q_5_4"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Capturar tráfico con tcpdump <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Bonus para futuros administradores de red. Vas a ver el tráfico real entre tus dos VMs.</p>
+
+<div class="pasos">
+<pre class="code">sudo apt install -y tcpdump
+
+<span class="cm"># Ver interfaces disponibles</span>
+sudo tcpdump -D
+
+<span class="cm"># Capturar ICMP (ping) en la interfaz de la red interna</span>
+sudo tcpdump -i enp0s8 icmp -c 10
+
+<span class="cm"># Mientras tcpdump está esperando, lanza un ping desde la VM Windows hacia esta Ubuntu:</span>
+<span class="cm">#   (en CMD Windows)   ping 10.10.10.20 -n 5</span>
+
+<span class="cm"># Verás cada paquete ICMP echo request y reply</span>
+
+<span class="cm"># Guardar a un .pcap (se abre con Wireshark luego)</span>
+sudo tcpdump -i enp0s8 -w /tmp/ping_capture.pcap icmp -c 20</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura mostrando tcpdump capturando paquetes ICMP de la otra VM <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_tcpdump"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>6.2 · ¿Qué información concreta ves en cada línea de tcpdump? (origen, destino, tipo de mensaje, etc.)</label>
+<textarea data-k="q_6_2"></textarea>
+</div>
+
+<div class="tip">
+<strong>Wireshark.</strong> Es la versión gráfica. Para usarlo: <span class="k">sudo apt install wireshark</span>, abrir el .pcap. En clase no llegaremos al detalle, pero ya tienes el archivo capturado.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Reto final · Diagnóstico real <span class="dur">10 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Escenario.</strong> Un usuario te dice: «No me funciona internet». Tienes 5 minutos para descartar 5 cosas en orden. Diseña tu metodología.
+</div>
+
+<div class="q">
+<label>7.1 · Lista de comprobaciones en orden (de la más simple/local a la más remota). Comando concreto para cada una.</label>
+<textarea data-k="q_7_1" style="min-height:200px" placeholder="1. ...
+2. ...
+3. ..."></textarea>
+</div>
+
+<div class="q">
+<label>7.2 · Si <span class="k">ping 8.8.8.8</span> funciona pero <span class="k">ping google.com</span> no, ¿qué problema concreto tienes?</label>
+<input type="text" data-k="q_7_2">
+</div>
+
+<div class="q">
+<label>7.3 · Si no funciona ni 8.8.8.8 ni google.com pero <span class="k">ping 192.168.1.1</span> (tu router) sí, ¿qué pasa?</label>
+<input type="text" data-k="q_7_3">
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He configurado resolución, escala y multimonitor en la VM.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He explorado planes de energía y <span class="k">powercfg</span> a fondo.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · He montado una Red interna entre las VMs en VirtualBox.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He asignado IP estática a cada VM y conseguido ping en ambos sentidos.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · Domino ping, tracert/traceroute, nslookup/dig y netstat/ss.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He capturado tráfico ICMP real con tcpdump.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · Tengo una metodología clara para diagnosticar «no me funciona internet».</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué te ha parecido lo más útil para tu carrera?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 6 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s06_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

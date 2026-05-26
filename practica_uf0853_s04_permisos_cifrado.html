@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P4 · UF0853 · Permisos, cuotas y cifrado</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#553c9a; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}
+.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}
+.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P4 · UF0853 · Permisos, cuotas y cifrado</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 4 · Permisos, cuotas y cifrado</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 4 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu · <strong>Necesita:</strong> haber hecho la P3 (disco extra con particiones)<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Hoy proteges los datos a 3 niveles: <strong>permisos</strong> (quién puede ver/modificar qué), <strong>cuotas</strong> (cuánto espacio puede usar cada uno) y <strong>cifrado</strong> (que solo abra el dueño). Lo harás con un escenario realista: un equipo donde conviven 2 usuarios y hay carpetas privadas, compartidas y cifradas.</p>
+<p><strong>Por qué importa.</strong> Es la diferencia entre «mi PC» y «un equipo profesional». Sin esto, cualquiera con acceso físico ve todo.</p>
+</div>
+
+<div class="nota">
+<strong>Antes de empezar:</strong> en la VM Windows necesitas tener al menos 2 usuarios. Si solo tienes uno, en la sección 1 te explico cómo crearlo rápido (luego en la P7 lo haremos en profundidad).
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Preparar dos usuarios para los experimentos <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>En Windows · Crear «alumno2»</strong>
+<ol>
+<li>Win+I → Cuentas → Otros usuarios → <strong>Agregar cuenta</strong>.</li>
+<li>«No tengo la información de inicio de sesión» → «Agregar un usuario sin cuenta Microsoft».</li>
+<li>Nombre: <span class="k">alumno2</span> · contraseña: <span class="k">alumno2.</span> (con punto al final).</li>
+<li>Déjalo como <strong>cuenta estándar</strong> (no admin).</li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>En Ubuntu · Crear «alumno2»</strong>
+<pre class="code">sudo adduser alumno2
+<span class="cm"># Sigue las preguntas. Password: alumno2.</span>
+id alumno2
+ls /home    <span class="cm"># verás la carpeta /home/alumno2</span></pre>
+</div>
+
+<div class="q">
+<label>1.1 · UID asignado a alumno2 en Ubuntu</label>
+<input type="text" data-k="q_1_1" class="inline" placeholder="ej. 1001">
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Permisos NTFS con herencia (Windows) <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Crear la estructura</strong>
+<pre class="code">mkdir C:\Equipo
+mkdir C:\Equipo\Publico
+mkdir C:\Equipo\Privado_Admin
+mkdir C:\Equipo\Solo_Lectura</pre>
+</div>
+
+<div class="pasos">
+<strong>Configurar permisos a mano</strong>
+<ol>
+<li>Clic derecho <span class="k">C:\Equipo</span> → Propiedades → Seguridad.</li>
+<li>Verás los grupos heredados: SYSTEM, Administradores, Usuarios autenticados...</li>
+<li><strong>Avanzadas</strong> → <strong>Deshabilitar herencia</strong> → «Convertir los permisos heredados en permisos explícitos».</li>
+<li>Edita y deja:
+<ul>
+<li>SYSTEM — Control total.</li>
+<li>Administradores — Control total.</li>
+<li>Tu usuario admin — Control total.</li>
+<li>(quita el resto)</li>
+</ul></li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>Configurar cada subcarpeta</strong>
+<table>
+<tr><th>Carpeta</th><th>Usuario / grupo</th><th>Permiso</th></tr>
+<tr><td><span class="k">Publico</span></td><td>Usuarios (locales)</td><td>Modificar</td></tr>
+<tr><td><span class="k">Privado_Admin</span></td><td>Solo administradores</td><td>Control total</td></tr>
+<tr><td><span class="k">Solo_Lectura</span></td><td>Usuarios</td><td>Lectura y ejecución</td></tr>
+</table>
+<p>Para añadir un usuario o grupo: Seguridad → Editar → Agregar → escribes <span class="k">alumno2</span> → Comprobar nombres → Aceptar → marcas el nivel de permiso.</p>
+</div>
+
+<div class="pasos">
+<strong>Verificar desde CMD con icacls</strong>
+<pre class="code">icacls C:\Equipo
+icacls C:\Equipo\Publico
+icacls C:\Equipo\Privado_Admin
+icacls C:\Equipo\Solo_Lectura</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.1 · Captura de la salida de <span class="k">icacls</span> mostrando los permisos finales de las 3 subcarpetas <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_icacls"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Probar como alumno2</strong>
+<ol>
+<li>Cierra sesión y entra como <strong>alumno2</strong>.</li>
+<li>Intenta:
+<ul>
+<li>Crear un archivo en <span class="k">C:\Equipo\Publico</span>: ¿se puede?</li>
+<li>Crear un archivo en <span class="k">C:\Equipo\Solo_Lectura</span>: ¿se puede?</li>
+<li>Abrir <span class="k">C:\Equipo\Privado_Admin</span>: ¿qué pasa?</li>
+</ul></li>
+</ol>
+</div>
+
+<div class="q">
+<label>2.2 · Resultados desde alumno2</label>
+<table>
+<tr><th>Carpeta</th><th>Crear archivo</th><th>Abrir</th></tr>
+<tr><td>Publico</td><td><input type="text" data-k="q_2_2a"></td><td><input type="text" data-k="q_2_2b"></td></tr>
+<tr><td>Solo_Lectura</td><td><input type="text" data-k="q_2_2c"></td><td><input type="text" data-k="q_2_2d"></td></tr>
+<tr><td>Privado_Admin</td><td><input type="text" data-k="q_2_2e"></td><td><input type="text" data-k="q_2_2f"></td></tr>
+</table>
+</div>
+
+<h3>Tomar posesión</h3>
+<p>Vuelve como admin. Imagina que un archivo se quedó «huérfano» porque su dueño se fue de la empresa.</p>
+<pre class="code"><span class="cm">REM Crea un archivo y «dáselo» a alumno2</span>
+echo "huerfano" &gt; C:\Equipo\Privado_Admin\huerfano.txt
+icacls C:\Equipo\Privado_Admin\huerfano.txt /setowner alumno2
+
+<span class="cm">REM Verifica</span>
+icacls C:\Equipo\Privado_Admin\huerfano.txt
+
+<span class="cm">REM Como admin, recupera la posesión</span>
+takeown /F C:\Equipo\Privado_Admin\huerfano.txt
+icacls C:\Equipo\Privado_Admin\huerfano.txt</pre>
+
+<div class="q">
+<label>2.3 · ¿Quién aparece como propietario antes y después de <span class="k">takeown</span>?</label>
+<textarea data-k="q_2_3"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Permisos en Linux: chmod simbólico y octal <span class="dur">40 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Crear estructura de prueba</strong>
+<pre class="code">cd ~
+mkdir -p Equipo/{publico,privado,solo_lectura}
+echo "hola publico" &gt; Equipo/publico/hola.txt
+echo "secreto privado" &gt; Equipo/privado/secreto.txt
+echo "lectura solo" &gt; Equipo/solo_lectura/lectura.txt
+
+ls -la Equipo/</pre>
+</div>
+
+<h3>chmod octal · cálculo en directo</h3>
+<p>Recuerda: <strong>r=4 · w=2 · x=1</strong>. Suma los que quieras para cada grupo (propietario, grupo, otros).</p>
+
+<table>
+<tr><th>Quiero...</th><th>Notación rwx</th><th>Octal</th><th>Comando</th></tr>
+<tr><td>Yo todo, grupo lee y ejecuta, otros lee</td><td>rwxr-xr--</td><td><strong>754</strong></td><td><span class="k">chmod 754 f</span></td></tr>
+<tr><td>Yo y mi grupo todo, otros nada</td><td>rwxrwx---</td><td><input type="text" data-k="q_oct_1" placeholder="?"></td><td><span class="k">chmod ___ f</span></td></tr>
+<tr><td>Solo yo lectura, nadie más</td><td>r--------</td><td><input type="text" data-k="q_oct_2" placeholder="?"></td><td></td></tr>
+<tr><td>Yo todo, mi grupo lee, otros nada</td><td>rwxr-----</td><td><input type="text" data-k="q_oct_3" placeholder="?"></td><td></td></tr>
+<tr><td>Todos todo (peligroso)</td><td>rwxrwxrwx</td><td><input type="text" data-k="q_oct_4" placeholder="?"></td><td></td></tr>
+<tr><td>Yo escribo y leo, otros nada</td><td>rw-------</td><td><input type="text" data-k="q_oct_5" placeholder="?"></td><td></td></tr>
+</table>
+
+<div class="pasos">
+<strong>Aplicar y verificar</strong>
+<pre class="code">cd ~/Equipo
+chmod 644 publico/hola.txt
+chmod 600 privado/secreto.txt
+chmod 444 solo_lectura/lectura.txt
+
+ls -la publico/hola.txt privado/secreto.txt solo_lectura/lectura.txt</pre>
+</div>
+
+<div class="q">
+<label>3.1 · Pega la salida exacta de <span class="k">ls -la</span> para los 3 archivos</label>
+<textarea data-k="q_3_1" style="font-family:monospace;font-size:12px"></textarea>
+</div>
+
+<h3>chmod simbólico</h3>
+<pre class="code"><span class="cm"># u=user, g=group, o=others, a=all</span>
+chmod u+x publico/hola.txt           <span class="cm"># añade x al usuario</span>
+chmod o-r privado/secreto.txt        <span class="cm"># quita r a otros</span>
+chmod g=rx solo_lectura/lectura.txt  <span class="cm"># grupo = exactamente rx</span>
+chmod a-w publico/hola.txt           <span class="cm"># nadie escribe</span>
+
+ls -la publico/hola.txt privado/secreto.txt solo_lectura/lectura.txt</pre>
+
+<h3>chown · cambiar propietario</h3>
+<pre class="code"><span class="cm"># Dale el archivo a alumno2</span>
+sudo chown alumno2 privado/secreto.txt
+ls -la privado/secreto.txt
+
+<span class="cm"># Y el grupo también</span>
+sudo chown alumno2:alumno2 privado/secreto.txt
+ls -la privado/secreto.txt
+
+<span class="cm"># Recursivo: toda la carpeta y su contenido</span>
+sudo chown -R $USER:$USER ~/Equipo</pre>
+
+<div class="pasos">
+<strong>Probar como alumno2</strong>
+<pre class="code">su alumno2
+<span class="cm"># Te pide contraseña: alumno2.</span>
+
+cd /home/&lt;TU_USUARIO&gt;/Equipo 2&gt;/dev/null
+<span class="cm"># Probablemente no entres porque /home/&lt;tu&gt; tiene 750 o 700</span>
+
+<span class="cm"># Para que pueda probar, vamos a abrir tu home con +x para otros</span>
+exit
+chmod o+x ~
+
+su alumno2
+ls ~/../&lt;tu_usuario&gt;/Equipo/publico/ 2&gt;&amp;1
+cat ~/../&lt;tu_usuario&gt;/Equipo/privado/secreto.txt 2&gt;&amp;1
+exit</pre>
+</div>
+
+<div class="q">
+<label>3.2 · ¿Qué mensaje aparece al intentar leer secreto.txt como alumno2 si tiene <span class="k">600</span>?</label>
+<input type="text" data-k="q_3_2" placeholder="Permission denied / ...">
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.3 · Captura del experimento completo (cambiar usuario, intentar acceder, denegar) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_perms"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>El bit x en carpetas</h3>
+<p>En archivos, <span class="k">x</span> = ejecutar. En carpetas, <span class="k">x</span> = poder <em>entrar</em> con <span class="k">cd</span>. <strong>Sin x, no puedes hacer cd aunque tengas r.</strong></p>
+<pre class="code">mkdir test_x
+chmod 644 test_x   <span class="cm"># sin x</span>
+cd test_x          <span class="cm"># Permission denied</span>
+chmod 755 test_x   <span class="cm"># con x</span>
+cd test_x          <span class="cm"># funciona</span>
+cd ..</pre>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Listas de control de acceso (ACL) en Linux <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>El modelo <span class="k">rwx</span> clásico se queda corto cuando quieres dar permisos a <em>varios usuarios</em> distintos a la vez. Las ACL lo permiten.</p>
+
+<div class="pasos">
+<strong>Instalar herramientas</strong>
+<pre class="code">sudo apt install -y acl
+mount | grep acl   <span class="cm"># verifica que el FS soporta ACL (ext4 sí por defecto)</span></pre>
+</div>
+
+<div class="pasos">
+<strong>Escenario:</strong> quiero que <span class="k">secreto.txt</span> lo lea solo alumno2, además del dueño.
+<pre class="code">cd ~/Equipo/privado
+
+<span class="cm"># Sin ACL: para dar lectura a otro usuario tendrías que ampliar a "otros"</span>
+ls -la secreto.txt
+
+<span class="cm"># Con ACL: doy lectura solo a alumno2</span>
+sudo setfacl -m u:alumno2:r secreto.txt
+
+<span class="cm"># Verifica</span>
+ls -la secreto.txt    <span class="cm"># aparece un + al final de los permisos</span>
+getfacl secreto.txt</pre>
+</div>
+
+<div class="q">
+<label>4.1 · ¿Qué significa el <span class="k">+</span> al final de los permisos en <span class="k">ls -la</span>?</label>
+<input type="text" data-k="q_4_1">
+</div>
+
+<div class="pasos">
+<strong>Heredar ACL en una carpeta</strong>
+<pre class="code">sudo setfacl -d -m u:alumno2:rwx ~/Equipo/publico
+
+<span class="cm"># Cualquier archivo nuevo dentro hereda esta ACL</span>
+touch ~/Equipo/publico/nuevo.txt
+getfacl ~/Equipo/publico/nuevo.txt</pre>
+</div>
+
+<div class="pasos">
+<strong>Quitar ACL</strong>
+<pre class="code">sudo setfacl -x u:alumno2 ~/Equipo/privado/secreto.txt
+getfacl ~/Equipo/privado/secreto.txt
+
+<span class="cm"># Borrar todas las ACL</span>
+sudo setfacl -b ~/Equipo/publico</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.2 · Captura mostrando <span class="k">getfacl</span> con la ACL aplicada</label>
+<div class="shot" data-k="s4_acl"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> Cifrado en Windows · BitLocker en disco virtual <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Requisito:</strong> tu VM Windows debe ser <strong>Pro o Enterprise</strong> (Home no tiene BitLocker). Si tienes Home, salta a la sección 6 y haz solo el cifrado de Linux. Para verlo: <span class="k">winver</span>.
+</div>
+
+<p>Vamos a cifrar el disco extra E: que añadiste en la P3 (si lo eliminaste, créalo de nuevo y formatealo NTFS).</p>
+
+<div class="pasos">
+<strong>Activar BitLocker en E:</strong>
+<ol>
+<li>Abre el Explorador → clic derecho en <strong>E:</strong> → <strong>Activar BitLocker</strong>.</li>
+<li>Elige «Usar contraseña para desbloquear la unidad» → contraseña <span class="k">BitLocker2026!</span></li>
+<li>Guardar la clave de recuperación → «en un archivo». Guárdala en <span class="k">C:\Users\&lt;tú&gt;\Desktop\clave_E.txt</span>.</li>
+<li>«Cifrar solo el espacio usado» (más rápido para esta prueba).</li>
+<li>«Modo compatible» (mejor compatibilidad).</li>
+<li>Iniciar cifrado. Tarda unos minutos.</li>
+</ol>
+</div>
+
+<div class="aviso">
+<strong>LA CLAVE DE RECUPERACIÓN ES IMPRESCINDIBLE.</strong> Sin ella, si olvidas la contraseña, los datos son <em>irrecuperables</em>. En esta práctica vamos a usarla a propósito.
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.1 · Captura del Explorador con el icono del candado en E: (cifrado activo) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_bitlocker"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Probar el cifrado</strong>
+<ol>
+<li>Crea un archivo de prueba en E:\</li>
+<li>Cierra sesión o reinicia la VM.</li>
+<li>Al volver, al hacer doble clic en E: → pide contraseña.</li>
+<li>Pruébala. ¿Funciona?</li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>Recuperar con la clave (escenario olvido de contraseña)</strong>
+<ol>
+<li>Bloquea E: (clic derecho → Bloquear unidad).</li>
+<li>Doble clic → cuando pida contraseña, escribe una incorrecta. «Más opciones» → «Introducir clave de recuperación».</li>
+<li>Abre <span class="k">clave_E.txt</span>, copia los 48 dígitos, pégalos.</li>
+<li>Confirma que la unidad se abre.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>5.2 · ¿Cuántos dígitos exactos tiene tu clave de recuperación? ¿En qué bloques está dividida?</label>
+<input type="text" data-k="q_5_2">
+</div>
+
+<div class="pasos">
+<strong>Gestionar BitLocker desde CMD</strong>
+<pre class="code">manage-bde -status E:
+manage-bde -lock E:        REM bloquear inmediatamente
+manage-bde -unlock E: -password
+manage-bde -off E:         REM descifrar (cuidado)</pre>
+</div>
+
+<div class="q">
+<label>5.3 · Pega la salida de <span class="k">manage-bde -status E:</span> con tu disco cifrado</label>
+<textarea data-k="q_5_3" style="font-family:monospace;font-size:12px"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Cifrado en Linux · LUKS en disco virtual <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>LUKS (Linux Unified Key Setup) es el estándar de cifrado de particiones en Linux. Vamos a cifrar <span class="k">/dev/sdb3</span> (la partición FAT32 que creaste en la P3 — la vamos a re-formatear, así que asegúrate de que no tiene datos importantes).</p>
+
+<div class="pasos">
+<strong>Paso 1 · Desmontar y limpiar</strong>
+<pre class="code">sudo umount /mnt/fat32_compat 2&gt;/dev/null
+
+<span class="cm"># Quita la línea de /etc/fstab para que no falle al arrancar</span>
+sudo nano /etc/fstab
+<span class="cm"># Comenta con # la línea de /dev/sdb3 y guarda</span></pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 2 · Crear contenedor LUKS sobre sdb3</strong>
+<pre class="code">sudo apt install -y cryptsetup
+
+<span class="cm"># Inicializa la partición como LUKS (CUIDADO: borra los datos)</span>
+sudo cryptsetup luksFormat /dev/sdb3
+<span class="cm"># Confirma con YES (mayúsculas)</span>
+<span class="cm"># Contraseña: LinuxLUKS2026!</span></pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 3 · Abrir el contenedor y formatear dentro</strong>
+<pre class="code"><span class="cm"># Abrir como mapeo (se crea /dev/mapper/cripta)</span>
+sudo cryptsetup open /dev/sdb3 cripta
+
+<span class="cm"># Verifica</span>
+ls -la /dev/mapper/cripta
+lsblk
+
+<span class="cm"># Formatea ext4 DENTRO del contenedor</span>
+sudo mkfs.ext4 -L "CIFRADO" /dev/mapper/cripta
+
+<span class="cm"># Montar</span>
+sudo mkdir -p /mnt/cifrado
+sudo mount /dev/mapper/cripta /mnt/cifrado
+df -h | grep cifrado</pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 4 · Probar</strong>
+<pre class="code">echo "Este archivo está dentro de LUKS" | sudo tee /mnt/cifrado/prueba.txt
+sudo cat /mnt/cifrado/prueba.txt
+
+<span class="cm"># Cerrar (lo cifra de vuelta)</span>
+sudo umount /mnt/cifrado
+sudo cryptsetup close cripta
+lsblk</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura mostrando <span class="k">lsblk</span> con el contenedor abierto (<span class="k">cripta</span> visible) y con la partición montada <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_luks"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Paso 5 · Reabrir tras cerrar</strong>
+<pre class="code">sudo cryptsetup open /dev/sdb3 cripta
+<span class="cm"># Pide la contraseña: LinuxLUKS2026!</span>
+sudo mount /dev/mapper/cripta /mnt/cifrado
+ls /mnt/cifrado/
+sudo cat /mnt/cifrado/prueba.txt</pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 6 · Múltiples contraseñas (slot keys)</strong>
+<p>LUKS soporta hasta 8 contraseñas distintas (slots). Útil para entornos con varios admins.</p>
+<pre class="code">sudo cryptsetup luksAddKey /dev/sdb3
+<span class="cm"># Pide la contraseña existente (LinuxLUKS2026!)</span>
+<span class="cm"># Después pide la nueva: backup2026!</span>
+
+sudo cryptsetup luksDump /dev/sdb3 | grep -A2 "Key Slot"</pre>
+</div>
+
+<div class="q">
+<label>6.2 · ¿Cuántos slots ocupados ves después de añadir la 2ª contraseña?</label>
+<input type="text" data-k="q_6_2" class="inline">
+</div>
+
+<div class="tip">
+<strong>Caso real.</strong> Las distros como Ubuntu ofrecen «Cifrar la nueva instalación» al instalar. Eso configura LUKS sobre la raíz automáticamente. Saber gestionarlo desde consola te permite reparar instalaciones cifradas que arrancan mal.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Cuotas de disco <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<h3>Cuotas en Windows</h3>
+<div class="pasos">
+<ol>
+<li>Clic derecho en C: → Propiedades → pestaña <strong>Cuota</strong> → Mostrar configuración de cuota.</li>
+<li>Marca «Habilitar la administración de cuota».</li>
+<li>Marca «Denegar espacio en disco a usuarios que excedan el límite de cuota».</li>
+<li>Limitar espacio: <strong>500 MB</strong>, nivel de advertencia: <strong>400 MB</strong>.</li>
+<li>Aplicar.</li>
+<li>Entradas de cuota → Cuota → Nueva entrada de cuota → busca <span class="k">alumno2</span> → asigna 200 MB / 150 MB.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 7.1 · Captura de Entradas de cuota mostrando alumno2 con su límite asignado</label>
+<div class="shot" data-k="s7_cuota_win"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Cuotas en Linux</h3>
+<p>Más antiguo, pero funcional. Se usa en aulas y servidores.</p>
+<pre class="code">sudo apt install -y quota
+
+<span class="cm"># Editar /etc/fstab para añadir las opciones usrquota,grpquota a /home</span>
+<span class="cm"># Si /home es partición propia. Si no, a /</span>
+sudo nano /etc/fstab
+<span class="cm"># Cambia la línea de la raíz / o de /home:</span>
+<span class="cm">#   ANTES:   ... ext4 defaults 0 1</span>
+<span class="cm">#   DESPUÉS: ... ext4 defaults,usrquota,grpquota 0 1</span>
+
+sudo mount -o remount /
+
+<span class="cm"># Inicializar cuotas</span>
+sudo quotacheck -cum /
+sudo quotaon /
+
+<span class="cm"># Asignar cuota a alumno2: soft 50M, hard 100M</span>
+sudo setquota -u alumno2 51200 102400 0 0 /
+
+<span class="cm"># Verificar</span>
+sudo quota -u alumno2
+sudo repquota /</pre>
+
+<div class="q">
+<label>7.2 · ¿Diferencia entre soft limit y hard limit?</label>
+<textarea data-k="q_7_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 8 ============= -->
+<div class="section">
+<h2><span class="n">8</span> Reto final · Escenario realista <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Escenario.</strong> Tu cliente es una clínica con 5 técnicos. Te pide:
+<ul>
+<li>Una carpeta <strong>Compartida</strong> donde todos lean y escriban.</li>
+<li>Una carpeta <strong>Solo_Dirección</strong> a la que solo accede la directora.</li>
+<li>Una carpeta <strong>Solo_Lectura_Protocolos</strong> que todos leen pero solo la directora modifica.</li>
+<li>El disco principal cifrado con BitLocker (o LUKS si es Linux) por si roban un equipo.</li>
+<li>Cada usuario con un máximo de 1 GB en su carpeta.</li>
+</ul>
+</div>
+
+<div class="q">
+<label>8.1 · Diseña la solución completa: qué usuarios y grupos crearías, qué permisos pondrías a cada carpeta, qué herramienta de cifrado usarías y por qué. Sé concreto.</label>
+<textarea data-k="q_8_1" style="min-height:200px"></textarea>
+</div>
+
+<div class="q">
+<label>8.2 · La directora pierde su contraseña. ¿Qué le habrías recomendado antes? ¿Cómo podrías recuperar sus datos?</label>
+<textarea data-k="q_8_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He creado el segundo usuario en ambos SOs.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He configurado permisos NTFS con herencia rota y verificado con icacls.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · Domino chmod octal y simbólico, y he comprobado el bit x en carpetas.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He usado ACL (setfacl/getfacl) para dar permisos a un usuario concreto.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · He cifrado E: con BitLocker y recuperado con la clave de 48 dígitos (si Pro/Enterprise).</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He cifrado sdb3 con LUKS, abierto, montado, escrito, cerrado y reabierto.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · He configurado cuotas en Windows y en Linux.</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> S8 · He diseñado la solución del escenario clínica.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_10"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué te ha parecido más complicado?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 4 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s04_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

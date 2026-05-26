@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P5 · UF0853 · Accesibilidad y dispositivos</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#276749; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+.persona{background:#fff5f5;border:1px solid #feb2b2;border-left:5px solid var(--rojo);border-radius:8px;padding:14px 18px;margin:12px 0}
+.persona h4{color:var(--rojo);margin-bottom:6px}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno,.persona{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P5 · UF0853 · Accesibilidad y dispositivos</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 5 · Accesibilidad y configuración de dispositivos</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 5 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Vas a configurar 3 perfiles de accesibilidad para 3 personas con necesidades distintas, y después vas a diagnosticar 3 problemas de hardware en el Administrador de dispositivos. Termina inventariando todo el hardware de la VM por consola.</p>
+<p><strong>Por qué importa.</strong> La accesibilidad NO es una opción: es ley (CE EAA 2025 + UNE-EN 301549). Y los problemas de drivers son el día a día de cualquier técnico.</p>
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Tres perfiles de accesibilidad (Windows) <span class="dur">50 min</span></h2>
+<div class="sb">
+
+<p>Cada persona tiene necesidades reales. Vas a configurar Windows para los 3 casos y probarlos durante <strong>al menos 5 minutos cada uno</strong>. La idea es que sientas qué es usar el SO con la limitación.</p>
+
+<div class="persona">
+<h4>👵 Persona 1 · Carmen, 68 años, baja visión y manos temblorosas</h4>
+<p>No ve bien la pantalla, tiene cataratas. Le tiemblan las manos: a veces toca dos veces sin querer.</p>
+</div>
+
+<div class="pasos">
+<strong>Configura para Carmen</strong>
+<ol>
+<li>Win+I → Accesibilidad → <strong>Texto</strong>: tamaño de texto al <strong>150%</strong>.</li>
+<li>Accesibilidad → <strong>Cursor de mouse y puntero</strong>: tamaño del puntero al <strong>5</strong>, color «invertido».</li>
+<li>Accesibilidad → <strong>Cursor de texto</strong>: indicador activado, tamaño 5, color amarillo.</li>
+<li>Accesibilidad → <strong>Lupa</strong>: actívala al 200%, modo «acoplada».</li>
+<li>Accesibilidad → <strong>Temas de color</strong> → contraste alto «Acuático» o similar.</li>
+<li>Accesibilidad → <strong>Teclado</strong> → activa <strong>Teclas de filtro</strong>: ignora pulsaciones rápidas o repetidas.</li>
+<li>Usa el equipo así durante 5 minutos: abre Edge, busca «accesibilidad cataratas» y lee.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 1.1 · Captura del escritorio con la configuración de Carmen activa (alto contraste + lupa + cursor) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_carmen"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>1.2 · ¿Qué te ha costado más al usar el equipo así durante 5 minutos? Sé honesto.</label>
+<textarea data-k="q_1_2"></textarea>
+</div>
+
+<div class="persona">
+<h4>👨‍🦯 Persona 2 · Pablo, 34 años, ceguera total</h4>
+<p>Pablo no ve nada. Trabaja en una oficina y necesita usar Outlook y Word.</p>
+</div>
+
+<div class="pasos">
+<strong>Configura para Pablo</strong>
+<ol>
+<li>Antes de activar el Narrador, lee <strong>los atajos básicos</strong>:
+<ul>
+<li><strong>Win+Ctrl+Intro</strong>: activar/desactivar Narrador.</li>
+<li><strong>Bloq Mayús + flechas</strong>: navegar.</li>
+<li><strong>Bloq Mayús + R</strong>: leer desde donde está el cursor.</li>
+<li><strong>Bloq Mayús + Esc</strong>: salir del Narrador.</li>
+</ul></li>
+<li>Activa el Narrador con <strong>Win+Ctrl+Intro</strong>.</li>
+<li>Sigue el tutorial inicial (te lo lee él mismo).</li>
+<li><strong>Cierra los ojos.</strong> Sin abrirlos, intenta:
+<ul>
+<li>Abrir el Bloc de notas (Win + escribe «bloc» + Enter).</li>
+<li>Escribir tu nombre.</li>
+<li>Guardarlo en el Escritorio.</li>
+</ul></li>
+<li>Tiempo máximo: 10 minutos.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>1.3 · ¿Has conseguido guardar el archivo con los ojos cerrados? ¿Qué te ha pasado? Anota lo que has aprendido.</label>
+<textarea data-k="q_1_3" style="min-height:90px"></textarea>
+</div>
+
+<div class="persona">
+<h4>👦 Persona 3 · Marta, 12 años, sordera profunda</h4>
+<p>Marta no oye. Quiere ver vídeos de YouTube en clase y participar en videollamadas familiares.</p>
+</div>
+
+<div class="pasos">
+<strong>Configura para Marta</strong>
+<ol>
+<li>Accesibilidad → <strong>Subtítulos en directo</strong>: actívalos con <strong>Win+Ctrl+L</strong>.</li>
+<li>Acepta que descargue el modelo de idioma (primera vez, pesa ~250 MB; si la VM no tiene internet salta este paso y solo lo explicas).</li>
+<li>Abre cualquier vídeo de YouTube en Edge y observa los subtítulos automáticos generados por el SO en una barra superior.</li>
+<li>Accesibilidad → <strong>Audio</strong>: activa «Mostrar alertas de audio visualmente» (flash de pantalla cuando hay un sonido del sistema).</li>
+<li>Accesibilidad → <strong>Audio mono</strong>: actívalo (combinar los dos canales en uno, útil con un solo audífono).</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 1.4 · Captura mostrando los subtítulos en directo funcionando sobre un vídeo</label>
+<div class="shot" data-k="s1_marta"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="aviso">
+<strong>Restablecer.</strong> Al terminar, desactiva todo lo que has activado para Carmen/Pablo/Marta. Texto al 100%, sin alto contraste, narrador apagado, etc. Si no, la VM queda rara para las próximas prácticas.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Accesibilidad en Ubuntu (Orca y GNOME) <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Acceso</strong>
+<ol>
+<li>Configuración → <strong>Accesibilidad</strong>.</li>
+<li>Activa: <strong>Texto grande</strong>, <strong>Alto contraste</strong>, <strong>Zoom</strong>.</li>
+<li>Para el lector de pantalla: <span class="k">sudo apt install -y orca</span>. Después actívalo en Accesibilidad → Lector de pantalla.</li>
+<li>Atajo: <strong>Super + Alt + S</strong> activa/desactiva Orca.</li>
+</ol>
+</div>
+
+<h3>Equivalencias rápidas</h3>
+<table>
+<tr><th>Función</th><th>Windows</th><th>Ubuntu</th></tr>
+<tr><td>Lector de pantalla</td><td>Narrador (Win+Ctrl+Intro)</td><td>Orca (Super+Alt+S)</td></tr>
+<tr><td>Lupa</td><td>Win + tecla más</td><td>Super + tecla más</td></tr>
+<tr><td>Alto contraste</td><td>Win+Ctrl+C (toggle clásico) / Temas</td><td>Configuración → Accesibilidad</td></tr>
+<tr><td>Teclas pegajosas</td><td>5× Mayús</td><td>Sí, en Accesibilidad</td></tr>
+<tr><td>Teclado en pantalla</td><td>Win+Ctrl+O</td><td>Sí, en Accesibilidad</td></tr>
+</table>
+
+<div class="shot-wrap">
+<label>📷 2.1 · Captura del panel Accesibilidad de Ubuntu con varias opciones activas</label>
+<div class="shot" data-k="s2_ubuntu_acc"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>2.2 · Compara: ¿qué SO te parece más completo en accesibilidad de fábrica? Justifica.</label>
+<textarea data-k="q_2_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Administrador de dispositivos a fondo (Windows) <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>Abre <span class="k">devmgmt.msc</span>. Vamos a recorrer todas las categorías y entender qué hay.</p>
+
+<div class="pasos">
+<strong>Inventario completo</strong>
+<p>Rellena esta tabla mirando cada categoría:</p>
+<table>
+<tr><th>Categoría</th><th>¿Cuántos elementos?</th><th>Marca / modelo del primero</th></tr>
+<tr><td>Adaptadores de pantalla</td><td><input type="text" data-k="q_3_a1"></td><td><input type="text" data-k="q_3_a2"></td></tr>
+<tr><td>Adaptadores de red</td><td><input type="text" data-k="q_3_b1"></td><td><input type="text" data-k="q_3_b2"></td></tr>
+<tr><td>Controladoras de almacenamiento</td><td><input type="text" data-k="q_3_c1"></td><td><input type="text" data-k="q_3_c2"></td></tr>
+<tr><td>Dispositivos de sistema</td><td><input type="text" data-k="q_3_d1"></td><td>—</td></tr>
+<tr><td>Procesadores</td><td><input type="text" data-k="q_3_e1"></td><td><input type="text" data-k="q_3_e2"></td></tr>
+<tr><td>Unidades de disco</td><td><input type="text" data-k="q_3_f1"></td><td><input type="text" data-k="q_3_f2"></td></tr>
+<tr><td>Controladoras USB</td><td><input type="text" data-k="q_3_g1"></td><td>—</td></tr>
+</table>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.1 · Captura del Administrador de dispositivos con todas las categorías desplegadas <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_devmgmt"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Diagnóstico simulado · 3 averías a resolver</h3>
+
+<div class="persona">
+<h4>🔧 Avería 1 · El sonido no funciona</h4>
+<p>Vas a provocarla a propósito: Administrador de dispositivos → Controladoras de sonido y vídeo → clic derecho en el dispositivo de audio → <strong>Deshabilitar</strong>.</p>
+<p>Ahora intenta reproducir un sonido (Win+R → <span class="k">control mmsys.cpl</span> → pestaña Sonidos → probar). ¿Se oye?</p>
+</div>
+
+<div class="q">
+<label>3.2 · Diagnóstico paso a paso: ¿cómo localizarías el problema (sin saber lo que tú mismo has hecho)?</label>
+<textarea data-k="q_3_2"></textarea>
+</div>
+
+<p><strong>Reparar:</strong> clic derecho → Habilitar.</p>
+
+<div class="persona">
+<h4>🔧 Avería 2 · Driver desactualizado</h4>
+<p>Elige cualquier dispositivo → Propiedades → pestaña Controlador → <strong>Revertir controlador</strong> si está disponible, o anota la fecha y versión.</p>
+</div>
+
+<div class="q">
+<label>3.3 · Versión y fecha del controlador del adaptador de red en tu VM</label>
+<input type="text" data-k="q_3_3" placeholder="ej. 10.0.19041.1 - 06/06/2023">
+</div>
+
+<div class="persona">
+<h4>🔧 Avería 3 · Dispositivo desconocido</h4>
+<p>Para reproducir un «dispositivo desconocido» en VM: instala/desinstala las Guest Additions de VirtualBox. Tras una desinstalación, suele quedar algún dispositivo con ⚠.</p>
+</div>
+
+<div class="q">
+<label>3.4 · ¿Cuántos dispositivos con icono de advertencia hay en tu VM ahora mismo? Si hay alguno, anota qué es.</label>
+<input type="text" data-k="q_3_4">
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Inventario por consola (CMD y PowerShell) <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<h3>WMIC y CIM en Windows</h3>
+<pre class="code"><span class="cm">REM CPU</span>
+wmic cpu get name,numberofcores,maxclockspeed
+<span class="cm">REM RAM</span>
+wmic memorychip get capacity,speed,manufacturer
+<span class="cm">REM Disco</span>
+wmic diskdrive get model,size,interfacetype
+<span class="cm">REM BIOS</span>
+wmic bios get manufacturer,smbiosbiosversion,releasedate
+<span class="cm">REM Placa base</span>
+wmic baseboard get product,manufacturer,serialnumber</pre>
+
+<p>WMIC está deprecado. La versión moderna en PowerShell:</p>
+<pre class="code">Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,MaxClockSpeed
+Get-CimInstance Win32_PhysicalMemory | Select-Object Capacity,Speed,Manufacturer
+Get-CimInstance Win32_DiskDrive | Select-Object Model,Size,InterfaceType
+Get-CimInstance Win32_BIOS
+Get-CimInstance Win32_BaseBoard
+
+<span class="cm"># Resumen completo (¡oro puro!)</span>
+Get-ComputerInfo | Format-List CsManufacturer,CsModel,OsName,OsVersion,CsProcessors,CsTotalPhysicalMemory</pre>
+
+<div class="shot-wrap">
+<label>📷 4.1 · Captura de PowerShell con <span class="k">Get-ComputerInfo</span> mostrando los datos de tu VM <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_psinventario"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Inventario en Linux</h3>
+<pre class="code"><span class="cm"># Información del sistema completa</span>
+sudo apt install -y hwinfo lshw inxi
+
+inxi -F                  <span class="cm"># resumen amigable</span>
+sudo lshw -short         <span class="cm"># vista resumida</span>
+sudo lshw -class disk    <span class="cm"># solo discos</span>
+sudo lshw -class network <span class="cm"># solo red</span>
+
+<span class="cm"># PCI y USB</span>
+lspci | grep -i "vga\|network\|audio"
+lsusb
+lsblk
+
+<span class="cm"># CPU y memoria</span>
+lscpu
+free -h
+cat /proc/cpuinfo | grep "model name" | head -1
+cat /proc/meminfo | head -3
+
+<span class="cm"># Resumen DMI (placa base, BIOS)</span>
+sudo dmidecode -t system
+sudo dmidecode -t baseboard
+sudo dmidecode -t bios</pre>
+
+<div class="shot-wrap">
+<label>📷 4.2 · Captura de <span class="k">inxi -F</span> en Ubuntu mostrando el inventario completo de la VM <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_inxi"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>4.3 · Rellena con los datos reales de tu VM Ubuntu</label>
+<table>
+<tr><th>Dato</th><th>Valor</th></tr>
+<tr><td>Modelo CPU</td><td><input type="text" data-k="q_4_3a"></td></tr>
+<tr><td>Núcleos</td><td><input type="text" data-k="q_4_3b"></td></tr>
+<tr><td>RAM</td><td><input type="text" data-k="q_4_3c"></td></tr>
+<tr><td>Modelo de disco</td><td><input type="text" data-k="q_4_3d"></td></tr>
+<tr><td>Tarjeta de red</td><td><input type="text" data-k="q_4_3e"></td></tr>
+<tr><td>Adaptador de vídeo</td><td><input type="text" data-k="q_4_3f"></td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> Drivers en Linux: módulos del kernel <span class="dur">20 min</span></h2>
+<div class="sb">
+
+<p>En Linux los drivers son <strong>módulos del kernel</strong>. Casi todos vienen ya compilados con el kernel.</p>
+
+<pre class="code"><span class="cm"># Listar módulos cargados</span>
+lsmod | head -20
+
+<span class="cm"># Ver info de un módulo concreto</span>
+modinfo e1000          <span class="cm"># driver de Intel ethernet</span>
+
+<span class="cm"># Cargar un módulo manualmente</span>
+sudo modprobe usb_storage
+
+<span class="cm"># Descargar un módulo</span>
+sudo modprobe -r usb_storage
+
+<span class="cm"># Ver qué driver usa cada dispositivo PCI</span>
+lspci -k | head -30
+
+<span class="cm"># Logs del kernel: aquí se ven cargas/descargas de drivers en tiempo real</span>
+sudo dmesg | tail -30
+sudo dmesg -w        <span class="cm"># live tail (Ctrl+C para salir)</span></pre>
+
+<div class="pasos">
+<strong>Experimento · Drivers Nvidia</strong>
+<p>Si tienes una VM con GPU virtual o un equipo físico:</p>
+<pre class="code">ubuntu-drivers devices         <span class="cm"># muestra drivers disponibles</span>
+sudo ubuntu-drivers autoinstall  <span class="cm"># instala los recomendados</span></pre>
+</div>
+
+<div class="q">
+<label>5.1 · ¿Qué driver usa tu adaptador de red según <span class="k">lspci -k</span>?</label>
+<input type="text" data-k="q_5_1" class="inline">
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.2 · Captura de <span class="k">lspci -k | head -30</span> o <span class="k">lsmod | head -20</span></label>
+<div class="shot" data-k="s5_drivers"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Reto final · Informe de inventario <span class="dur">20 min</span></h2>
+<div class="sb">
+
+<p>Vas a generar un <strong>informe de inventario</strong> automático combinando todo lo aprendido.</p>
+
+<div class="pasos">
+<strong>En Linux</strong>
+<pre class="code">cd ~
+{
+  echo "INVENTARIO HARDWARE - $(hostname) - $(date)"
+  echo "============================================"
+  echo ""
+  echo "## CPU"
+  lscpu | grep -E "Model name|CPU\(s\)|Architecture"
+  echo ""
+  echo "## MEMORIA"
+  free -h
+  echo ""
+  echo "## DISCOS"
+  lsblk
+  echo ""
+  echo "## RED"
+  ip -br a
+  echo ""
+  echo "## PCI"
+  lspci
+  echo ""
+  echo "## USB"
+  lsusb
+} &gt; inventario_$(hostname)_$(date +%Y%m%d).txt
+
+cat inventario_*.txt</pre>
+</div>
+
+<div class="pasos">
+<strong>En Windows · PowerShell</strong>
+<pre class="code">$out = "$env:USERPROFILE\Desktop\inventario_$(hostname)_$(Get-Date -Format yyyyMMdd).txt"
+"INVENTARIO HARDWARE - $(hostname) - $(Get-Date)" | Out-File $out
+"=================================" | Out-File $out -Append
+Get-ComputerInfo | Format-List CsManufacturer,CsModel,OsName,OsVersion,CsProcessors,CsTotalPhysicalMemory | Out-File $out -Append
+"## DISCOS" | Out-File $out -Append
+Get-CimInstance Win32_DiskDrive | Format-List Model,Size,InterfaceType | Out-File $out -Append
+"## RED" | Out-File $out -Append
+Get-NetAdapter | Format-List Name,InterfaceDescription,LinkSpeed,MacAddress | Out-File $out -Append
+notepad $out</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura del informe de inventario generado (en Windows o Linux, el que prefieras) <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_informe"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He configurado los 3 perfiles de Carmen, Pablo y Marta y los he probado al menos 5 min cada uno.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> He cerrado los ojos y guardado un archivo solo con el Narrador.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S2 · He configurado accesibilidad en Ubuntu (Orca + zoom + contraste).</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S3 · He inventariado el Administrador de dispositivos y diagnosticado las 3 averías.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S4 · He hecho inventario con WMIC/PowerShell y con inxi/lshw.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S5 · Entiendo los módulos del kernel y he visto qué driver usa cada dispositivo.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S6 · He generado un informe de inventario automático.</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> He restablecido la accesibilidad al normal al terminar.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_10"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>Tras la experiencia con los ojos cerrados, ¿qué cambia en tu percepción sobre la accesibilidad?</label>
+<textarea data-k="ev_reflexion" style="min-height:90px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 5 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s05_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

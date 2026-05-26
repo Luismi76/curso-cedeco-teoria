@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P2 · UF0853 · Gestión de archivos en Linux</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#c05621; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+.bar button.danger:hover{background:rgba(220,53,69,.45)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+header.head .meta strong{opacity:1}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}
+.sb ul,.sb ol{margin:6px 0 8px 22px}
+.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}
+.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+pre.code .p{color:#68d391}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}
+.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}
+.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot-wrap>label .req{color:var(--rojo);margin-left:4px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px 18px}.content{padding:16px 14px}.sb{padding:14px 14px}}
+@media print{
+body{background:#fff;padding:0;font-size:11px}
+.bar,#saved-indicator,.shot .x,.no-print{display:none!important}
+.container{box-shadow:none;border-radius:0;max-width:100%}
+.section{page-break-inside:avoid;border:1px solid #999}
+header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+th{background:#edf2f7!important;-webkit-print-color-adjust:exact}
+.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}
+textarea{min-height:auto!important;overflow:visible;height:auto}
+.shot{border:1px dashed #999;min-height:100px}
+.shot img{max-height:300px}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P2 · UF0853 · Gestión de archivos en Linux</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 2 · Gestión de archivos en Linux</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 2 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Ubuntu (práctica 07) · <strong>No requiere</strong> hardware externo<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas, exportado como JSON o impreso a PDF
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre" placeholder="Tu nombre completo"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas" placeholder="ej. 4h"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> La terminal de Linux es la herramienta más potente que vas a usar en tu carrera. Si dominas estos comandos, dominas el sistema. En esta sesión vas a manejar la terminal de Ubuntu durante 4 horas: navegación, manipulación de archivos, comodines, redirección, tuberías, búsquedas con <span class="k">find</span> y <span class="k">grep</span>, compresión y edición.</p>
+<p><strong>Por qué importa.</strong> En un servidor real (web, base de datos, red) <em>no hay escritorio gráfico</em>. Solo terminal por SSH. Si no sabes moverte ahí, no puedes administrar nada.</p>
+<p><strong>Cómo se entrega.</strong> Pega capturas con <kbd>Ctrl+V</kbd>, arrastra o selecciona. Autosave en este navegador. <strong>⬇ Exportar</strong> al terminar.</p>
+</div>
+
+<div class="nota">
+<strong>Antes de empezar:</strong> arranca la VM Ubuntu. Abre una terminal con <span class="k">Ctrl+Alt+T</span>. Si no la tienes funcionando, vuelve a la práctica 07.
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Anatomía del prompt y navegación <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<h3>Diseccionar el prompt</h3>
+<p>Cuando abres una terminal, lo primero que ves es algo así:</p>
+<pre class="code"><span class="p">juan@portatil</span>:<span class="cm">~</span>$ </pre>
+<p>Léelo de izquierda a derecha:</p>
+<ul>
+<li><span class="k">juan</span> — tu usuario.</li>
+<li><span class="k">@</span> — separador.</li>
+<li><span class="k">portatil</span> — el hostname (nombre del equipo).</li>
+<li><span class="k">:</span> — separador.</li>
+<li><span class="k">~</span> — directorio actual (la virgulilla = <span class="k">/home/juan</span>).</li>
+<li><span class="k">$</span> — usuario normal. Si fuera <span class="k">#</span>, serías root.</li>
+</ul>
+
+<div class="q">
+<label>1.1 · Anota el prompt completo que ves en tu VM (copia tal cual)</label>
+<input type="text" data-k="q_1_1" placeholder="ej. alumno@ubuntu:~$ ">
+</div>
+
+<div class="pasos">
+<strong>Comandos de orientación</strong>
+<pre class="code">whoami       <span class="cm"># ¿quién soy?</span>
+hostname     <span class="cm"># ¿en qué máquina estoy?</span>
+pwd          <span class="cm"># ¿dónde estoy?</span>
+id           <span class="cm"># UID, GID y grupos</span>
+date         <span class="cm"># fecha y hora</span>
+uptime       <span class="cm"># tiempo encendido y carga</span>
+uname -a     <span class="cm"># kernel y arquitectura</span></pre>
+</div>
+
+<table>
+<tr><th>Comando</th><th>Tu salida</th></tr>
+<tr><td><span class="k">whoami</span></td><td><input type="text" data-k="q_orient_1"></td></tr>
+<tr><td><span class="k">id</span> (UID que aparece)</td><td><input type="text" data-k="q_orient_2"></td></tr>
+<tr><td><span class="k">uname -a</span> (versión del kernel)</td><td><input type="text" data-k="q_orient_3"></td></tr>
+<tr><td><span class="k">uptime</span> (carga media)</td><td><input type="text" data-k="q_orient_4"></td></tr>
+</table>
+
+<div class="shot-wrap">
+<label>📷 1.2 · Captura de la terminal con la salida de los 6 comandos anteriores <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_orient"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Navegación</h3>
+<pre class="code">cd /etc             <span class="cm"># ir a /etc (absoluta)</span>
+pwd                 <span class="cm"># confirma dónde estás</span>
+cd                  <span class="cm"># sin argumento te lleva a ~</span>
+cd /var/log
+cd -                <span class="cm"># vuelve a la carpeta anterior</span>
+cd ../..            <span class="cm"># sube dos niveles</span>
+cd ~juan            <span class="cm"># va a la home de otro usuario (si existe)</span></pre>
+
+<div class="q">
+<label>1.3 · Ejecuta <span class="k">cd /etc &amp;&amp; ls | wc -l</span>. ¿Cuántos archivos/carpetas hay en /etc?</label>
+<input type="text" data-k="q_1_3" class="inline" placeholder="número">
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Listado, creación y manipulación <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<h3>Variantes de ls</h3>
+<pre class="code">ls                  <span class="cm"># simple</span>
+ls -l               <span class="cm"># largo, con permisos, tamaño, fecha</span>
+ls -la              <span class="cm"># incluye ocultos</span>
+ls -lh              <span class="cm"># tamaños humanos (K, M, G)</span>
+ls -lhS             <span class="cm"># ordenado por tamaño (S=size)</span>
+ls -lhrt            <span class="cm"># más reciente al final (r reverse, t time)</span>
+ls -laR /etc/network <span class="cm"># recursivo</span></pre>
+
+<div class="q">
+<label>2.1 · En tu home (<span class="k">cd ~</span>), ¿cuántos archivos ocultos hay? (<span class="k">ls -la | wc -l</span> menos 3 — punto, doblepunto y total)</label>
+<input type="text" data-k="q_2_1" class="inline">
+</div>
+
+<h3>Reto de creación</h3>
+<p>Vas a crear esta estructura en <span class="k">~/Reto_Linux</span>:</p>
+<pre class="code">~/Reto_Linux/
+├── docs/
+│   ├── 2024/
+│   ├── 2025/
+│   └── 2026/
+├── scripts/
+│   ├── activos/
+│   └── archivados/
+├── logs/
+└── .config_oculto/
+    └── settings.conf</pre>
+
+<div class="pasos">
+<strong>Hazlo en UNA línea aprovechando llaves y -p</strong>
+<pre class="code">mkdir -p ~/Reto_Linux/{docs/{2024,2025,2026},scripts/{activos,archivados},logs,.config_oculto}
+touch ~/Reto_Linux/.config_oculto/settings.conf
+tree ~/Reto_Linux -a    <span class="cm"># si no tienes tree: sudo apt install tree</span></pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.2 · Captura de la terminal con la salida de <span class="k">tree ~/Reto_Linux -a</span> <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_tree"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Rellenar con archivos</h3>
+<pre class="code">cd ~/Reto_Linux
+
+<span class="cm"># crear varios archivos con touch</span>
+touch docs/2024/{enero,febrero,marzo}.txt
+touch docs/2025/{enero,febrero,marzo,abril,mayo}.txt
+touch docs/2026/{enero,febrero}.txt
+
+<span class="cm"># archivo con contenido usando echo y redirección</span>
+echo "Mi primer script" &gt; scripts/activos/hola.sh
+echo "echo Hola mundo" &gt;&gt; scripts/activos/hola.sh
+cat scripts/activos/hola.sh
+
+<span class="cm"># varios archivos de log de relleno</span>
+for i in {1..10}; do echo "log $i" &gt; logs/sistema_$i.log; done
+ls -lh logs/</pre>
+
+<div class="q">
+<label>2.3 · ¿Qué hace la diferencia entre <span class="k">&gt;</span> y <span class="k">&gt;&gt;</span>? (lo acabas de usar)</label>
+<textarea data-k="q_2_3"></textarea>
+</div>
+
+<h3>cp y mv</h3>
+<pre class="code">cp scripts/activos/hola.sh scripts/activos/hola_copia.sh
+cp -r docs docs_backup   <span class="cm"># carpetas necesitan -r</span>
+mv docs_backup docs_archivo   <span class="cm"># renombrar</span>
+mv logs/sistema_1.log logs/old_1.log   <span class="cm"># mover/renombrar archivo</span>
+ls logs/</pre>
+
+<div class="q">
+<label>2.4 · ¿Por qué <span class="k">cp</span> de una carpeta sin <span class="k">-r</span> falla? ¿Qué mensaje da?</label>
+<textarea data-k="q_2_4"></textarea>
+</div>
+
+<h3>Borrado</h3>
+<pre class="code"><span class="cm"># un archivo</span>
+rm logs/old_1.log
+
+<span class="cm"># varios</span>
+rm logs/sistema_{8,9,10}.log
+
+<span class="cm"># carpeta entera (CUIDADO)</span>
+rm -r docs_archivo
+
+<span class="cm"># si quieres confirmación archivo por archivo</span>
+rm -i scripts/activos/hola_copia.sh</pre>
+
+<div class="aviso">
+<strong>Cuidado mortal:</strong> <span class="k">rm -rf /</span> borra todo el sistema. Sin papelera. Sin confirmación. Sin recuperación. Antes de teclear cualquier <span class="k">rm -rf</span>, mira dos veces la ruta.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Comodines y expansión <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<table>
+<tr><th>Comodín</th><th>Significado</th><th>Ejemplo</th></tr>
+<tr><td><span class="k">*</span></td><td>Cualquier cantidad de caracteres</td><td><span class="k">ls *.txt</span></td></tr>
+<tr><td><span class="k">?</span></td><td>Un único carácter</td><td><span class="k">ls foto?.jpg</span></td></tr>
+<tr><td><span class="k">[abc]</span></td><td>Cualquiera de esos</td><td><span class="k">ls foto[12].jpg</span></td></tr>
+<tr><td><span class="k">[a-z]</span></td><td>Rango</td><td><span class="k">ls *[0-9].txt</span></td></tr>
+<tr><td><span class="k">{a,b,c}</span></td><td>Varias opciones</td><td><span class="k">ls *.{txt,md,log}</span></td></tr>
+</table>
+
+<div class="pasos">
+<strong>Experimentos en <span class="k">~/Reto_Linux/docs</span></strong>
+<pre class="code">cd ~/Reto_Linux/docs/2025
+ls *.txt                       <span class="cm"># todos los .txt</span>
+ls ?nero.txt                   <span class="cm"># un solo carácter al inicio</span>
+ls [ef]*.txt                   <span class="cm"># empiezan por e o f</span>
+ls /etc/*.conf | head          <span class="cm"># confs en /etc, primeros 10</span>
+ls /etc/{passwd,group,shadow}  <span class="cm"># archivos concretos</span></pre>
+</div>
+
+<div class="q">
+<label>3.1 · ¿Cuántos archivos <span class="k">.conf</span> hay en <span class="k">/etc</span>? (<span class="k">ls /etc/*.conf | wc -l</span>)</label>
+<input type="text" data-k="q_3_1" class="inline">
+</div>
+
+<div class="q">
+<label>3.2 · Lista solo los archivos de <span class="k">/etc</span> que empiecen por «a» o «b» y terminen en «.conf». Escribe el comando exacto.</label>
+<input type="text" data-k="q_3_2" placeholder="ls /etc/...">
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.3 · Captura del comando del 3.2 ejecutándose en tu terminal</label>
+<div class="shot" data-k="s3_wildcard"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Redirección y tuberías <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<table>
+<tr><th>Símbolo</th><th>Qué hace</th></tr>
+<tr><td><span class="k">&gt;</span></td><td>Redirige salida a un archivo (sobrescribe)</td></tr>
+<tr><td><span class="k">&gt;&gt;</span></td><td>Añade al final del archivo</td></tr>
+<tr><td><span class="k">&lt;</span></td><td>Lee la entrada desde un archivo</td></tr>
+<tr><td><span class="k">|</span></td><td>Pasa la salida de un comando como entrada al siguiente</td></tr>
+<tr><td><span class="k">2&gt;</span></td><td>Redirige solo los errores</td></tr>
+<tr><td><span class="k">2&gt;&amp;1</span></td><td>Funde errores con la salida normal</td></tr>
+<tr><td><span class="k">/dev/null</span></td><td>«Agujero negro»: lo que se redirige ahí se descarta</td></tr>
+</table>
+
+<div class="pasos">
+<strong>Ejercicios</strong>
+<pre class="code">cd ~/Reto_Linux
+
+<span class="cm"># Listar /etc y guardar a archivo</span>
+ls /etc &gt; lista_etc.txt
+wc -l lista_etc.txt
+
+<span class="cm"># Añadir la fecha al final del archivo</span>
+date &gt;&gt; lista_etc.txt
+tail lista_etc.txt
+
+<span class="cm"># Pipeline: contar archivos .conf en /etc</span>
+ls /etc | grep "\.conf$" | wc -l
+
+<span class="cm"># Top 5 procesos por uso de memoria</span>
+ps aux --sort=-%mem | head -6
+
+<span class="cm"># Errores van por separado: forzar uno y redirigirlo</span>
+ls /noexiste 2&gt; errores.log
+cat errores.log
+
+<span class="cm"># Descartar errores</span>
+find / -name "*.conf" 2&gt; /dev/null | head</pre>
+</div>
+
+<div class="q">
+<label>4.1 · ¿Cuántas líneas tiene <span class="k">lista_etc.txt</span> antes de añadir la fecha? ¿Cuántas después?</label>
+<input type="text" data-k="q_4_1" placeholder="antes / después">
+</div>
+
+<div class="q">
+<label>4.2 · Compón un pipeline que muestre las 10 carpetas más grandes en tu home. (Pista: <span class="k">du -sh ~/*/ | sort -hr | head</span>)</label>
+<textarea data-k="q_4_2"></textarea>
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.3 · Captura de tu pipeline del 4.2 funcionando <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_pipe"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> Buscar archivos con find y texto con grep <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<h3>find: el buscador todoterreno</h3>
+<pre class="code"><span class="cm"># sintaxis: find &lt;dónde&gt; &lt;criterio&gt; &lt;acción&gt;</span>
+
+find /etc -name "*.conf"                   <span class="cm"># por nombre</span>
+find /etc -iname "*RESOLV*"                <span class="cm"># sin distinguir mayúsculas</span>
+find / -size +100M 2&gt;/dev/null             <span class="cm"># por tamaño &gt; 100 MB</span>
+find ~ -mtime -1                           <span class="cm"># modificados hace menos de 1 día</span>
+find ~ -mtime +30                          <span class="cm"># modificados hace más de 30 días</span>
+find ~ -type f -name "*.log"               <span class="cm"># solo archivos (no carpetas)</span>
+find ~ -type d -name "scripts"             <span class="cm"># solo directorios</span>
+find ~/Reto_Linux -empty                   <span class="cm"># vacíos</span>
+
+<span class="cm"># find + acción: borrar todos los .tmp</span>
+find /tmp -name "*.tmp" -delete
+
+<span class="cm"># find + exec: ejecutar comando sobre cada resultado</span>
+find ~/Reto_Linux/logs -name "*.log" -exec wc -l {} \;</pre>
+
+<div class="q">
+<label>5.1 · ¿Cuántos archivos <span class="k">.conf</span> hay en todo <span class="k">/etc</span> (recursivo)?</label>
+<input type="text" data-k="q_5_1" class="inline" placeholder="find /etc -name '*.conf' | wc -l">
+</div>
+
+<div class="q">
+<label>5.2 · Encuentra todos los archivos de tu home modificados en las últimas 24 horas. Comando exacto y número de resultados.</label>
+<input type="text" data-k="q_5_2" placeholder="el comando">
+</div>
+
+<h3>grep: buscar dentro de archivos</h3>
+<pre class="code">grep "root" /etc/passwd                  <span class="cm"># líneas con "root"</span>
+grep -i "INTERFACE" /etc/network/interfaces 2&gt;/dev/null <span class="cm"># sin mayúsculas</span>
+grep -n "bash" /etc/passwd               <span class="cm"># con número de línea</span>
+grep -c "bash" /etc/passwd               <span class="cm"># contar coincidencias</span>
+grep -v "#" /etc/ssh/sshd_config 2&gt;/dev/null | grep -v "^$"  <span class="cm"># sin comentarios ni vacías</span>
+grep -r "ubuntu" /etc 2&gt;/dev/null         <span class="cm"># recursivo</span>
+grep -E "^(root|nobody):" /etc/passwd     <span class="cm"># regex extendida</span></pre>
+
+<div class="q">
+<label>5.3 · ¿Cuántos usuarios tienen <span class="k">/bin/bash</span> como shell por defecto en tu sistema? (<span class="k">grep -c bash /etc/passwd</span>)</label>
+<input type="text" data-k="q_5_3" class="inline">
+</div>
+
+<div class="q">
+<label>5.4 · Lista los usuarios que NO tienen shell de login (busca <span class="k">nologin</span> o <span class="k">false</span>)</label>
+<input type="text" data-k="q_5_4" placeholder="grep -E ...">
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.5 · Captura de la salida de <span class="k">find / -name "ssh_config" 2&gt;/dev/null</span> mostrando todas las apariciones <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_find"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Compresión: tar, gzip, zip <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<h3>tar — el estándar en Linux</h3>
+<p>Memotécnico para las opciones más comunes:</p>
+<table>
+<tr><th>Letra</th><th>Significa</th></tr>
+<tr><td><span class="k">c</span></td><td>Create (crear)</td></tr>
+<tr><td><span class="k">x</span></td><td>eXtract (extraer)</td></tr>
+<tr><td><span class="k">t</span></td><td>lisT (listar sin extraer)</td></tr>
+<tr><td><span class="k">v</span></td><td>Verbose (ver qué hace)</td></tr>
+<tr><td><span class="k">f</span></td><td>File (siempre antes del nombre del archivo)</td></tr>
+<tr><td><span class="k">z</span></td><td>gZip (comprime/descomprime con gzip)</td></tr>
+<tr><td><span class="k">j</span></td><td>bzip2 (más compresión, más lento)</td></tr>
+<tr><td><span class="k">J</span></td><td>xz (todavía más compresión)</td></tr>
+</table>
+
+<div class="pasos">
+<pre class="code">cd ~
+
+<span class="cm"># Crear tar.gz de Reto_Linux</span>
+tar -czvf reto.tar.gz Reto_Linux/
+
+<span class="cm"># Listar sin extraer</span>
+tar -tzvf reto.tar.gz | head
+
+<span class="cm"># Tamaño comparativo</span>
+du -sh Reto_Linux/ reto.tar.gz
+
+<span class="cm"># Probar bzip2 y xz</span>
+tar -cjvf reto.tar.bz2 Reto_Linux/
+tar -cJvf reto.tar.xz Reto_Linux/
+ls -lh reto.tar.*
+
+<span class="cm"># Extraer en otra carpeta</span>
+mkdir -p ~/Destino
+tar -xzvf reto.tar.gz -C ~/Destino/
+ls ~/Destino/</pre>
+</div>
+
+<div class="q">
+<label>6.1 · Tamaños comparativos (rellena con tu salida)</label>
+<table>
+<tr><th>Archivo</th><th>Tamaño</th></tr>
+<tr><td>Reto_Linux/ (sin comprimir)</td><td><input type="text" data-k="q_6_1a"></td></tr>
+<tr><td>reto.tar.gz</td><td><input type="text" data-k="q_6_1b"></td></tr>
+<tr><td>reto.tar.bz2</td><td><input type="text" data-k="q_6_1c"></td></tr>
+<tr><td>reto.tar.xz</td><td><input type="text" data-k="q_6_1d"></td></tr>
+</table>
+</div>
+
+<h3>zip — compatible con Windows</h3>
+<pre class="code">sudo apt install -y zip unzip   <span class="cm"># si no están</span>
+zip -r reto.zip Reto_Linux/
+unzip -l reto.zip | head
+unzip reto.zip -d ~/Destino_zip/</pre>
+
+<div class="q">
+<label>6.2 · ¿Cuál de los formatos (tar.gz, tar.bz2, tar.xz, zip) ha quedado más pequeño? ¿Compensa siempre usar el más comprimido?</label>
+<textarea data-k="q_6_2"></textarea>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.3 · Captura de <span class="k">ls -lh reto.*</span> mostrando los 4 archivos comprimidos y sus tamaños <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_comp"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Editores en consola: nano y vim básico <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<h3>nano — fácil</h3>
+<pre class="code">nano ~/Reto_Linux/notas.txt
+<span class="cm"># Escribe varias líneas</span>
+<span class="cm"># Ctrl+O   guardar (write Out)</span>
+<span class="cm"># Ctrl+X   salir</span>
+<span class="cm"># Ctrl+K   cortar línea</span>
+<span class="cm"># Ctrl+U   pegar</span>
+<span class="cm"># Ctrl+W   buscar (Where)</span>
+<span class="cm"># Ctrl+_   ir a número de línea</span></pre>
+
+<div class="q">
+<label>7.1 · Crea con <span class="k">nano</span> el archivo <span class="k">~/Reto_Linux/notas.txt</span> con 5 líneas: tu nombre, fecha, distro, kernel y una nota libre. Pega aquí lo que has escrito:</label>
+<textarea data-k="q_7_1"></textarea>
+</div>
+
+<h3>vim — el ninja</h3>
+<p>Vim tiene <strong>modos</strong>. Esa es la clave que confunde a todo el mundo al principio:</p>
+<ul>
+<li><strong>Modo normal</strong> (al entrar): teclas para moverte y dar órdenes. Aquí <em>no escribes texto</em>.</li>
+<li><strong>Modo insertar</strong> (pulsando <span class="k">i</span>): aquí sí escribes texto, como en cualquier editor.</li>
+<li><strong>Modo comando</strong> (pulsando <span class="k">:</span> desde normal): para guardar, salir, buscar.</li>
+</ul>
+<p>Para volver a normal desde cualquier sitio: <span class="k">Esc</span>.</p>
+
+<div class="pasos">
+<strong>Tour básico</strong>
+<pre class="code">vim ~/Reto_Linux/vim_tour.txt
+<span class="cm"># Pulsa i para entrar en modo insertar</span>
+<span class="cm"># Escribe: "Hola desde vim"</span>
+<span class="cm"># Pulsa Esc</span>
+<span class="cm"># Escribe :w para guardar</span>
+<span class="cm"># Escribe :q para salir</span>
+<span class="cm"># O en una sola: :wq</span>
+<span class="cm"># Si quieres salir sin guardar: :q!</span></pre>
+</div>
+
+<div class="q">
+<label>7.2 · Has salido de vim con éxito. ¿Qué tecla se te ha olvidado más veces? (es obligatorio escribir Esc honestamente)</label>
+<input type="text" data-k="q_7_2" class="inline">
+</div>
+
+<div class="tip">
+<strong>Por qué aprender vim al menos un poco.</strong> En servidores remotos por SSH muchas veces solo tienes vim. Es el único editor garantizado en cualquier Unix. Aprende como mínimo <span class="k">i</span>, <span class="k">Esc</span>, <span class="k">:wq</span> y <span class="k">:q!</span>: con eso ya no te quedas «atrapado».
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 8 ============= -->
+<div class="section">
+<h2><span class="n">8</span> Reto final · Pipeline real <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Escenario.</strong> Tienes que generar un informe sobre el sistema, comprimirlo y dejarlo listo para entregar. Vas a usar todo lo aprendido en una sola sesión.
+</div>
+
+<div class="pasos">
+<strong>Tarea 1 · Genera 50 archivos de log de relleno</strong>
+<pre class="code">cd ~/Reto_Linux/logs
+for i in $(seq 1 50); do
+  echo "$(date) - evento $i" &gt; "log_$(printf '%03d' $i).log"
+done
+ls -la | head</pre>
+</div>
+
+<div class="pasos">
+<strong>Tarea 2 · Hazlos «antiguos» modificando fechas</strong>
+<pre class="code"><span class="cm"># Los 25 primeros con fecha de hace 60 días</span>
+for i in $(seq 1 25); do
+  touch -d "60 days ago" "log_$(printf '%03d' $i).log"
+done
+ls -lt | head -30</pre>
+</div>
+
+<div class="pasos">
+<strong>Tarea 3 · Borra los antiguos automáticamente con find</strong>
+<pre class="code">find . -name "log_*.log" -mtime +30 -delete
+ls | wc -l   <span class="cm"># ¿cuántos quedan?</span></pre>
+</div>
+
+<div class="q">
+<label>8.1 · ¿Cuántos archivos quedan en la carpeta <span class="k">logs/</span> tras el borrado automático? ¿Por qué?</label>
+<input type="text" data-k="q_8_1">
+</div>
+
+<div class="pasos">
+<strong>Tarea 4 · Construye un informe del sistema</strong>
+<pre class="code">cd ~/Reto_Linux
+
+{
+  echo "=== INFORME DEL SISTEMA ==="
+  echo "Fecha: $(date)"
+  echo "Usuario: $(whoami)"
+  echo "Hostname: $(hostname)"
+  echo ""
+  echo "=== KERNEL ==="
+  uname -a
+  echo ""
+  echo "=== MEMORIA ==="
+  free -h
+  echo ""
+  echo "=== DISCO ==="
+  df -h /
+  echo ""
+  echo "=== TOP 5 PROCESOS POR RAM ==="
+  ps aux --sort=-%mem | head -6
+  echo ""
+  echo "=== ARCHIVOS DE LOG RESTANTES ==="
+  ls logs/ | wc -l
+} &gt; informe_$(date +%Y%m%d).txt
+
+cat informe_*.txt</pre>
+</div>
+
+<div class="pasos">
+<strong>Tarea 5 · Comprime y deja todo listo</strong>
+<pre class="code">tar -czvf entrega_$(whoami)_$(date +%Y%m%d).tar.gz \
+  Reto_Linux/informe_*.txt \
+  Reto_Linux/logs/ \
+  Reto_Linux/scripts/
+
+ls -lh entrega_*.tar.gz</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 8.2 · Captura final mostrando: (a) <span class="k">cat informe_*.txt</span> y (b) el <span class="k">.tar.gz</span> generado <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s8_final"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>8.3 · ¿Qué hace la sintaxis <span class="k">{ ... } &gt; archivo</span>? ¿Cómo se diferencia de hacer cada <span class="k">echo &gt;&gt;</span> uno a uno?</label>
+<textarea data-k="q_8_3"></textarea>
+</div>
+
+<div class="q">
+<label>8.4 · Reflexiona: ¿podrías meter todos estos comandos en un script <span class="k">.sh</span> que se ejecutara solo cada día? Indica cómo (sin escribirlo entero).</label>
+<textarea data-k="q_8_4"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<p style="font-size:13px;color:#4a5568;margin-bottom:12px">Marca lo que has completado.</p>
+
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He diseccionado el prompt y manejo comandos de orientación.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He creado la estructura Reto_Linux usando llaves y <span class="k">mkdir -p</span> en una línea.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · Domino los comodines <span class="k">*</span>, <span class="k">?</span>, <span class="k">[ ]</span> y <span class="k">{ }</span>.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He compuesto un pipeline de 3+ comandos.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · He buscado archivos con <span class="k">find</span> y texto con <span class="k">grep</span>.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He comprimido en 4 formatos (tar.gz, tar.bz2, tar.xz, zip) y comparado tamaños.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · He entrado y salido de vim sin quedarme atrapado.</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> S8 · He hecho el reto final: 50 logs, borrado por edad y informe automatizado.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He subido las capturas marcadas con * (mínimo 5).</label>
+<label class="check"><input type="checkbox" data-k="ev_10"> He exportado el progreso como JSON o impreso a PDF.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué comando te ha parecido más útil para tu día a día como técnico?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota que te pondrías (0–10) y por qué</label>
+<input type="text" data-k="ev_nota" class="inline" placeholder="ej. 8 — porque...">
+</div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">UF0853 · Práctica 2 de 10 · Progreso autosalvado. <strong>Exportar</strong> para entregar.</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s02_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)" title="Eliminar">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P8 · UF0853 · Mantenimiento del sistema</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#975a16; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P8 · UF0853 · Mantenimiento del sistema</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 8 · Mantenimiento del sistema</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 8 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Vas a aplicar un <strong>protocolo completo de mantenimiento</strong> de un equipo: actualizaciones, limpieza de espacio, comprobación de discos, reparación de archivos del sistema, salud del disco con SMART y tareas programadas. Termina con una tarea programada que <em>realmente</em> se dispara y verás el resultado.</p>
+<p><strong>Por qué importa.</strong> Un PC sin mantenimiento muere antes y va más lento. En una empresa, mantener 50 PCs sin automatizar es imposible.</p>
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Actualizaciones del sistema <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<h3>Windows Update</h3>
+<div class="pasos">
+<ol>
+<li>Win+I → Windows Update → Buscar actualizaciones.</li>
+<li>Mientras corre, abre PowerShell admin y ejecuta:</li>
+</ol>
+<pre class="code">Get-WindowsUpdateLog | Out-Null   <span class="cm"># prepara el log (puede tardar)</span>
+
+<span class="cm"># Historial: qué se ha instalado</span>
+Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10
+
+<span class="cm"># Atajo histórico</span>
+wmic qfe list brief /format:table</pre>
+</div>
+
+<div class="q">
+<label>1.1 · ¿Cuántas actualizaciones (KB) tienes instaladas en tu VM Windows?</label>
+<input type="text" data-k="q_1_1" class="inline">
+</div>
+
+<div class="q">
+<label>1.2 · Fecha de la última actualización aplicada y su KB</label>
+<input type="text" data-k="q_1_2" placeholder="ej. KB5028185 el 11/07/2026">
+</div>
+
+<div class="pasos">
+<strong>PSWindowsUpdate (módulo avanzado, opcional)</strong>
+<pre class="code">Install-Module PSWindowsUpdate -Force -Scope CurrentUser
+Import-Module PSWindowsUpdate
+Get-WindowsUpdate            <span class="cm"># lista de updates pendientes</span>
+<span class="cm"># Install-WindowsUpdate -AcceptAll -AutoReboot</span></pre>
+</div>
+
+<h3>apt en Ubuntu</h3>
+<pre class="code">sudo apt update              <span class="cm"># actualiza la lista de paquetes</span>
+apt list --upgradable        <span class="cm"># qué se va a actualizar</span>
+sudo apt upgrade -y          <span class="cm"># instala</span>
+sudo apt full-upgrade -y     <span class="cm"># también puede añadir/quitar paquetes si hace falta</span>
+sudo apt autoremove -y       <span class="cm"># elimina paquetes huérfanos</span>
+sudo apt clean               <span class="cm"># vacía caché de .deb descargados</span>
+
+<span class="cm"># Logs</span>
+ls /var/log/apt/
+zcat /var/log/apt/history.log.*.gz | head -30
+cat /var/log/apt/history.log | tail -50</pre>
+
+<div class="shot-wrap">
+<label>📷 1.3 · Captura de <span class="k">apt list --upgradable</span> o de <span class="k">apt upgrade</span> en curso <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_apt"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Actualizaciones automáticas</h3>
+<pre class="code"><span class="cm"># Verifica si unattended-upgrades está instalado (suele venir)</span>
+dpkg -l | grep unattended
+
+<span class="cm"># Configurar qué se actualiza solo</span>
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+
+<span class="cm"># Ver qué hace y qué decide</span>
+sudo unattended-upgrade --dry-run --debug 2&gt;&amp;1 | head -30</pre>
+
+<div class="q">
+<label>1.4 · ¿Es mejor automatizar updates en un servidor de producción? Argumenta pros y contras.</label>
+<textarea data-k="q_1_4"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Liberar espacio en disco <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<h3>Windows · Liberador clásico + Storage Sense</h3>
+<div class="pasos">
+<ol>
+<li>Ejecuta <span class="k">cleanmgr</span> (Liberador de espacio).</li>
+<li>Elige <strong>C:</strong>. Apunta cuánto recuperarías.</li>
+<li>Pulsa «Limpiar archivos del sistema» (botón) → permite limpiar Windows.old, caché de actualizaciones, registros, etc. ¡Mucho más espacio!</li>
+<li>Marca todas las casillas excepto «Descargas» (puede tener cosas tuyas).</li>
+<li>Ejecuta la limpieza.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>2.1 · Espacio liberado por <span class="k">cleanmgr</span> (incluido «Limpiar archivos del sistema»)</label>
+<input type="text" data-k="q_2_1" class="inline" placeholder="ej. 4.2 GB">
+</div>
+
+<h3>Storage Sense (moderno)</h3>
+<div class="pasos">
+<ol>
+<li>Win+I → Sistema → <strong>Almacenamiento</strong>.</li>
+<li>Verás cuánto ocupa cada categoría (apps, archivos temporales, sistema y reservados...).</li>
+<li>Pincha en <strong>Archivos temporales</strong> → marca y elimina.</li>
+<li>Activa <strong>Sensor de almacenamiento</strong>: que limpie solo cada semana, papelera de 30 días, descargas no usadas en 60.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.2 · Captura del panel «Almacenamiento» con el desglose por categorías <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_storage"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>WinDirStat-style desde PowerShell</h3>
+<pre class="code"><span class="cm"># Top 20 archivos más grandes en C:</span>
+Get-ChildItem C:\ -Recurse -File -ErrorAction SilentlyContinue |
+  Sort-Object Length -Descending |
+  Select-Object -First 20 FullName, @{Name="GB"; Expression={[math]::Round($_.Length/1GB,2)}}</pre>
+
+<div class="q">
+<label>2.3 · ¿Cuál es el archivo más grande de tu VM y qué es?</label>
+<textarea data-k="q_2_3"></textarea>
+</div>
+
+<h3>Linux</h3>
+<pre class="code"><span class="cm"># Cuánto ocupa cada cosa en tu home</span>
+du -sh ~/* | sort -hr | head
+
+<span class="cm"># Versión interactiva (mejor)</span>
+sudo apt install -y ncdu
+sudo ncdu /
+
+<span class="cm"># Limpiar</span>
+sudo apt autoremove -y
+sudo apt clean
+sudo journalctl --vacuum-time=7d         <span class="cm"># logs solo de los últimos 7 días</span>
+sudo journalctl --disk-usage             <span class="cm"># cuánto ocupan los logs</span>
+
+<span class="cm"># Caché de snap (Ubuntu)</span>
+snap list --all | awk '/disabled/{print $1, $3}' | while read name rev; do
+  sudo snap remove "$name" --revision="$rev"
+done</pre>
+
+<div class="shot-wrap">
+<label>📷 2.4 · Captura de <span class="k">ncdu /</span> mostrando el desglose interactivo de tu disco <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s2_ncdu"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Comprobación de discos <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<h3>Windows · chkdsk, sfc y DISM</h3>
+
+<table>
+<tr><th>Herramienta</th><th>Qué hace</th><th>Cuándo</th></tr>
+<tr><td><span class="k">chkdsk</span></td><td>Comprueba sistema de archivos y sectores</td><td>Disco que falla, errores I/O</td></tr>
+<tr><td><span class="k">sfc /scannow</span></td><td>Repara archivos del sistema (DLLs corruptas)</td><td>Sistema con comportamiento raro</td></tr>
+<tr><td><span class="k">DISM</span></td><td>Repara la imagen base del sistema (la fuente de sfc)</td><td>Antes de sfc si sfc no logra reparar</td></tr>
+</table>
+
+<div class="pasos">
+<pre class="code">REM Abre CMD elevado
+
+REM Solo lectura (no repara)
+chkdsk C:
+
+REM Repara errores lógicos
+chkdsk C: /F
+REM Te dice que no puede porque C: está en uso. Te pregunta si quieres
+REM programarlo para el próximo reinicio. Di que sí (Y).
+
+REM Buscar sectores defectuosos (lento)
+chkdsk D: /R     REM en un disco no de sistema (usa la D: si la tienes de P3)
+
+REM SFC
+sfc /scannow
+
+REM DISM (debe ir antes de sfc si sfc no logra reparar)
+DISM /Online /Cleanup-Image /CheckHealth
+DISM /Online /Cleanup-Image /ScanHealth
+DISM /Online /Cleanup-Image /RestoreHealth</pre>
+</div>
+
+<div class="q">
+<label>3.1 · ¿Qué te ha respondido <span class="k">sfc /scannow</span>? (resumen final exacto)</label>
+<textarea data-k="q_3_1"></textarea>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.2 · Captura de <span class="k">sfc /scannow</span> terminado <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_sfc"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Linux · fsck y debsums</h3>
+<pre class="code"><span class="cm"># fsck necesita la partición DESMONTADA o se hace al arranque</span>
+
+<span class="cm"># Forzar comprobación en el próximo arranque de /</span>
+sudo touch /forcefsck    <span class="cm"># marcador clásico</span>
+<span class="cm"># o</span>
+sudo tune2fs -c 1 /dev/sda1   <span class="cm"># forzar fsck cada X montajes</span>
+
+<span class="cm"># En particiones extra (sdb1, sdb2 de la P3) sí podemos desmontarlas y comprobar</span>
+sudo umount /mnt/datos_linux
+sudo fsck -f /dev/sdb1
+sudo mount /mnt/datos_linux
+
+<span class="cm"># Comprobar checksums de paquetes instalados (sfc-like)</span>
+sudo apt install -y debsums
+sudo debsums -s       <span class="cm"># solo errores; sin salida = todo bien</span></pre>
+
+<h3>SMART · salud del disco</h3>
+<pre class="code"><span class="cm"># Windows (CrystalDiskInfo recomendado, o desde CMD)</span>
+wmic diskdrive get model,status
+PowerShell:
+Get-PhysicalDisk | Select-Object FriendlyName, MediaType, HealthStatus
+
+<span class="cm"># Linux (más informativo)</span>
+sudo apt install -y smartmontools
+sudo smartctl -i /dev/sda           <span class="cm"># info del disco</span>
+sudo smartctl -H /dev/sda           <span class="cm"># salud global</span>
+sudo smartctl -A /dev/sda           <span class="cm"># todos los atributos SMART</span>
+sudo smartctl -t short /dev/sda     <span class="cm"># test corto (2 min)</span>
+sudo smartctl -l selftest /dev/sda  <span class="cm"># resultado del test</span></pre>
+
+<div class="aviso">
+<strong>En una VM</strong> los atributos SMART son simulados (el disco real es del anfitrión). Aun así, los comandos funcionan y verás los campos. En un equipo físico, los atributos clave son: Reallocated_Sector_Ct (5), Power_On_Hours (9), Current_Pending_Sector (197), Wear_Leveling_Count (177, en SSD). Si crecen, el disco está muriendo.
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.3 · Captura de <span class="k">smartctl -A /dev/sda</span> mostrando los atributos <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_smart"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Desfragmentación vs TRIM <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<p><strong>Lo más importante:</strong> nunca desfragmentes un SSD. Windows lo sabe y, si detecta SSD, ejecuta TRIM en lugar de desfragmentar. Esta sección es corta porque casi no hay nada que hacer salvo confirmar.</p>
+
+<h3>Windows · «Optimizar unidades»</h3>
+<div class="pasos">
+<ol>
+<li>Win + escribe «Optimizar unidades» → Abrir.</li>
+<li>Mira la columna <strong>Tipo de medio</strong>: «Unidad de estado sólido» o «Unidad de disco duro».</li>
+<li>Selecciona C: → <strong>Analizar</strong>. Si es SSD pondrá «no se necesita optimización» o el porcentaje TRIM. Si es HDD, pondrá fragmentación %.</li>
+<li><strong>Optimizar</strong>.</li>
+</ol>
+<pre class="code">REM Desde CMD: forzar TRIM en C:
+defrag C: /L
+
+REM Para HDDs (no tu caso en VM)
+defrag C: /U /V</pre>
+</div>
+
+<div class="q">
+<label>4.1 · ¿Qué tipo de medio detecta Windows para tu C: virtual?</label>
+<input type="text" data-k="q_4_1" class="inline">
+</div>
+
+<h3>Linux · TRIM</h3>
+<pre class="code"><span class="cm"># Comprobar si fstrim está habilitado (timer semanal por defecto en Ubuntu)</span>
+systemctl status fstrim.timer
+
+<span class="cm"># Ejecutar TRIM manualmente</span>
+sudo fstrim -av</pre>
+
+<div class="shot-wrap">
+<label>📷 4.2 · Captura del estado del fstrim.timer o de Optimizar unidades de Windows</label>
+<div class="shot" data-k="s4_trim"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> Tareas programadas (Windows) <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>Vas a crear una tarea que <strong>realmente se ejecuta</strong> y comprobarás el resultado.</p>
+
+<div class="pasos">
+<strong>Tarea 1 · Cleanup automático cada lunes</strong>
+<ol>
+<li><span class="k">taskschd.msc</span>.</li>
+<li>Acción → <strong>Crear tarea</strong> (no «básica», nos da más opciones).</li>
+<li>Pestaña <strong>General</strong>: nombre <span class="k">Cleanup_Semanal</span>. Marca «Ejecutar con privilegios más altos».</li>
+<li>Pestaña <strong>Desencadenadores</strong>: Nuevo → Semanalmente → Lunes 22:00.</li>
+<li>Pestaña <strong>Acciones</strong>: Nuevo → Iniciar programa → <span class="k">cleanmgr</span> con argumentos <span class="k">/sagerun:1</span>.</li>
+<li>Pestaña <strong>Condiciones</strong>: solo si está enchufado, despertar para ejecutar.</li>
+<li>Aceptar.</li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>Tarea 2 · Tarea de prueba que SÍ verás funcionar</strong>
+<ol>
+<li>Crear tarea básica → <span class="k">Prueba_Bloc</span>.</li>
+<li>Cuando se desencadene → <strong>Una sola vez</strong> → fecha y hora <strong>1 minuto en el futuro</strong>.</li>
+<li>Acción → Iniciar programa → <span class="k">notepad.exe</span>.</li>
+<li>Finalizar y espera ese minuto. Aparece el Bloc de notas.</li>
+</ol>
+</div>
+
+<h3>Desde CMD · schtasks</h3>
+<pre class="code">REM Crear tarea diaria a las 03:00 que ejecute un script
+schtasks /Create /SC DAILY /ST 03:00 /TN "Cleanup_Diario" /TR "cleanmgr /sagerun:1" /RL HIGHEST
+
+REM Listar tareas
+schtasks /Query /FO TABLE | findstr Prueba
+
+REM Forzar ejecución ahora (para probar)
+schtasks /Run /TN "Prueba_Bloc"
+
+REM Borrar
+schtasks /Delete /TN "Prueba_Bloc" /F</pre>
+
+<div class="shot-wrap">
+<label>📷 5.1 · Captura del Programador de tareas mostrando tus 2 tareas creadas <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_taskschd"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>5.2 · ¿Aparece el Bloc de notas exactamente al minuto programado? Si no, ¿por qué?</label>
+<textarea data-k="q_5_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Tareas programadas (Linux) · cron y systemd-timer <span class="dur">30 min</span></h2>
+<div class="sb">
+
+<h3>cron</h3>
+<pre class="code"><span class="cm"># Editar tu crontab personal</span>
+crontab -e
+<span class="cm"># elige nano la primera vez</span></pre>
+
+<p>Sintaxis de una línea cron:</p>
+<pre class="code"><span class="cm"># m h dom mon dow comando</span>
+<span class="cm"># │ │  │   │   │</span>
+<span class="cm"># │ │  │   │   └── día de la semana (0-6, 0=domingo)</span>
+<span class="cm"># │ │  │   └── mes (1-12)</span>
+<span class="cm"># │ │  └── día del mes (1-31)</span>
+<span class="cm"># │ └── hora (0-23)</span>
+<span class="cm"># └── minuto (0-59)</span>
+
+<span class="cm"># Cada minuto, escribe la fecha en un archivo</span>
+* * * * * date &gt;&gt; /tmp/cron_test.log
+
+<span class="cm"># Todos los días a las 03:00</span>
+0 3 * * * /home/usuario/backup.sh
+
+<span class="cm"># Cada 15 minutos</span>
+*/15 * * * * /usr/local/bin/check.sh
+
+<span class="cm"># Lunes a viernes a las 09:00</span>
+0 9 * * 1-5 /opt/scripts/diario.sh
+
+<span class="cm"># Primer día de cada mes a las 02:30</span>
+30 2 1 * * /opt/scripts/mensual.sh</pre>
+
+<div class="pasos">
+<strong>Crea esta tarea de prueba</strong>
+<pre class="code">crontab -e
+<span class="cm"># Añade:</span>
+* * * * * echo "Cron OK $(date)" &gt;&gt; /tmp/cron_test.log
+
+<span class="cm"># Guardar y salir. Espera 2 minutos.</span>
+cat /tmp/cron_test.log
+<span class="cm"># Verás 1-2 líneas. Limpia luego con: crontab -r o edita y borra</span></pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura mostrando <span class="k">crontab -l</span> y <span class="k">cat /tmp/cron_test.log</span> con varias líneas <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_cron"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>systemd-timer (alternativa moderna)</h3>
+<pre class="code"><span class="cm"># Listar timers activos</span>
+systemctl list-timers --all | head
+
+<span class="cm"># Ver detalles de uno</span>
+systemctl status fstrim.timer
+cat /lib/systemd/system/fstrim.timer</pre>
+
+<div class="q">
+<label>6.2 · ¿Qué timer de systemd te ha llamado la atención? ¿Cada cuánto se ejecuta?</label>
+<textarea data-k="q_6_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Reto final · Script de mantenimiento <span class="dur">15 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Escenario.</strong> Diseña un script de Linux que cada domingo a las 23:00 haga: actualizar paquetes, limpiar cachés, comprobar SMART de /dev/sda y guardar todo en un log con fecha. Después prográmalo con cron.
+</div>
+
+<div class="pasos">
+<pre class="code">cat &lt;&lt;'EOF' | sudo tee /usr/local/bin/mantenimiento.sh
+#!/bin/bash
+LOG="/var/log/mantenimiento_$(date +%Y%m%d).log"
+{
+  echo "=== MANTENIMIENTO $(date) ==="
+  echo "--- apt update ---"
+  apt update
+  echo "--- apt upgrade ---"
+  apt upgrade -y
+  echo "--- apt autoremove ---"
+  apt autoremove -y
+  echo "--- apt clean ---"
+  apt clean
+  echo "--- SMART ---"
+  smartctl -H /dev/sda
+  echo "--- Espacio en disco ---"
+  df -h /
+  echo "=== FIN $(date) ==="
+} &gt;&gt; "$LOG" 2&gt;&amp;1
+EOF
+
+sudo chmod +x /usr/local/bin/mantenimiento.sh
+
+<span class="cm"># Probar ejecutándolo manualmente</span>
+sudo /usr/local/bin/mantenimiento.sh
+cat /var/log/mantenimiento_*.log
+
+<span class="cm"># Programarlo en cron de root: todos los domingos 23:00</span>
+sudo crontab -e
+<span class="cm"># Añade:</span>
+0 23 * * 0 /usr/local/bin/mantenimiento.sh</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 7.1 · Captura del script y de las primeras líneas del log generado <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s7_script"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>7.2 · ¿Qué le añadirías al script para hacerlo más robusto? (al menos 3 mejoras concretas)</label>
+<textarea data-k="q_7_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He revisado y actualizado Windows y Ubuntu, y entiendo unattended-upgrades.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He liberado espacio con cleanmgr + Storage Sense en Windows y ncdu/apt en Linux.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · He ejecutado chkdsk, sfc, DISM en Windows y fsck/debsums en Linux.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> Sé interpretar la salida de SMART.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S4 · Sé que TRIM va en SSD y desfragmentar solo en HDD.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S5 · He creado tareas programadas en Windows (GUI y schtasks) y vi una ejecutarse.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S6 · He programado cron y entiendo la sintaxis. Conozco systemd-timer.</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> S7 · He escrito un script de mantenimiento que funciona.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_10"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>De todo el mantenimiento, ¿qué automatizarías de verdad en un equipo cliente?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 8 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s08_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

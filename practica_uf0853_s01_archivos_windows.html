@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1 · UF0853 · Gestión de archivos en Windows</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#c53030; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+.bar button.danger:hover{background:rgba(220,53,69,.45)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+header.head .meta strong{opacity:1}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}
+.sb ul,.sb ol{margin:6px 0 8px 22px}
+.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}
+.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}
+.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.q .hint{font-size:11.5px;color:#718096;font-weight:400;margin-left:6px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}
+.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot-wrap>label .req{color:var(--rojo);margin-left:4px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.evalfin th{background:#c6f6d5;color:var(--verde)}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px 18px}.content{padding:16px 14px}.sb{padding:14px 14px}.bar{padding:8px 10px}.bar .title{font-size:13px}}
+@media print{
+body{background:#fff;padding:0;font-size:11px}
+.bar,#saved-indicator,.shot .x,.no-print{display:none!important}
+.container{box-shadow:none;border-radius:0;max-width:100%}
+.section{page-break-inside:avoid;border:1px solid #999}
+header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+th{background:#edf2f7!important;-webkit-print-color-adjust:exact}
+.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}
+textarea{min-height:auto!important;overflow:visible;height:auto}
+.shot{border:1px dashed #999;min-height:100px}
+.shot img{max-height:300px}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P1 · UF0853 · Gestión de archivos en Windows</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()" title="Descargar progreso como JSON">⬇ Exportar</button>
+  <button onclick="importJSON()" title="Cargar progreso desde JSON">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger" title="Borrar todo">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 1 · Gestión de archivos en Windows</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · Explotación de las funcionalidades del sistema microinformático<br>
+<strong>Sesión:</strong> 1 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows 10/11 (práctica 06) · <strong>No requiere</strong> hardware externo<br>
+<strong>Entregable:</strong> este mismo archivo con capturas y respuestas, exportado como JSON o impreso a PDF
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre" placeholder="Tu nombre completo"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas" placeholder="ej. 4h 15min"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Vas a dominar la gestión de archivos en Windows desde 3 puntos de vista: <strong>Explorador gráfico</strong>, <strong>CMD</strong> y <strong>PowerShell</strong>. Empezarás configurando el Explorador para que muestre lo que normalmente esconde (extensiones, ocultos, rutas), montarás una estructura de carpetas tipo proyecto real y la moverás. Después manipularás atributos (oculto, solo lectura), harás búsquedas avanzadas con operadores reales y compararás CMD vs PowerShell con los mismos comandos. Termina con un escenario de papelera y un mini-reto.</p>
+<p><strong>Por qué importa.</strong> El 80% de los tickets de soporte que verás en tu carrera empezarán con <em>«no encuentro el archivo»</em>, <em>«se me ha borrado»</em> o <em>«no puedo abrir esto»</em>. Si no dominas el Explorador y la consola, vas perdido.</p>
+<p><strong>Cómo se entrega.</strong> En cada bloque hay huecos para capturas (📷): pega con <kbd>Ctrl+V</kbd>, arrastra el archivo, o haz clic para seleccionarlo. Todo se guarda automáticamente en este navegador. Al terminar, usa <strong>⬇ Exportar</strong> para enviar el JSON, o <strong>🖨 Imprimir → PDF</strong>.</p>
+</div>
+
+<div class="nota">
+<strong>Antes de empezar:</strong> arranca la VM de Windows de la práctica 06. Inicia sesión como tu usuario habitual (con permisos de administrador). Si no la tienes, créala primero — esta práctica depende de ella.
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Configurar el Explorador de archivos <span class="dur">25 min</span></h2>
+<div class="sb">
+<p>Por defecto Windows oculta cosas: extensiones, archivos del sistema, rutas completas. Como técnico tienes que <strong>verlo todo</strong>. Vamos a dejar el Explorador en modo «profesional».</p>
+
+<div class="pasos">
+<strong>Pasos:</strong>
+<ol>
+<li>Abre el Explorador con <span class="k">Win + E</span>.</li>
+<li>En Windows 11: clic en <strong>···</strong> (tres puntos) → <strong>Opciones</strong>. En Windows 10: pestaña <strong>Vista</strong> → <strong>Opciones</strong>.</li>
+<li>Pestaña <strong>Ver</strong>. Marca:
+<ul>
+<li><strong>Mostrar archivos, carpetas y unidades ocultos.</strong></li>
+<li><strong>Mostrar la ruta completa en la barra de título</strong> (Windows 10).</li>
+<li><strong>Mostrar letra de unidad.</strong></li>
+</ul>
+Desmarca:
+<ul>
+<li>«Ocultar extensiones de archivo para tipos de archivo conocidos».</li>
+<li>«Ocultar archivos protegidos del sistema operativo» — confirma el aviso (sí, te avisará).</li>
+</ul>
+</li>
+<li><strong>Aplicar a las carpetas</strong> → <strong>Aceptar</strong>.</li>
+<li>Vuelve a la pestaña <strong>Ver</strong> del Explorador y activa el <strong>Panel de detalles</strong> (lateral derecho).</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 1.1 · Captura de la ventana «Opciones de carpeta» con tus ajustes finales aplicados <span class="req">*</span></label>
+<div class="shot" data-k="s1_opciones"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>1.2 · Ve a <span class="k">C:\Windows\System32</span>. ¿Cuántos archivos hay aproximadamente? (mira el contador inferior del Explorador)</label>
+<input type="text" data-k="q_1_2" class="inline" placeholder="ej. unos 4500 archivos">
+</div>
+
+<div class="q">
+<label>1.3 · ¿Qué archivos con extensión <span class="k">.sys</span> ves ahora que antes no veías? Nombra 3.</label>
+<textarea data-k="q_1_3" placeholder="ej. ntoskrnl.sys, hal.dll..."></textarea>
+</div>
+
+<div class="aviso">
+<strong>Cuidado.</strong> Que ahora veas los archivos del sistema <em>no</em> significa que los puedas tocar. Si modificas o borras un <code>.sys</code> de System32, el sistema deja de arrancar. Mira sin tocar.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Crear una estructura de proyecto compleja <span class="dur">35 min</span></h2>
+<div class="sb">
+<p>Vas a crear esta estructura en tu escritorio, simulando la carpeta de un proyecto de cliente. Hazla <strong>primero gráficamente</strong>, después la replicarás por consola para comparar tiempos.</p>
+
+<pre class="code">Escritorio\
+└── Cliente_Acme\
+    ├── 01_Documentacion\
+    │   ├── contratos\
+    │   ├── facturas\
+    │   └── reuniones\
+    ├── 02_Diseño\
+    │   ├── borradores\
+    │   └── finales\
+    ├── 03_Codigo\
+    │   ├── frontend\
+    │   ├── backend\
+    │   └── docs_api\
+    ├── 04_Recursos\
+    │   ├── imagenes\
+    │   ├── videos\
+    │   └── audios\
+    └── 05_Backup\</pre>
+
+<div class="pasos">
+<strong>Parte A · Gráfica</strong>
+<ol>
+<li>Clic derecho en Escritorio → Nueva → Carpeta → <span class="k">Cliente_Acme</span>.</li>
+<li>Entra dentro y crea las 5 subcarpetas numeradas (<span class="k">01_Documentacion</span> a <span class="k">05_Backup</span>).</li>
+<li>Crea las subcarpetas hijas dentro de cada una según el árbol.</li>
+<li>Cronometra cuánto tardas en total: ___ minutos.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>2.1 · Tiempo total que has tardado creándolo a mano (estructura completa)</label>
+<input type="text" data-k="q_2_1" class="inline" placeholder="ej. 5 minutos">
+</div>
+
+<div class="pasos">
+<strong>Parte B · Por CMD (con <span class="k">mkdir</span> recursivo)</strong>
+<ol>
+<li>Borra la carpeta <span class="k">Cliente_Acme</span> entera (Mayús+Supr para no pasar por papelera).</li>
+<li>Abre CMD (<span class="k">Win+R</span> → <span class="k">cmd</span>) y ejecuta:</li>
+</ol>
+<pre class="code">cd %USERPROFILE%\Desktop
+mkdir Cliente_Acme\01_Documentacion\contratos
+mkdir Cliente_Acme\01_Documentacion\facturas
+mkdir Cliente_Acme\01_Documentacion\reuniones
+mkdir Cliente_Acme\02_Dise&#241;o\borradores
+mkdir Cliente_Acme\02_Dise&#241;o\finales
+mkdir Cliente_Acme\03_Codigo\frontend
+mkdir Cliente_Acme\03_Codigo\backend
+mkdir Cliente_Acme\03_Codigo\docs_api
+mkdir Cliente_Acme\04_Recursos\imagenes
+mkdir Cliente_Acme\04_Recursos\videos
+mkdir Cliente_Acme\04_Recursos\audios
+mkdir Cliente_Acme\05_Backup
+<span class="cm">REM Verifica el árbol</span>
+tree Cliente_Acme /F</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.2 · Captura de la salida del comando <span class="k">tree Cliente_Acme /F</span> mostrando todo el árbol <span class="req">*</span></label>
+<div class="shot" data-k="s2_tree"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>2.3 · ¿Cuánto has tardado escribiendo los <span class="k">mkdir</span> (asume copy-paste pero leyendo)?</label>
+<input type="text" data-k="q_2_3" class="inline" placeholder="ej. 30 segundos">
+</div>
+
+<div class="q">
+<label>2.4 · Conclusión: ¿en qué casos compensa hacerlo gráfico y en cuáles por consola?</label>
+<textarea data-k="q_2_4" placeholder="Razona basándote en tu experiencia."></textarea>
+</div>
+
+<div class="pasos">
+<strong>Parte C · Añadir archivos de relleno</strong>
+<ol>
+<li>Dentro de <span class="k">01_Documentacion\contratos</span> crea con el Bloc de notas: <span class="k">contrato_2026.txt</span> con cualquier texto.</li>
+<li>Copia ese mismo archivo a <span class="k">01_Documentacion\facturas\</span> usando CMD: <pre class="code">copy "%USERPROFILE%\Desktop\Cliente_Acme\01_Documentacion\contratos\contrato_2026.txt" "%USERPROFILE%\Desktop\Cliente_Acme\01_Documentacion\facturas\factura_001.txt"</pre></li>
+<li>Crea 5 archivos vacíos en <span class="k">04_Recursos\imagenes</span> usando: <pre class="code">cd %USERPROFILE%\Desktop\Cliente_Acme\04_Recursos\imagenes
+type nul &gt; foto01.jpg
+type nul &gt; foto02.jpg
+type nul &gt; foto03.jpg
+type nul &gt; foto04.jpg
+type nul &gt; logo.png</pre></li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 2.5 · Captura del Explorador mostrando los 5 archivos creados dentro de <span class="k">04_Recursos\imagenes</span></label>
+<div class="shot" data-k="s2_imagenes"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Atributos de archivo: oculto, solo lectura, sistema <span class="dur">30 min</span></h2>
+<div class="sb">
+<p>Los atributos son etiquetas internas. Vamos a manipularlos desde GUI y desde CMD con <span class="k">attrib</span>.</p>
+
+<h3>Atributos disponibles</h3>
+<table>
+<tr><th>Letra</th><th>Atributo</th><th>Efecto</th></tr>
+<tr><td><strong>R</strong></td><td>Solo lectura</td><td>No modificable. Sí borrable.</td></tr>
+<tr><td><strong>H</strong></td><td>Oculto</td><td>No visible salvo «Mostrar ocultos».</td></tr>
+<tr><td><strong>S</strong></td><td>Sistema</td><td>Archivo del SO. No tocar.</td></tr>
+<tr><td><strong>A</strong></td><td>Archivo</td><td>Marca que ha cambiado desde la última copia.</td></tr>
+</table>
+
+<div class="pasos">
+<strong>Parte A · Vía GUI</strong>
+<ol>
+<li>Crea en el Escritorio el archivo <span class="k">secreto.txt</span> y escribe «hola».</li>
+<li>Clic derecho → Propiedades → marca <strong>Oculto</strong> → Aceptar.</li>
+<li>Desactiva «Mostrar ocultos» en Vista. ¿Sigue ahí el archivo?</li>
+<li>Vuelve a activar «Mostrar ocultos». Reaparece, pero con icono atenuado.</li>
+<li>Propiedades → marca <strong>Solo lectura</strong> → intenta abrirlo, modificar y guardar. ¿Qué pasa?</li>
+</ol>
+</div>
+
+<div class="q">
+<label>3.1 · ¿Qué mensaje muestra el Bloc de notas al guardar un archivo de solo lectura?</label>
+<textarea data-k="q_3_1" placeholder="Transcribe el mensaje exacto."></textarea>
+</div>
+
+<div class="pasos">
+<strong>Parte B · Vía CMD con attrib</strong>
+<pre class="code">cd %USERPROFILE%\Desktop
+<span class="cm">REM Ver atributos actuales</span>
+attrib secreto.txt
+
+<span class="cm">REM Quitar solo lectura y oculto</span>
+attrib -R -H secreto.txt
+
+<span class="cm">REM Verifica</span>
+attrib secreto.txt
+
+<span class="cm">REM Aplicar oculto + sistema (es lo que tienen los archivos críticos)</span>
+attrib +H +S secreto.txt
+dir            <span class="cm">REM ¿lo ves?</span>
+dir /A         <span class="cm">REM con /A muestra todos</span>
+
+<span class="cm">REM Limpiar para terminar</span>
+attrib -H -S secreto.txt</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.2 · Captura de CMD mostrando el ciclo completo: <span class="k">attrib</span>, <span class="k">+H +S</span>, <span class="k">dir</span> sin archivo, <span class="k">dir /A</span> con archivo <span class="req">*</span></label>
+<div class="shot" data-k="s3_attrib"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>3.3 · ¿Por qué Windows oculta por defecto los archivos del sistema con +S? Razona.</label>
+<textarea data-k="q_3_3"></textarea>
+</div>
+
+<div class="aviso">
+<strong>Caso real.</strong> Existen virus que ponen <span class="k">+H +S</span> a tus archivos en un USB y dejan en su lugar accesos directos con nombres iguales. Cuando ves un USB «vacío» pero sí ocupa espacio, ejecuta <span class="k">attrib -H -S /S /D *</span> dentro del USB para recuperarlos.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Búsqueda avanzada con operadores <span class="dur">35 min</span></h2>
+<div class="sb">
+<p>La caja de búsqueda del Explorador acepta operadores. Esto separa al técnico del usuario normal.</p>
+
+<h3>Operadores que vas a usar</h3>
+<table>
+<tr><th>Operador</th><th>Ejemplo</th><th>Resultado</th></tr>
+<tr><td><span class="k">*</span></td><td><span class="k">*.pdf</span></td><td>Todos los PDF</td></tr>
+<tr><td><span class="k">nombre:</span></td><td><span class="k">nombre:informe</span></td><td>Archivos con «informe» en el nombre</td></tr>
+<tr><td><span class="k">tipo:</span></td><td><span class="k">tipo:imagen</span></td><td>Solo imágenes (jpg, png, gif...)</td></tr>
+<tr><td><span class="k">tamaño:</span></td><td><span class="k">tamaño:&gt;10MB</span></td><td>Más de 10 MB</td></tr>
+<tr><td><span class="k">tamaño:</span></td><td><span class="k">tamaño:enorme</span></td><td>Más de 128 MB</td></tr>
+<tr><td><span class="k">fechamodificación:</span></td><td><span class="k">fechamodificación:hoy</span></td><td>Modificados hoy</td></tr>
+<tr><td><span class="k">fechacreación:</span></td><td><span class="k">fechacreación:esta semana</span></td><td>Creados esta semana</td></tr>
+<tr><td><span class="k">extensión:</span></td><td><span class="k">extensión:.log</span></td><td>Archivos .log</td></tr>
+<tr><td><span class="k">AND/OR/NOT</span></td><td><span class="k">*.pdf NOT nombre:factura</span></td><td>PDFs que no sean facturas</td></tr>
+</table>
+
+<p>Realiza estas búsquedas en <span class="k">C:\</span> (puede tardar varios minutos la primera vez):</p>
+
+<table>
+<tr><th>#</th><th>Búsqueda</th><th>Filtro a escribir</th><th>Cuántos archivos</th></tr>
+<tr><td>4.1</td><td>Todos los .log en C:</td><td><span class="k">*.log</span></td><td><input type="text" data-k="q_4_1"></td></tr>
+<tr><td>4.2</td><td>Archivos &gt; 100 MB en C:</td><td><span class="k">tamaño:&gt;100MB</span></td><td><input type="text" data-k="q_4_2"></td></tr>
+<tr><td>4.3</td><td>Modificados hoy en C:</td><td><span class="k">fechamodificación:hoy</span></td><td><input type="text" data-k="q_4_3"></td></tr>
+<tr><td>4.4</td><td>Imágenes en tu carpeta de usuario</td><td><span class="k">tipo:imagen</span></td><td><input type="text" data-k="q_4_4"></td></tr>
+<tr><td>4.5</td><td>Archivos vacíos en Escritorio</td><td><span class="k">tamaño:vacío</span></td><td><input type="text" data-k="q_4_5"></td></tr>
+<tr><td>4.6</td><td>PDFs que NO sean facturas</td><td><span class="k">*.pdf NOT nombre:factura</span></td><td><input type="text" data-k="q_4_6"></td></tr>
+</table>
+
+<div class="shot-wrap">
+<label>📷 4.7 · Captura del Explorador mostrando el resultado de una de las búsquedas (la que prefieras) <span class="req">*</span></label>
+<div class="shot" data-k="s4_busqueda"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>4.8 · Tu jefe te pide: «búscame todos los Excel que se hayan tocado en las últimas 2 semanas, excluyendo los que se llamen ‘plantilla’». Escribe el filtro exacto que usarías.</label>
+<input type="text" data-k="q_4_8" placeholder="Tu filtro aquí">
+</div>
+
+<div class="nota">
+<strong>El índice de Windows.</strong> Estas búsquedas son rapidísimas si la carpeta está indexada. Panel de control → Opciones de indización. Carpetas no indexadas tienen búsqueda lenta. Es lo que pasa en C:\ entera.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> CMD vs PowerShell: mismos resultados, distintos comandos <span class="dur">35 min</span></h2>
+<div class="sb">
+<p>PowerShell es el sucesor moderno de CMD. Más potente, basado en objetos, multiplataforma. CMD se mantiene por compatibilidad. Compáralos haciendo las mismas tareas con ambos.</p>
+
+<p>Abre <strong>dos ventanas a la vez</strong>: una CMD y otra PowerShell (botón Inicio → escribe el nombre). Sitúate en <span class="k">%USERPROFILE%\Desktop\Cliente_Acme</span> en las dos.</p>
+
+<table>
+<tr><th>Tarea</th><th>CMD</th><th>PowerShell</th><th>¿Funciona en ambos? S/N</th></tr>
+<tr><td>Listar</td><td><span class="k">dir</span></td><td><span class="k">ls</span> (alias de <span class="k">Get-ChildItem</span>)</td><td><input type="text" data-k="q_5_1"></td></tr>
+<tr><td>Listar recursivo</td><td><span class="k">dir /S</span></td><td><span class="k">ls -Recurse</span></td><td><input type="text" data-k="q_5_2"></td></tr>
+<tr><td>Crear archivo vacío</td><td><span class="k">type nul &gt; vacio.txt</span></td><td><span class="k">New-Item vacio.txt</span></td><td><input type="text" data-k="q_5_3"></td></tr>
+<tr><td>Ver contenido</td><td><span class="k">type archivo.txt</span></td><td><span class="k">cat archivo.txt</span> o <span class="k">Get-Content</span></td><td><input type="text" data-k="q_5_4"></td></tr>
+<tr><td>Borrar</td><td><span class="k">del archivo</span></td><td><span class="k">rm archivo</span> o <span class="k">Remove-Item</span></td><td><input type="text" data-k="q_5_5"></td></tr>
+<tr><td>Contar archivos</td><td><span class="k">dir | find /C ""</span></td><td><span class="k">(ls).Count</span></td><td><input type="text" data-k="q_5_6"></td></tr>
+<tr><td>Filtrar por nombre</td><td><span class="k">dir *.txt</span></td><td><span class="k">ls *.txt</span></td><td><input type="text" data-k="q_5_7"></td></tr>
+<tr><td>Buscar texto en archivos</td><td><span class="k">findstr "hola" *.txt</span></td><td><span class="k">Select-String "hola" *.txt</span></td><td><input type="text" data-k="q_5_8"></td></tr>
+</table>
+
+<div class="shot-wrap">
+<label>📷 5.9 · Captura con las dos ventanas (CMD y PowerShell) lado a lado mostrando el resultado de <span class="k">dir</span> y <span class="k">ls</span> respectivamente <span class="req">*</span></label>
+<div class="shot" data-k="s5_dual"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>5.10 · ¿Qué diferencia visible hay entre la salida de <span class="k">dir</span> y la de <span class="k">ls</span> en PowerShell? Fíjate en columnas y formato.</label>
+<textarea data-k="q_5_10"></textarea>
+</div>
+
+<div class="q">
+<label>5.11 · En PowerShell ejecuta <span class="k">ls | Sort-Object Length -Descending | Select-Object -First 5</span>. ¿Qué hace ese pipeline?</label>
+<textarea data-k="q_5_11"></textarea>
+</div>
+
+<div class="tip">
+<strong>Idea clave.</strong> CMD trabaja con <em>texto</em>. PowerShell trabaja con <em>objetos</em>. Por eso PowerShell puede ordenar por «tamaño» sin parsear texto raro: ya sabe que cada archivo tiene una propiedad <span class="k">Length</span>.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Papelera de reciclaje: comportamiento y configuración <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Experimentos</strong>
+<ol>
+<li>Crea en el Escritorio <span class="k">borrar1.txt</span> y <span class="k">borrar2.txt</span>.</li>
+<li>Borra <span class="k">borrar1.txt</span> con <strong>Supr</strong>. Abre la papelera: ¿está?</li>
+<li>Borra <span class="k">borrar2.txt</span> con <strong>Mayús+Supr</strong>. Abre la papelera: ¿está?</li>
+<li>Conecta el USB virtual (si la VM tiene uno simulado) o usa otra unidad si la tienes. Si no, crea <span class="k">C:\test.txt</span> y bórralo: ¿llega a la papelera? Crea ahora <span class="k">D:\test.txt</span> en una unidad secundaria (si existe) o salta este punto.</li>
+<li>Desde CMD: <span class="k">del %USERPROFILE%\Desktop\borrar3.txt</span> (créalo antes). ¿Va a la papelera?</li>
+<li>Clic derecho en la papelera → Propiedades. Anota el tamaño máximo asignado a C: (en MB).</li>
+</ol>
+</div>
+
+<div class="q">
+<label>6.1 · Resultados de cada paso (¿llegó a la papelera? Sí/No)</label>
+<table>
+<tr><th>#</th><th>Acción</th><th>¿A la papelera?</th></tr>
+<tr><td>1</td><td>Supr en Escritorio</td><td><input type="text" data-k="q_6_1a"></td></tr>
+<tr><td>2</td><td>Mayús+Supr en Escritorio</td><td><input type="text" data-k="q_6_1b"></td></tr>
+<tr><td>3</td><td>Borrar archivo en unidad secundaria/USB</td><td><input type="text" data-k="q_6_1c"></td></tr>
+<tr><td>4</td><td><span class="k">del</span> en CMD</td><td><input type="text" data-k="q_6_1d"></td></tr>
+</table>
+</div>
+
+<div class="q">
+<label>6.2 · Tamaño máximo de la papelera para C: en esta VM (MB)</label>
+<input type="text" data-k="q_6_2" class="inline">
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.3 · Captura de Propiedades de la papelera mostrando el tamaño máximo</label>
+<div class="shot" data-k="s6_papelera"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>6.4 · Un usuario te dice «he borrado una carpeta con 50 archivos importantes con Mayús+Supr hace 10 minutos. Sin reiniciar nada, ¿se puede recuperar?». Responde con tu mejor consejo profesional.</label>
+<textarea data-k="q_6_4"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Reto final · Operación masiva <span class="dur">30 min</span></h2>
+<div class="sb">
+<p>Aplica todo lo aprendido en este escenario:</p>
+
+<div class="aviso">
+<strong>Escenario.</strong> Tu cliente Acme te entrega 100 archivos: <span class="k">informe_001.txt</span> a <span class="k">informe_100.txt</span>. Hay que: (a) crearlos en una carpeta nueva, (b) ocultar los pares, (c) hacer de solo-lectura los múltiplos de 10, (d) buscar y mover los del 50 al 70 a otra carpeta, (e) comprimir el resto en un ZIP.
+</div>
+
+<div class="pasos">
+<strong>Paso 1 · Generar los 100 archivos con un bucle FOR en CMD</strong>
+<pre class="code">cd %USERPROFILE%\Desktop
+mkdir Reto_Acme
+cd Reto_Acme
+for /L %i in (1,1,100) do type nul &gt; informe_%i.txt</pre>
+<p>(En un .bat sería <span class="k">%%i</span>, en CMD directo es <span class="k">%i</span>.)</p>
+</div>
+
+<div class="pasos">
+<strong>Paso 2 · Ocultar los pares</strong>
+<pre class="code">for /L %i in (2,2,100) do attrib +H informe_%i.txt</pre>
+<p>(El <span class="k">(2,2,100)</span> significa: empieza en 2, salta de 2 en 2, hasta 100.)</p>
+</div>
+
+<div class="pasos">
+<strong>Paso 3 · Solo lectura a los múltiplos de 10</strong>
+<pre class="code">for /L %i in (10,10,100) do attrib +R informe_%i.txt</pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 4 · Mover del 50 al 70 a otra carpeta</strong>
+<pre class="code">mkdir ..\Reto_Acme_Subset
+for /L %i in (50,1,70) do move informe_%i.txt ..\Reto_Acme_Subset\</pre>
+</div>
+
+<div class="pasos">
+<strong>Paso 5 · Comprimir el resto a ZIP</strong>
+<p>En PowerShell (más cómodo para esto):</p>
+<pre class="code">cd $env:USERPROFILE\Desktop
+Compress-Archive -Path .\Reto_Acme\* -DestinationPath .\Reto_Acme.zip</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 7.1 · Captura del Explorador mostrando Reto_Acme (con archivos ocultos visibles), Reto_Acme_Subset y Reto_Acme.zip <span class="req">*</span></label>
+<div class="shot" data-k="s7_reto"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>7.2 · ¿Cuántos archivos quedan en Reto_Acme tras mover el subset? ___ &nbsp; &nbsp; ¿En Reto_Acme_Subset? ___</label>
+<input type="text" data-k="q_7_2" placeholder="ej. 79 y 21">
+</div>
+
+<div class="q">
+<label>7.3 · Si alguien intenta borrar un archivo que tiene <span class="k">+R</span> con <span class="k">del</span> en CMD, ¿qué pasa? Pruébalo con <span class="k">del informe_10.txt</span>.</label>
+<textarea data-k="q_7_3"></textarea>
+</div>
+
+<div class="q">
+<label>7.4 · ¿Cómo borrarías un archivo de solo lectura sin quitarle antes el atributo? (pista: una opción del propio <span class="k">del</span>)</label>
+<input type="text" data-k="q_7_4" class="inline" placeholder="el comando completo">
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<p style="font-size:13px;color:#4a5568;margin-bottom:12px">Marca lo que has completado. Tu progreso se actualizará abajo.</p>
+
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · Explorador configurado en modo profesional (extensiones + ocultos + sistema visibles).</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · Estructura Cliente_Acme creada con GUI y con CMD; <span class="k">tree</span> capturado.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · He manejado <span class="k">attrib</span> con +R/-R, +H/-H, +S/-S y entiendo el caso del USB infectado.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He hecho 6 búsquedas avanzadas con operadores reales.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · He comparado CMD y PowerShell en 8 tareas y entiendo la diferencia objeto vs texto.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He probado el comportamiento de la papelera en 4 escenarios distintos.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · He completado el reto final (100 archivos con bucle FOR, atributos, mover y ZIP).</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> He subido las 7 capturas obligatorias marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He exportado el progreso (JSON) o imprimido a PDF.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué te ha costado más? ¿Qué te llevas claro?</label>
+<textarea data-k="ev_reflexion" style="min-height:90px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota que te pondrías a ti mismo (0–10) y por qué</label>
+<input type="text" data-k="ev_nota" class="inline" placeholder="ej. 8 — porque...">
+</div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">UF0853 · Práctica 1 de 10 · El progreso se guarda automáticamente en este navegador. Usa <strong>Exportar</strong> para llevártelo o entregarlo.</div>
+</div><!-- /container -->
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s01_v1';
+let saveTimer;
+
+function autosave(){
+  const d={};
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const k=el.dataset.k;
+    if(el.classList && el.classList.contains('shot')){
+      if(el.dataset.img) d['img_'+k]=el.dataset.img;
+    } else if(el.tagName==='INPUT' && el.type==='checkbox'){
+      d[k]=el.checked;
+    } else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){
+      d[k]=el.value;
+    }
+  });
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); showSaved(); }
+  catch(e){ console.warn('Storage lleno o no disponible',e); }
+  updateProgress();
+}
+
+function restore(){
+  let raw; try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}
+  if(!raw) return;
+  let d; try{d=JSON.parse(raw)}catch(e){return}
+  Object.keys(d).forEach(k=>{
+    if(k.startsWith('img_')){
+      const key=k.slice(4);
+      const el=document.querySelector('.shot[data-k="'+key+'"]');
+      if(el) setImage(el,d[k]);
+      return;
+    }
+    const el=document.querySelector('[data-k="'+k+'"]');
+    if(!el) return;
+    if(el.type==='checkbox') el.checked=!!d[k];
+    else el.value=d[k]||'';
+  });
+  updateProgress();
+}
+
+function setImage(shot,url){
+  shot.dataset.img=url;
+  shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)" title="Eliminar">×</button>';
+}
+
+function clearImg(ev,btn){
+  ev.stopPropagation();
+  const shot=btn.closest('.shot');
+  delete shot.dataset.img;
+  shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';
+  bindShot(shot);
+  autosave();
+}
+
+function bindShot(shot){
+  const fileInput=shot.querySelector('input[type=file]');
+  shot.addEventListener('click',e=>{
+    if(e.target.classList && e.target.classList.contains('x')) return;
+    if(shot.dataset.img) return;
+    if(fileInput) fileInput.click();
+  });
+  if(fileInput){
+    fileInput.addEventListener('change',e=>{
+      const f=e.target.files[0]; if(f) loadFile(shot,f);
+    });
+  }
+  shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});
+  shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));
+  shot.addEventListener('drop',e=>{
+    e.preventDefault(); shot.classList.remove('drag');
+    const f=e.dataTransfer.files[0]; if(f) loadFile(shot,f);
+  });
+}
+
+function loadFile(shot,file){
+  if(!file.type.startsWith('image/')){ alert('Solo imágenes'); return; }
+  const r=new FileReader();
+  r.onload=e=>{ setImage(shot,e.target.result); autosave(); };
+  r.readAsDataURL(file);
+}
+
+document.addEventListener('paste',e=>{
+  if(!e.clipboardData) return;
+  for(let it of e.clipboardData.items){
+    if(it.type && it.type.startsWith('image/')){
+      const f=it.getAsFile();
+      let target=document.activeElement && document.activeElement.closest && document.activeElement.closest('.shot');
+      if(!target){
+        const shots=document.querySelectorAll('.shot');
+        for(let s of shots){ if(!s.dataset.img){ target=s; break; } }
+      }
+      if(target){ loadFile(target,f); e.preventDefault(); return; }
+    }
+  }
+});
+
+function exportJSON(){
+  const d=localStorage.getItem(STORAGE_KEY)||'{}';
+  const nombre=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');
+  const blob=new Blob([d],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=STORAGE_KEY+'_'+nombre+'_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='application/json,.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
+        location.reload();
+      }catch(err){ alert('JSON inválido: '+err.message); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+function clearAll(){
+  if(!confirm('¿Borrar todo el progreso de esta práctica? Esta acción no se puede deshacer.')) return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  location.reload();
+}
+
+function showSaved(){
+  const el=document.getElementById('saved-indicator'); if(!el) return;
+  el.textContent='✓ Guardado '+new Date().toLocaleTimeString();
+  el.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+function updateProgress(){
+  const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');
+  const total=evs.length, done=[...evs].filter(c=>c.checked).length;
+  const pct=total?Math.round(done/total*100):0;
+  const bar=document.getElementById('bar'), txt=document.getElementById('pct');
+  if(bar) bar.style.width=pct+'%';
+  if(txt) txt.textContent=pct+'%';
+}
+
+window.addEventListener('load',()=>{
+  document.querySelectorAll('.shot').forEach(bindShot);
+  restore();
+  document.body.addEventListener('input',()=>{clearTimeout(saveTimer); saveTimer=setTimeout(autosave,400)});
+  document.body.addEventListener('change',autosave);
+});
+</script>
+</body>
+</html>

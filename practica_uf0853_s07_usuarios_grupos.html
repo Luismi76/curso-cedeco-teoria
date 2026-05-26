@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P7 · UF0853 · Usuarios y grupos</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#b83280; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}.sb ul,.sb ol{margin:6px 0 8px 22px}.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P7 · UF0853 · Usuarios y grupos</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 7 · Usuarios y grupos</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 7 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows (Pro recomendado) + VM Ubuntu<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Vas a construir un escenario de empresa con <strong>5 usuarios y 3 grupos</strong> en ambos sistemas, configurar políticas de contraseña, gestionar <code>sudo</code>, y resolver un caso real de «se ha ido el técnico de TI y nadie recuerda la contraseña de admin».</p>
+<p><strong>Por qué importa.</strong> Casi cualquier auditoría de seguridad mira primero «quién puede entrar y como qué». Si lo gestionas bien, ya tienes 80% del trabajo hecho.</p>
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Crear usuarios en Windows (GUI + CLI) <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<h3>Por interfaz gráfica</h3>
+<div class="pasos">
+<ol>
+<li>Win+I → Cuentas → Otros usuarios → Agregar cuenta.</li>
+<li>Sin cuenta Microsoft. Crea: <span class="k">tecnico1</span> con contraseña <span class="k">Pwd2026.</span></li>
+<li>Tipo de cuenta: <strong>Estándar</strong>.</li>
+</ol>
+</div>
+
+<h3>Por línea de comandos (más rápido)</h3>
+<p>Abre CMD <strong>como administrador</strong>:</p>
+<pre class="code">net user tecnico2 Pwd2026. /add /fullname:"Técnico 2" /comment:"Soporte de turno"
+net user tecnico3 Pwd2026. /add /fullname:"Técnico 3"
+net user tecnico4 Pwd2026. /add /fullname:"Técnico 4"
+net user direccion DirPwd2026. /add /fullname:"Dirección"
+
+REM Listar todos los usuarios
+net user
+
+REM Ver detalles de uno
+net user tecnico2</pre>
+
+<h3>PowerShell (versión moderna)</h3>
+<pre class="code">New-LocalUser -Name "tecnico5" -Password (ConvertTo-SecureString "Pwd2026." -AsPlainText -Force) -FullName "Técnico 5" -Description "Soporte"
+Get-LocalUser
+Get-LocalUser tecnico5 | Format-List</pre>
+
+<div class="shot-wrap">
+<label>📷 1.1 · Captura de <span class="k">net user</span> mostrando todos los usuarios creados <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_netuser"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="q">
+<label>1.2 · ¿Cuántos usuarios totales (incluyendo invitado, Administrador, etc.) tienes ahora?</label>
+<input type="text" data-k="q_1_2" class="inline">
+</div>
+
+<h3>Subir uno a administrador</h3>
+<pre class="code">net localgroup Administradores direccion /add
+REM (En Win en inglés: "Administrators")
+
+net localgroup Administradores
+Get-LocalGroupMember -Group Administradores</pre>
+
+<div class="q">
+<label>1.3 · Lista de miembros del grupo Administradores en tu VM</label>
+<textarea data-k="q_1_3"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Grupos personalizados y permisos <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>Crearás 3 grupos: <strong>Soporte</strong>, <strong>Direccion</strong>, <strong>RecursosHumanos</strong>.</p>
+
+<pre class="code">net localgroup Soporte /add /comment:"Equipo de soporte técnico"
+net localgroup Direccion /add /comment:"Equipo directivo"
+net localgroup RecursosHumanos /add /comment:"Departamento RR.HH."
+
+REM Asignar usuarios
+net localgroup Soporte tecnico1 /add
+net localgroup Soporte tecnico2 /add
+net localgroup Soporte tecnico3 /add
+net localgroup Soporte tecnico4 /add
+net localgroup Soporte tecnico5 /add
+net localgroup Direccion direccion /add
+
+REM Verificar
+net localgroup Soporte
+net localgroup Direccion
+net localgroup RecursosHumanos</pre>
+
+<div class="shot-wrap">
+<label>📷 2.1 · Captura de <span class="k">net localgroup Soporte</span> mostrando los 5 técnicos</label>
+<div class="shot" data-k="s2_grupo"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Carpeta departamental con permisos por grupo</h3>
+<pre class="code">mkdir C:\Departamentos
+mkdir C:\Departamentos\Soporte
+mkdir C:\Departamentos\Direccion
+mkdir C:\Departamentos\RRHH
+
+REM Romper herencia y asignar permisos por grupo
+icacls C:\Departamentos\Soporte /inheritance:r
+icacls C:\Departamentos\Soporte /grant Administradores:F SYSTEM:F Soporte:M
+
+icacls C:\Departamentos\Direccion /inheritance:r
+icacls C:\Departamentos\Direccion /grant Administradores:F SYSTEM:F Direccion:F
+
+icacls C:\Departamentos\RRHH /inheritance:r
+icacls C:\Departamentos\RRHH /grant Administradores:F SYSTEM:F RecursosHumanos:M
+
+REM Verifica
+icacls C:\Departamentos\Soporte</pre>
+
+<div class="pasos">
+<strong>Probar como tecnico1</strong>
+<ol>
+<li>Cierra sesión, entra como tecnico1 / Pwd2026.</li>
+<li>Intenta entrar en <span class="k">C:\Departamentos\Soporte</span> y crear un archivo. ¿Funciona?</li>
+<li>Intenta entrar en <span class="k">C:\Departamentos\Direccion</span>. ¿Qué pasa?</li>
+<li>Vuelve a admin.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>2.2 · Resultado para tecnico1</label>
+<table>
+<tr><th>Carpeta</th><th>Entrar</th><th>Crear archivo</th></tr>
+<tr><td>Soporte</td><td><input type="text" data-k="q_2_2a"></td><td><input type="text" data-k="q_2_2b"></td></tr>
+<tr><td>Direccion</td><td><input type="text" data-k="q_2_2c"></td><td><input type="text" data-k="q_2_2d"></td></tr>
+<tr><td>RRHH</td><td><input type="text" data-k="q_2_2e"></td><td><input type="text" data-k="q_2_2f"></td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Directivas de contraseña <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p><strong>Solo en Windows Pro/Enterprise.</strong> Home no tiene <span class="k">secpol.msc</span>. Si tienes Home, usa <span class="k">net accounts</span> que sí funciona.</p>
+
+<h3>secpol.msc · GUI</h3>
+<div class="pasos">
+<ol>
+<li>Ejecuta <span class="k">secpol.msc</span> (Win+R).</li>
+<li>Directivas de cuenta → <strong>Directiva de contraseñas</strong>.</li>
+<li>Configura:
+<ul>
+<li><strong>Longitud mínima:</strong> 10 caracteres</li>
+<li><strong>Complejidad:</strong> Habilitada</li>
+<li><strong>Vigencia máxima:</strong> 90 días</li>
+<li><strong>Vigencia mínima:</strong> 1 día</li>
+<li><strong>Historial:</strong> 5 contraseñas recordadas</li>
+</ul></li>
+<li>Directivas de cuenta → <strong>Directiva de bloqueo de cuenta</strong>:
+<ul>
+<li>Umbral: 5 intentos fallidos</li>
+<li>Duración: 30 minutos</li>
+<li>Restablecimiento: 30 minutos</li>
+</ul></li>
+</ol>
+</div>
+
+<h3>net accounts · equivalente CLI</h3>
+<pre class="code">net accounts /minpwlen:10 /maxpwage:90 /minpwage:1 /uniquepw:5
+net accounts /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
+net accounts                                REM ver el estado actual</pre>
+
+<div class="shot-wrap">
+<label>📷 3.1 · Captura de <span class="k">net accounts</span> con tus parámetros aplicados <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_netacc"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Probar la directiva</strong>
+<ol>
+<li>Intenta cambiar la contraseña de tecnico1 a <span class="k">1234</span>. ¿Qué pasa?</li>
+<li>Intenta una contraseña sin mayúsculas: <span class="k">solominus2026</span>. ¿Pasa?</li>
+<li>Cierra sesión, entra como tecnico1 con contraseña incorrecta 5 veces. ¿Te bloquea?</li>
+<li>Vuelve a admin, abre <span class="k">net user tecnico1</span> y mira el estado. Desbloquéalo si hace falta: <span class="k">net user tecnico1 /active:yes</span>.</li>
+</ol>
+</div>
+
+<div class="q">
+<label>3.2 · ¿Qué mensaje exacto da Windows cuando una contraseña no cumple la directiva?</label>
+<textarea data-k="q_3_2"></textarea>
+</div>
+
+<h3>Caducidad y «forzar cambio»</h3>
+<pre class="code">REM forzar cambio en el próximo login
+net user tecnico1 /logonpasswordchg:yes
+
+REM caducidad concreta
+wmic useraccount where name='tecnico1' set PasswordExpires=TRUE</pre>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Usuarios en Linux: passwd, shadow, group <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Crear los 5 técnicos en Ubuntu</strong>
+<pre class="code">for u in tecnico1 tecnico2 tecnico3 tecnico4 tecnico5; do
+  sudo adduser --gecos "Tecnico,,," --disabled-password $u
+  echo "$u:Pwd2026." | sudo chpasswd
+done
+
+sudo adduser --gecos "Direccion,,," --disabled-password direccion
+echo "direccion:DirPwd2026." | sudo chpasswd
+
+<span class="cm"># Verificar</span>
+getent passwd | tail -10
+cat /etc/passwd | tail -10</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.1 · Captura de la salida de <span class="k">getent passwd | tail -10</span> con tus 6 usuarios nuevos <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_passwd"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<h3>Diseccionar /etc/passwd y /etc/shadow</h3>
+<pre class="code">grep tecnico1 /etc/passwd</pre>
+<p>Verás algo como:</p>
+<pre class="code">tecnico1:x:1003:1003:Tecnico,,,:/home/tecnico1:/bin/bash
+   │     │   │    │     │           │              │
+   │     │   │    │     │           │              └── shell de login
+   │     │   │    │     │           └── carpeta home
+   │     │   │    │     └── GECOS (info descriptiva)
+   │     │   │    └── GID primario
+   │     │   └── UID
+   │     └── la 'x' significa que la contraseña real está en /etc/shadow
+   └── nombre de usuario</pre>
+
+<pre class="code">sudo grep tecnico1 /etc/shadow</pre>
+<p>Formato:</p>
+<pre class="code">tecnico1:$y$j9T$...HASH...:19850:0:99999:7:::
+   │              │             │   │  │   │
+   │              │             │   │  │   └── días de aviso antes de caducar
+   │              │             │   │  └── máximo días entre cambios
+   │              │             │   └── mínimo días entre cambios
+   │              │             └── último cambio (días desde 1/1/1970)
+   │              └── hash de la contraseña
+   └── usuario</pre>
+
+<div class="q">
+<label>4.2 · ¿Por qué <span class="k">/etc/passwd</span> es legible por todos pero <span class="k">/etc/shadow</span> solo por root?</label>
+<textarea data-k="q_4_2"></textarea>
+</div>
+
+<h3>Caducidad y políticas con chage</h3>
+<pre class="code">sudo chage -l tecnico1                <span class="cm"># ver política actual</span>
+
+<span class="cm"># Forzar cambio en próximo login</span>
+sudo chage -d 0 tecnico1
+
+<span class="cm"># Caducidad cada 90 días, aviso a 7 días</span>
+sudo chage -M 90 -W 7 tecnico1
+
+<span class="cm"># Caducar cuenta el 31/12/2026</span>
+sudo chage -E 2026-12-31 tecnico1
+
+sudo chage -l tecnico1</pre>
+
+<h3>Políticas en /etc/login.defs y PAM</h3>
+<pre class="code">sudo grep -E "^PASS_" /etc/login.defs
+<span class="cm"># PASS_MAX_DAYS, PASS_MIN_DAYS, PASS_WARN_AGE</span>
+
+<span class="cm"># Para complejidad: PAM module pwquality</span>
+sudo apt install -y libpam-pwquality
+sudo grep pam_pwquality /etc/pam.d/common-password</pre>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> Grupos y permisos compartidos (Linux) <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<pre class="code">sudo groupadd soporte
+sudo groupadd departamento
+sudo groupadd rrhh
+
+sudo usermod -aG soporte tecnico1
+sudo usermod -aG soporte tecnico2
+sudo usermod -aG soporte tecnico3
+sudo usermod -aG soporte tecnico4
+sudo usermod -aG soporte tecnico5
+sudo usermod -aG departamento direccion
+
+<span class="cm"># Importante: la -a hace ADD. Sin -a, BORRARÍA los grupos anteriores.</span>
+
+<span class="cm"># Verificar</span>
+groups tecnico1
+getent group soporte</pre>
+</div>
+
+<h3>Carpeta compartida con SGID</h3>
+<p>El bit <strong>SGID</strong> en una carpeta hace que los archivos nuevos hereden el grupo de la carpeta (no del usuario que crea). Útil para colaboración.</p>
+
+<pre class="code">sudo mkdir -p /srv/departamentos/soporte
+sudo chown :soporte /srv/departamentos/soporte
+sudo chmod 2770 /srv/departamentos/soporte   <span class="cm"># 2 = SGID</span>
+
+ls -ld /srv/departamentos/soporte           <span class="cm"># verás drwxrws---</span>
+
+<span class="cm"># Prueba</span>
+sudo -u tecnico1 touch /srv/departamentos/soporte/notas_t1.txt
+sudo -u tecnico2 touch /srv/departamentos/soporte/notas_t2.txt
+ls -la /srv/departamentos/soporte/</pre>
+
+<div class="q">
+<label>5.1 · ¿Qué grupo aparece como propietario de los archivos que han creado tecnico1 y tecnico2?</label>
+<input type="text" data-k="q_5_1">
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.2 · Captura de <span class="k">ls -la</span> mostrando los archivos con el grupo «soporte» heredado por SGID <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_sgid"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> sudo y /etc/sudoers <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p><span class="k">sudo</span> permite ejecutar un comando con privilegios de root. ¿Quién puede usar <span class="k">sudo</span>? Lo define <span class="k">/etc/sudoers</span>.</p>
+
+<div class="aviso">
+<strong>NUNCA edites /etc/sudoers directamente.</strong> Si te equivocas con una coma, el sistema deja de aceptar sudo. Usa SIEMPRE <span class="k">sudo visudo</span>, que valida sintaxis antes de guardar.
+</div>
+
+<div class="pasos">
+<strong>Dar sudo a tecnico1 de forma limpia</strong>
+<pre class="code"><span class="cm"># Forma 1: añadirlo al grupo sudo (la limpia)</span>
+sudo usermod -aG sudo tecnico1
+
+<span class="cm"># Forma 2: regla individual (más quirúrgica)</span>
+sudo visudo
+<span class="cm"># Añade al final:</span>
+<span class="cm"># tecnico1 ALL=(ALL:ALL) ALL</span>
+
+<span class="cm"># Forma 3: regla limitada (mejor)</span>
+<span class="cm"># tecnico2 ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade</span>
+<span class="cm"># tecnico2 puede actualizar paquetes sin contraseña, nada más</span></pre>
+</div>
+
+<div class="pasos">
+<strong>Probar como tecnico1</strong>
+<pre class="code">su tecnico1
+sudo apt update    <span class="cm"># debería pedirle SU contraseña, no la de root</span>
+exit</pre>
+</div>
+
+<h3>Diferencia entre su, sudo, sudo -i, sudo su</h3>
+<table>
+<tr><th>Comando</th><th>Qué hace</th></tr>
+<tr><td><span class="k">su</span></td><td>Cambia a root (necesita contraseña de root). En Ubuntu por defecto está deshabilitado.</td></tr>
+<tr><td><span class="k">su - tecnico1</span></td><td>Cambia a tecnico1 (contraseña de tecnico1) con su entorno completo.</td></tr>
+<tr><td><span class="k">sudo cmd</span></td><td>Ejecuta solo «cmd» como root, con TU contraseña.</td></tr>
+<tr><td><span class="k">sudo -i</span></td><td>Te da un shell de root completo.</td></tr>
+<tr><td><span class="k">sudo su -</span></td><td>Equivalente a sudo -i, más viejo.</td></tr>
+</table>
+
+<div class="q">
+<label>6.1 · ¿Por qué Ubuntu deshabilita por defecto el login de root y obliga a usar sudo?</label>
+<textarea data-k="q_6_1"></textarea>
+</div>
+
+<h3>Auditoría de sudo</h3>
+<pre class="code">sudo grep sudo /var/log/auth.log | tail -20</pre>
+<p>Cada uso de sudo queda registrado. Es la primera parada en una investigación de seguridad.</p>
+
+<div class="shot-wrap">
+<label>📷 6.2 · Captura de los últimos usos de sudo en /var/log/auth.log</label>
+<div class="shot" data-k="s6_auth"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Caso real · Reset de admin perdido <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<div class="aviso">
+<strong>Escenario.</strong> Te llega un PC: el único usuario admin se fue de la empresa y nadie sabe la contraseña. No hay otro admin. ¿Cómo entras?
+</div>
+
+<h3>Linux · Modo single user / chroot</h3>
+<div class="pasos">
+<ol>
+<li>Reinicia, mantén Mayús durante el arranque para ver GRUB.</li>
+<li>Selecciona la entrada habitual, pulsa <strong>e</strong> (edit).</li>
+<li>Localiza la línea que empieza por <span class="k">linux</span> y al final añade <span class="k">init=/bin/bash</span>.</li>
+<li>Ctrl+X o F10 para arrancar.</li>
+<li>Tendrás shell de root sin contraseña:</li>
+</ol>
+<pre class="code">mount -o remount,rw /
+passwd usuario_admin
+<span class="cm"># Nueva contraseña</span>
+sync; reboot -f</pre>
+</div>
+
+<div class="q">
+<label>7.1 · ¿Qué se aprende sobre la seguridad de un Linux con esto? ¿Cómo se previene?</label>
+<textarea data-k="q_7_1" style="min-height:90px"></textarea>
+</div>
+
+<h3>Windows · Reset desde un USB de instalación</h3>
+<div class="pasos">
+<ol>
+<li>Arranca desde un USB de instalación de Windows 10/11.</li>
+<li>«Reparar el equipo» → Solucionar problemas → Símbolo del sistema.</li>
+<li>El truco clásico es sustituir <span class="k">sethc.exe</span> (sticky keys) o <span class="k">utilman.exe</span> por <span class="k">cmd.exe</span>:</li>
+</ol>
+<pre class="code">copy c:\windows\system32\cmd.exe c:\windows\system32\utilman.exe
+<span class="cm"># Reiniciar normalmente</span>
+<span class="cm"># En la pantalla de login, pulsa el icono de accesibilidad: abre CMD como SYSTEM</span>
+<span class="cm"># Desde ahí:</span>
+net user usuario_admin NuevaPwd2026.</pre>
+<p>Esto demuestra que el cifrado de disco (BitLocker) es <strong>imprescindible</strong>: sin él, cualquiera con acceso físico al disco puede entrar.</p>
+
+<div class="q">
+<label>7.2 · ¿Por qué BitLocker resuelve este problema? ¿Qué pediría Windows si el disco estuviera cifrado?</label>
+<textarea data-k="q_7_2"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He creado 5 usuarios en Windows con GUI, CMD y PowerShell.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · He creado 3 grupos y dado permisos NTFS por grupo, verificando con icacls.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · He configurado directivas de contraseña (longitud, complejidad, vigencia, bloqueo).</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He creado los usuarios en Linux y diseccionado /etc/passwd y /etc/shadow.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · He configurado un grupo «soporte» con SGID y los archivos heredan el grupo.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · Domino sudo, sudoers, visudo y entiendo la diferencia su / sudo / sudo -i.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · He aprendido a recuperar acceso en Linux y en Windows (y por qué el cifrado importa).</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> He subido las capturas marcadas con *.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué consideración de seguridad te ha resultado más reveladora?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 7 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s07_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>

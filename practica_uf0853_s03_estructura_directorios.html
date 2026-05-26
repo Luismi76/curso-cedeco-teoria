@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P3 · UF0853 · Estructura de directorios y sistemas de archivos</title>
+<style>
+:root { --azul:#1a365d; --ac:#2b6cb0; --gb:#cbd5e0; --bg:#f7fafc; --rojo:#c53030; --verde:#276749; --naranja:#c05621; --amarillo:#975a16; --tx:#2d3748; --c:#2b6cb0; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;color:var(--tx);background:#e2e8f0;padding:0 0 60px;line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:var(--azul);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+.bar a.home{color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600}
+.bar .title{flex:1;font-size:14px;font-weight:600;min-width:200px}
+.bar button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:500}
+.bar button:hover{background:rgba(255,255,255,.22)}
+.bar button.danger{background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.5)}
+.bar button.danger:hover{background:rgba(220,53,69,.45)}
+#saved-indicator{font-size:12px;color:#9ae6b4;opacity:0;transition:opacity .3s;min-width:130px;text-align:right}
+#saved-indicator.show{opacity:1}
+.container{max-width:980px;margin:0 auto;background:#fff;border-radius:0 0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden}
+header.head{background:linear-gradient(135deg,var(--azul) 0%,var(--c) 100%);color:#fff;padding:24px 32px}
+header.head h1{font-size:22px;margin-bottom:8px;line-height:1.3}
+header.head .meta{font-size:12.5px;opacity:.92;line-height:1.7}
+.content{padding:24px 32px}
+.alumno{background:var(--bg);border:2px solid var(--ac);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.alumno label{font-weight:600;font-size:12px;color:var(--azul);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.alumno input{width:100%;padding:7px 10px;border:1px solid var(--gb);border-radius:5px;font-size:13.5px;background:#fff}
+.intro{background:#ebf8ff;border-left:4px solid var(--ac);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:24px;font-size:13.5px;line-height:1.65}
+.intro strong{color:var(--azul)}
+.section{margin-bottom:26px;border:1px solid var(--gb);border-radius:8px;overflow:hidden}
+.section>h2{background:var(--azul);color:#fff;padding:11px 18px;font-size:15.5px;display:flex;align-items:center;gap:10px}
+.section>h2 .n{background:rgba(255,255,255,.18);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.section>h2 .dur{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-weight:500}
+.sb{padding:18px 22px}
+.sb h3{color:var(--ac);font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.sb h3:first-child{margin-top:0}
+.sb h4{color:var(--azul);font-size:13.5px;margin:14px 0 6px;font-weight:700}
+.sb p{margin:6px 0}
+.sb ul,.sb ol{margin:6px 0 8px 22px}
+.sb li{margin:4px 0}
+.pasos{background:var(--bg);border-left:3px solid var(--ac);padding:12px 16px 12px 18px;margin:10px 0;border-radius:0 6px 6px 0}
+.pasos ol{margin:4px 0 4px 20px;line-height:1.85}
+.pasos strong{color:var(--azul)}
+code,.k{background:#2d3748;color:#f7fafc;padding:2px 7px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:12.5px;white-space:nowrap}
+pre.code{background:#1a202c;color:#e2e8f0;padding:11px 14px;border-radius:6px;font-family:Consolas,Monaco,monospace;font-size:12.5px;line-height:1.55;margin:10px 0;overflow-x:auto;white-space:pre}
+pre.code .cm{color:#718096}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#edf2f7;color:var(--azul);padding:8px 10px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--gb)}
+td{padding:7px 10px;border:1px solid var(--gb);vertical-align:top}
+td input[type=text],td select{width:100%;padding:4px 8px;border:1px solid #e2e8f0;border-radius:3px;font-size:13px;background:#fafafa}
+td input[type=text]:focus,td select:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+textarea{width:100%;padding:10px;border:1px solid var(--gb);border-radius:5px;font-family:inherit;font-size:13px;resize:vertical;min-height:70px;background:#fafafa;line-height:1.55}
+textarea:focus{border-color:var(--ac);outline:none;background:#fff;box-shadow:0 0 0 2px rgba(43,108,176,.15)}
+input[type=text].inline{width:auto;display:inline-block;padding:3px 8px;border:1px solid var(--gb);border-radius:4px;font-size:13px;background:#fafafa}
+.q{margin:12px 0}
+.q>label{display:block;font-weight:600;font-size:13px;color:var(--azul);margin-bottom:5px}
+.check{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.check input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--ac)}
+.nota{background:#ebf8ff;border-left:4px solid var(--ac);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.aviso{background:#fff5f5;border-left:4px solid var(--rojo);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.tip{background:#f0fff4;border-left:4px solid var(--verde);padding:10px 14px;font-size:13px;margin:10px 0;border-radius:0 5px 5px 0}
+.shot-wrap{margin:12px 0}
+.shot-wrap>label{display:block;font-weight:600;font-size:12.5px;color:var(--azul);margin-bottom:5px}
+.shot{border:2px dashed var(--gb);border-radius:8px;min-height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer;position:relative;overflow:hidden;transition:all .2s}
+.shot:hover{border-color:var(--ac);background:#ebf8ff}
+.shot.drag{border-color:var(--ac);background:#ebf8ff;border-style:solid}
+.shot .ph{color:#718096;font-size:12.5px;padding:24px 16px;text-align:center;line-height:1.6;pointer-events:none}
+.shot .ph b{color:var(--azul);font-weight:600}
+.shot img{max-width:100%;max-height:480px;display:block}
+.shot .x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700}
+.shot .x:hover{background:var(--rojo)}
+.evalfin{background:#f0fff4;border:2px solid #9ae6b4;border-radius:8px;padding:16px 20px;margin-top:24px}
+.evalfin h2{color:var(--verde);font-size:16px;margin-bottom:10px}
+.progress{margin:10px 0;background:#edf2f7;border-radius:20px;height:10px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--verde),#48bb78);transition:width .3s}
+.progress-text{font-size:12px;color:#4a5568;margin-bottom:4px;display:flex;justify-content:space-between}
+.footer{text-align:center;font-size:11.5px;color:#718096;padding:18px;border-top:1px solid var(--gb);background:var(--bg)}
+@media (max-width:640px){header.head{padding:18px}.content{padding:16px 14px}.sb{padding:14px}}
+@media print{body{background:#fff;padding:0;font-size:11px}.bar,#saved-indicator,.shot .x,.no-print{display:none!important}.container{box-shadow:none;border-radius:0;max-width:100%}.section{page-break-inside:avoid;border:1px solid #999}header.head,.section>h2{background:var(--azul)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}th{background:#edf2f7!important;-webkit-print-color-adjust:exact}.intro,.nota,.aviso,.tip,.evalfin,.pasos,.shot,.alumno{-webkit-print-color-adjust:exact;print-color-adjust:exact}input[type=text],select,textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px!important}textarea{min-height:auto!important;overflow:visible;height:auto}.shot{border:1px dashed #999;min-height:100px}.shot img{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" class="home">← Teoría</a>
+  <span class="title">P3 · UF0853 · Estructura de directorios y FS</span>
+  <span id="saved-indicator">✓ Guardado</span>
+  <button onclick="exportJSON()">⬇ Exportar</button>
+  <button onclick="importJSON()">⬆ Importar</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button onclick="clearAll()" class="danger">🗑</button>
+</div>
+
+<div class="container">
+<header class="head">
+<h1>Práctica 3 · Estructura de directorios y sistemas de archivos</h1>
+<div class="meta">
+<strong>UF:</strong> UF0853 · <strong>Sesión:</strong> 3 / 10 · <strong>Duración:</strong> 4 horas · <strong>Modalidad:</strong> individual<br>
+<strong>Entorno:</strong> VM Windows + VM Ubuntu (VirtualBox) · <strong>No requiere</strong> pendrives ni discos reales<br>
+<strong>Entregable:</strong> este archivo con capturas y respuestas
+</div>
+</header>
+
+<div class="content">
+
+<div class="alumno">
+  <div><label>Nombre y apellidos</label><input type="text" data-k="alumno_nombre"></div>
+  <div><label>Grupo</label><input type="text" data-k="alumno_grupo" placeholder="IFCT0309"></div>
+  <div><label>Fecha</label><input type="date" data-k="alumno_fecha"></div>
+  <div><label>Horas reales</label><input type="text" data-k="alumno_horas"></div>
+</div>
+
+<div class="intro">
+<p><strong>De qué va.</strong> Vas a recorrer el árbol completo de Windows y Linux, comparar dónde guarda cada uno qué tipo de archivo, y después <strong>añadir un disco virtual extra</strong> a las dos VMs para particionarlo, formatearlo con distintos sistemas de archivos (NTFS, exFAT, ext4) y montarlo. Termina configurando <span class="k">/etc/fstab</span> en Linux para que el disco se monte solo al arrancar.</p>
+<p><strong>Por qué importa.</strong> Cuando un cliente te llame con «no me caben más datos» o «mi USB no se ve en Linux», estarás haciendo justo lo de esta práctica.</p>
+</div>
+
+<div class="nota">
+<strong>Antes de empezar:</strong> apaga las dos VMs. Vas a tocar la configuración de discos en VirtualBox con ellas apagadas.
+</div>
+
+<!-- ============= SECCIÓN 1 ============= -->
+<div class="section">
+<h2><span class="n">1</span> Safari por el árbol de Windows <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Arranca la VM Windows. Vas a explorar las carpetas y rellenar la tabla con tus hallazgos reales (no copies del libro).</p>
+
+<table>
+<tr><th>Carpeta</th><th>¿Qué contiene?</th><th>Tamaño aprox.</th></tr>
+<tr><td><span class="k">C:\Windows</span></td><td><input type="text" data-k="q_win_w1"></td><td><input type="text" data-k="q_win_w1s"></td></tr>
+<tr><td><span class="k">C:\Windows\System32</span></td><td><input type="text" data-k="q_win_w2"></td><td><input type="text" data-k="q_win_w2s"></td></tr>
+<tr><td><span class="k">C:\Program Files</span></td><td><input type="text" data-k="q_win_w3"></td><td><input type="text" data-k="q_win_w3s"></td></tr>
+<tr><td><span class="k">C:\Program Files (x86)</span></td><td><input type="text" data-k="q_win_w4"></td><td><input type="text" data-k="q_win_w4s"></td></tr>
+<tr><td><span class="k">C:\Users\&lt;tú&gt;\AppData</span></td><td><input type="text" data-k="q_win_w5"></td><td><input type="text" data-k="q_win_w5s"></td></tr>
+<tr><td><span class="k">C:\ProgramData</span></td><td><input type="text" data-k="q_win_w6"></td><td><input type="text" data-k="q_win_w6s"></td></tr>
+</table>
+
+<p><strong>Truco para ver el tamaño:</strong> clic derecho en la carpeta → Propiedades. Para las grandes (System32, Windows) tardará un rato.</p>
+
+<div class="q">
+<label>1.1 · Diferencia entre <span class="k">C:\Program Files</span> y <span class="k">C:\Program Files (x86)</span>. ¿Qué programas concretos hay en cada una en tu VM?</label>
+<textarea data-k="q_1_1"></textarea>
+</div>
+
+<div class="q">
+<label>1.2 · Dentro de <span class="k">AppData</span> hay 3 subcarpetas: <span class="k">Local</span>, <span class="k">LocalLow</span>, <span class="k">Roaming</span>. ¿Para qué sirve cada una?</label>
+<textarea data-k="q_1_2"></textarea>
+</div>
+
+<h3>El registro de Windows</h3>
+<p>Ejecuta <span class="k">regedit</span> (necesita admin). El registro es la base de datos de configuración de Windows, equivalente a <span class="k">/etc</span> de Linux pero binaria. Las 5 ramas principales (HKEYs):</p>
+<ul>
+<li><span class="k">HKEY_CLASSES_ROOT (HKCR)</span> — asociaciones de extensiones y COM.</li>
+<li><span class="k">HKEY_CURRENT_USER (HKCU)</span> — config del usuario actual.</li>
+<li><span class="k">HKEY_LOCAL_MACHINE (HKLM)</span> — config del equipo, todos los usuarios.</li>
+<li><span class="k">HKEY_USERS (HKU)</span> — config de todos los usuarios cargados.</li>
+<li><span class="k">HKEY_CURRENT_CONFIG (HKCC)</span> — config actual de hardware.</li>
+</ul>
+
+<div class="shot-wrap">
+<label>📷 1.3 · Captura de <span class="k">regedit</span> mostrando las 5 HKEYs <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s1_regedit"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="aviso">
+<strong>Cuidado.</strong> El registro es como el sistema nervioso de Windows. <em>Modificar sin saber</em> = sistema roto. Solo <strong>mira</strong> en esta práctica.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 2 ============= -->
+<div class="section">
+<h2><span class="n">2</span> Safari por el FHS de Linux <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Arranca la VM Ubuntu. Igual que en la sección 1, explora y rellena la tabla.</p>
+
+<table>
+<tr><th>Carpeta</th><th>Comando</th><th>Tu observación</th></tr>
+<tr><td><span class="k">/</span></td><td><span class="k">ls /</span></td><td><input type="text" data-k="q_lin_l1"></td></tr>
+<tr><td><span class="k">/etc</span></td><td><span class="k">ls /etc | wc -l</span></td><td><input type="text" data-k="q_lin_l2" placeholder="nº archivos"></td></tr>
+<tr><td><span class="k">/home</span></td><td><span class="k">ls /home</span></td><td><input type="text" data-k="q_lin_l3"></td></tr>
+<tr><td><span class="k">/var/log</span></td><td><span class="k">ls /var/log</span></td><td><input type="text" data-k="q_lin_l4"></td></tr>
+<tr><td><span class="k">/dev</span></td><td><span class="k">ls /dev | head -20</span></td><td><input type="text" data-k="q_lin_l5"></td></tr>
+<tr><td><span class="k">/proc</span></td><td><span class="k">cat /proc/cpuinfo | head -5</span></td><td><input type="text" data-k="q_lin_l6"></td></tr>
+<tr><td><span class="k">/boot</span></td><td><span class="k">ls /boot</span></td><td><input type="text" data-k="q_lin_l7"></td></tr>
+</table>
+
+<h3>Archivos especiales de /dev</h3>
+<pre class="code">ls -la /dev/sda*       <span class="cm"># tu disco principal</span>
+ls -la /dev/null       <span class="cm"># el agujero negro</span>
+ls -la /dev/zero       <span class="cm"># produce ceros infinitos</span>
+ls -la /dev/random     <span class="cm"># produce bytes aleatorios</span>
+
+<span class="cm"># cuidado, son archivos especiales (b o c)</span>
+file /dev/sda /dev/null /dev/random</pre>
+
+<div class="q">
+<label>2.1 · ¿Qué tipo de archivo (la primera letra de los permisos) tiene <span class="k">/dev/sda</span>? ¿Y <span class="k">/dev/null</span>? Explica qué significa cada letra.</label>
+<textarea data-k="q_2_1"></textarea>
+</div>
+
+<h3>/proc: el sistema vivo</h3>
+<p><span class="k">/proc</span> no es disco real: es un sistema de archivos virtual que el kernel rellena al vuelo. Cada proceso tiene una carpeta con su PID.</p>
+<pre class="code">cat /proc/version
+cat /proc/meminfo | head
+cat /proc/cpuinfo | grep "model name" | head -1
+ls /proc | head    <span class="cm"># los números son PIDs de procesos</span>
+ls /proc/self/    <span class="cm"># tu propio proceso shell</span></pre>
+
+<div class="shot-wrap">
+<label>📷 2.2 · Captura de <span class="k">cat /proc/cpuinfo | head -10</span> y <span class="k">cat /proc/meminfo | head -5</span></label>
+<div class="shot" data-k="s2_proc"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="tip">
+<strong>Idea brutal.</strong> En Linux <em>todo es un archivo</em>: tu CPU, tu RAM, los procesos, los dispositivos USB, las cámaras... Todo se manipula con los mismos comandos (<span class="k">cat</span>, <span class="k">echo</span>, <span class="k">cp</span>) que usas para archivos normales. Eso es lo que lo hace tan potente.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 3 ============= -->
+<div class="section">
+<h2><span class="n">3</span> Añadir un disco virtual extra <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<p>Vas a simular un USB / disco externo creando un <strong>disco virtual nuevo</strong> en VirtualBox y conectándolo a cada VM. Esto es 100% reproducible y no necesita hardware.</p>
+
+<div class="pasos">
+<strong>Paso 1 · Crear el disco virtual (con las VMs apagadas)</strong>
+<ol>
+<li>VirtualBox → selecciona <strong>VM Ubuntu</strong> → Configuración → Almacenamiento.</li>
+<li>En el controlador SATA: clic en el icono <strong>añadir disco duro</strong> (verde con un +).</li>
+<li>«Crear» → tipo <strong>VDI</strong> → reservado dinámicamente → tamaño <strong>2 GB</strong> → nombre <span class="k">disco_extra.vdi</span>.</li>
+<li>Acepta y guarda la configuración.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.1 · Captura de Configuración → Almacenamiento de tu VM Ubuntu mostrando el nuevo disco SATA conectado <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_disco_vb"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Paso 2 · Detectarlo desde Ubuntu</strong>
+<p>Arranca la VM Ubuntu y en terminal:</p>
+<pre class="code">lsblk
+sudo fdisk -l 2&gt;/dev/null | grep -E "Disk /dev/sd|Disk model"</pre>
+<p>Verás <span class="k">sda</span> (tu disco original) y <span class="k">sdb</span> (el nuevo, sin particionar todavía).</p>
+</div>
+
+<div class="q">
+<label>3.2 · Tamaño que aparece para <span class="k">/dev/sdb</span> en <span class="k">lsblk</span></label>
+<input type="text" data-k="q_3_2" class="inline">
+</div>
+
+<div class="shot-wrap">
+<label>📷 3.3 · Captura de la salida de <span class="k">lsblk</span> con el nuevo disco visible <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s3_lsblk"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 4 ============= -->
+<div class="section">
+<h2><span class="n">4</span> Particionar y formatear (Linux) <span class="dur">40 min</span></h2>
+<div class="sb">
+
+<p>Vas a crear 3 particiones en <span class="k">/dev/sdb</span> con sistemas de archivos diferentes para comparar.</p>
+
+<div class="aviso">
+<strong>Antes de tocar nada:</strong> verifica que estás operando sobre <span class="k">/dev/sdb</span> y NO sobre <span class="k">/dev/sda</span>. Si te equivocas, te cargas el sistema. Confirma con <span class="k">lsblk</span> que <span class="k">sdb</span> tiene 2G y no tiene particiones aún.
+</div>
+
+<div class="pasos">
+<strong>Crear 3 particiones con cfdisk (interfaz visual de consola)</strong>
+<pre class="code">sudo cfdisk /dev/sdb</pre>
+<ol>
+<li>Selecciona <strong>gpt</strong> como tipo de tabla.</li>
+<li><strong>New</strong> → 700M → primary → Type Linux filesystem.</li>
+<li>Otra <strong>New</strong> → 700M → primary → Type Microsoft basic data.</li>
+<li>Otra <strong>New</strong> → resto → primary → Type Microsoft basic data.</li>
+<li><strong>Write</strong> → escribe «yes».</li>
+<li><strong>Quit</strong>.</li>
+</ol>
+<p>Verifica:</p>
+<pre class="code">lsblk /dev/sdb
+sudo fdisk -l /dev/sdb 2&gt;/dev/null</pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.1 · Captura de <span class="k">cfdisk</span> con las 3 particiones definidas antes de hacer Write <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_cfdisk"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Formatear cada partición</strong>
+<pre class="code">sudo mkfs.ext4 -L "DATOS_LINUX" /dev/sdb1
+sudo mkfs.exfat -L "USB_GRANDE" /dev/sdb2     <span class="cm"># si no tienes: sudo apt install exfat-fuse exfatprogs</span>
+sudo mkfs.vfat -F 32 -n "FAT32_COMPAT" /dev/sdb3
+
+<span class="cm"># Verifica</span>
+sudo blkid /dev/sdb*
+lsblk -f /dev/sdb</pre>
+</div>
+
+<div class="q">
+<label>4.2 · Pega la salida de <span class="k">sudo blkid /dev/sdb*</span></label>
+<textarea data-k="q_4_2" style="font-family:monospace;font-size:12px"></textarea>
+</div>
+
+<div class="pasos">
+<strong>Montar las particiones</strong>
+<pre class="code">sudo mkdir -p /mnt/datos_linux /mnt/usb_grande /mnt/fat32_compat
+sudo mount /dev/sdb1 /mnt/datos_linux
+sudo mount /dev/sdb2 /mnt/usb_grande
+sudo mount /dev/sdb3 /mnt/fat32_compat
+
+df -h | grep sdb</pre>
+</div>
+
+<div class="pasos">
+<strong>Escribir archivos en cada una</strong>
+<pre class="code">echo "Soy una partición ext4 de Linux" | sudo tee /mnt/datos_linux/hola.txt
+echo "Soy exFAT, compatible Win/Mac" | sudo tee /mnt/usb_grande/hola.txt
+echo "Soy FAT32, compatible con todo (4 GB max)" | sudo tee /mnt/fat32_compat/hola.txt
+
+ls -la /mnt/datos_linux /mnt/usb_grande /mnt/fat32_compat</pre>
+</div>
+
+<div class="pasos">
+<strong>Probar el límite de 4 GB de FAT32</strong>
+<pre class="code"><span class="cm"># Intenta crear un archivo de 5 GB en FAT32</span>
+sudo fallocate -l 5G /mnt/fat32_compat/grande.bin
+<span class="cm"># Falla — máximo 4 GB</span>
+
+<span class="cm"># El mismo intento en exFAT funciona</span>
+sudo fallocate -l 5G /mnt/usb_grande/grande.bin
+ls -lh /mnt/usb_grande/grande.bin</pre>
+</div>
+
+<div class="q">
+<label>4.3 · ¿Qué mensaje de error da FAT32 al intentar el archivo de 5 GB?</label>
+<textarea data-k="q_4_3"></textarea>
+</div>
+
+<div class="shot-wrap">
+<label>📷 4.4 · Captura con: <span class="k">df -h</span>, intento fallido en FAT32 y éxito en exFAT <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s4_fat_exfat"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 5 ============= -->
+<div class="section">
+<h2><span class="n">5</span> /etc/fstab: montaje automático <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Si reinicias la VM ahora mismo, las particiones <strong>se desmontan</strong>. Para que se monten solas al arrancar hay que añadirlas a <span class="k">/etc/fstab</span>.</p>
+
+<h3>Anatomía de una línea fstab</h3>
+<pre class="code">UUID=xxxx-xxxx  /mnt/datos  ext4  defaults  0  2
+   │               │         │      │       │  │
+   │               │         │      │       │  └── orden de fsck (1=raíz, 2=resto, 0=no)
+   │               │         │      │       └── dump (0 casi siempre)
+   │               │         │      └── opciones de montaje
+   │               │         └── tipo de sistema de archivos
+   │               └── punto de montaje
+   └── dispositivo (UUID es más estable que /dev/sdb1)</pre>
+
+<div class="pasos">
+<strong>Paso 1 · Conseguir los UUID</strong>
+<pre class="code">sudo blkid /dev/sdb1 /dev/sdb2 /dev/sdb3</pre>
+<p>Anota los UUID en la tabla:</p>
+</div>
+
+<table>
+<tr><th>Partición</th><th>UUID</th></tr>
+<tr><td>/dev/sdb1 (ext4)</td><td><input type="text" data-k="q_uuid_1"></td></tr>
+<tr><td>/dev/sdb2 (exFAT)</td><td><input type="text" data-k="q_uuid_2"></td></tr>
+<tr><td>/dev/sdb3 (FAT32)</td><td><input type="text" data-k="q_uuid_3"></td></tr>
+</table>
+
+<div class="pasos">
+<strong>Paso 2 · Editar fstab con cuidado</strong>
+<pre class="code">sudo cp /etc/fstab /etc/fstab.bak    <span class="cm"># SIEMPRE backup antes de tocar fstab</span>
+sudo nano /etc/fstab</pre>
+<p>Añade al final estas líneas (sustituye los UUID por los tuyos):</p>
+<pre class="code"># Disco extra - práctica UF0853
+UUID=TU-UUID-1  /mnt/datos_linux    ext4   defaults,nofail  0  2
+UUID=TU-UUID-2  /mnt/usb_grande     exfat  defaults,nofail,uid=1000,gid=1000  0  0
+UUID=TU-UUID-3  /mnt/fat32_compat   vfat   defaults,nofail,uid=1000,gid=1000  0  0</pre>
+<p><span class="k">nofail</span> es importante: si el disco no está, el sistema arranca igual. Sin <span class="k">nofail</span>, un disco que falle puede dejar el sistema sin arrancar.</p>
+</div>
+
+<div class="pasos">
+<strong>Paso 3 · Probar sin reiniciar</strong>
+<pre class="code">sudo umount /mnt/datos_linux /mnt/usb_grande /mnt/fat32_compat
+df -h | grep mnt   <span class="cm"># ya no están</span>
+
+sudo mount -a      <span class="cm"># monta todo lo de fstab</span>
+df -h | grep mnt   <span class="cm"># vuelven a estar</span></pre>
+</div>
+
+<div class="shot-wrap">
+<label>📷 5.1 · Captura del <span class="k">nano /etc/fstab</span> con tus 3 líneas añadidas <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s5_fstab"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Paso 4 · Reiniciar y comprobar</strong>
+<pre class="code">sudo reboot</pre>
+<p>Tras reiniciar, abre terminal:</p>
+<pre class="code">df -h | grep mnt</pre>
+<p>Las 3 particiones deberían aparecer montadas <em>sin que tú las hayas montado</em>.</p>
+</div>
+
+<div class="q">
+<label>5.2 · Tras el reinicio, ¿están las 3 particiones montadas? Pega la salida de <span class="k">df -h | grep mnt</span></label>
+<textarea data-k="q_5_2" style="font-family:monospace;font-size:12px"></textarea>
+</div>
+
+<div class="aviso">
+<strong>Si algo va mal:</strong> el sistema puede arrancar en modo emergencia pidiéndote la contraseña de root. Edita <span class="k">/etc/fstab</span>, comenta tus líneas con <span class="k">#</span>, guarda y reinicia. <strong>Por eso hicimos el backup.</strong> Si tienes copia en <span class="k">/etc/fstab.bak</span>: <span class="k">sudo cp /etc/fstab.bak /etc/fstab</span>.
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 6 ============= -->
+<div class="section">
+<h2><span class="n">6</span> Lo mismo en Windows · Administración de discos <span class="dur">35 min</span></h2>
+<div class="sb">
+
+<div class="pasos">
+<strong>Paso 1 · Añadir disco virtual a VM Windows</strong>
+<p>Apaga la VM Windows. En VirtualBox: Configuración → Almacenamiento → controlador SATA → añadir disco duro → Crear nuevo VDI → 2 GB → <span class="k">disco_extra_win.vdi</span>. Arranca la VM.</p>
+</div>
+
+<div class="pasos">
+<strong>Paso 2 · Detectar e inicializar</strong>
+<ol>
+<li>Clic derecho en el botón Inicio → <strong>Administración de discos</strong> (o <span class="k">diskmgmt.msc</span>).</li>
+<li>Saltará un pop-up: «Debe inicializar un disco». Elige <strong>GPT</strong> → Aceptar.</li>
+<li>Verás el disco como «No asignado» de 2 GB.</li>
+</ol>
+</div>
+
+<div class="pasos">
+<strong>Paso 3 · Crear 3 particiones</strong>
+<ol>
+<li>Clic derecho en el espacio no asignado → <strong>Nuevo volumen simple</strong>.</li>
+<li>Tamaño 700 MB → siguiente.</li>
+<li>Letra <strong>E:</strong>.</li>
+<li>Formato <strong>NTFS</strong>, etiqueta <span class="k">DATOS_WIN</span>, formato rápido. Finalizar.</li>
+<li>Repite con otros 700 MB → letra <strong>F:</strong> → formato <strong>exFAT</strong>, etiqueta <span class="k">EXFAT_WIN</span>.</li>
+<li>Repite con el resto → letra <strong>G:</strong> → formato <strong>FAT32</strong>, etiqueta <span class="k">FAT32_WIN</span>.</li>
+</ol>
+</div>
+
+<div class="shot-wrap">
+<label>📷 6.1 · Captura de Administración de discos mostrando las 3 particiones del nuevo disco con sus formatos <span style="color:#c53030">*</span></label>
+<div class="shot" data-k="s6_diskmgmt"><span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden></div>
+</div>
+
+<div class="pasos">
+<strong>Paso 4 · Probar desde el Explorador</strong>
+<ol>
+<li>Abre el Explorador. En «Este equipo» deberías ver E:, F:, G:</li>
+<li>Crea un archivo en cada una.</li>
+<li>Comprueba propiedades: clic derecho → Propiedades → pestaña General. ¿Qué sistema de archivos aparece?</li>
+</ol>
+</div>
+
+<div class="q">
+<label>6.2 · Sistema de archivos detectado por Windows en cada partición</label>
+<table>
+<tr><th>Letra</th><th>FS según Propiedades</th></tr>
+<tr><td>E:</td><td><input type="text" data-k="q_6_2a"></td></tr>
+<tr><td>F:</td><td><input type="text" data-k="q_6_2b"></td></tr>
+<tr><td>G:</td><td><input type="text" data-k="q_6_2c"></td></tr>
+</table>
+</div>
+
+<div class="pasos">
+<strong>Paso 5 · Cambiar letra de unidad</strong>
+<p>Administración de discos → clic derecho en E: → <strong>Cambiar la letra y rutas de acceso</strong> → cambia a <strong>W:</strong>. Mira el Explorador.</p>
+</div>
+
+<div class="q">
+<label>6.3 · ¿Qué utilidad tiene poder cambiar la letra de unidad? Da un caso real.</label>
+<textarea data-k="q_6_3"></textarea>
+</div>
+</div>
+</div>
+
+<!-- ============= SECCIÓN 7 ============= -->
+<div class="section">
+<h2><span class="n">7</span> Compatibilidad cruzada Windows ↔ Linux <span class="dur">25 min</span></h2>
+<div class="sb">
+
+<p>Resumen visual: qué FS lee qué SO de forma nativa.</p>
+
+<table>
+<tr><th>Sistema de archivos</th><th>Windows lo lee</th><th>Linux lo lee</th><th>macOS lo lee</th><th>Uso típico</th></tr>
+<tr><td><strong>NTFS</strong></td><td>Nativo</td><td>Sí (ntfs-3g)</td><td>Solo lectura por defecto</td><td>Disco principal Windows</td></tr>
+<tr><td><strong>FAT32</strong></td><td>Nativo</td><td>Nativo</td><td>Nativo</td><td>USB pequeños, ESP</td></tr>
+<tr><td><strong>exFAT</strong></td><td>Nativo</td><td>Sí (exfatprogs)</td><td>Nativo</td><td>USB grandes</td></tr>
+<tr><td><strong>ext4</strong></td><td>NO (necesita ext2fsd o WSL)</td><td>Nativo</td><td>No</td><td>Disco principal Linux</td></tr>
+<tr><td><strong>APFS</strong></td><td>No</td><td>Solo lectura</td><td>Nativo</td><td>Disco principal Mac</td></tr>
+</table>
+
+<div class="q">
+<label>7.1 · Tu cliente trabaja entre Windows y Mac y quiere compartir archivos enormes (más de 4 GB) en un USB. ¿Qué formato le recomiendas? ¿Por qué?</label>
+<textarea data-k="q_7_1"></textarea>
+</div>
+
+<div class="q">
+<label>7.2 · Otro cliente te trae un disco externo formateado en ext4 y quiere usarlo en Windows. Opciones que le das (no una sola, varias).</label>
+<textarea data-k="q_7_2"></textarea>
+</div>
+
+<div class="q">
+<label>7.3 · ¿Por qué FAT32, siendo el más viejo, sigue siendo el formato obligatorio de la partición EFI System Partition (ESP) en arranques UEFI modernos?</label>
+<textarea data-k="q_7_3"></textarea>
+</div>
+
+<div class="tip">
+<strong>Recordatorio.</strong> FAT32 tiene 2 limitaciones grabadas a fuego: máximo <strong>4 GB por archivo</strong> y máximo <strong>2 TB por partición</strong>. exFAT no las tiene. Si dudas entre FAT32 y exFAT en 2026: usa exFAT.
+</div>
+</div>
+</div>
+
+<!-- ============= AUTOEVAL ============= -->
+<div class="evalfin">
+<h2>✓ Autoevaluación final</h2>
+<p style="font-size:13px;color:#4a5568;margin-bottom:12px">Marca lo que has completado.</p>
+
+<div class="progress-text"><span>Progreso</span><span id="pct">0%</span></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
+
+<div style="margin-top:14px">
+<label class="check"><input type="checkbox" data-k="ev_1"> S1 · He recorrido las carpetas clave de Windows y entiendo Local/Roaming/LocalLow.</label>
+<label class="check"><input type="checkbox" data-k="ev_2"> S2 · Conozco la FHS de Linux y sé que /proc y /dev son virtuales.</label>
+<label class="check"><input type="checkbox" data-k="ev_3"> S3 · He añadido un disco virtual a la VM Ubuntu y lo veo en lsblk.</label>
+<label class="check"><input type="checkbox" data-k="ev_4"> S4 · He creado 3 particiones con ext4, exFAT y FAT32 y verificado el límite de 4 GB de FAT32.</label>
+<label class="check"><input type="checkbox" data-k="ev_5"> S5 · He configurado /etc/fstab con UUIDs y nofail; tras reboot las particiones se montan solas.</label>
+<label class="check"><input type="checkbox" data-k="ev_6"> S6 · He hecho lo mismo en Windows desde diskmgmt.msc.</label>
+<label class="check"><input type="checkbox" data-k="ev_7"> S7 · Sé qué FS elegir según el caso (NTFS / exFAT / FAT32 / ext4).</label>
+<label class="check"><input type="checkbox" data-k="ev_8"> He subido las capturas obligatorias.</label>
+<label class="check"><input type="checkbox" data-k="ev_9"> He exportado el progreso como JSON.</label>
+</div>
+
+<div class="q" style="margin-top:18px">
+<label>¿Qué te ha sorprendido más comparando ambos sistemas?</label>
+<textarea data-k="ev_reflexion" style="min-height:80px"></textarea>
+</div>
+
+<div class="q">
+<label>Nota (0–10)</label>
+<input type="text" data-k="ev_nota" class="inline">
+</div>
+</div>
+
+</div>
+<div class="footer">UF0853 · Práctica 3 de 10</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'practica_uf0853_s03_v1';
+let saveTimer;
+function autosave(){const d={};document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.classList&&el.classList.contains('shot')){if(el.dataset.img)d['img_'+k]=el.dataset.img;}else if(el.tagName==='INPUT'&&el.type==='checkbox'){d[k]=el.checked;}else if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){d[k]=el.value;}});try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));showSaved();}catch(e){}updateProgress();}
+function restore(){let raw;try{raw=localStorage.getItem(STORAGE_KEY)}catch(e){return}if(!raw)return;let d;try{d=JSON.parse(raw)}catch(e){return}Object.keys(d).forEach(k=>{if(k.startsWith('img_')){const key=k.slice(4);const el=document.querySelector('.shot[data-k="'+key+'"]');if(el)setImage(el,d[k]);return;}const el=document.querySelector('[data-k="'+k+'"]');if(!el)return;if(el.type==='checkbox')el.checked=!!d[k];else el.value=d[k]||'';});updateProgress();}
+function setImage(shot,url){shot.dataset.img=url;shot.innerHTML='<img src="'+url+'" alt="captura"><button class="x" type="button" onclick="clearImg(event,this)" title="Eliminar">×</button>';}
+function clearImg(ev,btn){ev.stopPropagation();const shot=btn.closest('.shot');delete shot.dataset.img;shot.innerHTML='<span class="ph"><b>Pega (Ctrl+V)</b>, arrastra una imagen o haz clic para seleccionar</span><input type="file" accept="image/*" hidden>';bindShot(shot);autosave();}
+function bindShot(shot){const fi=shot.querySelector('input[type=file]');shot.addEventListener('click',e=>{if(e.target.classList&&e.target.classList.contains('x'))return;if(shot.dataset.img)return;if(fi)fi.click();});if(fi){fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)loadFile(shot,f);});}shot.addEventListener('dragover',e=>{e.preventDefault();shot.classList.add('drag')});shot.addEventListener('dragleave',()=>shot.classList.remove('drag'));shot.addEventListener('drop',e=>{e.preventDefault();shot.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)loadFile(shot,f);});}
+function loadFile(shot,file){if(!file.type.startsWith('image/')){alert('Solo imágenes');return;}const r=new FileReader();r.onload=e=>{setImage(shot,e.target.result);autosave();};r.readAsDataURL(file);}
+document.addEventListener('paste',e=>{if(!e.clipboardData)return;for(let it of e.clipboardData.items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();let t=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.shot');if(!t){const ss=document.querySelectorAll('.shot');for(let s of ss){if(!s.dataset.img){t=s;break;}}}if(t){loadFile(t,f);e.preventDefault();return;}}}});
+function exportJSON(){const d=localStorage.getItem(STORAGE_KEY)||'{}';const n=(JSON.parse(d).alumno_nombre||'alumno').replace(/[^a-zA-Z0-9_-]/g,'_');const b=new Blob([d],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=STORAGE_KEY+'_'+n+'_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(d));location.reload();}catch(err){alert('JSON inválido');}};r.readAsText(f);};i.click();}
+function clearAll(){if(!confirm('¿Borrar todo el progreso?'))return;try{localStorage.removeItem(STORAGE_KEY);}catch(e){}location.reload();}
+function showSaved(){const el=document.getElementById('saved-indicator');if(!el)return;el.textContent='✓ Guardado '+new Date().toLocaleTimeString();el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),1800);}
+function updateProgress(){const evs=document.querySelectorAll('input[type=checkbox][data-k^="ev_"]');const t=evs.length,d=[...evs].filter(c=>c.checked).length;const p=t?Math.round(d/t*100):0;const b=document.getElementById('bar'),x=document.getElementById('pct');if(b)b.style.width=p+'%';if(x)x.textContent=p+'%';}
+window.addEventListener('load',()=>{document.querySelectorAll('.shot').forEach(bindShot);restore();document.body.addEventListener('input',()=>{clearTimeout(saveTimer);saveTimer=setTimeout(autosave,400)});document.body.addEventListener('change',autosave);});
+</script>
+</body>
+</html>
