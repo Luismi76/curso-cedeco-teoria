@@ -284,6 +284,17 @@ systemctl hibernate</pre>
 <pre class="code">ipconfig | findstr /C:"10.10"</pre>
 </div>
 
+<div class="nota">
+<strong>¿Windows no te deja guardar sin puerta de enlace?</strong> En algunas versiones de Windows 10/11 la interfaz gráfica obliga a rellenar el campo, aunque una red aislada no necesite puerta de enlace. Tienes tres formas de resolverlo:
+<ol style="margin:8px 0 2px 20px;line-height:1.7">
+<li><strong>Puerta de enlace ficticia (lo más sencillo):</strong> escribe <span class="k">10.10.10.1</span> como puerta de enlace. No hace falta que exista ningún equipo con esa IP; la comunicación entre las VMs sigue funcionando porque todas están en la misma subred.</li>
+<li><strong>Por PowerShell (recomendado):</strong> ábrelo como administrador y asigna la IP sin puerta de enlace:
+<pre class="code">New-NetIPAddress -InterfaceAlias "Ethernet 2" -IPAddress 10.10.10.10 -PrefixLength 24</pre>
+El <span class="k">-PrefixLength 24</span> equivale a la máscara <span class="k">255.255.255.0</span>.</li>
+<li><strong>Por el Panel de control clásico:</strong> <span class="k">Win+R</span> → <span class="k">ncpa.cpl</span> → clic derecho en <em>Ethernet 2</em> → Propiedades → <em>Protocolo de Internet versión 4 (TCP/IPv4)</em> → Propiedades → <em>Usar la siguiente dirección IP</em>. Esta ventana clásica sí suele permitir dejar la puerta de enlace en blanco.</li>
+</ol>
+</div>
+
 <h3>VM Ubuntu · IP estática (con nmcli)</h3>
 <p><span class="k">nmcli</span> es el cliente de línea de comandos de <strong>NetworkManager</strong>, el servicio que gestiona la red en Ubuntu (lo mismo que hace el icono de la barra superior, pero por consola).</p>
 <p>Primero identifica el nombre que Linux le ha dado a la nueva tarjeta (en VirtualBox suele ser <span class="k">enp0s8</span>, pero puede variar):</p>
